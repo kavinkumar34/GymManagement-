@@ -10,9 +10,18 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
-    })
-    ->withExceptions(function (Exceptions $exceptions): void {
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->alias([
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'trainer' => \App\Http\Middleware\TrainerMiddleware::class,
+    ]);
+    
+    // CRITICAL: Disable CSRF for PayU callbacks
+    $middleware->validateCsrfTokens(except: [
+        '/payment/success',
+        '/payment/failure',
+    ]);
+})
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

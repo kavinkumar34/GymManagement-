@@ -4,15 +4,14 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class Admin extends Authenticatable
 {
-    protected $table = 'users';
+    protected $table = 'admins';
     
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
     ];
     
     protected $hidden = [
