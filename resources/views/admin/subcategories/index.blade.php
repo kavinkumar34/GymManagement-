@@ -1,12 +1,12 @@
 @extends('layouts.admin-layout')
 
 @section('content')
-<div class="container-fluid">
-    <div class="card shadow-sm">
+<div class="container">
+    <div class="card shadow-sm" style="margin-left:200px;">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="fas fa-folder me-2 text-primary"></i>Categories</h5>
-            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm">
-                <i class="fas fa-plus me-1"></i> Add Category
+            <h5 class="mb-0"><i class="fas fa-folder-open me-2 text-primary"></i>Sub Categories</h5>
+            <a href="{{ route('admin.subcategories.create') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus me-1"></i> Add Sub Category
             </a>
         </div>
         <div class="card-body">
@@ -15,63 +15,63 @@
             @endif
 
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
                             <th>Image</th>
                             <th>Name</th>
-                            <th>Top Category</th>
+                            <th>Category</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($categories as $cat)
+                        @forelse($subCategories as $sub)
                         <tr>
-                            <td>{{ $cat->id }}</td>
+                            <td>{{ $sub->id }}</td>
                             <td>
-                                @if($cat->image)
-                                    <img src="{{ asset('storage/'.$cat->image) }}" style="width:40px;height:40px;object-fit:cover;" class="rounded">
+                                @if($sub->image)
+                                    <img src="{{ asset('storage/'.$sub->image) }}" style="width:40px;height:40px;object-fit:cover;" class="rounded">
                                 @else
                                     <div class="bg-secondary text-white rounded d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
                                         <i class="fas fa-folder"></i>
                                     </div>
                                 @endif
                               </td>
-                            <td><strong>{{ $cat->name }}</strong></td>
-                            <td>{{ $cat->topCategory->name ?? 'N/A' }} (@if($cat->topCategory) GST:{{ $cat->topCategory->gst_rate }}% @endif)</td>
+                            <td><strong>{{ $sub->name }}</strong></td>
+                            <td>{{ $sub->category->name ?? 'N/A' }}</td>
                             <td>
-                                <span class="badge bg-{{ $cat->is_active ? 'success' : 'secondary' }}">
-                                    {{ $cat->is_active ? 'Active' : 'Inactive' }}
+                                <span class="badge bg-{{ $sub->is_active ? 'success' : 'secondary' }}">
+                                    {{ $sub->is_active ? 'Active' : 'Inactive' }}
                                 </span>
-                              </td>
+                              </table>
                             <td>
-                                <a href="{{ route('admin.categories.edit', $cat->id) }}" class="btn btn-sm btn-outline-primary">
+                                <a href="{{ route('admin.subcategories.edit', $sub->id) }}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <button class="btn btn-sm btn-outline-danger ms-1" onclick="deleteItem({{ $cat->id }})">
+                                <button class="btn btn-sm btn-outline-danger ms-1" onclick="deleteItem({{ $sub->id }})">
                                     <i class="fas fa-trash"></i>
                                 </button>
-                                <form id="delete-form-{{ $cat->id }}" action="{{ route('admin.categories.destroy', $cat->id) }}" method="POST" style="display:none;">
+                                <form id="delete-form-{{ $sub->id }}" action="{{ route('admin.subcategories.destroy', $sub->id) }}" method="POST" style="display:none;">
                                     @csrf @method('DELETE')
                                 </form>
                               </td>
                         </tr>
                         @empty
-                        <tr><td colspan="6" class="text-center text-muted">No categories found</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted">No sub categories found</td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            {{ $categories->links() }}
+            {{ $subCategories->links() }}
         </div>
     </div>
 </div>
 
 <script>
 function deleteItem(id) {
-    if(confirm('Delete this category?')) {
+    if(confirm('Delete this sub category?')) {
         document.getElementById('delete-form-' + id).submit();
     }
 }

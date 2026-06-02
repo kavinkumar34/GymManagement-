@@ -13,32 +13,77 @@
                 <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
             </a>
         </li>
+
+        <!-- Products Dropdown -->
+        <li class="nav-item has-dropdown">
+            <a class="nav-link" href="#">
+                <i class="fas fa-box"></i> <span>Products</span>
+                <span class="dropdown-arrow">▼</span>
+            </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.products.create') }}">
+                        <i class="fas fa-plus"></i> Add Product
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.products.index') }}">
+                        <i class="fas fa-list"></i> Products List
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.categories.index') }}">
+                        <i class="fas fa-tags"></i> Categories
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.subcategories.index') }}">
+                        <i class="fas fa-folder-open"></i> Sub Categories
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.producttypes.index') }}">
+                        <i class="fas fa-tag"></i> Product Types
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.brands.index') }}">
+                        <i class="fas fa-building"></i> Brands
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.attributes.index') }}">
+                        <i class="fas fa-list-ul"></i> Attributes
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.topcategories.index') }}">
+                        <i class="fas fa-layer-group"></i> Top Categories
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.sizecharts.index') }}">
+                        <i class="fas fa-chart-line"></i> Size Charts
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Contact Messages -->
         <li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.products.create') }}">
-        <i class="fas fa-box"></i> <span>Products</span>
-    </a>
-</li>
-      <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.products') }}">
-                <i class="fas fa-list"></i> Products List
+            <a class="nav-link" href="{{ route('admin.contacts.index') }}">
+                <i class="fas fa-envelope"></i> <span>Contact Messages</span>
+                @php 
+                    use App\Models\Contact;
+                    $pendingCount = Contact::where('status', 'Pending')->count(); 
+                @endphp
+                @if($pendingCount > 0)
+                    <span class="badge bg-danger ms-2">{{ $pendingCount }}</span>
+                @endif
             </a>
         </li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.categories') }}">
-        <i class="fas fa-tags"></i> <span>Categories</span>
-    </a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.contacts') }}">
-        <i class="fas fa-envelope"></i> <span>Contact Messages</span>
-        @php $pendingCount = App\Models\Contact::where('status', 'Pending')->count(); @endphp
-        @if($pendingCount > 0)
-            <span class="badge bg-danger ms-2">{{ $pendingCount }}</span>
-        @endif
-    </a>
-</li>
 
-        <!-- Members with Hover Dropdown -->
+        <!-- Members Dropdown -->
         <li class="nav-item has-dropdown">
             <a class="nav-link" href="{{ route('admin.members') }}">
                 <i class="fas fa-users"></i> <span>Members</span>
@@ -53,7 +98,7 @@
             </ul>
         </li>
 
-        <!-- Trainers with Hover Dropdown -->
+        <!-- Trainers Dropdown -->
         <li class="nav-item has-dropdown">
             <a class="nav-link" href="{{ route('admin.trainers') }}">
                 <i class="fas fa-chalkboard-user"></i> <span>Trainers</span>
@@ -69,48 +114,40 @@
         </li>
 
         <!-- Payments -->
-     <!-- Payments -->
-<!-- Payments -->
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.payments') }}" id="paymentsNavLink" onclick="markPaymentsViewed()">
-        <i class="fas fa-credit-card"></i> <span>Payments</span>
-        @php
-            $lastViewedAt = session('payments_last_viewed_at', now()->subDays(30));
-            $newPendingOrders = App\Models\Order::where('payment_status', 'PENDING')
-                ->where('created_at', '>', $lastViewedAt)
-                ->count();
-        @endphp
-        @if($newPendingOrders > 0)
-            <span class="badge bg-danger ms-2" id="pendingBadge">{{ $newPendingOrders }}</span>
-        @endif
-    </a>
-</li>
         <li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.banners') }}">
-        <i class="fas fa-image"></i> <span>Banners</span>
-    </a>
-</li>
+            <a class="nav-link" href="{{ route('admin.payments.index') }}" id="paymentsNavLink" onclick="markPaymentsViewed()">
+                <i class="fas fa-credit-card"></i> <span>Payments</span>
+                @php
+                    use App\Models\Order;
+                    $lastViewedAt = session('payments_last_viewed_at', now()->subDays(30));
+                    $newPendingOrders = Order::where('payment_status', 'PENDING')
+                        ->where('created_at', '>', $lastViewedAt)
+                        ->count();
+                @endphp
+                @if($newPendingOrders > 0)
+                    <span class="badge bg-danger ms-2" id="pendingBadge">{{ $newPendingOrders }}</span>
+                @endif
+            </a>
+        </li>
 
-        <!-- Reports -->
-  
-        <!-- Equipment -->
-      
-
-        <!-- Notifications -->
-    
+        <!-- Banners -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.banners.index') }}">
+                <i class="fas fa-image"></i> <span>Banners</span>
+            </a>
+        </li>
 
         <!-- Settings -->
-    
         <li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.settings') }}">
-        <i class="fas fa-cog"></i> <span>Settings</span>
-    </a>
-</li>
+            <a class="nav-link" href="{{ route('admin.settings') }}">
+                <i class="fas fa-cog"></i> <span>Settings</span>
+            </a>
+        </li>
     </ul>
 
     <div class="sidebar-footer">
         <div class="user-info">
-            <i class="fas fa-user-shield"></i> {{ auth()->guard('admin')->user()->name }}
+            <i class="fas fa-user-shield"></i> {{ auth()->guard('admin')->user()->name ?? 'Admin' }}
         </div>
         <a class="logout-btn" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
             <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
@@ -121,6 +158,7 @@
 <form id="admin-logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
     @csrf
 </form>
+
 <script>
 // Function to mark payments as viewed when clicked
 function markPaymentsViewed() {
@@ -133,7 +171,6 @@ function markPaymentsViewed() {
     }).then(response => response.json())
       .then(data => {
           if (data.success) {
-              // Hide the badge
               const badge = document.getElementById('pendingBadge');
               if (badge) {
                   badge.style.display = 'none';
@@ -153,7 +190,6 @@ function checkNewOrders() {
                     badge.textContent = data.new_count;
                     badge.style.display = 'inline-block';
                 } else {
-                    // Create badge if it doesn't exist
                     const navLink = document.getElementById('paymentsNavLink');
                     if (navLink) {
                         const newBadge = document.createElement('span');
@@ -244,7 +280,6 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
         color: white;
     }
 
-    /* Dropdown Arrow */
     .dropdown-arrow {
         margin-left: auto;
         font-size: 10px;
@@ -255,14 +290,13 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
         transform: rotate(180deg);
     }
 
-    /* Custom Dropdown Menu - Appears Below */
     .dropdown-menu-custom {
         position: absolute;
         left: 0;
         top: 100%;
         background: #2d2d4a;
         border-radius: 8px;
-        min-width: 180px;
+        min-width: 200px;
         padding: 8px 0;
         margin: 0;
         list-style: none;
@@ -273,7 +307,6 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
         z-index: 1001;
     }
 
-    /* Show dropdown on hover */
     .has-dropdown:hover .dropdown-menu-custom {
         opacity: 1;
         visibility: visible;

@@ -21,6 +21,15 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TrackOrderController;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\BannerApiController;
+
+// ============ NEW CONTROLLERS ============
+use App\Http\Controllers\Admin\AttributeController;
+use App\Http\Controllers\Admin\TopCategoryController;
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\SubCategoryController;
+use App\Http\Controllers\Admin\ProductTypeController;
+use App\Http\Controllers\Admin\SizeChartController;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -83,7 +92,8 @@ Route::get('/about', function () {
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
+    
+    // ============ DASHBOARD ============
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // ============ MEMBER MANAGEMENT ROUTES ============
@@ -109,58 +119,120 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('/settings/logo', [SettingsController::class, 'uploadLogo'])->name('settings.upload.logo');
     
+// Top Category Routes
+Route::get('/topcategories', [TopCategoryController::class, 'index'])->name('topcategories.index');
+Route::get('/topcategories/create', [TopCategoryController::class, 'create'])->name('topcategories.create');
+Route::post('/topcategories', [TopCategoryController::class, 'store'])->name('topcategories.store');
+Route::get('/topcategories/{id}/edit', [TopCategoryController::class, 'edit'])->name('topcategories.edit');
+Route::put('/topcategories/{id}', [TopCategoryController::class, 'update'])->name('topcategories.update');
+Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])->name('topcategories.destroy');
+
+    // ============ BRAND MANAGEMENT ROUTES (NEW) ============
+    Route::get('/brands', [BrandController::class, 'index'])->name('brands.index');
+    Route::get('/brands/create', [BrandController::class, 'create'])->name('brands.create');
+    Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::get('/brands/{id}/edit', [BrandController::class, 'edit'])->name('brands.edit');
+    Route::put('/brands/{id}', [BrandController::class, 'update'])->name('brands.update');
+    Route::delete('/brands/{id}', [BrandController::class, 'destroy'])->name('brands.destroy');
+    
     // ============ CATEGORY MANAGEMENT ROUTES ============
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
-    Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');
+    Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/categories/{id}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     
+    // ============ SUB CATEGORY MANAGEMENT ROUTES (NEW) ============
+    Route::get('/subcategories', [SubCategoryController::class, 'index'])->name('subcategories.index');
+    Route::get('/subcategories/create', [SubCategoryController::class, 'create'])->name('subcategories.create');
+    Route::post('/subcategories', [SubCategoryController::class, 'store'])->name('subcategories.store');
+    Route::get('/subcategories/{id}/edit', [SubCategoryController::class, 'edit'])->name('subcategories.edit');
+    Route::put('/subcategories/{id}', [SubCategoryController::class, 'update'])->name('subcategories.update');
+    Route::delete('/subcategories/{id}', [SubCategoryController::class, 'destroy'])->name('subcategories.destroy');
+    
+    // ============ PRODUCT TYPE MANAGEMENT ROUTES (NEW) ============
+    Route::get('/producttypes', [ProductTypeController::class, 'index'])->name('producttypes.index');
+    Route::get('/producttypes/create', [ProductTypeController::class, 'create'])->name('producttypes.create');
+    Route::post('/producttypes', [ProductTypeController::class, 'store'])->name('producttypes.store');
+    Route::get('/producttypes/{id}/edit', [ProductTypeController::class, 'edit'])->name('producttypes.edit');
+    Route::put('/producttypes/{id}', [ProductTypeController::class, 'update'])->name('producttypes.update');
+    Route::delete('/producttypes/{id}', [ProductTypeController::class, 'destroy'])->name('producttypes.destroy');
+    
+    // ============ ATTRIBUTE MANAGEMENT ROUTES ============
+    Route::get('/attributes', [AttributeController::class, 'index'])->name('attributes.index');
+    Route::get('/attributes/create', [AttributeController::class, 'create'])->name('attributes.create');
+    Route::post('/attributes', [AttributeController::class, 'store'])->name('attributes.store');
+    Route::get('/attributes/{id}/edit', [AttributeController::class, 'edit'])->name('attributes.edit');
+    Route::put('/attributes/{id}', [AttributeController::class, 'update'])->name('attributes.update');
+    Route::delete('/attributes/{id}', [AttributeController::class, 'destroy'])->name('attributes.destroy');
+    
+    // ============ SIZE CHART MANAGEMENT ROUTES (NEW) ============
+    Route::get('/sizecharts', [SizeChartController::class, 'index'])->name('sizecharts.index');
+    Route::get('/sizecharts/create', [SizeChartController::class, 'create'])->name('sizecharts.create');
+    Route::post('/sizecharts', [SizeChartController::class, 'store'])->name('sizecharts.store');
+    Route::get('/sizecharts/{id}/edit', [SizeChartController::class, 'edit'])->name('sizecharts.edit');
+    Route::put('/sizecharts/{id}', [SizeChartController::class, 'update'])->name('sizecharts.update');
+    Route::delete('/sizecharts/{id}', [SizeChartController::class, 'destroy'])->name('sizecharts.destroy');
+    
+    // ============ PRODUCT MANAGEMENT ROUTES ============
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+
     // ============ QUICK ADD CATEGORY (AJAX) ============
     Route::post('/categories/quick-store', [CategoryController::class, 'quickStore'])->name('categories.quick.store');
     
     // ============ VIEW PRODUCTS IN CATEGORY ============
     Route::get('/categories/{id}/products', [CategoryController::class, 'showProducts'])->name('categories.products');
     
-    // ============ PRODUCT MANAGEMENT ROUTES ============
-    Route::get('/products', [ProductController::class, 'index'])->name('products');
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
-    Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
-    Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
-
+    // ============ AJAX ROUTES FOR DYNAMIC FORMS (NEW) ============
+    // Categories by Top Category
+    Route::get('/get-categories/{topId}', [CategoryController::class, 'getByTopCategory'])->name('get.categories');
+    
+    // Sub Categories by Category
+    Route::get('/get-subcategories/{categoryId}', [SubCategoryController::class, 'getByCategory'])->name('get.subcategories');
+    
+    // Product Types by Sub Category
+    Route::get('/get-producttypes/{subCategoryId}', [ProductTypeController::class, 'getBySubCategory'])->name('get.producttypes');
+    
+    // Category Attributes
+    Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
+    
+    // Sub Category Attributes
+    Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
+    
+    // Stock Update (AJAX)
+    Route::post('/update-stock', [ProductController::class, 'updateStock'])->name('update.stock');
+    
     // ============ CONTACT MANAGEMENT ROUTES ============
-    Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts');
+    Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
     Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('contacts.show');
     Route::delete('/contacts/{id}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
     Route::post('/contacts/{id}/status', [AdminContactController::class, 'updateStatus'])->name('contacts.status');
     
     // ============ BANNER MANAGEMENT ROUTES ============
-    Route::get('/banners', [BannerController::class, 'index'])->name('banners');
+    Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
     Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
-    Route::post('/banners/store', [BannerController::class, 'store'])->name('banners.store');
+    Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
     Route::get('/banners/{id}/edit', [BannerController::class, 'edit'])->name('banners.edit');
     Route::put('/banners/{id}', [BannerController::class, 'update'])->name('banners.update');
     Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
     
     // ============ PAYMENT/ORDER MANAGEMENT ROUTES ============
-    // Note: Route order matters - specific routes before parameter routes
-    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments');
+    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/create', [AdminPaymentController::class, 'create'])->name('payments.create');
-    Route::post('/payments/store', [AdminPaymentController::class, 'store'])->name('payments.store');
+    Route::post('/payments', [AdminPaymentController::class, 'store'])->name('payments.store');
     Route::get('/payments/{id}/edit', [AdminPaymentController::class, 'edit'])->name('payments.edit');
     Route::put('/payments/{id}', [AdminPaymentController::class, 'update'])->name('payments.update');
     Route::delete('/payments/{id}', [AdminPaymentController::class, 'destroy'])->name('payments.destroy');
     Route::post('/payments/{id}/status', [AdminPaymentController::class, 'updateStatus'])->name('payments.status');
-    
-    // ============ PAYMENT BADGE AJAX ROUTES ============
     Route::post('/payments/mark-viewed', [AdminPaymentController::class, 'markViewed'])->name('payments.mark-viewed');
     Route::get('/payments/check-new', [AdminPaymentController::class, 'getNewOrdersCount'])->name('payments.check-new');
-    
-    // This route must be last in the payments group (catches specific ID after other routes)
     Route::get('/payments/{id}', [AdminPaymentController::class, 'show'])->name('payments.show');
 });
 
