@@ -31,8 +31,8 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         height: 100%;
         position: relative;
-        background: white;  
-    }   
+        background: white;
+    }
     
     .product-card:hover {
         transform: translateY(-10px);
@@ -43,6 +43,44 @@
         height: 200px;
         object-fit: cover;
         width: 100%;
+    }
+    
+    /* Product Image Slider Styles */
+    .product-image-slider {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .product-image-slider .carousel-control-prev,
+    .product-image-slider .carousel-control-next {
+        opacity: 0;
+        transition: opacity 0.3s;
+        width: 30px;
+        height: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.5);
+        border-radius: 50%;
+    }
+    
+    .product-card:hover .product-image-slider .carousel-control-prev,
+    .product-card:hover .product-image-slider .carousel-control-next {
+        opacity: 1;
+    }
+    
+    .product-image-slider .carousel-control-prev {
+        left: 5px;
+    }
+    
+    .product-image-slider .carousel-control-next {
+        right: 5px;
+    }
+    
+    .product-image-slider .carousel-control-prev-icon,
+    .product-image-slider .carousel-control-next-icon {
+        background-size: 60%;
+        width: 15px;
+        height: 15px;
     }
     
     .product-price {
@@ -241,72 +279,71 @@
         color: #000000 !important;
     }
     
-    /* Best Sellers List */
-    .best-sellers-list .badge-warning {
-        background-color: #dc3545 !important;
+    /* Banner Slider Styles */
+    .banner-slider {
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        width: 100%;
+        position: relative;
+        left: 0;
+        right: 0;
     }
     
-   /* Banner Slider Styles - Full Width */
-.banner-slider {
-    margin: 0 !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    width: 100%;
-    position: relative;
-    left: 0;
-    right: 0;
-}
-.banner-slider .carousel-item {
-    height: 450px;
-    width: 100%;
-}
-.banner-slider .carousel-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.banner-caption {
-    position: absolute;
-    bottom: 20%;
-    left: 10%;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    background: rgba(0,0,0,0.4);
-    padding: 15px 25px;
-    border-radius: 10px;
-}
-.banner-caption h3 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-.banner-caption p {
-    font-size: 1.2rem;
-    margin-bottom: 0;
-}
-@media (max-width: 768px) {
     .banner-slider .carousel-item {
-        height: 250px;
+        height: 450px;
+        width: 100%;
     }
+    
+    .banner-slider .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
     .banner-caption {
-        bottom: 10%;
-        left: 5%;
-        padding: 8px 15px;
+        position: absolute;
+        bottom: 20%;
+        left: 10%;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.4);
+        padding: 15px 25px;
+        border-radius: 10px;
     }
+    
     .banner-caption h3 {
-        font-size: 1rem;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
+    
     .banner-caption p {
-        font-size: 0.7rem;
+        font-size: 1.2rem;
+        margin-bottom: 0;
     }
-}
+    
+    @media (max-width: 768px) {
+        .banner-slider .carousel-item {
+            height: 250px;
+        }
+        .banner-caption {
+            bottom: 10%;
+            left: 5%;
+            padding: 8px 15px;
+        }
+        .banner-caption h3 {
+            font-size: 1rem;
+        }
+        .banner-caption p {
+            font-size: 0.7rem;
+        }
+    }
 </style>
 
-
 <!-- Banner Slider Section -->
-<!-- Banner Slider Section - Full Width -->
 <div id="bannerSlider" class="carousel slide banner-slider" data-bs-ride="carousel" style="margin: 0; padding: 0; width: 100%;">
     <div class="carousel-inner" id="bannerContainer" style="width: 100%;">
         <div class="carousel-item active">
@@ -323,14 +360,10 @@
     </button>
 </div>
 
-
-
 <!-- Category Section -->
 <div class="container mt-4">
     <h2 class="text-center mb-4" style="color: #000000;">Shop by Category</h2>
-    <div class="row" id="categoryContainer">
-        <!-- Categories will be loaded here dynamically -->
-    </div>
+    <div class="row" id="categoryContainer"></div>
 </div>
 
 <!-- Products Section -->
@@ -345,9 +378,7 @@
         <p>Loading products...</p>
     </div>
     
-    <div class="row" id="productsContainer">
-        <!-- Products will be loaded here dynamically from database -->
-    </div>
+    <div class="row" id="productsContainer"></div>
 </div>
 
 <!-- Best Sellers List -->
@@ -356,78 +387,44 @@
         <div class="card-header best-sellers-header">
             <h4 class="mb-0"><i class="fas fa-trophy"></i> Best Selling Products</h4>
         </div>
-        <div class="card-body" id="bestSellersList">
-            <!-- Best sellers will be loaded here -->
-        </div>
+        <div class="card-body" id="bestSellersList"></div>
     </div>
 </div>
 
-<style>
-    .hero-section {
-        background: #000000;
-        border-radius: 0 0 50px 50px;
-        margin-top: -20px;
-    }
-    .card {
-        transition: transform 0.3s;
-        border: none;
-        border-radius: 15px;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-</style>
-
 <script>
     // Banner loading function
-// Banner loading function
-async function loadBanners() {
-    try {
-        const response = await fetch('/api/banners');
-        const banners = await response.json();
-        
-        const bannerContainer = document.getElementById('bannerContainer');
-        
-        if (!bannerContainer) return;
-        
-        if (banners.length === 0) {
-            bannerContainer.innerHTML = '<div class="carousel-item active"><div style="height:450px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;width:100%;"><i class="fas fa-image fa-2x"></i> <span class="ms-2">No Banners Available</span></div></div>';
-            return;
+    async function loadBanners() {
+        try {
+            const response = await fetch('/api/banners');
+            const banners = await response.json();
+            const bannerContainer = document.getElementById('bannerContainer');
+            if (!bannerContainer) return;
+            
+            if (banners.length === 0) {
+                bannerContainer.innerHTML = '<div class="carousel-item active"><div style="height:450px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;width:100%;"><i class="fas fa-image fa-2x"></i> <span class="ms-2">No Banners Available</span></div></div>';
+                return;
+            }
+            
+            let bannerHtml = '';
+            banners.forEach((banner, index) => {
+                bannerHtml += `
+                    <div class="carousel-item ${index === 0 ? 'active' : ''}" style="width:100%;">
+                        ${banner.link ? `<a href="${banner.link}" target="_blank" style="display:block;width:100%;">` : ''}
+                            <img src="${banner.image_url}" alt="Banner" style="width:100%; height:450px; object-fit:cover;">
+                        ${banner.link ? `</a>` : ''}
+                    </div>
+                `;
+            });
+            bannerContainer.innerHTML = bannerHtml;
+        } catch (error) {
+            console.error('Error loading banners:', error);
         }
-        
-        let bannerHtml = '';
-        banners.forEach((banner, index) => {
-            bannerHtml += `
-                <div class="carousel-item ${index === 0 ? 'active' : ''}" style="width:100%;">
-                    ${banner.link ? `<a href="${banner.link}" target="_blank" style="display:block;width:100%;">` : ''}
-                        <img src="${banner.image_url}" alt="Banner" style="width:100%; height:450px; object-fit:cover;">
-                    ${banner.link ? `</a>` : ''}
-                </div>
-            `;
-        });
-        bannerContainer.innerHTML = bannerHtml;
-    } catch (error) {
-        console.error('Error loading banners:', error);
-    }
-}
-
-// Load banners on page load
-if (document.getElementById('bannerContainer')) {
-    loadBanners();
-}
-
-    
-    function escapeHtmlBanner(text) {
-        if (!text) return '';
-        return text.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
     }
 
-    // THIS FUNCTION MUST RUN ON EVERY PAGE - CHECK PERMANENT HIDE FLAG
+    if (document.getElementById('bannerContainer')) {
+        loadBanners();
+    }
+
     function checkAndHideWishlistCountIfViewed() {
         let permanentHide = localStorage.getItem('wishlist_permanent_hide') === 'true';
         let wishlistCountElement = document.getElementById('navbarWishlistCount');
@@ -447,13 +444,9 @@ if (document.getElementById('bannerContainer')) {
         }
     }
 
-    // Cart array to store items
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    
-    // Wishlist array
     let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
     
-    // Update cart count display
     function updateCartCount() {
         let count = cart.reduce((total, item) => total + item.quantity, 0);
         let cartCountElement = document.getElementById('navbarCartCount');
@@ -465,12 +458,8 @@ if (document.getElementById('bannerContainer')) {
                 cartCountElement.classList.add('hide-badge');
             }
         }
-        document.querySelectorAll('.cart-count').forEach(el => {
-            el.textContent = count;
-        });
     }
     
-    // Update wishlist count in navbar
     function updateWishlistCount() {
         let count = wishlist.length;
         let wishlistCountElement = document.getElementById('navbarWishlistCount');
@@ -485,7 +474,6 @@ if (document.getElementById('bannerContainer')) {
         }
     }
     
-    // Load wishlist status on page load
     function loadWishlistStatus() {
         wishlist.forEach(item => {
             const icon = document.getElementById(`wishlist-icon-${item.id}`);
@@ -495,7 +483,6 @@ if (document.getElementById('bannerContainer')) {
         });
     }
     
-    // Toggle wishlist
     function toggleWishlist(id, name, price, image) {
         @if(!auth()->check())
             if(confirm('Please login to add items to wishlist. Go to login page?')) {
@@ -539,7 +526,6 @@ if (document.getElementById('bannerContainer')) {
         }
     }
     
-    // Add to cart function
     function addToCart(id, name, price, imageUrl) {
         @if(!auth()->check())
             if(confirm('Please login to add products to cart. Go to login page?')) {
@@ -577,7 +563,6 @@ if (document.getElementById('bannerContainer')) {
         showNotification(name + ' added to cart!', 'success');
     }
     
-    // Buy Now function
     function buyNow(productId, productName, productPrice) {
         @if(!auth()->check())
             if(confirm('Please login to purchase. Go to login page?')) {
@@ -612,7 +597,6 @@ if (document.getElementById('bannerContainer')) {
         form.submit();
     }
     
-    // Show notification
     function showNotification(message, type) {
         let notification = document.createElement('div');
         notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'info') + ' alert-dismissible fade show';
@@ -652,7 +636,7 @@ if (document.getElementById('bannerContainer')) {
         }
     }
     
-    // Load products from database
+    // Load products from database with image slider - Click goes to product detail page
     async function loadProducts() {
         const loader = document.getElementById('productsLoader');
         const container = document.getElementById('productsContainer');
@@ -673,30 +657,67 @@ if (document.getElementById('bannerContainer')) {
                 const displayPrice = product.discount_price ? product.discount_price : product.price;
                 const oldPriceHtml = product.discount_price ? `<span class="product-old-price">₹${parseFloat(product.price).toLocaleString()}</span>` : '';
                 const discountBadge = product.discount_price ? `<div class="discount-badge">-${discountPercent}%</div>` : '';
-                const imageUrl = product.image ? '/storage/' + product.image : 'https://via.placeholder.com/300x200?text=No+Image';
+                
+                let images = [];
+                if (product.image) {
+                    images.push(product.image);
+                }
+                if (product.gallery_images && product.gallery_images.length) {
+                    images = [...images, ...product.gallery_images];
+                }
+                
+                if (images.length === 0) {
+                    images = ['https://via.placeholder.com/300x300?text=No+Image'];
+                }
+                
+                const imageUrls = images.map(img => img.startsWith('http') ? img : '/storage/' + img);
+                const carouselId = `productCarousel-${product.id}`;
                 const isInWishlist = wishlist.some(item => item.id === product.id);
                 const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
+                const escapeName = product.name.replace(/'/g, "\\'");
                 
                 return `
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card card">
                             ${discountBadge}
-                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${product.name}', ${displayPrice}, '${imageUrl}')">
+                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrls[0]}')">
                                 <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
                             </button>
-                            <img src="${imageUrl}" class="product-image" alt="${product.name}">
+                            
+                            <div id="${carouselId}" class="carousel slide product-image-slider" data-bs-ride="false">
+                                <div class="carousel-inner">
+                                    ${imageUrls.map((imgUrl, idx) => `
+                                        <div class="carousel-item ${idx === 0 ? 'active' : ''}">
+                                            <a href="/product/${product.id}" style="display: block; text-decoration: none;">
+                                                <img src="${imgUrl}" class="d-block w-100 product-image" alt="${product.name}" style="height: 200px; object-fit: cover; cursor: pointer;">
+                                            </a>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                ${imageUrls.length > 1 ? `
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#${carouselId}" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon"></span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#${carouselId}" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon"></span>
+                                    </button>
+                                ` : ''}
+                            </div>
+                            
                             <div class="card-body text-center">
-                                <h5 class="card-title">${product.name}</h5>
+                                <a href="/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                    <h5 class="card-title">${product.name}</h5>
+                                </a>
                                 <p class="text-muted">${product.category ? product.category.name : 'Uncategorized'}</p>
                                 <div>
                                     ${oldPriceHtml}
                                     <span class="product-price">₹${parseFloat(displayPrice).toLocaleString()}</span>
                                 </div>
                                 <div class="product-actions">
-                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${product.name}', ${displayPrice})">
+                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrls[0]}')">
                                         <i class="fas fa-shopping-cart"></i> Add
                                     </button>
-                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${product.name}', ${displayPrice})">
+                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice})">
                                         <i class="fas fa-bolt"></i> Buy Now
                                     </button>
                                 </div>
@@ -705,7 +726,9 @@ if (document.getElementById('bannerContainer')) {
                     </div>
                 `;
             }).join('');
+            
             loadWishlistStatus();
+            
         } catch (error) {
             console.error('Error loading products:', error);
             if (loader) loader.style.display = 'none';
@@ -774,23 +797,28 @@ if (document.getElementById('bannerContainer')) {
                 const imageUrl = product.image ? '/storage/' + product.image : 'https://via.placeholder.com/300x200?text=No+Image';
                 const isInWishlist = wishlist.some(item => item.id === product.id);
                 const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
+                const escapeName = product.name.replace(/'/g, "\\'");
                 
                 return `
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card card">
-                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${product.name}', ${displayPrice}, '${imageUrl}')">
+                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
                                 <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
                             </button>
-                            <img src="${imageUrl}" class="product-image" alt="${product.name}">
+                            <a href="/product/${product.id}" style="display: block;">
+                                <img src="${imageUrl}" class="product-image" alt="${product.name}" style="height: 200px; object-fit: cover; width: 100%;">
+                            </a>
                             <div class="card-body text-center">
-                                <h5 class="card-title">${product.name}</h5>
+                                <a href="/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                    <h5 class="card-title">${product.name}</h5>
+                                </a>
                                 <p class="text-muted">${product.category ? product.category.name : 'Uncategorized'}</p>
                                 <span class="product-price">₹${parseFloat(displayPrice).toLocaleString()}</span>
                                 <div class="product-actions mt-3">
-                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${product.name}', ${displayPrice})">
+                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
                                         <i class="fas fa-shopping-cart"></i> Add to Cart
                                     </button>
-                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${product.name}', ${displayPrice})">
+                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice})">
                                         <i class="fas fa-bolt"></i> Buy Now
                                     </button>
                                 </div>
@@ -827,22 +855,27 @@ if (document.getElementById('bannerContainer')) {
                 const imageUrl = product.image ? '/storage/' + product.image : 'https://via.placeholder.com/300x200?text=No+Image';
                 const isInWishlist = wishlist.some(item => item.id === product.id);
                 const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
+                const escapeName = product.name.replace(/'/g, "\\'");
                 
                 return `
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card card">
-                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${product.name}', ${displayPrice}, '${imageUrl}')">
+                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
                                 <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
                             </button>
-                            <img src="${imageUrl}" class="product-image" alt="${product.name}">
+                            <a href="/product/${product.id}" style="display: block;">
+                                <img src="${imageUrl}" class="product-image" alt="${product.name}" style="height: 200px; object-fit: cover; width: 100%;">
+                            </a>
                             <div class="card-body text-center">
-                                <h5 class="card-title">${product.name}</h5>
+                                <a href="/product/${product.id}" style="text-decoration: none; color: inherit;">
+                                    <h5 class="card-title">${product.name}</h5>
+                                </a>
                                 <span class="product-price">₹${parseFloat(displayPrice).toLocaleString()}</span>
                                 <div class="product-actions mt-3">
-                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${product.name}', ${displayPrice})">
+                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
                                         <i class="fas fa-shopping-cart"></i> Add to Cart
                                     </button>
-                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${product.name}', ${displayPrice})">
+                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice})">
                                         <i class="fas fa-bolt"></i> Buy Now
                                     </button>
                                 </div>

@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\SizeChartController;
+use App\Http\Controllers\ProductDetailController;  // ADD THIS LINE
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -37,6 +38,9 @@ use Illuminate\Http\Request;
 Route::get('/', function () {
     return view('home');
 })->name('home');
+
+// ============ PRODUCT DETAIL PAGE (MUST BE OUTSIDE ADMIN GROUP) ============
+Route::get('/product/{id}', [ProductDetailController::class, 'show'])->name('product.show');
 
 // ============ CAPTCHA ============
 Route::get('/captcha', [CaptchaController::class, 'generate']);
@@ -119,15 +123,15 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('/settings/logo', [SettingsController::class, 'uploadLogo'])->name('settings.upload.logo');
     
-// Top Category Routes
-Route::get('/topcategories', [TopCategoryController::class, 'index'])->name('topcategories.index');
-Route::get('/topcategories/create', [TopCategoryController::class, 'create'])->name('topcategories.create');
-Route::post('/topcategories', [TopCategoryController::class, 'store'])->name('topcategories.store');
-Route::get('/topcategories/{id}/edit', [TopCategoryController::class, 'edit'])->name('topcategories.edit');
-Route::put('/topcategories/{id}', [TopCategoryController::class, 'update'])->name('topcategories.update');
-Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])->name('topcategories.destroy');
+    // Top Category Routes
+    Route::get('/topcategories', [TopCategoryController::class, 'index'])->name('topcategories.index');
+    Route::get('/topcategories/create', [TopCategoryController::class, 'create'])->name('topcategories.create');
+    Route::post('/topcategories', [TopCategoryController::class, 'store'])->name('topcategories.store');
+    Route::get('/topcategories/{id}/edit', [TopCategoryController::class, 'edit'])->name('topcategories.edit');
+    Route::put('/topcategories/{id}', [TopCategoryController::class, 'update'])->name('topcategories.update');
+    Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])->name('topcategories.destroy');
 
-    // ============ BRAND MANAGEMENT ROUTES (NEW) ============
+    // ============ BRAND MANAGEMENT ROUTES ============
     Route::get('/brands', [BrandController::class, 'index'])->name('brands.index');
     Route::get('/brands/create', [BrandController::class, 'create'])->name('brands.create');
     Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
@@ -143,7 +147,7 @@ Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])-
     Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     
-    // ============ SUB CATEGORY MANAGEMENT ROUTES (NEW) ============
+    // ============ SUB CATEGORY MANAGEMENT ROUTES ============
     Route::get('/subcategories', [SubCategoryController::class, 'index'])->name('subcategories.index');
     Route::get('/subcategories/create', [SubCategoryController::class, 'create'])->name('subcategories.create');
     Route::post('/subcategories', [SubCategoryController::class, 'store'])->name('subcategories.store');
@@ -151,7 +155,7 @@ Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])-
     Route::put('/subcategories/{id}', [SubCategoryController::class, 'update'])->name('subcategories.update');
     Route::delete('/subcategories/{id}', [SubCategoryController::class, 'destroy'])->name('subcategories.destroy');
     
-    // ============ PRODUCT TYPE MANAGEMENT ROUTES (NEW) ============
+    // ============ PRODUCT TYPE MANAGEMENT ROUTES ============
     Route::get('/producttypes', [ProductTypeController::class, 'index'])->name('producttypes.index');
     Route::get('/producttypes/create', [ProductTypeController::class, 'create'])->name('producttypes.create');
     Route::post('/producttypes', [ProductTypeController::class, 'store'])->name('producttypes.store');
@@ -167,7 +171,7 @@ Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])-
     Route::put('/attributes/{id}', [AttributeController::class, 'update'])->name('attributes.update');
     Route::delete('/attributes/{id}', [AttributeController::class, 'destroy'])->name('attributes.destroy');
     
-    // ============ SIZE CHART MANAGEMENT ROUTES (NEW) ============
+    // ============ SIZE CHART MANAGEMENT ROUTES ============
     Route::get('/sizecharts', [SizeChartController::class, 'index'])->name('sizecharts.index');
     Route::get('/sizecharts/create', [SizeChartController::class, 'create'])->name('sizecharts.create');
     Route::post('/sizecharts', [SizeChartController::class, 'store'])->name('sizecharts.store');
@@ -190,20 +194,11 @@ Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])-
     // ============ VIEW PRODUCTS IN CATEGORY ============
     Route::get('/categories/{id}/products', [CategoryController::class, 'showProducts'])->name('categories.products');
     
-    // ============ AJAX ROUTES FOR DYNAMIC FORMS (NEW) ============
-    // Categories by Top Category
+    // ============ AJAX ROUTES FOR DYNAMIC FORMS ============
     Route::get('/get-categories/{topId}', [CategoryController::class, 'getByTopCategory'])->name('get.categories');
-    
-    // Sub Categories by Category
     Route::get('/get-subcategories/{categoryId}', [SubCategoryController::class, 'getByCategory'])->name('get.subcategories');
-    
-    // Product Types by Sub Category
     Route::get('/get-producttypes/{subCategoryId}', [ProductTypeController::class, 'getBySubCategory'])->name('get.producttypes');
-    
-    // Category Attributes
     Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
-    
-    // Sub Category Attributes
     Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
     
     // Stock Update (AJAX)

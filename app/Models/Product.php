@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Models\Product;
+use App\Models\ProductVariant;
 class Product extends Model
 {
     use SoftDeletes;
@@ -15,11 +16,10 @@ class Product extends Model
         'name', 'slug', 'sku', 'top_category_id', 'brand_id',
         'category_id', 'sub_category_id', 'product_type_id', 'size_chart_id',
         'price', 'discount_price', 'mrp', 'gst_percentage', 'stock', 'min_stock_alert',
-        'weight', 'weight_unit', 'dimensions', 'image', 'video_url',
-        'description', 'short_description', 'attributes', 'shipping_info', 'return_policy',
+        'weight', 'weight_unit', 'dimensions', 'image',
+        'description', 'short_description',
         'is_featured', 'is_best_seller', 'is_new_arrival', 'is_trending',
         'status', 'return_days', 'warranty_months',
-        'meta_title', 'meta_description', 'meta_keywords',
         'description_title', 'description_details'
     ];
     

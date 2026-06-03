@@ -11,18 +11,16 @@ use App\Models\ProductType;
 use App\Models\SizeChart;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\VariantSize;
 use App\Models\Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'subCategory', 'topCategory'])
+        $products = Product::with(['category', 'subCategory', 'topCategory', 'variants'])
             ->orderBy('id', 'desc')
             ->paginate(15);
         return view('admin.products.index', compact('products'));
@@ -30,7 +28,6 @@ class ProductController extends Controller
 
     public function create()
     {
-        // Get all data for dropdowns
         $topCategories = TopCategory::where('is_active', 1)->get();
         $brands = Brand::where('is_active', 1)->get();
         $sizeCharts = SizeChart::all();
@@ -43,10 +40,10 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // Log incoming request
-        \Log::info('Product Store Request', $request->all());
+        // Ensure stock is not negative
+        $stock = max(0, $request->stock);
         
-        // Validation - only required fields
+        // Validate
         $request->validate([
             'name' => 'required|string|max:255',
             'top_category_id' => 'required|exists:top_categories,id',
@@ -54,78 +51,83 @@ class ProductController extends Controller
             'sub_category_id' => 'required|exists:sub_categories,id',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'images' => 'required|array|min:1|max:4',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        DB::beginTransaction();
-        
         try {
-            // Handle main image
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('products', 'public');
-                \Log::info('Image uploaded: ' . $imagePath);
+            // Handle images - First image becomes main image
+            $mainImagePath = null;
+            
+            if ($request->hasFile('images')) {
+                $images = $request->file('images');
+                foreach ($images as $index => $image) {
+                    if ($image && $image->isValid()) {
+                        $path = $image->store('products', 'public');
+                        if ($index == 0) {
+                            $mainImagePath = $path;
+                        }
+                    }
+                }
+            }
+
+            // If no images found, return error
+            if (!$mainImagePath) {
+                return back()->with('error', 'Please upload at least one valid image.')->withInput();
             }
 
             // Generate SKU
             $sku = 'GYM-' . strtoupper(Str::random(8));
-            
-            // Create product - using only columns that exist in your table
-            $product = new Product();
-            $product->name = $request->name;
-            $product->slug = Str::slug($request->name) . '-' . time();
-            $product->sku = $sku;
-            $product->top_category_id = $request->top_category_id;
-            $product->brand_id = $request->brand_id ?? null;
-            $product->category_id = $request->category_id;
-            $product->sub_category_id = $request->sub_category_id;
-            $product->product_type_id = $request->product_type_id ?? null;
-            $product->size_chart_id = $request->size_chart_id ?? null;
-            $product->price = $request->price;
-            $product->discount_price = $request->discount_price ?? null;
-            $product->mrp = $request->mrp ?? null;
-            $product->stock = $request->stock;
-            $product->image = $imagePath;
-            $product->description_title = $request->description_title ?? null;
-            $product->description_details = $request->description_details ?? null;
-            $product->short_description = $request->short_description ?? null;
-            $product->description = $request->description ?? null;
-            $product->is_featured = $request->has('is_featured') ? 1 : 0;
-            $product->is_best_seller = $request->has('is_best_seller') ? 1 : 0;
-            $product->is_new_arrival = $request->has('is_new_arrival') ? 1 : 0;
-            $product->is_trending = $request->has('is_trending') ? 1 : 0;
-            $product->status = $request->status ?? 'Draft';
-            $product->return_days = $request->return_days ?? 30;
-            $product->warranty_months = $request->warranty_months ?? 0;
-            $product->gst_percentage = $request->gst_percentage ?? 0;
-            $product->min_stock_alert = $request->min_stock_alert ?? 5;
-            $product->weight = $request->weight ?? null;
-            $product->weight_unit = $request->weight_unit ?? 'kg';
-            $product->dimensions = $request->dimensions ?? null;
-            
-            $product->save();
-            
-            \Log::info('Product saved with ID: ' . $product->id);
-            
-            // Save gallery images if any
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $index => $image) {
-                    $galleryPath = $image->store('product_gallery', 'public');
-                    \Log::info('Gallery image saved: ' . $galleryPath);
-                    // You can create a ProductImage model here if needed
+
+            // Create product
+            $product = Product::create([
+                'name' => $request->name,
+                'slug' => Str::slug($request->name) . '-' . time(),
+                'sku' => $sku,
+                'top_category_id' => $request->top_category_id,
+                'brand_id' => $request->brand_id,
+                'category_id' => $request->category_id,
+                'sub_category_id' => $request->sub_category_id,
+                'product_type_id' => $request->product_type_id,
+                'size_chart_id' => $request->size_chart_id,
+                'price' => $request->price,
+                'discount_price' => $request->discount_price,
+                'mrp' => $request->mrp,
+                'stock' => $stock,
+                'image' => $mainImagePath,
+                'short_description' => $request->short_description,
+                'description' => $request->description,
+                'is_featured' => $request->has('is_featured') ? 1 : 0,
+                'is_best_seller' => $request->has('is_best_seller') ? 1 : 0,
+                'is_new_arrival' => $request->has('is_new_arrival') ? 1 : 0,
+                'is_trending' => $request->has('is_trending') ? 1 : 0,
+                'status' => $request->status ?? 'Draft',
+                'return_days' => $request->return_days ?? 30,
+                'warranty_months' => $request->warranty_months ?? 0,
+                'gst_percentage' => $request->gst_percentage ?? 0,
+                'min_stock_alert' => $request->min_stock_alert ?? 5,
+                'weight' => $request->weight,
+                'weight_unit' => $request->weight_unit ?? 'kg',
+                'dimensions' => $request->dimensions,
+            ]);
+
+            // Save variants (for clothing products)
+            if ($request->has('variants') && is_array($request->variants)) {
+                foreach ($request->variants as $variantData) {
+                    if (!empty($variantData['color']) || !empty($variantData['size'])) {
+                        ProductVariant::create([
+                            'product_id' => $product->id,
+                            'color' => $variantData['color'] ?? 'Default',
+                            'images' => null,
+                        ]);
+                    }
                 }
             }
 
-            DB::commit();
-            
             return redirect()->route('admin.products.index')
                 ->with('success', 'Product "' . $product->name . '" created successfully!');
                 
         } catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Product Save Error: ' . $e->getMessage());
-            \Log::error('Error Line: ' . $e->getLine());
-            \Log::error('Error File: ' . $e->getFile());
-            
             return back()->with('error', 'Error: ' . $e->getMessage())->withInput();
         }
     }
@@ -173,8 +175,6 @@ class ProductController extends Controller
             'discount_price' => $request->discount_price,
             'mrp' => $request->mrp,
             'stock' => $request->stock,
-            'description_title' => $request->description_title,
-            'description_details' => $request->description_details,
             'short_description' => $request->short_description,
             'description' => $request->description,
             'is_featured' => $request->has('is_featured') ? 1 : 0,
@@ -197,10 +197,6 @@ class ProductController extends Controller
         }
         
         $product->delete();
-        
-        if (request()->ajax()) {
-            return response()->json(['success' => true]);
-        }
         
         return redirect()->route('admin.products.index')
             ->with('success', 'Product deleted successfully!');
@@ -235,31 +231,8 @@ class ProductController extends Controller
         return response()->json($productTypes);
     }
 
-    public function getCategoryAttributes($categoryId)
-    {
-        $attributes = Attribute::whereHas('categories', function($q) use ($categoryId) {
-            $q->where('category_id', $categoryId);
-        })->with('values')->get();
-        
-        return response()->json($attributes);
-    }
-
-    public function getSubCategoryAttributes($subCategoryId)
-    {
-        $attributes = Attribute::whereHas('subCategories', function($q) use ($subCategoryId) {
-            $q->where('sub_category_id', $subCategoryId);
-        })->with('values')->get();
-        
-        return response()->json($attributes);
-    }
-
     public function updateStock(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'stock' => 'required|integer|min:0'
-        ]);
-        
         $product = Product::findOrFail($request->product_id);
         $product->stock = $request->stock;
         $product->save();

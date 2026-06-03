@@ -2,64 +2,20 @@
 
 @section('content')
 <style>
-    .compact-container {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    .compact-form .card {
-        margin-bottom: 12px;
+    .form-section {
+        background: #fff;
         border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
     }
-    .compact-form .card-header {
-        padding: 8px 15px;
-        font-size: 14px;
-        font-weight: 600;
-        background-color: #f8f9fa;
-    }
-    .compact-form .card-body {
-        padding: 15px;
-    }
-    .compact-form .form-label {
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: #495057;
-    }
-    .compact-form .form-control, .compact-form .form-select {
-        font-size: 13px;
-        padding: 6px 10px;
-        height: 36px;
-        border-radius: 4px;
-    }
-    .compact-form textarea.form-control {
-        height: auto;
-    }
-    .form-check-label {
-        font-size: 12px;
-    }
-    h5 {
-        font-size: 15px !important;
-    }
-    small, .small {
-        font-size: 11px !important;
-    }
-    .attribute-group {
+    .form-section-header {
         background: #f8f9fa;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 4px;
-        border-left: 3px solid #0d6efd;
+        padding: 12px 15px;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
     }
-    .variant-card {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    .btn-xs {
-        padding: 2px 8px;
-        font-size: 11px;
+    .form-section-body {
+        padding: 20px;
     }
     .image-preview-container {
         display: flex;
@@ -93,298 +49,327 @@
         font-size: 12px;
         cursor: pointer;
     }
+    .variant-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .required-star {
+        color: red;
+    }
+    .image-upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .image-upload-area:hover {
+        border-color: #0d6efd;
+        background: #f8f9fa;
+    }
 </style>
 
-<div class="compact-container">
-    <div class="compact-form" style="margin-left:200px;">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-plus-circle me-2 text-primary"></i>Add New Product
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data" id="productForm">
-                    @csrf
-
-                    <div class="row">
-                        <!-- LEFT COLUMN -->
-                        <div class="col-md-8">
-                            <!-- Basic Information -->
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <i class="fas fa-info-circle me-1"></i> Basic Information
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Product Name <span class="text-danger">*</span></label>
-                                        <input type="text" name="name" class="form-control" required>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Top Category <span class="text-danger">*</span></label>
-                                            <select name="top_category_id" id="top_category" class="form-select" required>
-                                                <option value="">-- Select Top Category --</option>
-                                                @foreach($topCategories as $tc)
-                                                    <option value="{{ $tc->id }}">{{ $tc->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Category <span class="text-danger">*</span></label>
-                                            <select name="category_id" id="category" class="form-select" required>
-                                                <option value="">-- Select Category --</option>
-                                                @foreach($categories as $cat)
-                                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Sub Category <span class="text-danger">*</span></label>
-                                            <select name="sub_category_id" id="sub_category" class="form-select" required>
-                                                <option value="">-- Select Sub Category --</option>
-                                                @foreach($subCategories as $sub)
-                                                    <option value="{{ $sub->id }}">{{ $sub->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Brand</label>
-                                            <select name="brand_id" id="brand_id" class="form-select">
-                                                <option value="">-- Select Brand --</option>
-                                                @foreach($brands as $b)
-                                                    <option value="{{ $b->id }}">{{ $b->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Product Type</label>
-                                            <select name="product_type_id" id="product_type" class="form-select">
-                                                <option value="">-- Select Product Type --</option>
-                                                @foreach($productTypes as $pt)
-                                                    <option value="{{ $pt->id }}">{{ $pt->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label class="form-label">Size Chart</label>
-                                            <select name="size_chart_id" class="form-select">
-                                                <option value="">-- Select Size Chart --</option>
-                                                @foreach($sizeCharts as $sc)
-                                                    <option value="{{ $sc->id }}">{{ $sc->title }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Dynamic Attributes -->
-                            <div id="attributes_section" style="display: none;">
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <i class="fas fa-tags me-1"></i> Product Attributes
-                                    </div>
-                                    <div class="card-body" id="attributes_container"></div>
-                                </div>
-                            </div>
-
-                            <!-- Variations -->
-                            <div id="variations_section" style="display: none;">
-                                <div class="card">
-                                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                                        <span><i class="fas fa-palette me-1"></i> Variants (Color + Size)</span>
-                                        <button type="button" id="add_variant" class="btn btn-xs btn-primary">
-                                            <i class="fas fa-plus"></i> Add Variant
-                                        </button>
-                                    </div>
-                                    <div class="card-body" id="variations_container"></div>
-                                </div>
-                            </div>
-
-                            <!-- Description -->
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <i class="fas fa-align-left me-1"></i> Description
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Short Description</label>
-                                        <textarea name="short_description" class="form-control" rows="2" placeholder="Brief description for listing page"></textarea>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Full Description</label>
-                                        <textarea name="description" class="form-control" rows="4" placeholder="Detailed product description"></textarea>
-                                    </div>
-                                </div>
-                            </div>
+<div class="container">
+    <div class="row" style="margin-left:200px;"> 
+        <div class="col-12">
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-plus-circle me-2 text-primary"></i> Add New Product
+                </div>
+                <div class="form-section-body">
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            @foreach($errors->all() as $error)
+                                <p class="mb-0">{{ $error }}</p>
+                            @endforeach
                         </div>
+                    @endif
 
-                        <!-- RIGHT COLUMN -->
-                        <div class="col-md-4">
-                            <!-- Pricing -->
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <i class="fas fa-dollar-sign me-1"></i> Pricing
+                    <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data" id="productForm">
+                        @csrf
+
+                        <div class="row">
+                            <!-- LEFT COLUMN (8 columns) -->
+                            <div class="col-md-8">
+                                <!-- Basic Information Card -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Basic Information</div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label>Product Name <span class="required-star">*</span></label>
+                                            <input type="text" name="name" class="form-control" required>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label>Top Category <span class="required-star">*</span></label>
+                                                <select name="top_category_id" id="top_category" class="form-control" required>
+                                                    <option value="">-- Select --</option>
+                                                    @foreach($topCategories as $tc)
+                                                        <option value="{{ $tc->id }}">{{ $tc->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label>Category <span class="required-star">*</span></label>
+                                                <select name="category_id" id="category" class="form-control" required>
+                                                    <option value="">-- Select --</option>
+                                                    @foreach($categories as $cat)
+                                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label>Sub Category <span class="required-star">*</span></label>
+                                                <select name="sub_category_id" id="sub_category" class="form-control" required>
+                                                    <option value="">-- Select --</option>
+                                                    @foreach($subCategories as $sub)
+                                                        <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label>Brand</label>
+                                                <select name="brand_id" class="form-control">
+                                                    <option value="">-- Select --</option>
+                                                    @foreach($brands as $b)
+                                                        <option value="{{ $b->id }}">{{ $b->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label>Product Type</label>
+                                                <select name="product_type_id" class="form-control">
+                                                    <option value="">-- Select --</option>
+                                                    @foreach($productTypes as $pt)
+                                                        <option value="{{ $pt->id }}">{{ $pt->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label>Size Chart</label>
+                                                <select name="size_chart_id" class="form-control">
+                                                    <option value="">-- Select --</option>
+                                                    @foreach($sizeCharts as $sc)
+                                                        <option value="{{ $sc->id }}">{{ $sc->title }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.01" name="price" id="base_price" class="form-control" required>
+
+                                <!-- Dynamic Variants Section (Shows only for Clothing - Category ID 2) -->
+                                <div id="variants_section" style="display: none;">
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-palette me-1"></i> Product Variants (Size & Color)</span>
+                                            <button type="button" id="add_variant" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-plus"></i> Add Variant
+                                            </button>
+                                        </div>
+                                        <div class="card-body" id="variants_container"></div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Discount Price (₹)</label>
-                                        <input type="number" step="0.01" name="discount_price" class="form-control" placeholder="Sale price">
-                                        <small class="text-muted">Final price after discount</small>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">MRP (₹)</label>
-                                        <input type="number" step="0.01" name="mrp" class="form-control" placeholder="Maximum retail price">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">GST Percentage (%)</label>
-                                        <select name="gst_percentage" class="form-select">
-                                            <option value="0">0%</option>
-                                            <option value="5">5%</option>
-                                            <option value="12">12%</option>
-                                            <option value="18" selected>18%</option>
-                                            <option value="28">28%</option>
-                                        </select>
+                                </div>
+
+                                <!-- Description Card -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Description</div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label>Short Description</label>
+                                            <textarea name="short_description" class="form-control" rows="2" placeholder="Brief description for listing page"></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Full Description</label>
+                                            <textarea name="description" class="form-control" rows="4" placeholder="Detailed product description"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Stock & Inventory -->
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <i class="fas fa-boxes me-1"></i> Inventory
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Stock Quantity <span class="text-danger">*</span></label>
-                                        <input type="number" name="stock" class="form-control" value="0" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Minimum Stock Alert</label>
-                                        <input type="number" name="min_stock_alert" class="form-control" value="5" placeholder="Notify when stock below">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Weight</label>
-                                        <div class="input-group">
-                                            <input type="number" step="0.01" name="weight" class="form-control" placeholder="0.5">
-                                            <select name="weight_unit" class="form-select" style="width: 80px;">
-                                                <option value="kg">kg</option>
-                                                <option value="g">g</option>
-                                                <option value="lb">lb</option>
+                            <!-- RIGHT COLUMN (4 columns) -->
+                            <div class="col-md-4">
+                                <!-- Pricing Card -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Pricing</div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label>Price (₹) <span class="required-star">*</span></label>
+                                            <input type="number" step="0.01" name="price" class="form-control" required min="0">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Discount Price (₹)</label>
+                                            <input type="number" step="0.01" name="discount_price" class="form-control" min="0" placeholder="Sale price">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>MRP (₹)</label>
+                                            <input type="number" step="0.01" name="mrp" class="form-control" min="0" placeholder="Maximum retail price">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>GST (%)</label>
+                                            <select name="gst_percentage" class="form-control">
+                                                <option value="0">0%</option>
+                                                <option value="5">5%</option>
+                                                <option value="12">12%</option>
+                                                <option value="18" selected>18%</option>
+                                                <option value="28">28%</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Dimensions (L × W × H)</label>
-                                        <input type="text" name="dimensions" class="form-control" placeholder="30 × 20 × 10 cm">
+                                </div>
+
+                                <!-- Inventory Card -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Inventory</div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label>Stock Quantity <span class="required-star">*</span></label>
+                                            <input type="number" name="stock" id="stock" class="form-control" value="0" min="0" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Min Stock Alert</label>
+                                            <input type="number" name="min_stock_alert" class="form-control" value="5" min="0">
+                                            <small class="text-muted">Notify when stock reaches this level</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Weight</label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.01" name="weight" class="form-control" min="0" placeholder="0.5">
+                                                <select name="weight_unit" class="form-control" style="width: 80px;">
+                                                    <option value="kg">kg</option>
+                                                    <option value="g">g</option>
+                                                    <option value="lb">lb</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Dimensions</label>
+                                            <input type="text" name="dimensions" class="form-control" placeholder="L × W × H cm">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Status</label>
+                                            <select name="status" class="form-control">
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                                <option value="Draft">Draft</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Features -->
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <i class="fas fa-star me-1"></i> Features
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
+                                <!-- Features Card -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Features</div>
+                                    <div class="card-body">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="is_featured" value="1" id="featured">
+                                            <input type="checkbox" name="is_featured" value="1" class="form-check-input" id="featured">
                                             <label class="form-check-label" for="featured">Featured Product</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="is_best_seller" value="1" id="bestseller">
+                                            <input type="checkbox" name="is_best_seller" value="1" class="form-check-input" id="bestseller">
                                             <label class="form-check-label" for="bestseller">Best Seller</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="is_new_arrival" value="1" id="newarrival">
+                                            <input type="checkbox" name="is_new_arrival" value="1" class="form-check-input" id="newarrival">
                                             <label class="form-check-label" for="newarrival">New Arrival</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="is_trending" value="1" id="trending">
+                                            <input type="checkbox" name="is_trending" value="1" class="form-check-input" id="trending">
                                             <label class="form-check-label" for="trending">Trending</label>
                                         </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Status</label>
-                                        <select name="status" class="form-select">
-                                            <option value="Active">Active</option>
-                                            <option value="Inactive">Inactive</option>
-                                            <option value="Draft">Draft</option>
-                                        </select>
-                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Return & Warranty -->
-                            <div class="card">
-                                <div class="card-header bg-light">
-                                    <i class="fas fa-undo-alt me-1"></i> Return & Warranty
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Return Days</label>
-                                        <select name="return_days" class="form-select">
-                                            <option value="7">7 Days</option>
-                                            <option value="15">15 Days</option>
-                                            <option value="30" selected>30 Days</option>
-                                            <option value="0">Non-returnable</option>
-                                        </select>
+                                <!-- Product Images Card (Flexible Images - Min 1, Max 4) -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Product Images</div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="d-block">Product Images <span class="required-star">*</span> <span class="text-muted">(1 to 4 images)</span></label>
+                                            <div class="image-upload-area" onclick="document.getElementById('product_images_input').click()">
+                                                <i class="fas fa-cloud-upload-alt fa-2x mb-2 text-primary"></i>
+                                                <p class="mb-0">Click to upload images</p>
+                                                <small class="text-muted">You can select 1 to 4 images</small>
+                                            </div>
+                                            <input type="file" id="product_images_input" name="images[]" class="d-none" accept="image/*" multiple onchange="previewImages(this)">
+                                            <div id="images_preview" class="image-preview-container mt-3"></div>
+                                            <div id="image_count_warning" class="alert alert-warning mt-2" style="display: none; font-size: 12px; padding: 8px;">
+                                                <i class="fas fa-exclamation-triangle me-1"></i> You can upload maximum 4 images. Please remove some images.
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Warranty (Months)</label>
-                                        <input type="number" name="warranty_months" class="form-control" value="0" placeholder="Warranty period in months">
+                                </div>
+
+                                <!-- Shipping Info Card -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Shipping Info</div>
+                                    <div class="card-body">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="cod_available" value="1" id="cod" checked>
+                                            <label class="form-check-label" for="cod">Cash on Delivery (COD) Available</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Delivery Time</label>
+                                            <select name="delivery_option" class="form-control">
+                                                <option value="1_day">Express Delivery (1 Day)</option>
+                                                <option value="2_3_days">Fast Delivery (2-3 Days)</option>
+                                                <option value="3_5_days">Standard Delivery (3-5 Days)</option>
+                                                <option value="5_7_days">Economy Delivery (5-7 Days)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Return & Warranty Card -->
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">Return & Warranty</div>
+                                    <div class="card-body">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="return_available" value="1" id="return_available" checked>
+                                            <label class="form-check-label" for="return_available">Return Available</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Return Days</label>
+                                            <select name="return_days" class="form-control">
+                                                <option value="7">7 Days</option>
+                                                <option value="15">15 Days</option>
+                                                <option value="30" selected>30 Days</option>
+                                                <option value="0">Non-returnable</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="exchange_available" value="1" id="exchange_available">
+                                            <label class="form-check-label" for="exchange_available">Exchange Available</label>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Warranty (Months)</label>
+                                            <input type="number" name="warranty_months" class="form-control" value="0" min="0">
+                                            <small class="text-muted">0 = No warranty</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- PRODUCT IMAGES -->
-                    <div class="card mt-3">
-                        <div class="card-header bg-light">
-                            <i class="fas fa-image me-1"></i> Product Images (Max 4 Images)
+                        <!-- Submit Buttons -->
+                        <div class="text-end mt-3">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-1"></i> Save Product
+                            </button>
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary px-4 ms-2">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Main Image <span class="text-danger">*</span></label>
-                                    <input type="file" name="image" class="form-control" accept="image/*" onchange="previewMainImage(this)" required>
-                                    <small class="text-muted">Primary product image (Required)</small>
-                                    <div id="main_image_preview" class="mt-2"></div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Gallery Images <span class="text-danger">(Up to 3 images)</span></label>
-                                    <input type="file" id="gallery_input" class="form-control" accept="image/*" multiple onchange="previewGalleryImages(this)">
-                                    <small class="text-muted">Select up to 3 additional images</small>
-                                    <div id="gallery_preview" class="image-preview-container mt-2"></div>
-                                </div>
-                            </div>
-                            <div id="image_count_warning" class="alert alert-warning mt-2" style="display: none; font-size: 12px; padding: 8px;">
-                                <i class="fas fa-exclamation-triangle me-1"></i> Maximum 4 images allowed (1 main + 3 gallery). Please remove some images.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Submit Buttons -->
-                    <div class="mt-3 text-end">
-                        <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-save me-1"></i> Save Product
-                        </button>
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary px-4 ms-2">
-                            <i class="fas fa-times me-1"></i> Cancel
-                        </a>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -393,341 +378,231 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-let selectedAttrs = {};
-let variantIndex = 0;
-let galleryFiles = [];
-let mainImageFile = null;
+    let variantIndex = 0;
+    let imageFiles = [];
 
-// ========== DYNAMIC CATEGORY FILTERING ==========
-
-// Top Category change - Filter Categories
-$('#top_category').change(function() {
-    let topId = $(this).val();
-    let categorySelect = $('#category');
-    let subCategorySelect = $('#sub_category');
-    let productTypeSelect = $('#product_type');
+    // ========== DYNAMIC CATEGORY FILTERING ==========
     
-    if (topId) {
-        $.ajax({
-            url: `/admin/get-categories/${topId}`,
-            type: 'GET',
-            success: function(data) {
+    $('#top_category').change(function() {
+        let topId = $(this).val();
+        if (topId) {
+            $.get(`/admin/get-categories/${topId}`, function(data) {
+                let categorySelect = $('#category');
                 categorySelect.empty().append('<option value="">-- Select Category --</option>');
                 $.each(data, function(i, cat) {
                     categorySelect.append(`<option value="${cat.id}">${cat.name}</option>`);
                 });
-                subCategorySelect.empty().append('<option value="">-- Select Sub Category --</option>');
-                productTypeSelect.empty().append('<option value="">-- Select Product Type --</option>');
-            },
-            error: function() {
-                categorySelect.empty().append('<option value="">Error loading categories</option>');
-            }
-        });
-    } else {
-        categorySelect.empty().append('<option value="">-- Select Category --</option>');
-        subCategorySelect.empty().append('<option value="">-- Select Sub Category --</option>');
-        productTypeSelect.empty().append('<option value="">-- Select Product Type --</option>');
-    }
-});
+                $('#sub_category').empty().append('<option value="">-- Select Sub Category --</option>');
+                $('select[name="product_type_id"]').empty().append('<option value="">-- Select Product Type --</option>');
+            });
+        }
+    });
 
-// Category change - Filter Sub Categories
-$('#category').change(function() {
-    let catId = $(this).val();
-    let subCategorySelect = $('#sub_category');
-    let productTypeSelect = $('#product_type');
-    
-    if (catId) {
-        $.ajax({
-            url: `/admin/get-subcategories/${catId}`,
-            type: 'GET',
-            success: function(data) {
-                subCategorySelect.empty().append('<option value="">-- Select Sub Category --</option>');
+    $('#category').change(function() {
+        let catId = $(this).val();
+        if (catId) {
+            $.get(`/admin/get-subcategories/${catId}`, function(data) {
+                let subSelect = $('#sub_category');
+                subSelect.empty().append('<option value="">-- Select Sub Category --</option>');
                 $.each(data, function(i, sub) {
-                    subCategorySelect.append(`<option value="${sub.id}">${sub.name}</option>`);
+                    subSelect.append(`<option value="${sub.id}">${sub.name}</option>`);
                 });
-                productTypeSelect.empty().append('<option value="">-- Select Product Type --</option>');
-                loadAttributes(catId);
-            },
-            error: function() {
-                subCategorySelect.empty().append('<option value="">Error loading sub categories</option>');
-            }
-        });
-    } else {
-        subCategorySelect.empty().append('<option value="">-- Select Sub Category --</option>');
-        productTypeSelect.empty().append('<option value="">-- Select Product Type --</option>');
-    }
-});
+                $('select[name="product_type_id"]').empty().append('<option value="">-- Select Product Type --</option>');
+            });
+        }
+        if (catId == '2') {
+            $('#variants_section').show();
+        } else {
+            $('#variants_section').hide();
+            $('#variants_container').empty();
+        }
+    });
 
-// Sub Category change - Filter Product Types
-$('#sub_category').change(function() {
-    let subId = $(this).val();
-    let productTypeSelect = $('#product_type');
-    
-    if (subId) {
-        $.ajax({
-            url: `/admin/get-producttypes/${subId}`,
-            type: 'GET',
-            success: function(data) {
-                productTypeSelect.empty().append('<option value="">-- Select Product Type --</option>');
+    $('#sub_category').change(function() {
+        let subId = $(this).val();
+        if (subId) {
+            $.get(`/admin/get-producttypes/${subId}`, function(data) {
+                let ptSelect = $('select[name="product_type_id"]');
+                ptSelect.empty().append('<option value="">-- Select Product Type --</option>');
                 $.each(data, function(i, pt) {
-                    productTypeSelect.append(`<option value="${pt.id}">${pt.name}</option>`);
+                    ptSelect.append(`<option value="${pt.id}">${pt.name}</option>`);
                 });
-                loadSubCategoryAttributes(subId);
-            },
-            error: function() {
-                productTypeSelect.empty().append('<option value="">Error loading product types</option>');
-            }
-        });
-    } else {
-        productTypeSelect.empty().append('<option value="">-- Select Product Type --</option>');
-    }
-});
-
-function loadAttributes(catId){
-    $.get(`/admin/get-category-attributes/${catId}`, function(data){
-        if(data.length > 0){
-            $('#attributes_section').show();
-            renderAttributes(data);
-        } else {
-            $('#attributes_section').hide();
-        }
-    }).fail(function(error) {
-        console.log('Error loading attributes:', error);
-    });
-}
-
-function loadSubCategoryAttributes(subId){
-    $.get(`/admin/get-subcategory-attributes/${subId}`, function(data){
-        if(data.length > 0){
-            $('#attributes_section').show();
-            renderAttributes(data);
-        } else {
-            $('#attributes_section').hide();
-        }
-    }).fail(function(error) {
-        console.log('Error loading subcategory attributes:', error);
-    });
-}
-
-function renderAttributes(attrs){
-    let container = $('#attributes_container');
-    container.empty();
-    selectedAttrs = {};
-
-    $.each(attrs, function(i, attr){
-        let html = `<div class="attribute-group">
-            <label>${attr.label} ${attr.required ? '<span class="text-danger">*</span>' : ''}</label>
-            <select name="attributes[${attr.name}]" class="form-select attribute-select" data-attr="${attr.name}" ${attr.required ? 'required' : ''}>
-                <option value="">Select ${attr.label}</option>`;
-        $.each(attr.values, function(j, val){
-            html += `<option value="${val.value}" data-price="${val.additional_price || 0}">${val.value}${val.additional_price > 0 ? ' (+₹'+val.additional_price+')' : ''}</option>`;
-        });
-        html += `</select></div>`;
-        container.append(html);
-    });
-
-    $('.attribute-select').change(function(){
-        updateSelectedAttributes();
-    });
-}
-
-function updateSelectedAttributes(){
-    selectedAttrs = {};
-    $('.attribute-select').each(function(){
-        let val = $(this).val();
-        if(val){
-            let name = $(this).data('attr');
-            let price = $(this).find('option:selected').data('price') || 0;
-            selectedAttrs[name] = [{name: name, value: val, price: price}];
+            });
         }
     });
-    if(Object.keys(selectedAttrs).length > 0){
-        generateVariations();
-    }
-}
 
-function generateVariations(){
-    let attrsArray = Object.values(selectedAttrs);
-    if(attrsArray.length === 0) return;
-    let combinations = [[]];
-    for(let attr of attrsArray){
-        let newCombos = [];
-        for(let combo of combinations){
-            for(let val of attr){
-                newCombos.push([...combo, val]);
-            }
-        }
-        combinations = newCombos;
-    }
-    renderVariationFields(combinations);
-}
-
-function renderVariationFields(combinations){
-    let container = $('#variations_container');
-    container.empty();
-    $('#variations_section').show();
-    let basePrice = $('#base_price').val() || 0;
-
-    $.each(combinations, function(idx, combo){
-        let text = combo.map(c => `${c.name}:${c.value}`).join(', ');
-        let extraPrice = combo.reduce((sum,c) => sum + (c.price || 0), 0);
-        let finalPrice = parseFloat(basePrice) + extraPrice;
-
+    // ========== VARIANT FUNCTIONS ==========
+    
+    $('#add_variant').click(function() {
+        variantIndex++;
         let html = `<div class="variant-card">
-            <input type="hidden" name="variants[${idx}][attributes]" value='${JSON.stringify(combo)}'>
-            <div class="row g-2">
-                <div class="col-4">
-                    <label style="font-size: 11px;">Color / Variation</label>
-                    <input type="text" name="variants[${idx}][color]" class="form-control form-control-sm" value="${text}" readonly>
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <label style="font-size: 11px;">Size</label>
+                    <input type="text" name="variants[${variantIndex}][size]" class="form-control form-control-sm" placeholder="e.g., S, M, L, XL">
                 </div>
-                <div class="col-3">
-                    <label style="font-size: 11px;">Price (₹)</label>
-                    <input type="number" step="0.01" name="variants[${idx}][price]" class="form-control form-control-sm variant-price" value="${finalPrice}">
+                <div class="col-md-3 mb-2">
+                    <label style="font-size: 11px;">Color</label>
+                    <input type="text" name="variants[${variantIndex}][color]" class="form-control form-control-sm" placeholder="e.g., Red, Blue">
                 </div>
-                <div class="col-2">
+                <div class="col-md-2 mb-2">
                     <label style="font-size: 11px;">Stock</label>
-                    <input type="number" name="variants[${idx}][stock]" class="form-control form-control-sm" value="0">
+                    <input type="number" name="variants[${variantIndex}][stock]" class="form-control form-control-sm" value="0" min="0">
                 </div>
-                <div class="col-3">
-                    <label style="font-size: 11px;">Image</label>
-                    <input type="file" name="variant_images[${idx}][]" class="form-control form-control-sm" accept="image/*">
+                <div class="col-md-2 mb-2">
+                    <label style="font-size: 11px;">Price (₹)</label>
+                    <input type="number" step="0.01" name="variants[${variantIndex}][price]" class="form-control form-control-sm" min="0">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button type="button" class="btn btn-danger btn-sm remove-variant mt-4">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
                 </div>
             </div>
         </div>`;
-        container.append(html);
+        $('#variants_container').append(html);
     });
-}
 
-$('#base_price').on('input', function(){
-    let newBase = $(this).val() || 0;
-    $('.variant-price').each(function(){
-        let extra = 0;
-        $(this).closest('.variant-card').find('input[type="hidden"]').each(function(){
-            try {
-                let combo = JSON.parse($(this).val());
-                extra = combo.reduce((s,c) => s + (c.price || 0), 0);
-            } catch(e) {}
-        });
-        $(this).val(parseFloat(newBase) + extra);
+    $(document).on('click', '.remove-variant', function() {
+        $(this).closest('.variant-card').remove();
     });
-});
 
-function previewMainImage(input) {
-    let preview = $('#main_image_preview');
-    preview.empty();
-    if (input.files && input.files[0]) {
-        mainImageFile = input.files[0];
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            preview.html(`<div class="image-preview-item">
-                <img src="${e.target.result}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
-                <span class="badge bg-primary mt-1 d-block text-center">Main Image</span>
-            </div>`);
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-    updateImageCount();
-}
-
-function previewGalleryImages(input) {
-    let files = Array.from(input.files);
-    let existingCount = galleryFiles.length;
-    let availableSlots = 3 - existingCount;
-    if (files.length > availableSlots) {
-        alert(`You can only add ${availableSlots} more image(s). Maximum 3 gallery images.`);
+    // ========== IMAGE FUNCTIONS ==========
+    
+    function previewImages(input) {
+        let files = Array.from(input.files);
+        let totalFiles = imageFiles.length + files.length;
+        
+        if (totalFiles > 4) {
+            alert('You can upload maximum 4 images only. You have ' + totalFiles + ' images selected.');
+            input.value = '';
+            return;
+        }
+        
+        imageFiles = [...imageFiles, ...files];
+        updateImagePreview();
         input.value = '';
-        return;
+        checkImageCount();
     }
-    galleryFiles = [...galleryFiles, ...files];
-    updateGalleryPreview();
-    updateImageCount();
-}
 
-function updateGalleryPreview() {
-    let preview = $('#gallery_preview');
-    preview.empty();
-    galleryFiles.forEach((file, index) => {
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            preview.append(`
-                <div class="image-preview-item" data-index="${index}">
-                    <img src="${e.target.result}">
-                    <button type="button" class="remove-img" onclick="removeGalleryImage(${index})">×</button>
-                    <span class="badge bg-secondary mt-1 d-block text-center">Gallery ${index + 1}</span>
-                </div>
-            `);
-        };
-        reader.readAsDataURL(file);
+    function updateImagePreview() {
+        let preview = $('#images_preview');
+        preview.empty();
+        
+        imageFiles.forEach((file, index) => {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                preview.append(`
+                    <div class="image-preview-item">
+                        <img src="${e.target.result}">
+                        <button type="button" class="remove-img" onclick="removeImage(${index})">×</button>
+                        <span class="badge ${index === 0 ? 'bg-primary' : 'bg-secondary'} d-block text-center">${index === 0 ? 'Main Image' : 'Image ' + (index + 1)}</span>
+                    </div>
+                `);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeImage(index) {
+        imageFiles.splice(index, 1);
+        updateImagePreview();
+        checkImageCount();
+    }
+    
+    function checkImageCount() {
+        if (imageFiles.length > 4) {
+            $('#image_count_warning').show();
+        } else {
+            $('#image_count_warning').hide();
+        }
+    }
+
+    // ========== FORM SUBMIT HANDLER WITH PROPER ERROR DISPLAY ==========
+    
+    $('#productForm').on('submit', function(e) {
+        let stock = parseInt($('#stock').val());
+        if (isNaN(stock) || stock < 0) {
+            e.preventDefault();
+            alert('Stock cannot be negative. Please enter 0 or more.');
+            return false;
+        }
+        
+        if (imageFiles.length === 0) {
+            e.preventDefault();
+            alert('Please upload at least 1 product image.');
+            return false;
+        }
+        
+        if (imageFiles.length > 4) {
+            e.preventDefault();
+            alert('Maximum 4 images allowed. Please remove some images.');
+            return false;
+        }
+        
+        // Create FormData and manually append images
+        let formData = new FormData(this);
+        formData.delete('images[]');
+        for (let i = 0; i < imageFiles.length; i++) {
+            formData.append('images[]', imageFiles[i]);
+        }
+        
+        e.preventDefault();
+        
+        // Show loading
+        let submitBtn = $(this).find('button[type="submit"]');
+        let originalText = submitBtn.html();
+        submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Saving...').prop('disabled', true);
+        
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                submitBtn.html(originalText).prop('disabled', false);
+                if (response.success) {
+                    window.location.href = "{{ route('admin.products.index') }}";
+                } else if (response.redirect) {
+                    window.location.href = response.redirect;
+                } else {
+                    alert(response.message || 'Product saved successfully!');
+                    window.location.href = "{{ route('admin.products.index') }}";
+                }
+            },
+            error: function(xhr) {
+                submitBtn.html(originalText).prop('disabled', false);
+                
+                // Show detailed error
+                console.log('XHR Error:', xhr);
+                console.log('Response Text:', xhr.responseText);
+                
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    let errors = xhr.responseJSON.errors;
+                    let errorMsg = '';
+                    for (let key in errors) {
+                        errorMsg += errors[key][0] + '\n';
+                    }
+                    alert('Validation Error:\n' + errorMsg);
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    alert('Error: ' + xhr.responseJSON.message);
+                } else if (xhr.responseText) {
+                    // Try to parse HTML error
+                    let errorMatch = xhr.responseText.match(/<h1>(.*?)<\/h1>/);
+                    if (errorMatch) {
+                        alert('Server Error: ' + errorMatch[1]);
+                    } else {
+                        alert('Server Error: ' + xhr.status + ' - ' + xhr.statusText);
+                    }
+                } else {
+                    alert('An error occurred. Please check the console for details.');
+                }
+            }
+        });
     });
-}
-
-function removeGalleryImage(index) {
-    galleryFiles.splice(index, 1);
-    updateGalleryPreview();
-    updateImageCount();
-    let galleryInput = $('#gallery_input');
-    galleryInput.val('');
-}
-
-function updateImageCount() {
-    let mainCount = mainImageFile ? 1 : 0;
-    let galleryCount = galleryFiles.length;
-    let totalCount = mainCount + galleryCount;
-    if (totalCount > 4) {
-        $('#image_count_warning').show();
-    } else {
-        $('#image_count_warning').hide();
-    }
-}
-
-$('#productForm').on('submit', function(e) {
-    let mainCount = mainImageFile ? 1 : 0;
-    let galleryCount = galleryFiles.length;
-    let totalCount = mainCount + galleryCount;
-    if (totalCount === 0) {
-        e.preventDefault();
-        alert('Please upload at least 1 main image');
-        return false;
-    }
-    if (totalCount > 4) {
-        e.preventDefault();
-        alert('Maximum 4 images allowed (1 main + 3 gallery)');
-        return false;
-    }
-});
-
-$('#add_variant').click(function(){
-    variantIndex++;
-    let html = `<div class="variant-card">
-        <div class="row g-2">
-            <div class="col-4">
-                <label style="font-size: 11px;">Color / Variation</label>
-                <input type="text" name="custom_variants[${variantIndex}][color]" class="form-control form-control-sm" placeholder="e.g., Red, Blue">
-            </div>
-            <div class="col-3">
-                <label style="font-size: 11px;">Price (₹)</label>
-                <input type="number" step="0.01" name="custom_variants[${variantIndex}][price]" class="form-control form-control-sm" placeholder="Price">
-            </div>
-            <div class="col-2">
-                <label style="font-size: 11px;">Stock</label>
-                <input type="number" name="custom_variants[${variantIndex}][stock]" class="form-control form-control-sm" placeholder="Stock" value="0">
-            </div>
-            <div class="col-3">
-                <label style="font-size: 11px;">Image</label>
-                <input type="file" name="custom_variant_images[${variantIndex}][]" class="form-control form-control-sm" accept="image/*">
-            </div>
-        </div>
-        <div class="mt-2">
-            <button type="button" class="btn btn-danger btn-xs remove-variant">
-                <i class="fas fa-trash"></i> Remove Variant
-            </button>
-        </div>
-    </div>`;
-    $('#variations_container').append(html);
-});
-
-$(document).on('click', '.remove-variant', function(){
-    $(this).closest('.variant-card').remove();
-});
 </script>
 @endsection
