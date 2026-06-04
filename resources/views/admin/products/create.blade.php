@@ -71,6 +71,11 @@
         border-color: #0d6efd;
         background: #f8f9fa;
     }
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+    }
 </style>
 
 <div class="container">
@@ -288,7 +293,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Product Images Card (Flexible Images - Min 1, Max 4) -->
+                                <!-- Product Images Card -->
                                 <div class="card mb-3">
                                     <div class="card-header bg-light">Product Images</div>
                                     <div class="card-body">
@@ -299,7 +304,8 @@
                                                 <p class="mb-0">Click to upload images</p>
                                                 <small class="text-muted">You can select 1 to 4 images</small>
                                             </div>
-                                            <input type="file" id="product_images_input" name="images[]" class="d-none" accept="image/*" multiple onchange="previewImages(this)">
+                                            <!-- REMOVED required attribute and changed to visible input -->
+                                            <input type="file" id="product_images_input" name="images[]" class="form-control mt-2" accept="image/*" multiple style="display: block;" onchange="previewImages(this)">
                                             <div id="images_preview" class="image-preview-container mt-3"></div>
                                             <div id="image_count_warning" class="alert alert-warning mt-2" style="display: none; font-size: 12px; padding: 8px;">
                                                 <i class="fas fa-exclamation-triangle me-1"></i> You can upload maximum 4 images. Please remove some images.
@@ -375,7 +381,6 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     let variantIndex = 0;
@@ -481,13 +486,14 @@
         
         imageFiles = [...imageFiles, ...files];
         updateImagePreview();
-        input.value = '';
         checkImageCount();
     }
 
     function updateImagePreview() {
         let preview = $('#images_preview');
         preview.empty();
+        
+        if (imageFiles.length === 0) return;
         
         imageFiles.forEach((file, index) => {
             let reader = new FileReader();
@@ -508,6 +514,13 @@
         imageFiles.splice(index, 1);
         updateImagePreview();
         checkImageCount();
+        
+        // Update the file input
+        let dataTransfer = new DataTransfer();
+        for (let i = 0; i < imageFiles.length; i++) {
+            dataTransfer.items.add(imageFiles[i]);
+        }
+        document.getElementById('product_images_input').files = dataTransfer.files;
     }
     
     function checkImageCount() {
@@ -518,7 +531,7 @@
         }
     }
 
-    // ========== FORM SUBMIT HANDLER WITH PROPER ERROR DISPLAY ==========
+    // ========== FORM SUBMIT HANDLER ==========
     
     $('#productForm').on('submit', function(e) {
         let stock = parseInt($('#stock').val());
@@ -540,69 +553,15 @@
             return false;
         }
         
-        // Create FormData and manually append images
-        let formData = new FormData(this);
-        formData.delete('images[]');
+        // Update file input with current images before submit
+        let dataTransfer = new DataTransfer();
         for (let i = 0; i < imageFiles.length; i++) {
-            formData.append('images[]', imageFiles[i]);
+            dataTransfer.items.add(imageFiles[i]);
         }
+        document.getElementById('product_images_input').files = dataTransfer.files;
         
-        e.preventDefault();
-        
-        // Show loading
-        let submitBtn = $(this).find('button[type="submit"]');
-        let originalText = submitBtn.html();
-        submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Saving...').prop('disabled', true);
-        
-        $.ajax({
-            url: $(this).attr('action'),
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') || '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                submitBtn.html(originalText).prop('disabled', false);
-                if (response.success) {
-                    window.location.href = "{{ route('admin.products.index') }}";
-                } else if (response.redirect) {
-                    window.location.href = response.redirect;
-                } else {
-                    alert(response.message || 'Product saved successfully!');
-                    window.location.href = "{{ route('admin.products.index') }}";
-                }
-            },
-            error: function(xhr) {
-                submitBtn.html(originalText).prop('disabled', false);
-                
-                // Show detailed error
-                console.log('XHR Error:', xhr);
-                console.log('Response Text:', xhr.responseText);
-                
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    let errors = xhr.responseJSON.errors;
-                    let errorMsg = '';
-                    for (let key in errors) {
-                        errorMsg += errors[key][0] + '\n';
-                    }
-                    alert('Validation Error:\n' + errorMsg);
-                } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                    alert('Error: ' + xhr.responseJSON.message);
-                } else if (xhr.responseText) {
-                    // Try to parse HTML error
-                    let errorMatch = xhr.responseText.match(/<h1>(.*?)<\/h1>/);
-                    if (errorMatch) {
-                        alert('Server Error: ' + errorMatch[1]);
-                    } else {
-                        alert('Server Error: ' + xhr.status + ' - ' + xhr.statusText);
-                    }
-                } else {
-                    alert('An error occurred. Please check the console for details.');
-                }
-            }
-        });
+        // Allow normal form submission
+        return true;
     });
 </script>
 @endsection

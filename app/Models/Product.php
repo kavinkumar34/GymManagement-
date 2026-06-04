@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Product;
 use App\Models\ProductVariant;
 class Product extends Model
+
 {
     use SoftDeletes;
     
