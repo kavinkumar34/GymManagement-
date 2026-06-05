@@ -29,7 +29,8 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\SizeChartController;
-use App\Http\Controllers\ProductDetailController;  // ADD THIS LINE
+use App\Http\Controllers\ProductDetailController;
+use App\Http\Controllers\Admin\DeliverablePincodeController; // ADD THIS LINE
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -229,6 +230,10 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/payments/mark-viewed', [AdminPaymentController::class, 'markViewed'])->name('payments.mark-viewed');
     Route::get('/payments/check-new', [AdminPaymentController::class, 'getNewOrdersCount'])->name('payments.check-new');
     Route::get('/payments/{id}', [AdminPaymentController::class, 'show'])->name('payments.show');
+    
+    // ============ PINCODE MANAGEMENT ROUTES ============
+    Route::resource('pincodes', DeliverablePincodeController::class);
+    Route::post('pincodes/bulk-import', [DeliverablePincodeController::class, 'bulkImport'])->name('pincodes.bulk');
 });
 
 // ============ TRAINER ROUTES ============
@@ -255,3 +260,18 @@ Route::post('/api/set-checkout-cart', function (Request $request) {
     session(['checkout_cart' => $request->cart]);
     return response()->json(['success' => true]);
 })->middleware('auth');
+
+// ============ PINCODE CHECK API ROUTE (PUBLIC) ============
+Route::get('/api/check-pincode/{pincode}', function ($pincode) {
+    $isDeliverable = \App\Models\DeliverablePincode::isDeliverable($pincode);
+    $deliveryInfo = \App\Models\DeliverablePincode::getDeliveryInfo($pincode);
+    
+    return response()->json([
+        'success' => true,
+        'deliverable' => $isDeliverable,
+        'delivery_days' => $deliveryInfo ? $deliveryInfo->delivery_days : null,
+        'city' => $deliveryInfo ? $deliveryInfo->city : null,
+        'state' => $deliveryInfo ? $deliveryInfo->state : null,
+        'message' => $isDeliverable ? 'Delivery available' : 'Delivery not available for this pincode'
+    ]);
+})->name('check.pincode');

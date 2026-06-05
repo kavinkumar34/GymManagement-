@@ -143,6 +143,17 @@
                 <i class="fas fa-cog"></i> <span>Settings</span>
             </a>
         </li>
+@php
+    use Illuminate\Support\Facades\Route;
+@endphp
+
+@if(Route::has('admin.pincodes.index'))
+<li class="nav-item">
+    <a class="nav-link" href="{{ route('admin.pincodes.index') }}">
+        <i class="fas fa-map-marker-alt"></i> Deliverable Pincodes
+    </a>
+</li>
+@endif
     </ul>
 
     <div class="sidebar-footer">

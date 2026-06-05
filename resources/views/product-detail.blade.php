@@ -3,6 +3,118 @@
 
 @section('content')
 <style>
+    /* Delivery Pincode Section Styles */
+    .delivery-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+    }
+    
+    .delivery-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .delivery-header i {
+        font-size: 18px;
+        color: #dc3545;
+    }
+    
+    .delivery-header strong {
+        font-size: 14px;
+        color: #333;
+    }
+    
+    .delivery-header small {
+        color: #666;
+        font-size: 12px;
+        margin-left: 5px;
+    }
+    
+    .pincode-wrapper {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .pincode-wrapper input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .pincode-wrapper input:focus {
+        outline: none;
+        border-color: #dc3545;
+        box-shadow: 0 0 0 2px rgba(220,53,69,0.1);
+    }
+    
+    .pincode-wrapper input.valid {
+        border-color: #28a745;
+        background-color: #e8f5e9;
+    }
+    
+    .pincode-wrapper input.invalid {
+        border-color: #dc3545;
+        background-color: #ffebee;
+    }
+    
+    .pincode-wrapper button {
+        padding: 12px 24px;
+        background: #000;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .pincode-wrapper button:hover {
+        background: #dc3545;
+    }
+    
+    .delivery-message {
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    
+    .delivery-message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .delivery-message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .delivery-message.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+    
+    .delivery-message i {
+        font-size: 14px;
+    }
+    
+    /* Rest of your existing styles */
     .product-detail-container {
         background: white;
         border-radius: 15px;
@@ -11,13 +123,11 @@
         margin: 20px 0;
     }
     
-    /* ========== LEFT COLUMN - VERTICAL THUMBNAILS + MAIN IMAGE ========== */
     .product-gallery-wrapper {
         display: flex;
         gap: 15px;
     }
     
-    /* Vertical Thumbnails */
     .vertical-thumbnails {
         display: flex;
         flex-direction: column;
@@ -56,7 +166,6 @@
         border-color: #dc3545;
     }
     
-    /* Main Image Area */
     .main-image-area {
         flex: 1;
         background: #f8f9fa;
@@ -74,7 +183,6 @@
         max-width: 100%;
         max-height: 500px;
         object-fit: contain;
-        transition: transform 0.3s ease;
     }
     
     .nav-arrows {
@@ -107,7 +215,6 @@
         background: #dc3545;
     }
     
-    /* ========== RIGHT COLUMN - SCROLLABLE CONTENT ========== */
     .right-side-content {
         max-height: 650px;
         overflow-y: auto;
@@ -128,7 +235,6 @@
         border-radius: 5px;
     }
     
-    /* Brand */
     .brand-name {
         font-size: 14px;
         color: #666;
@@ -153,7 +259,6 @@
         margin-bottom: 10px;
     }
     
-    /* Rating */
     .rating {
         margin-bottom: 15px;
     }
@@ -168,7 +273,6 @@
         margin-left: 8px;
     }
     
-    /* Price */
     .price-section {
         margin-bottom: 15px;
         padding-bottom: 10px;
@@ -203,7 +307,6 @@
         margin-top: 5px;
     }
     
-    /* Size Selection */
     .size-section {
         margin-bottom: 20px;
     }
@@ -258,7 +361,6 @@
         margin-top: 8px;
     }
     
-    /* Quantity */
     .quantity-section {
         margin-bottom: 20px;
     }
@@ -294,7 +396,6 @@
         border-radius: 5px;
     }
     
-    /* Stock */
     .stock-status {
         margin-bottom: 20px;
     }
@@ -309,7 +410,6 @@
         font-size: 14px;
     }
     
-    /* Action Buttons */
     .action-buttons {
         display: flex;
         gap: 15px;
@@ -328,7 +428,7 @@
         font-size: 14px;
     }
     
-    .btn-wishlist:hover {
+    .btn-wishlist:hover:not(:disabled) {
         background: #dc3545;
         color: white;
     }
@@ -345,7 +445,7 @@
         font-size: 14px;
     }
     
-    .btn-add-cart:hover {
+    .btn-add-cart:hover:not(:disabled) {
         background: #dc3545;
     }
     
@@ -361,11 +461,18 @@
         font-size: 14px;
     }
     
-    .btn-buy-now:hover {
+    .btn-buy-now:hover:not(:disabled) {
         background: #000000;
     }
     
-    /* Delivery Info */
+    .btn-add-cart:disabled,
+    .btn-buy-now:disabled,
+    .btn-wishlist:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+    
     .delivery-box {
         background: #f8f9fa;
         padding: 15px;
@@ -398,31 +505,6 @@
         color: #666;
     }
     
-    .pincode-input {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
-    }
-    
-    .pincode-input input {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 13px;
-    }
-    
-    .pincode-input button {
-        padding: 10px 20px;
-        background: #000;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 13px;
-    }
-    
-    /* Tabs / Accordion */
     .product-info-tabs {
         margin-top: 20px;
     }
@@ -474,20 +556,6 @@
         overflow-y: auto;
     }
     
-    .info-tab-content::-webkit-scrollbar {
-        width: 5px;
-    }
-    
-    .info-tab-content::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 5px;
-    }
-    
-    .info-tab-content::-webkit-scrollbar-thumb {
-        background: #dc3545;
-        border-radius: 5px;
-    }
-    
     .info-tab-header .arrow {
         transition: transform 0.3s;
     }
@@ -512,7 +580,6 @@
         display: inline-block;
     }
     
-    /* Related Products */
     .related-card {
         transition: transform 0.3s;
         border: none;
@@ -530,7 +597,6 @@
         margin-bottom: 20px;
     }
     
-    /* Image Modal */
     .image-modal {
         display: none;
         position: fixed;
@@ -565,7 +631,43 @@
         cursor: pointer;
     }
     
-    /* Responsive */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 280px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-size: 14px;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .notification.success {
+        background: #28a745;
+    }
+    
+    .notification.error {
+        background: #dc3545;
+    }
+    
+    .notification.info {
+        background: #17a2b8;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
     @media (max-width: 768px) {
         .product-gallery-wrapper {
             flex-direction: column-reverse;
@@ -578,12 +680,23 @@
         .main-image-area {
             min-height: 350px;
         }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .btn-add-cart, .btn-buy-now, .btn-wishlist {
+            width: 100%;
+        }
+        .pincode-wrapper {
+            flex-direction: column;
+        }
+        .pincode-wrapper button {
+            width: 100%;
+        }
     }
 </style>
 
 <div class="container mt-4">
     <div class="product-detail-container">
-        <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -593,13 +706,10 @@
         </nav>
 
         <div class="row">
-            <!-- ========== LEFT COLUMN - VERTICAL THUMBNAILS + MAIN IMAGE ========== -->
             <div class="col-md-6">
                 <div class="product-gallery-wrapper">
-                    <!-- Vertical Thumbnails -->
                     <div class="vertical-thumbnails" id="verticalThumbnails">
                         @php
-                            // Get all images from product_images table
                             $allImages = \App\Models\ProductImage::where('product_id', $product->id)
                                 ->orderBy('display_order')
                                 ->get();
@@ -620,7 +730,6 @@
                         @endforeach
                     </div>
                     
-                    <!-- Main Image Area -->
                     <div class="main-image-area" id="mainImageArea" onclick="openModal(getCurrentImageSrc())">
                         <img id="mainImage" class="main-image" src="{{ asset('storage/' . ($allImages[0]->image_path ?? 'https://via.placeholder.com/500x500')) }}" alt="Product Image">
                         @if($allImages->count() > 1)
@@ -633,22 +742,18 @@
                 </div>
             </div>
             
-            <!-- ========== RIGHT COLUMN - ALL CONTENT (SCROLLABLE) ========== -->
             <div class="col-md-6">
                 <div class="right-side-content">
-                    <!-- Brand -->
                     <div class="brand-name">
                         <i class="fas fa-building"></i> {{ $product->brand->name ?? 'BRAVE' }}
                     </div>
                     
-                    <!-- Product Title -->
                     <h1 class="product-title">{{ $product->name }}</h1>
                     <p class="product-subtitle">{{ $product->short_description ?? 'Graphic Printed T-Shirt' }}</p>
                     <p class="product-category">
                         <i class="fas fa-tag"></i> {{ $product->category ? $product->category->name : 'Uncategorized' }}
                     </p>
                     
-                    <!-- Rating -->
                     <div class="rating">
                         <span class="stars">
                             <i class="fas fa-star"></i>
@@ -660,7 +765,6 @@
                         <span class="rating-text">Based on 0 ratings</span>
                     </div>
                     
-                    <!-- Price -->
                     <div class="price-section">
                         @if($product->discount_price && $product->discount_price < $product->price)
                             <span class="current-price">₹{{ number_format($product->discount_price, 2) }}</span>
@@ -672,7 +776,6 @@
                         <div class="tax-text">Inclusive of all taxes</div>
                     </div>
                     
-                    <!-- Size Selection -->
                     <div class="size-section">
                         <div class="size-header">
                             <span class="size-label">Select Size</span>
@@ -680,7 +783,7 @@
                         </div>
                         <div class="size-options" id="sizeOptions">
                             @php
-                                $sizes = ['4-5 Years', '5-6 Years', '7-8 Years', '8-9 Years', '9-10 Years', '10-11 Years', '11-12 Years', '12-13 Years'];
+                                $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
                             @endphp
                             @foreach($sizes as $size)
                             <button type="button" class="size-btn" data-size="{{ $size }}">{{ $size }}</button>
@@ -689,7 +792,6 @@
                         <div id="sizeWarning" class="size-warning">Please select a size first</div>
                     </div>
                     
-                    <!-- Quantity -->
                     <div class="quantity-section">
                         <label class="quantity-label">Quantity</label>
                         <div class="quantity-selector">
@@ -699,7 +801,6 @@
                         </div>
                     </div>
                     
-                    <!-- Stock Status -->
                     <div class="stock-status">
                         @if($product->stock > 0)
                             <span class="in-stock"><i class="fas fa-check-circle"></i> In Stock ({{ $product->stock }} items available)</span>
@@ -708,35 +809,21 @@
                         @endif
                     </div>
                     
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <button class="btn-wishlist" onclick="toggleWishlist(this)">
-                            <i class="far fa-heart"></i> Wishlist
-                        </button>
-                        <button class="btn-add-cart" onclick="addToCartWithSize()">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </button>
-                        <button class="btn-buy-now" onclick="buyNowWithSize()">
-                            <i class="fas fa-bolt"></i> Buy Now
-                        </button>
-                    </div>
-                    
-                    <!-- Delivery Info -->
-                    <div class="delivery-box">
-                        <div class="delivery-item">
+                    <!-- Delivery Section with Pincode Input - EMPTY INITIALLY -->
+                    <div class="delivery-section">
+                        <div class="delivery-header">
                             <i class="fas fa-map-marker-alt"></i>
-                            <div class="delivery-text">
-                                <strong>Select Delivery Location</strong>
-                                <small>Enter pincode to check availability</small>
-                            </div>
+                            <strong>Select Delivery Location</strong>
+                            <small>Enter pincode to check availability</small>
                         </div>
-                        <div class="pincode-input">
-                            <input type="text" id="pincode" placeholder="Enter pincode" maxlength="6">
-                            <button onclick="checkPincode()">Check</button>
+                        <div class="pincode-wrapper">
+                            <input type="text" id="pincodeInput" placeholder="Enter pincode" maxlength="6" autocomplete="off" value="">
+                            <button id="checkPincodeBtn" onclick="checkPincode()">Check</button>
                         </div>
-                        <div id="pincodeMessage" class="mt-2 small"></div>
+                        <div id="deliveryMessage" class="delivery-message" style="display: none;"></div>
                     </div>
                     
+                    <!-- Delivery Information Box -->
                     <div class="delivery-box">
                         <div class="delivery-item">
                             <i class="fas fa-truck"></i>
@@ -761,9 +848,19 @@
                         </div>
                     </div>
                     
-                    <!-- Product Info Tabs -->
+                    <div class="action-buttons">
+                        <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlistDetail()" disabled>
+                            <i class="far fa-heart"></i> Wishlist
+                        </button>
+                        <button class="btn-add-cart" id="addToCartBtn" onclick="addToCartDetail()" disabled>
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                        <button class="btn-buy-now" id="buyNowBtn" onclick="buyNowDetail()" disabled>
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
+                    
                     <div class="product-info-tabs">
-                        <!-- PRODUCT DETAILS -->
                         <div class="info-tab">
                             <div class="info-tab-header" onclick="toggleTab(this)">
                                 <span><i class="fas fa-info-circle"></i> PRODUCT DETAILS</span>
@@ -780,7 +877,6 @@
                             </div>
                         </div>
                         
-                        <!-- KNOW YOUR PRODUCT -->
                         <div class="info-tab">
                             <div class="info-tab-header" onclick="toggleTab(this)">
                                 <span><i class="fas fa-clipboard-list"></i> KNOW YOUR PRODUCT</span>
@@ -800,7 +896,6 @@
                             </div>
                         </div>
                         
-                        <!-- RETURN & EXCHANGE -->
                         <div class="info-tab">
                             <div class="info-tab-header" onclick="toggleTab(this)">
                                 <span><i class="fas fa-undo-alt"></i> RETURN & EXCHANGE</span>
@@ -828,7 +923,6 @@
         </div>
     </div>
     
-    <!-- Related Products -->
     @if(isset($relatedProducts) && $relatedProducts->count() > 0)
     <div class="mt-5">
         <h3 class="mb-4">You May Also Like</h3>
@@ -855,13 +949,11 @@
     @endif
 </div>
 
-<!-- Image Modal -->
 <div id="imageModal" class="image-modal" onclick="closeModal()">
     <span class="close-modal">&times;</span>
     <img class="modal-image" id="modalImage">
 </div>
 
-<!-- Size Guide Modal -->
 <div id="sizeGuideModal" class="image-modal" style="display:none;" onclick="closeSizeGuide()">
     <div style="background:white; border-radius:15px; max-width:500px; width:90%; padding:20px;" onclick="event.stopPropagation()">
         <span style="float:right; cursor:pointer; font-size:24px;" onclick="closeSizeGuide()">&times;</span>
@@ -869,39 +961,138 @@
         <table style="width:100%; border-collapse:collapse; margin-top:15px;">
             <tr style="background:#f0f0f0;">
                 <th style="padding:10px; border:1px solid #ddd;">Size</th>
-                <th style="padding:10px; border:1px solid #ddd;">Age</th>
-                <th style="padding:10px; border:1px solid #ddd;">Height (cm)</th>
+                <th style="padding:10px; border:1px solid #ddd;">Chest (inches)</th>
+                <th style="padding:10px; border:1px solid #ddd;">Length (inches)</th>
             </tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">4-5 Years</td><td style="padding:8px; border:1px solid #ddd;">4-5 Years</td><td style="padding:8px; border:1px solid #ddd;">100-110</td></tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">5-6 Years</td><td style="padding:8px; border:1px solid #ddd;">5-6 Years</td><td style="padding:8px; border:1px solid #ddd;">110-116</td></tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">7-8 Years</td><td style="padding:8px; border:1px solid #ddd;">7-8 Years</td><td style="padding:8px; border:1px solid #ddd;">122-128</td></tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">8-9 Years</td><td style="padding:8px; border:1px solid #ddd;">8-9 Years</td><td style="padding:8px; border:1px solid #ddd;">128-134</td></tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">9-10 Years</td><td style="padding:8px; border:1px solid #ddd;">9-10 Years</td><td style="padding:8px; border:1px solid #ddd;">134-140</td></tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">10-11 Years</td><td style="padding:8px; border:1px solid #ddd;">10-11 Years</td><td style="padding:8px; border:1px solid #ddd;">140-146</td></tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">11-12 Years</td><td style="padding:8px; border:1px solid #ddd;">11-12 Years</td><td style="padding:8px; border:1px solid #ddd;">146-152</td></tr>
-            <tr><td style="padding:8px; border:1px solid #ddd;">12-13 Years</td><td style="padding:8px; border:1px solid #ddd;">12-13 Years</td><td style="padding:8px; border:1px solid #ddd;">152-158</td></tr>
+            <tr><td style="padding:8px; border:1px solid #ddd;">XS</td><td style="padding:8px; border:1px solid #ddd;">34-36</td><td style="padding:8px; border:1px solid #ddd;">27</td></tr>
+            <tr><td style="padding:8px; border:1px solid #ddd;">S</td><td style="padding:8px; border:1px solid #ddd;">36-38</td><td style="padding:8px; border:1px solid #ddd;">28</td></tr>
+            <tr><td style="padding:8px; border:1px solid #ddd;">M</td><td style="padding:8px; border:1px solid #ddd;">38-40</td><td style="padding:8px; border:1px solid #ddd;">29</td></tr>
+            <tr><td style="padding:8px; border:1px solid #ddd;">L</td><td style="padding:8px; border:1px solid #ddd;">40-42</td><td style="padding:8px; border:1px solid #ddd;">30</td></tr>
+            <tr><td style="padding:8px; border:1px solid #ddd;">XL</td><td style="padding:8px; border:1px solid #ddd;">42-44</td><td style="padding:8px; border:1px solid #ddd;">31</td></tr>
+            <tr><td style="padding:8px; border:1px solid #ddd;">XXL</td><td style="padding:8px; border:1px solid #ddd;">44-46</td><td style="padding:8px; border:1px solid #ddd;">32</td></tr>
         </table>
     </div>
 </div>
 
 <script>
-    // ========== GALLERY VARIABLES ==========
     let currentIndex = 0;
     let totalImages = {{ $allImages->count() }};
     const images = @json($allImages->map(function($img) { return asset('storage/' . $img->image_path); }));
     
-    // Change main image
+    const productId = {{ $product->id }};
+    const productName = "{{ addslashes($product->name) }}";
+    const productPrice = {{ $product->discount_price ?? $product->price }};
+    const productImage = "{{ asset('storage/' . ($allImages[0]->image_path ?? $product->image)) }}";
+    let selectedSize = null;
+    let isPincodeValid = false;
+    let currentPincode = '';
+    
+    const wishlistBtn = document.getElementById('wishlistBtn');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const buyNowBtn = document.getElementById('buyNowBtn');
+    const pincodeInput = document.getElementById('pincodeInput');
+    const deliveryMessageDiv = document.getElementById('deliveryMessage');
+    
+    // Initially disable all buttons
+    function enableButtons() {
+        if (wishlistBtn) wishlistBtn.disabled = false;
+        if (addToCartBtn) addToCartBtn.disabled = false;
+        if (buyNowBtn) buyNowBtn.disabled = false;
+    }
+    
+    function disableButtons() {
+        if (wishlistBtn) wishlistBtn.disabled = true;
+        if (addToCartBtn) addToCartBtn.disabled = true;
+        if (buyNowBtn) buyNowBtn.disabled = true;
+    }
+    
+    function showDeliveryMessage(message, type, pincode = '', deliveryDays = '') {
+        deliveryMessageDiv.style.display = 'flex';
+        deliveryMessageDiv.className = `delivery-message ${type}`;
+        
+        let icon = '';
+        let messageText = '';
+        
+        if (type === 'success') {
+            icon = '<i class="fas fa-check-circle"></i>';
+            messageText = `✓ Delivery available for pincode ${pincode}! Delivery in ${deliveryDays} days`;
+        } else if (type === 'error') {
+            icon = '<i class="fas fa-times-circle"></i>';
+            messageText = `✗ ${message}`;
+        } else {
+            icon = '<i class="fas fa-spinner fa-spin"></i>';
+            messageText = message;
+        }
+        
+        deliveryMessageDiv.innerHTML = `${icon} ${messageText}`;
+    }
+    
+    function clearDeliveryMessage() {
+        deliveryMessageDiv.style.display = 'none';
+        deliveryMessageDiv.innerHTML = '';
+    }
+    
+    async function checkPincode() {
+        const pincode = pincodeInput.value.trim();
+        
+        // Check if pincode is empty
+        if (pincode === '') {
+            showDeliveryMessage('Please enter a pincode', 'error');
+            pincodeInput.classList.remove('valid', 'invalid');
+            isPincodeValid = false;
+            currentPincode = '';
+            disableButtons();
+            return;
+        }
+        
+        // Check if pincode is valid 6 digits
+        if (pincode.length !== 6 || isNaN(pincode)) {
+            showDeliveryMessage('Please enter valid 6-digit pincode', 'error');
+            pincodeInput.classList.remove('valid', 'invalid');
+            isPincodeValid = false;
+            currentPincode = '';
+            disableButtons();
+            return;
+        }
+        
+        showDeliveryMessage('Checking availability...', 'info');
+        
+        try {
+            const response = await fetch(`/api/check-pincode/${pincode}`);
+            const data = await response.json();
+            
+            if (data.deliverable) {
+                currentPincode = pincode;
+                isPincodeValid = true;
+                pincodeInput.classList.add('valid');
+                pincodeInput.classList.remove('invalid');
+                showDeliveryMessage('', 'success', pincode, data.delivery_days);
+                localStorage.setItem('delivery_pincode', pincode);
+                enableButtons();
+                showNotification(`Delivery available to ${pincode}!`, 'success');
+            } else {
+                isPincodeValid = false;
+                currentPincode = '';
+                pincodeInput.classList.add('invalid');
+                pincodeInput.classList.remove('valid');
+                showDeliveryMessage(data.message, 'error');
+                disableButtons();
+                showNotification(`Sorry, we don't deliver to ${pincode} yet`, 'error');
+            }
+        } catch (error) {
+            console.error('Error checking pincode:', error);
+            showDeliveryMessage('Error checking pincode. Please try again.', 'error');
+            disableButtons();
+        }
+    }
+    
+    // Function to change main image
     function changeMainImage(index) {
         currentIndex = index;
         document.getElementById('mainImage').src = images[index];
-        
-        // Update active thumbnail
         document.querySelectorAll('.vertical-thumb').forEach((thumb, i) => {
-            if (i == index) {
-                thumb.classList.add('active');
-            } else {
-                thumb.classList.remove('active');
-            }
+            if (i == index) thumb.classList.add('active');
+            else thumb.classList.remove('active');
         });
     }
     
@@ -921,14 +1112,12 @@
         changeMainImage(newIndex);
     }
     
-    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft') prevImage();
         if (e.key === 'ArrowRight') nextImage();
         if (e.key === 'Escape') closeModal();
     });
     
-    // ========== SIZE GUIDE MODAL ==========
     function showSizeGuide(event) {
         event.preventDefault();
         document.getElementById('sizeGuideModal').style.display = 'flex';
@@ -938,7 +1127,6 @@
         document.getElementById('sizeGuideModal').style.display = 'none';
     }
     
-    // ========== TAB TOGGLE ==========
     function toggleTab(header) {
         const content = header.nextElementSibling;
         const isActive = header.classList.contains('active');
@@ -956,45 +1144,48 @@
         }
     }
     
-    // ========== WISHLIST ==========
-    function toggleWishlist(btn) {
-        const icon = btn.querySelector('i');
-        if (icon.classList.contains('far')) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            btn.style.background = '#dc3545';
-            btn.style.color = 'white';
-            showNotification('Added to wishlist!', 'success');
-        } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            btn.style.background = 'white';
-            btn.style.color = '#dc3545';
-            showNotification('Removed from wishlist!', 'info');
-        }
-    }
-    
-    // ========== PINCODE CHECK ==========
-    function checkPincode() {
-        const pincode = document.getElementById('pincode').value;
-        const messageDiv = document.getElementById('pincodeMessage');
-        
-        if (pincode.length !== 6 || isNaN(pincode)) {
-            messageDiv.innerHTML = '<span class="text-danger">❌ Please enter valid 6-digit pincode</span>';
+    function toggleWishlistDetail() {
+        if (!isPincodeValid) {
+            showNotification('Please check delivery availability first!', 'info');
+            pincodeInput.focus();
             return;
         }
         
-        // Example deliverable pincodes
-        const deliverable = ['600001', '600002', '600003', '600004', '600005', '110001', '400001'];
-        if (deliverable.includes(pincode)) {
-            messageDiv.innerHTML = '<span class="text-success">✓ Delivery available to this location!</span>';
+        @if(!auth()->check())
+            if(confirm('Please login to add items to wishlist. Go to login page?')) {
+                window.location.href = "{{ route('login') }}";
+            }
+            return;
+        @endif
+        
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        const existingIndex = wishlist.findIndex(item => item.id === productId);
+        const btn = document.querySelector('.btn-wishlist');
+        const icon = btn.querySelector('i');
+        
+        if (existingIndex !== -1) {
+            wishlist.splice(existingIndex, 1);
+            icon.className = 'far fa-heart';
+            btn.style.background = 'white';
+            btn.style.color = '#dc3545';
+            showNotification('Removed from wishlist!', 'info');
         } else {
-            messageDiv.innerHTML = '<span class="text-danger">✗ Delivery not available to this location</span>';
+            wishlist.push({
+                id: productId,
+                name: productName,
+                price: productPrice,
+                image: productImage,
+                added_at: new Date().toISOString()
+            });
+            icon.className = 'fas fa-heart';
+            btn.style.background = '#dc3545';
+            btn.style.color = 'white';
+            showNotification('Added to wishlist!', 'success');
         }
+        
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        updateWishlistCount();
     }
-    
-    // ========== SIZE SELECTION ==========
-    let selectedSize = null;
     
     document.querySelectorAll('.size-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1002,10 +1193,10 @@
             this.classList.add('selected');
             selectedSize = this.getAttribute('data-size');
             document.getElementById('sizeWarning').style.display = 'none';
+            saveSelectedSize();
         });
     });
     
-    // ========== QUANTITY ==========
     function incrementQuantity() {
         let qty = document.getElementById('quantity');
         let max = parseInt(qty.getAttribute('max')) || 99;
@@ -1019,8 +1210,13 @@
         if (newVal >= 1) qty.value = newVal;
     }
     
-    // ========== ADD TO CART ==========
-    function addToCartWithSize() {
+    function addToCartDetail() {
+        if (!isPincodeValid) {
+            showNotification('Please check delivery availability first!', 'info');
+            pincodeInput.focus();
+            return;
+        }
+        
         @if(!auth()->check())
             if(confirm('Please login to add products to cart. Go to login page?')) {
                 window.location.href = "{{ route('login') }}";
@@ -1030,36 +1226,40 @@
         
         if (!selectedSize) {
             document.getElementById('sizeWarning').style.display = 'block';
+            document.getElementById('sizeWarning').scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
         
         let quantity = parseInt(document.getElementById('quantity').value);
-        let price = {{ $product->discount_price ?? $product->price }};
-        let imageUrl = "{{ asset('storage/' . ($allImages[0]->image_path ?? $product->image)) }}";
+        let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+        let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize);
         
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let existing = cart.find(item => item.id === {{ $product->id }} && item.size === selectedSize);
-        
-        if(existing) {
-            existing.quantity += quantity;
+        if(existingItem) {
+            existingItem.quantity += quantity;
         } else {
-            cart.push({
-                id: {{ $product->id }},
-                name: "{{ addslashes($product->name) }}",
-                price: price,
+            currentCart.push({
+                id: productId,
+                name: productName,
+                price: productPrice,
+                image: productImage,
                 quantity: quantity,
                 size: selectedSize,
-                image: imageUrl
+                delivery_pincode: currentPincode
             });
         }
         
-        localStorage.setItem('cart', JSON.stringify(cart));
-        showNotification('Added to cart!', 'success');
+        localStorage.setItem('cart', JSON.stringify(currentCart));
+        showNotification(productName + ' (' + selectedSize + ') added to cart!', 'success');
         updateCartCount();
     }
     
-    // ========== BUY NOW ==========
-    function buyNowWithSize() {
+    function buyNowDetail() {
+        if (!isPincodeValid) {
+            showNotification('Please check delivery availability first!', 'info');
+            pincodeInput.focus();
+            return;
+        }
+        
         @if(!auth()->check())
             if(confirm('Please login to purchase. Go to login page?')) {
                 window.location.href = "{{ route('login') }}";
@@ -1069,64 +1269,84 @@
         
         if (!selectedSize) {
             document.getElementById('sizeWarning').style.display = 'block';
+            document.getElementById('sizeWarning').scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
+        
+        let quantity = parseInt(document.getElementById('quantity').value);
         
         let form = document.createElement('form');
         form.method = 'POST';
         form.action = '{{ route("buy.now") }}';
         
-        let csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = '_token';
-        csrf.value = '{{ csrf_token() }}';
-        form.appendChild(csrf);
+        let csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = '{{ csrf_token() }}';
+        form.appendChild(csrfInput);
         
-        let product = document.createElement('input');
-        product.type = 'hidden';
-        product.name = 'product_id';
-        product.value = {{ $product->id }};
-        form.appendChild(product);
+        let productInput = document.createElement('input');
+        productInput.type = 'hidden';
+        productInput.name = 'product_id';
+        productInput.value = productId;
+        form.appendChild(productInput);
         
-        let quantity = document.createElement('input');
-        quantity.type = 'hidden';
-        quantity.name = 'quantity';
-        quantity.value = document.getElementById('quantity').value;
-        form.appendChild(quantity);
+        let quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = quantity;
+        form.appendChild(quantityInput);
         
-        let size = document.createElement('input');
-        size.type = 'hidden';
-        size.name = 'size';
-        size.value = selectedSize;
-        form.appendChild(size);
+        let sizeInput = document.createElement('input');
+        sizeInput.type = 'hidden';
+        sizeInput.name = 'size';
+        sizeInput.value = selectedSize;
+        form.appendChild(sizeInput);
+        
+        let pincodeField = document.createElement('input');
+        pincodeField.type = 'hidden';
+        pincodeField.name = 'delivery_pincode';
+        pincodeField.value = currentPincode;
+        form.appendChild(pincodeField);
         
         document.body.appendChild(form);
         form.submit();
     }
     
-    // ========== NOTIFICATION ==========
     function showNotification(message, type) {
-        let notification = document.createElement('div');
-        notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'info') + ' alert-dismissible fade show';
-        notification.style.position = 'fixed';
-        notification.style.top = '20px';
-        notification.style.right = '20px';
-        notification.style.zIndex = '9999';
-        notification.style.minWidth = '250px';
-        notification.innerHTML = '<i class="fas fa-check-circle me-2"></i> ' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} me-2"></i> ${message}`;
         document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 2000);
+        setTimeout(() => notification.remove(), 3000);
     }
     
-    // ========== UPDATE CART ==========
     function updateCartCount() {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let count = cart.reduce((s, i) => s + i.quantity, 0);
-        let el = document.getElementById('navbarCartCount');
-        if (el) el.textContent = count;
+        let count = cart.reduce((total, item) => total + item.quantity, 0);
+        let cartCountElement = document.getElementById('navbarCartCount');
+        if (cartCountElement) {
+            cartCountElement.textContent = count;
+            if(count > 0) cartCountElement.classList.remove('hide-badge');
+            else cartCountElement.classList.add('hide-badge');
+        }
     }
     
-    // ========== IMAGE MODAL ==========
+    function updateWishlistCount() {
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let count = wishlist.length;
+        let el = document.getElementById('navbarWishlistCount');
+        if (el) {
+            if(count > 0) {
+                el.textContent = count;
+                el.classList.remove('hide-badge');
+            } else {
+                el.textContent = '';
+                el.classList.add('hide-badge');
+            }
+        }
+    }
+    
     function openModal(src) {
         const modal = document.getElementById('imageModal');
         const modalImg = document.getElementById('modalImage');
@@ -1139,19 +1359,68 @@
         modal.classList.remove('show');
     }
     
-    // ========== DOM CONTENT LOADED ==========
+    function checkWishlistStatus() {
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        const isInWishlist = wishlist.some(item => item.id === productId);
+        const btn = document.querySelector('.btn-wishlist');
+        const icon = btn.querySelector('i');
+        
+        if (isInWishlist) {
+            icon.className = 'fas fa-heart';
+            btn.style.background = '#dc3545';
+            btn.style.color = 'white';
+        } else {
+            icon.className = 'far fa-heart';
+            btn.style.background = 'white';
+            btn.style.color = '#dc3545';
+        }
+    }
+    
+    function loadSavedSize() {
+        let savedSizes = JSON.parse(localStorage.getItem('selectedSizes')) || {};
+        if (savedSizes[productId]) {
+            selectedSize = savedSizes[productId];
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                if (btn.getAttribute('data-size') === selectedSize) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+    }
+    
+    function saveSelectedSize() {
+        let savedSizes = JSON.parse(localStorage.getItem('selectedSizes')) || {};
+        if (selectedSize) {
+            savedSizes[productId] = selectedSize;
+            localStorage.setItem('selectedSizes', JSON.stringify(savedSizes));
+        }
+    }
+    
+    // Enter key press on pincode input
+    pincodeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            checkPincode();
+        }
+    });
+    
     document.addEventListener('DOMContentLoaded', function() {
-        // Open first tab by default
         const firstTab = document.querySelector('.info-tab-header');
         if (firstTab) {
             firstTab.classList.add('active');
             if(firstTab.nextElementSibling) firstTab.nextElementSibling.classList.add('show');
         }
         
-        // Update cart count on load
         updateCartCount();
+        updateWishlistCount();
+        checkWishlistStatus();
+        loadSavedSize();
         
-        // Add click event for image zoom
+        // Initially disable all buttons - user must enter pincode first
+        disableButtons();
+        
+        // Clear any saved pincode from localStorage to start empty
+        // localStorage.removeItem('delivery_pincode');
+        
         const mainImageArea = document.getElementById('mainImageArea');
         if(mainImageArea) {
             mainImageArea.addEventListener('click', function(e) {
