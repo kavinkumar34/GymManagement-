@@ -30,35 +30,35 @@ use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\SizeChartController;
 use App\Http\Controllers\ProductDetailController;
-use App\Http\Controllers\Admin\DeliverablePincodeController; // ADD THIS LINE
+use App\Http\Controllers\Admin\DeliverablePincodeController;
+
+// ============ ADD THIS LINE ============
+use App\Models\UserAddress;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+
 
 // ============ HOME PAGE ============
 Route::get('/', function () {
     return view('home');
 })->name('home');
 
-// ============ PRODUCT DETAIL PAGE (MUST BE OUTSIDE ADMIN GROUP) ============
+// ============ PRODUCT DETAIL PAGE ============
 Route::get('/product/{id}', [ProductDetailController::class, 'show'])->name('product.show');
 
 // ============ CAPTCHA ============
 Route::get('/captcha', [CaptchaController::class, 'generate']);
 
-// ============ MEMBER/TRAINER LOGIN ============
+// ============ MEMBER/TRAINER LOGIN & REGISTER ============
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
-
-// ============ MEMBER/TRAINER REGISTER ============
 Route::get('/member/register', [MemberRegisterController::class, 'showRegisterForm'])->name('member.register');
 Route::post('/member/register', [MemberRegisterController::class, 'register'])->name('member.register.submit');
 
-// ============ ADMIN LOGIN ============
+// ============ ADMIN LOGIN & REGISTER ============
 Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
-
-// ============ ADMIN REGISTER ============
 Route::get('/admin/register', [AdminRegisterController::class, 'showRegisterForm'])->name('admin.register');
 Route::post('/admin/register', [AdminRegisterController::class, 'register'])->name('admin.register.submit');
 
@@ -66,17 +66,20 @@ Route::post('/admin/register', [AdminRegisterController::class, 'register'])->na
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
-// ============ CART ROUTE ============
+// ============ CART & WISHLIST & SHOP ROUTES ============
 Route::get('/cart', function () {
     return view('cart');
 })->name('cart');
 
-// ============ WISHLIST ROUTE ============
 Route::get('/wishlist', function () {
     return view('wishlist');
 })->name('wishlist');
 
-// ============ CONTACT ROUTES (Public) ============
+Route::get('/shop', function () {
+    return view('shop');
+})->name('shop');
+
+// ============ CONTACT ROUTES ============
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
@@ -87,21 +90,17 @@ Route::post('/payment/failure', [PaymentController::class, 'paymentFailure'])->n
 Route::get('/order/success/{id}', [PaymentController::class, 'orderSuccess'])->name('order.success')->middleware('auth');
 Route::get('/my-orders', [PaymentController::class, 'myOrders'])->name('my.orders')->middleware('auth');
 
-// ============ TRACK ORDER ROUTE ============
+// ============ TRACK ORDER & ABOUT ============
 Route::get('/track-order', [TrackOrderController::class, 'index'])->name('track.order');
-
-// ============ ABOUT PAGE ============
 Route::get('/about', function () {
     return view('about');
 })->name('about');
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
-    
-    // ============ DASHBOARD ============
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
-    // ============ MEMBER MANAGEMENT ROUTES ============
+    // Member Management
     Route::get('/members/create', [MemberController::class, 'create'])->name('member.create');
     Route::post('/members/store', [MemberController::class, 'store'])->name('member.store');
     Route::get('/members', [MemberController::class, 'index'])->name('members');
@@ -110,7 +109,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('member.destroy');
     Route::get('/members/{id}', [MemberController::class, 'show'])->name('member.show');
     
-    // ============ TRAINER MANAGEMENT ROUTES ============
+    // Trainer Management
     Route::get('/trainers/create', [TrainerController::class, 'create'])->name('trainer.create');
     Route::post('/trainers/store', [TrainerController::class, 'store'])->name('trainer.store');
     Route::get('/trainers', [TrainerController::class, 'index'])->name('trainers');
@@ -119,12 +118,12 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::delete('/trainers/{id}', [TrainerController::class, 'destroy'])->name('trainer.destroy');
     Route::get('/trainers/{id}', [TrainerController::class, 'show'])->name('trainer.show');
     
-    // ============ SETTINGS MANAGEMENT ROUTES ============
+    // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::post('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('/settings/logo', [SettingsController::class, 'uploadLogo'])->name('settings.upload.logo');
     
-    // Top Category Routes
+    // Top Categories
     Route::get('/topcategories', [TopCategoryController::class, 'index'])->name('topcategories.index');
     Route::get('/topcategories/create', [TopCategoryController::class, 'create'])->name('topcategories.create');
     Route::post('/topcategories', [TopCategoryController::class, 'store'])->name('topcategories.store');
@@ -132,7 +131,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/topcategories/{id}', [TopCategoryController::class, 'update'])->name('topcategories.update');
     Route::delete('/topcategories/{id}', [TopCategoryController::class, 'destroy'])->name('topcategories.destroy');
 
-    // ============ BRAND MANAGEMENT ROUTES ============
+    // Brands
     Route::get('/brands', [BrandController::class, 'index'])->name('brands.index');
     Route::get('/brands/create', [BrandController::class, 'create'])->name('brands.create');
     Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
@@ -140,15 +139,17 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/brands/{id}', [BrandController::class, 'update'])->name('brands.update');
     Route::delete('/brands/{id}', [BrandController::class, 'destroy'])->name('brands.destroy');
     
-    // ============ CATEGORY MANAGEMENT ROUTES ============
+    // Categories
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/categories/{id}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
     Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/categories/quick-store', [CategoryController::class, 'quickStore'])->name('categories.quick.store');
+    Route::get('/categories/{id}/products', [CategoryController::class, 'showProducts'])->name('categories.products');
     
-    // ============ SUB CATEGORY MANAGEMENT ROUTES ============
+    // Sub Categories
     Route::get('/subcategories', [SubCategoryController::class, 'index'])->name('subcategories.index');
     Route::get('/subcategories/create', [SubCategoryController::class, 'create'])->name('subcategories.create');
     Route::post('/subcategories', [SubCategoryController::class, 'store'])->name('subcategories.store');
@@ -156,7 +157,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/subcategories/{id}', [SubCategoryController::class, 'update'])->name('subcategories.update');
     Route::delete('/subcategories/{id}', [SubCategoryController::class, 'destroy'])->name('subcategories.destroy');
     
-    // ============ PRODUCT TYPE MANAGEMENT ROUTES ============
+    // Product Types
     Route::get('/producttypes', [ProductTypeController::class, 'index'])->name('producttypes.index');
     Route::get('/producttypes/create', [ProductTypeController::class, 'create'])->name('producttypes.create');
     Route::post('/producttypes', [ProductTypeController::class, 'store'])->name('producttypes.store');
@@ -164,7 +165,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/producttypes/{id}', [ProductTypeController::class, 'update'])->name('producttypes.update');
     Route::delete('/producttypes/{id}', [ProductTypeController::class, 'destroy'])->name('producttypes.destroy');
     
-    // ============ ATTRIBUTE MANAGEMENT ROUTES ============
+    // Attributes
     Route::get('/attributes', [AttributeController::class, 'index'])->name('attributes.index');
     Route::get('/attributes/create', [AttributeController::class, 'create'])->name('attributes.create');
     Route::post('/attributes', [AttributeController::class, 'store'])->name('attributes.store');
@@ -172,7 +173,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/attributes/{id}', [AttributeController::class, 'update'])->name('attributes.update');
     Route::delete('/attributes/{id}', [AttributeController::class, 'destroy'])->name('attributes.destroy');
     
-    // ============ SIZE CHART MANAGEMENT ROUTES ============
+    // Size Charts
     Route::get('/sizecharts', [SizeChartController::class, 'index'])->name('sizecharts.index');
     Route::get('/sizecharts/create', [SizeChartController::class, 'create'])->name('sizecharts.create');
     Route::post('/sizecharts', [SizeChartController::class, 'store'])->name('sizecharts.store');
@@ -180,7 +181,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/sizecharts/{id}', [SizeChartController::class, 'update'])->name('sizecharts.update');
     Route::delete('/sizecharts/{id}', [SizeChartController::class, 'destroy'])->name('sizecharts.destroy');
     
-    // ============ PRODUCT MANAGEMENT ROUTES ============
+    // Products
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
@@ -188,30 +189,22 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
-
-    // ============ QUICK ADD CATEGORY (AJAX) ============
-    Route::post('/categories/quick-store', [CategoryController::class, 'quickStore'])->name('categories.quick.store');
+    Route::post('/update-stock', [ProductController::class, 'updateStock'])->name('update.stock');
     
-    // ============ VIEW PRODUCTS IN CATEGORY ============
-    Route::get('/categories/{id}/products', [CategoryController::class, 'showProducts'])->name('categories.products');
-    
-    // ============ AJAX ROUTES FOR DYNAMIC FORMS ============
+    // AJAX Routes
     Route::get('/get-categories/{topId}', [CategoryController::class, 'getByTopCategory'])->name('get.categories');
     Route::get('/get-subcategories/{categoryId}', [SubCategoryController::class, 'getByCategory'])->name('get.subcategories');
     Route::get('/get-producttypes/{subCategoryId}', [ProductTypeController::class, 'getBySubCategory'])->name('get.producttypes');
     Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
     Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
     
-    // Stock Update (AJAX)
-    Route::post('/update-stock', [ProductController::class, 'updateStock'])->name('update.stock');
-    
-    // ============ CONTACT MANAGEMENT ROUTES ============
+    // Contacts
     Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
     Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('contacts.show');
     Route::delete('/contacts/{id}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
     Route::post('/contacts/{id}/status', [AdminContactController::class, 'updateStatus'])->name('contacts.status');
     
-    // ============ BANNER MANAGEMENT ROUTES ============
+    // Banners
     Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
     Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
     Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
@@ -219,7 +212,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/banners/{id}', [BannerController::class, 'update'])->name('banners.update');
     Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
     
-    // ============ PAYMENT/ORDER MANAGEMENT ROUTES ============
+    // Payments/Orders
     Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
     Route::get('/payments/create', [AdminPaymentController::class, 'create'])->name('payments.create');
     Route::post('/payments', [AdminPaymentController::class, 'store'])->name('payments.store');
@@ -231,7 +224,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/payments/check-new', [AdminPaymentController::class, 'getNewOrdersCount'])->name('payments.check-new');
     Route::get('/payments/{id}', [AdminPaymentController::class, 'show'])->name('payments.show');
     
-    // ============ PINCODE MANAGEMENT ROUTES ============
+    // Pincodes
     Route::resource('pincodes', DeliverablePincodeController::class);
     Route::post('pincodes/bulk-import', [DeliverablePincodeController::class, 'bulkImport'])->name('pincodes.bulk');
 });
@@ -261,7 +254,7 @@ Route::post('/api/set-checkout-cart', function (Request $request) {
     return response()->json(['success' => true]);
 })->middleware('auth');
 
-// ============ PINCODE CHECK API ROUTE (PUBLIC) ============
+// ============ PINCODE CHECK API ============
 Route::get('/api/check-pincode/{pincode}', function ($pincode) {
     $isDeliverable = \App\Models\DeliverablePincode::isDeliverable($pincode);
     $deliveryInfo = \App\Models\DeliverablePincode::getDeliveryInfo($pincode);
@@ -275,3 +268,87 @@ Route::get('/api/check-pincode/{pincode}', function ($pincode) {
         'message' => $isDeliverable ? 'Delivery available' : 'Delivery not available for this pincode'
     ]);
 })->name('check.pincode');
+
+// ============ USER API ============
+Route::get('/api/user', function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        return response()->json([
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone ?? ''
+            ]
+        ]);
+    }
+    return response()->json(['success' => false, 'message' => 'Not logged in']);
+})->name('api.user');
+
+// ============ USER ADDRESSES API ==========
+Route::get('/api/user-addresses', function () {
+    if (auth()->check()) {
+        $addresses = UserAddress::where('user_id', auth()->id())
+            ->orderBy('is_default', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return response()->json([
+            'success' => true,
+            'addresses' => $addresses
+        ]);
+    }
+    return response()->json(['success' => false, 'addresses' => []]);
+})->name('api.user.addresses');
+
+Route::post('/api/user-addresses', function (Illuminate\Http\Request $request) {
+    try {
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'User not logged in']);
+        }
+        
+        \Log::info('Saving address', $request->all());
+        
+        $address = UserAddress::create([
+            'user_id' => auth()->id(),
+            'name' => $request->name,
+            'email' => $request->email ?? auth()->user()->email,
+            'address' => $request->address,
+            'area' => $request->area,
+            'city' => $request->city,
+            'state' => $request->state,
+            'pincode' => $request->pincode,
+            'phone' => $request->phone,
+            'is_default' => $request->is_default ?? false
+        ]);
+        
+        return response()->json(['success' => true, 'address' => $address]);
+    } catch (\Exception $e) {
+        \Log::error('Address save error: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+})->name('api.user.addresses.store');
+
+Route::delete('/api/user-addresses/{id}', function ($id) {
+    if (auth()->check()) {
+        $address = UserAddress::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
+        if ($address) {
+            $address->delete();
+            return response()->json(['success' => true]);
+        }
+    }
+    return response()->json(['success' => false]);
+})->name('api.user.addresses.delete');
+
+// ============ DELIVERABLE PINCODES API ==========
+Route::get('/api/deliverable-pincodes', function () {
+    $pincodes = \App\Models\DeliverablePincode::where('is_active', 1)
+        ->select('pincode', 'city', 'state', 'delivery_days', 'is_active')
+        ->get();
+    return response()->json([
+        'success' => true,
+        'pincodes' => $pincodes
+    ]);
+})->name('deliverable.pincodes');
