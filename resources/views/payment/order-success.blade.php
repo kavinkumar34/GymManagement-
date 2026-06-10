@@ -25,9 +25,6 @@
         margin: 10px 0 0;
         font-size: 1.5rem;
     }
-    .success-body {
-        padding: 25px;
-    }
     .order-details-table {
         width: 100%;
         margin-bottom: 20px;
@@ -72,9 +69,10 @@
     .btn-success-custom:hover {
         background: #218838;
         transform: translateY(-2px);
+        color: white;
     }
-    .btn-secondary-custom {
-        background: #6c757d;
+    .btn-primary-custom {
+        background: #3b82f6;
         color: white;
         padding: 10px 25px;
         border-radius: 25px;
@@ -83,9 +81,10 @@
         margin: 5px;
         transition: all 0.3s;
     }
-    .btn-secondary-custom:hover {
-        background: #5a6268;
+    .btn-primary-custom:hover {
+        background: #2563eb;
         transform: translateY(-2px);
+        color: white;
     }
     .grand-total {
         background: #f8f9fa;
@@ -93,6 +92,29 @@
     }
     .grand-total td {
         padding: 12px;
+    }
+    .order-status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-confirmed {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+    .status-pending {
+        background: #fef9c3;
+        color: #854d0e;
+    }
+    .status-shipped {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+    .status-delivered {
+        background: #dcfce7;
+        color: #15803d;
     }
 </style>
 
@@ -110,7 +132,7 @@
                     <h5 style="margin-bottom: 15px; color: #333;"><i class="fas fa-receipt"></i> Order Details</h5>
                     <table class="order-details-table">
                         <tr><td>Order Number</td><td><strong>{{ $order->order_number }}</strong></td></tr>
-                        <tr><td>Order Date</td><td>{{ \Carbon\Carbon::parse($order->order_date)->format('d M Y, h:i A') }}</td></tr>
+                        <tr><td>Order Date</td><td>{{ \Carbon\Carbon::parse($order->order_date ?? $order->created_at)->format('d M Y, h:i A') }}</td></tr>
                         <tr><td>Payment Status</td><td><span class="badge bg-success">Paid</span></td></tr>
                         <tr><td>Total Amount</td><td><strong style="color: #28a745;">₹{{ number_format($order->total_amount, 2) }}</strong></td></tr>
                     </table>
@@ -118,8 +140,8 @@
                 <div class="col-md-6">
                     <h5 style="margin-bottom: 15px; color: #333;"><i class="fas fa-user"></i> Customer Details</h5>
                     <table class="order-details-table">
-                        <tr><td>Name</td><td>{{ Auth::user()->name }}</td></tr>
-                        <tr><td>Email</td><td>{{ Auth::user()->email }}</td></tr>
+                        <tr><td>Name</td><td>{{ Auth::user()->name ?? $order->user->name ?? 'N/A' }}</td></tr>
+                        <tr><td>Email</td><td>{{ Auth::user()->email ?? $order->user->email ?? 'N/A' }}</td></tr>
                     </table>
                 </div>
             </div>
@@ -134,10 +156,10 @@
                     <tbody>
                         @foreach($order->items as $item)
                         <tr>
-                            <td>{{ $item->product_name }}</td>
-                            <td>{{ $item->quantity }}</td>
-                            <td>₹{{ number_format($item->price, 2) }}</td>
-                            <td>₹{{ number_format($item->price * $item->quantity, 2) }}</td>
+                            <td>{{ $item->product_name }}</div>
+                            <td>{{ $item->quantity }}</div>
+                            <td>₹{{ number_format($item->price, 2) }}</div>
+                            <td>₹{{ number_format($item->price * $item->quantity, 2) }}</div>
                          </tr>
                         @endforeach
                     </tbody>
@@ -155,16 +177,25 @@
                 <a href="{{ url('/') }}" class="btn-success-custom">
                     <i class="fas fa-shopping-cart"></i> Continue Shopping
                 </a>
-                <a href="{{ route('track.order') }}" class="btn-secondary-custom">
-                    <i class="fas fa-truck"></i> View My Orders
+                <a href="{{ route('my.orders') }}" class="btn-primary-custom">
+                    <i class="fas fa-list-ul"></i> View My Orders
                 </a>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     // Clear cart from localStorage when order success page loads
-    localStorage.removeItem('cart');
+    if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('cart');
+        localStorage.removeItem('checkout_cart');
+    }
+    
+    // Clear session storage
+    if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('checkout_cart');
+    }
     
     // Update navbar cart count
     let cartCountElement = document.getElementById('navbarCartCount');
@@ -174,7 +205,24 @@
         cartCountElement.style.display = 'none';
     }
     
-    // Clear any stored checkout cart
-    sessionStorage.removeItem('checkout_cart');
+    // Update wishlist count if needed
+    let wishlistCountElement = document.getElementById('navbarWishlistCount');
+    if (wishlistCountElement) {
+        // Don't clear wishlist, just refresh count
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let count = wishlist.length;
+        if (count > 0) {
+            wishlistCountElement.innerText = count;
+            wishlistCountElement.classList.remove('hide-badge');
+            wishlistCountElement.style.display = 'inline-flex';
+        } else {
+            wishlistCountElement.innerText = '';
+            wishlistCountElement.classList.add('hide-badge');
+            wishlistCountElement.style.display = 'none';
+        }
+    }
+    
+    // Store that order was successful (optional)
+    localStorage.setItem('last_order_successful', Date.now());
 </script>
 @endsection

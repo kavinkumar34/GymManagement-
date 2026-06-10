@@ -3,118 +3,7 @@
 
 @section('content')
 <style>
-    /* Delivery Pincode Section Styles */
-    .delivery-section {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        border: 1px solid #eee;
-    }
-    
-    .delivery-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 12px;
-    }
-    
-    .delivery-header i {
-        font-size: 18px;
-        color: #dc3545;
-    }
-    
-    .delivery-header strong {
-        font-size: 14px;
-        color: #333;
-    }
-    
-    .delivery-header small {
-        color: #666;
-        font-size: 12px;
-        margin-left: 5px;
-    }
-    
-    .pincode-wrapper {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .pincode-wrapper input {
-        flex: 1;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        font-size: 14px;
-        transition: all 0.3s;
-    }
-    
-    .pincode-wrapper input:focus {
-        outline: none;
-        border-color: #dc3545;
-        box-shadow: 0 0 0 2px rgba(220,53,69,0.1);
-    }
-    
-    .pincode-wrapper input.valid {
-        border-color: #28a745;
-        background-color: #e8f5e9;
-    }
-    
-    .pincode-wrapper input.invalid {
-        border-color: #dc3545;
-        background-color: #ffebee;
-    }
-    
-    .pincode-wrapper button {
-        padding: 12px 24px;
-        background: #000;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-    
-    .pincode-wrapper button:hover {
-        background: #dc3545;
-    }
-    
-    .delivery-message {
-        padding: 10px 12px;
-        border-radius: 8px;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 10px;
-    }
-    
-    .delivery-message.success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .delivery-message.error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    
-    .delivery-message.info {
-        background: #d1ecf1;
-        color: #0c5460;
-        border: 1px solid #bee5eb;
-    }
-    
-    .delivery-message i {
-        font-size: 14px;
-    }
-    
-    /* Rest of your existing styles */
+    /* Rest of your existing styles (keep everything except delivery-section styles) */
     .product-detail-container {
         background: white;
         border-radius: 15px;
@@ -686,12 +575,6 @@
         .btn-add-cart, .btn-buy-now, .btn-wishlist {
             width: 100%;
         }
-        .pincode-wrapper {
-            flex-direction: column;
-        }
-        .pincode-wrapper button {
-            width: 100%;
-        }
     }
 </style>
 
@@ -809,21 +692,7 @@
                         @endif
                     </div>
                     
-                    <!-- Delivery Section with Pincode Input - EMPTY INITIALLY -->
-                    <div class="delivery-section">
-                        <div class="delivery-header">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <strong>Select Delivery Location</strong>
-                            <small>Enter pincode to check availability</small>
-                        </div>
-                        <div class="pincode-wrapper">
-                            <input type="text" id="pincodeInput" placeholder="Enter pincode" maxlength="6" autocomplete="off" value="">
-                            <button id="checkPincodeBtn" onclick="checkPincode()">Check</button>
-                        </div>
-                        <div id="deliveryMessage" class="delivery-message" style="display: none;"></div>
-                    </div>
-                    
-                    <!-- Delivery Information Box -->
+                    <!-- Delivery Information Box (Without Pincode Input) -->
                     <div class="delivery-box">
                         <div class="delivery-item">
                             <i class="fas fa-truck"></i>
@@ -849,13 +718,13 @@
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlistDetail()" disabled>
+                        <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlistDetail()">
                             <i class="far fa-heart"></i> Wishlist
                         </button>
-                        <button class="btn-add-cart" id="addToCartBtn" onclick="addToCartDetail()" disabled>
+                        <button class="btn-add-cart" id="addToCartBtn" onclick="addToCartDetail()">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
-                        <button class="btn-buy-now" id="buyNowBtn" onclick="buyNowDetail()" disabled>
+                        <button class="btn-buy-now" id="buyNowBtn" onclick="buyNowDetail()">
                             <i class="fas fa-bolt"></i> Buy Now
                         </button>
                     </div>
@@ -984,107 +853,10 @@
     const productPrice = {{ $product->discount_price ?? $product->price }};
     const productImage = "{{ asset('storage/' . ($allImages[0]->image_path ?? $product->image)) }}";
     let selectedSize = null;
-    let isPincodeValid = false;
-    let currentPincode = '';
     
     const wishlistBtn = document.getElementById('wishlistBtn');
     const addToCartBtn = document.getElementById('addToCartBtn');
     const buyNowBtn = document.getElementById('buyNowBtn');
-    const pincodeInput = document.getElementById('pincodeInput');
-    const deliveryMessageDiv = document.getElementById('deliveryMessage');
-    
-    // Initially disable all buttons
-    function enableButtons() {
-        if (wishlistBtn) wishlistBtn.disabled = false;
-        if (addToCartBtn) addToCartBtn.disabled = false;
-        if (buyNowBtn) buyNowBtn.disabled = false;
-    }
-    
-    function disableButtons() {
-        if (wishlistBtn) wishlistBtn.disabled = true;
-        if (addToCartBtn) addToCartBtn.disabled = true;
-        if (buyNowBtn) buyNowBtn.disabled = true;
-    }
-    
-    function showDeliveryMessage(message, type, pincode = '', deliveryDays = '') {
-        deliveryMessageDiv.style.display = 'flex';
-        deliveryMessageDiv.className = `delivery-message ${type}`;
-        
-        let icon = '';
-        let messageText = '';
-        
-        if (type === 'success') {
-            icon = '<i class="fas fa-check-circle"></i>';
-            messageText = `✓ Delivery available for pincode ${pincode}! Delivery in ${deliveryDays} days`;
-        } else if (type === 'error') {
-            icon = '<i class="fas fa-times-circle"></i>';
-            messageText = `✗ ${message}`;
-        } else {
-            icon = '<i class="fas fa-spinner fa-spin"></i>';
-            messageText = message;
-        }
-        
-        deliveryMessageDiv.innerHTML = `${icon} ${messageText}`;
-    }
-    
-    function clearDeliveryMessage() {
-        deliveryMessageDiv.style.display = 'none';
-        deliveryMessageDiv.innerHTML = '';
-    }
-    
-    async function checkPincode() {
-        const pincode = pincodeInput.value.trim();
-        
-        // Check if pincode is empty
-        if (pincode === '') {
-            showDeliveryMessage('Please enter a pincode', 'error');
-            pincodeInput.classList.remove('valid', 'invalid');
-            isPincodeValid = false;
-            currentPincode = '';
-            disableButtons();
-            return;
-        }
-        
-        // Check if pincode is valid 6 digits
-        if (pincode.length !== 6 || isNaN(pincode)) {
-            showDeliveryMessage('Please enter valid 6-digit pincode', 'error');
-            pincodeInput.classList.remove('valid', 'invalid');
-            isPincodeValid = false;
-            currentPincode = '';
-            disableButtons();
-            return;
-        }
-        
-        showDeliveryMessage('Checking availability...', 'info');
-        
-        try {
-            const response = await fetch(`/api/check-pincode/${pincode}`);
-            const data = await response.json();
-            
-            if (data.deliverable) {
-                currentPincode = pincode;
-                isPincodeValid = true;
-                pincodeInput.classList.add('valid');
-                pincodeInput.classList.remove('invalid');
-                showDeliveryMessage('', 'success', pincode, data.delivery_days);
-                localStorage.setItem('delivery_pincode', pincode);
-                enableButtons();
-                showNotification(`Delivery available to ${pincode}!`, 'success');
-            } else {
-                isPincodeValid = false;
-                currentPincode = '';
-                pincodeInput.classList.add('invalid');
-                pincodeInput.classList.remove('valid');
-                showDeliveryMessage(data.message, 'error');
-                disableButtons();
-                showNotification(`Sorry, we don't deliver to ${pincode} yet`, 'error');
-            }
-        } catch (error) {
-            console.error('Error checking pincode:', error);
-            showDeliveryMessage('Error checking pincode. Please try again.', 'error');
-            disableButtons();
-        }
-    }
     
     // Function to change main image
     function changeMainImage(index) {
@@ -1145,12 +917,6 @@
     }
     
     function toggleWishlistDetail() {
-        if (!isPincodeValid) {
-            showNotification('Please check delivery availability first!', 'info');
-            pincodeInput.focus();
-            return;
-        }
-        
         @if(!auth()->check())
             if(confirm('Please login to add items to wishlist. Go to login page?')) {
                 window.location.href = "{{ route('login') }}";
@@ -1211,12 +977,6 @@
     }
     
     function addToCartDetail() {
-        if (!isPincodeValid) {
-            showNotification('Please check delivery availability first!', 'info');
-            pincodeInput.focus();
-            return;
-        }
-        
         @if(!auth()->check())
             if(confirm('Please login to add products to cart. Go to login page?')) {
                 window.location.href = "{{ route('login') }}";
@@ -1243,8 +1003,7 @@
                 price: productPrice,
                 image: productImage,
                 quantity: quantity,
-                size: selectedSize,
-                delivery_pincode: currentPincode
+                size: selectedSize
             });
         }
         
@@ -1254,12 +1013,6 @@
     }
     
     function buyNowDetail() {
-        if (!isPincodeValid) {
-            showNotification('Please check delivery availability first!', 'info');
-            pincodeInput.focus();
-            return;
-        }
-        
         @if(!auth()->check())
             if(confirm('Please login to purchase. Go to login page?')) {
                 window.location.href = "{{ route('login') }}";
@@ -1302,12 +1055,6 @@
         sizeInput.name = 'size';
         sizeInput.value = selectedSize;
         form.appendChild(sizeInput);
-        
-        let pincodeField = document.createElement('input');
-        pincodeField.type = 'hidden';
-        pincodeField.name = 'delivery_pincode';
-        pincodeField.value = currentPincode;
-        form.appendChild(pincodeField);
         
         document.body.appendChild(form);
         form.submit();
@@ -1396,13 +1143,6 @@
         }
     }
     
-    // Enter key press on pincode input
-    pincodeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            checkPincode();
-        }
-    });
-    
     document.addEventListener('DOMContentLoaded', function() {
         const firstTab = document.querySelector('.info-tab-header');
         if (firstTab) {
@@ -1414,12 +1154,6 @@
         updateWishlistCount();
         checkWishlistStatus();
         loadSavedSize();
-        
-        // Initially disable all buttons - user must enter pincode first
-        disableButtons();
-        
-        // Clear any saved pincode from localStorage to start empty
-        // localStorage.removeItem('delivery_pincode');
         
         const mainImageArea = document.getElementById('mainImageArea');
         if(mainImageArea) {

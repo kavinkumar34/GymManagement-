@@ -12,24 +12,33 @@ class DeliverablePincode extends Model
     protected $table = 'deliverable_pincodes';
     
     protected $fillable = [
-        'pincode', 'city', 'state', 'delivery_days', 'is_active'
+        'state', 'shipping_charge', 'is_active'
     ];
     
     protected $casts = [
         'is_active' => 'boolean',
-        'delivery_days' => 'integer'
+        'shipping_charge' => 'decimal:2'
     ];
     
-    public static function isDeliverable($pincode)
+    public static function getShippingCharge($state)
     {
-        return self::where('pincode', $pincode)
+        $pincode = self::where('state', $state)
+            ->where('is_active', 1)
+            ->first();
+        
+        return $pincode ? $pincode->shipping_charge : 0;
+    }
+    
+    public static function isDeliverable($state)
+    {
+        return self::where('state', $state)
             ->where('is_active', 1)
             ->exists();
     }
     
-    public static function getDeliveryInfo($pincode)
+    public static function getDeliveryInfo($state)
     {
-        return self::where('pincode', $pincode)
+        return self::where('state', $state)
             ->where('is_active', 1)
             ->first();
     }

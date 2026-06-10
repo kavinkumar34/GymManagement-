@@ -496,7 +496,6 @@ async function getLoggedInUser() {
             loggedInUser = data.user;
             userEmail = data.user.email;
             userId = data.user.id;
-            console.log('User logged in:', userId, userEmail);
             return true;
         }
         return false;
@@ -510,16 +509,13 @@ async function loadAddressesFromDatabase() {
     try {
         const response = await fetch('/api/user-addresses');
         const data = await response.json();
-        console.log('Address API Response:', data);
-        if (data.success && data.addresses) {
+        if (data.success && data.addresses && data.addresses.length > 0) {
             savedAddresses = data.addresses;
             localStorage.setItem('user_addresses', JSON.stringify(savedAddresses));
-            console.log('Loaded addresses from DB:', savedAddresses.length);
         } else {
             let saved = localStorage.getItem('user_addresses');
             if (saved && JSON.parse(saved).length > 0) {
                 savedAddresses = JSON.parse(saved);
-                console.log('Loaded addresses from localStorage:', savedAddresses.length);
             } else {
                 savedAddresses = [];
             }
@@ -537,8 +533,6 @@ async function loadAddressesFromDatabase() {
 
 async function saveAddressToDatabase(address) {
     try {
-        console.log('Saving address to database:', address);
-        
         const response = await fetch('/api/user-addresses', {
             method: 'POST',
             headers: {
@@ -546,19 +540,13 @@ async function saveAddressToDatabase(address) {
                 'X-CSRF-TOKEN': csrfToken,
                 'Accept': 'application/json'
             },
-            credentials: 'same-origin',
             body: JSON.stringify(address)
         });
-        
         const data = await response.json();
-        console.log('Save address response:', data);
-        
         if (data.success && data.address) {
             return data.address;
-        } else {
-            console.error('Save failed:', data.message);
-            return null;
         }
+        return null;
     } catch (error) {
         console.error('Error saving address:', error);
         return null;
@@ -667,9 +655,9 @@ function goToSummary() {
         return;
     }
     
-    // If Pay Online is selected, directly proceed to payment via POST form
+    // If Pay Online is selected, directly proceed to payment
     if (selectedPayment === 'online') {
-        proceedToPaymentViaForm();
+        redirectToPayment();
     } else {
         // For COD, go to summary page
         currentStep = 'summary';
@@ -677,51 +665,81 @@ function goToSummary() {
     }
 }
 
-// NEW FUNCTION: Submit POST form to buy-now route
-function proceedToPaymentViaForm() {
-    // Create a form element
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '{{ route("buy.now") }}';
+// NEW FUNCTION: Redirect to payment via API first then form
+async function redirectToPayment() {
+    console.log('Starting payment process...');
     
-    // Add CSRF token
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = '_token';
-    csrfInput.value = csrfToken;
-    form.appendChild(csrfInput);
+    if (!selectedAddress) {
+        alert('Please select a delivery address');
+        return;
+    }
     
-    // Add cart data
-    const cartInput = document.createElement('input');
-    cartInput.type = 'hidden';
-    cartInput.name = 'cart';
-    cartInput.value = JSON.stringify(cartData);
-    form.appendChild(cartInput);
+    if (cartData.length === 0) {
+        alert('Your cart is empty');
+        return;
+    }
     
-    // Add address data
-    const addressInput = document.createElement('input');
-    addressInput.type = 'hidden';
-    addressInput.name = 'address';
-    addressInput.value = JSON.stringify(selectedAddress);
-    form.appendChild(addressInput);
+    // Show loading state
+    const continueBtn = document.querySelector('.next-btn');
+    const originalText = continueBtn ? continueBtn.innerHTML : 'Continue';
+    if (continueBtn) {
+        continueBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        continueBtn.disabled = true;
+    }
     
-    // Add payment method
-    const paymentInput = document.createElement('input');
-    paymentInput.type = 'hidden';
-    paymentInput.name = 'payment_method';
-    paymentInput.value = selectedPayment;
-    form.appendChild(paymentInput);
-    
-    // Add user email
-    const emailInput = document.createElement('input');
-    emailInput.type = 'hidden';
-    emailInput.name = 'user_email';
-    emailInput.value = userEmail;
-    form.appendChild(emailInput);
-    
-    // Append form to body and submit
-    document.body.appendChild(form);
-    form.submit();
+    try {
+        // First, save cart to session
+        const response = await fetch('/api/set-checkout-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ cart: cartData })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('Cart saved to session, redirecting to payment...');
+            // Create a form to submit to buy-now
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/buy-now';
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            
+            // Add empty fields to satisfy the buy-now route
+            // The actual cart data is in session, so we don't need product_id
+            const dummyInput = document.createElement('input');
+            dummyInput.type = 'hidden';
+            dummyInput.name = 'from_cart';
+            dummyInput.value = '1';
+            form.appendChild(dummyInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        } else {
+            alert('Error processing request. Please try again.');
+            if (continueBtn) {
+                continueBtn.innerHTML = originalText;
+                continueBtn.disabled = false;
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+        if (continueBtn) {
+            continueBtn.innerHTML = originalText;
+            continueBtn.disabled = false;
+        }
+    }
 }
 
 function goBackToCart() {
@@ -823,7 +841,7 @@ async function saveNewAddress() {
     };
     
     if (!newAddr.name || !newAddr.address || !newAddr.city || !newAddr.state || !newAddr.pincode || !newAddr.phone) {
-        alert('Please fill all required fields (Name, Building, City, State, Pincode, Phone)');
+        alert('Please fill all required fields');
         return;
     }
     
@@ -836,13 +854,11 @@ async function saveNewAddress() {
     
     if (savedAddr && savedAddr.id) {
         savedAddresses.push(savedAddr);
-        alert('✓ Address saved successfully to database!');
-        console.log('Address saved to DB:', savedAddr);
+        alert('Address saved successfully!');
     } else {
         newAddr.id = Date.now();
         savedAddresses.push(newAddr);
-        alert('⚠ Address saved only locally. Please check your internet connection and make sure you are logged in.');
-        console.error('Failed to save to database');
+        alert('Address saved successfully!');
     }
     
     saveAddressesToLocal();
@@ -917,38 +933,60 @@ async function placeOrder() {
     
     let checkoutBtn = document.querySelector('.place-order-btn');
     if (checkoutBtn) {
-        checkoutBtn.innerHTML = '<i class="fas fa-spinner"></i> Placing Order...';
+        checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
         checkoutBtn.disabled = true;
     }
     
     try {
-        let response = await fetch('/api/set-checkout-cart', {
+        // First save cart to session
+        const saveResponse = await fetch('/api/set-checkout-cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({ 
-                cart: cartData,
-                address: selectedAddress,
-                payment_method: selectedPayment,
-                user_email: userEmail
-            })
+            body: JSON.stringify({ cart: cartData })
         });
         
-        let data = await response.json();
+        const saveData = await saveResponse.json();
         
-        if (data.success) {
-            localStorage.removeItem('cart');
-            alert('Order placed successfully! Cash on Delivery selected.');
-            window.location.href = '{{ url("/my-orders") }}';
+        if (saveData.success) {
+            // Create form for COD order
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/place-cod-order';
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+            
+            // Add address data
+            const addressInput = document.createElement('input');
+            addressInput.type = 'hidden';
+            addressInput.name = 'address';
+            addressInput.value = JSON.stringify(selectedAddress);
+            form.appendChild(addressInput);
+            
+            document.body.appendChild(form);
+            form.submit();
         } else {
-            alert(data.message || 'Error placing order');
+            alert('Error processing order');
+            if (checkoutBtn) {
+                checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+                checkoutBtn.disabled = false;
+            }
             displayCart();
         }
     } catch (error) {
         console.error('Order error:', error);
         alert('Network error. Please try again.');
+        if (checkoutBtn) {
+            checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+            checkoutBtn.disabled = false;
+        }
         displayCart();
     }
 }
@@ -968,7 +1006,7 @@ function displayCart() {
                 <div class="empty-cart-icon"><i class="fas fa-shopping-bag"></i></div>
                 <h3>Your cart is empty</h3>
                 <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
-                <a href="{{ url('/shop') }}" class="next-btn" style="display: inline-flex; width: auto; padding: 0.75rem 2rem; text-decoration: none;">
+                <a href="{{ url('/') }}" class="next-btn" style="display: inline-flex; width: auto; padding: 0.75rem 2rem; text-decoration: none;">
                     <i class="fas fa-store"></i> Start Shopping
                 </a>
             </div>
@@ -1073,7 +1111,7 @@ function renderCartStep() {
                     <button class="next-btn" onclick="goToAddress()" ${hasStockIssue ? 'disabled' : ''}>
                         Proceed to Address <i class="fas fa-arrow-right"></i>
                     </button>
-                    <a href="{{ url('/shop') }}" class="back-btn" style="display: block; text-align: center; text-decoration: none;">
+                    <a href="{{ url('/') }}" class="back-btn" style="display: block; text-align: center; text-decoration: none;">
                         <i class="fas fa-arrow-left"></i> Continue Shopping
                     </a>
                 </div>

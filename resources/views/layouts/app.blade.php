@@ -220,22 +220,24 @@
                             <li><a class="dropdown-item" href="#">⌚ Fitness Trackers</a></li>
                         </ul>
                     </li>
+                    <!-- FIXED: My Orders link for logged-in users -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">My Orders</a>
+                        <a class="nav-link" href="{{ route('my.orders') }}">
+                            <i class="fas fa-shopping-bag me-1"></i> My Orders
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('contact') }}">Contact</a>
                     </li>
-               <!-- <li class="nav-item">
-    <a class="nav-link" href="{{ route('track.order') }}">Track Order</a>
-</li> -->
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('about') }}">About Us</a>
-</li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('track.order') }}">Track Order</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('about') }}">About Us</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link btn-dashboard" href="{{ getDashboardUrl() }}">
-                        <i class="fas fa-sign-in-alt"></i> Join Gym
+                            <i class="fas fa-sign-in-alt"></i> Join Gym
                         </a>
                     </li>
                 </ul>
@@ -280,10 +282,10 @@
                             <li><a class="dropdown-item" href="#">
                                 <i class="fas fa-id-card me-2"></i> My Profile
                             </a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <!-- FIXED: My Orders link in dropdown -->
+                            <li><a class="dropdown-item" href="{{ route('my.orders') }}">
                                 <i class="fas fa-shopping-bag me-2"></i> My Orders
                             </a></li>
-                       
                             @if(auth()->user()->role == 'trainer')
                                 <li><a class="dropdown-item" href="{{ route('trainer.dashboard') }}">
                                     <i class="fas fa-chalkboard-user me-2"></i> Trainer Dashboard
@@ -341,19 +343,21 @@
                         <li><a class="dropdown-item" href="#">⌚ Fitness Trackers</a></li>
                     </ul>
                 </li>
+                <!-- FIXED: My Orders link for guests redirects to login -->
                 <li class="nav-item">
-                    <a class="nav-link" href="#">My Orders</a>
+                    <a class="nav-link" href="{{ route('login') }}">
+                        <i class="fas fa-shopping-bag me-1"></i> My Orders
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('login') }}">Contact</a>
                 </li>
-               <!-- <li class="nav-item">
-    <a class="nav-link" href="{{ route('track.order') }}">Track Order</a>
-</li> -->
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('about') }}">About Us</a>
-</li>
-
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('track.order') }}">Track Order</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('about') }}">About Us</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link btn-join-gym" href="{{ route('login') }}">
                         <i class="fas fa-sign-in-alt"></i> Join Gym
@@ -432,8 +436,7 @@
                 <h5>Quick Links</h5>
                 <ul class="footer-links">
                     <li><a href="{{ url('/') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
-                    <!-- <li><a href="#"><i class="fas fa-chevron-right"></i> Shop</a></li> -->
-<li><a href="{{ route('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                    <li><a href="{{ route('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
                     <li><a href="@if(auth()->check()) {{ route('contact') }} @else {{ route('login') }} @endif"><i class="fas fa-chevron-right"></i> Contact</a></li>
                     <li><a href="#"><i class="fas fa-chevron-right"></i> Blog</a></li>
                 </ul>
@@ -443,12 +446,9 @@
             <div class="col-md-3 mb-4">
                 <h5>Customer Service</h5>
                 <ul class="footer-links">
-                    <li><a href="#"><i class="fas fa-chevron-right"></i> My Account</a></li>
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('track.order') }}">Track Order</a>
-</li> 
-
-<li><a href="#"><i class="fas fa-chevron-right"></i> Returns & Exchange</a></li>
+                    <li><a href="@if(auth()->check()) {{ route('my.orders') }} @else {{ route('login') }} @endif"><i class="fas fa-chevron-right"></i> My Account</a></li>
+                    <li><a href="{{ route('track.order') }}"><i class="fas fa-chevron-right"></i> Track Order</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Returns & Exchange</a></li>
                     <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
                     <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
                     <li><a href="#"><i class="fas fa-chevron-right"></i> Terms & Conditions</a></li>

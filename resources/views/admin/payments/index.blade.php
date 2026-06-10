@@ -36,7 +36,7 @@
     }
     .order-status-badge.Pending { background: #f59e0b; color: white; }
     .order-status-badge.Confirmed { background: #3b82f6; color: white; }
-    .order-status-badge.Shipped { background: #8b5cf6; color: white; }
+    .order-status-badge.Shipped { background: #06b6d4; color: white; }
     .order-status-badge.Delivered { background: #10b981; color: white; }
     .order-status-badge.Cancelled { background: #ef4444; color: white; }
     .order-status-badge.Failed { background: #dc2626; color: white; }
@@ -123,6 +123,7 @@
         padding: 1rem;
         border-radius: 12px;
         margin-bottom: 0.5rem;
+        line-height: 1.6;
     }
     .payment-method-badge {
         display: inline-flex;
@@ -142,6 +143,46 @@
     }
     .pagination {
         margin-bottom: 0;
+    }
+    
+    /* Status Dropdown Button Styles */
+    .status-dropdown-btn {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        border: none;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        min-width: 90px;
+    }
+    .status-dropdown-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+    }
+    .dropdown-menu {
+        min-width: 150px;
+    }
+    .dropdown-item.status-opt {
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+    }
+    .dropdown-item.status-opt:hover {
+        background-color: #eef2ff;
+    }
+    .dropdown-item.status-opt i {
+        width: 24px;
+        margin-right: 8px;
+    }
+    
+    .fa-spinner {
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>
 
@@ -206,31 +247,30 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover">
+                    <table class="table table-bordered table-hover" id="ordersTable">
                         <thead class="table-dark">
                             <tr>
-                                <th width="5%">ID</th>
-                                <th width="15%">Order Number</th>
-                                <th width="15%">Customer</th>
-                                <th width="13%">Date & Time</th>
-                                <th width="8%">Items</th>
-                                <th width="10%">Total Amount</th>
-                                <th width="10%">Order Status</th>
-                                <th width="10%">Payment</th>
-                                <th width="14%">Actions</th>
+                                <th width="5%">ORDER ID</th>
+                                <th width="13%">DATE & TIME</th>
+                                <th width="15%">CUSTOMER</th>
+                                <th width="8%">ITEMS</th>
+                                <th width="10%">TOTAL AMOUNT</th>
+                                <th width="10%">ORDER STATUS</th>
+                                <th width="10%">PAYMENT</th>
+                                <th width="15%">UPDATE STATUS</th>
+                                <th width="14%">ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($orders as $order)
-                            <tr>
-                                <td>{{ $order->id }}</td>
+                            <tr id="order-row-{{ $order->id }}">
                                 <td><strong>#{{ $order->order_number }}</strong></td>
+                                <td>{{ \Carbon\Carbon::parse($order->order_date ?? $order->created_at)->format('d/m/Y, h:i A') }}</td>
                                 <td>
                                     <strong>{{ $order->user->name ?? 'N/A' }}</strong><br>
                                     <small class="text-muted">{{ $order->user->email ?? 'N/A' }}</small>
-                                </td>
-                                <td>{{ \Carbon\Carbon::parse($order->order_date ?? $order->created_at)->format('d/m/Y, h:i A') }}</td>
-                                <td>{{ $order->items_count ?? $order->items->count() ?? 1 }} item(s)</td>
+                                 </td>
+                                <td>{{ $order->items->count() }} item(s)</td>
                                 <td>₹{{ number_format($order->total_amount, 2) }}</td>
                                 <td>
                                     @php
@@ -242,8 +282,8 @@
                                         elseif($order->order_status == 'Failed') $statusClass = 'danger';
                                         elseif($order->order_status == 'Pending') $statusClass = 'warning';
                                     @endphp
-                                    <span class="badge bg-{{ $statusClass }}">{{ $order->order_status }}</span>
-                                </td>
+                                    <span class="badge bg-{{ $statusClass }} order-status-badge-{{ $order->id }}" id="order-status-{{ $order->id }}">{{ $order->order_status }}</span>
+                                 </td>
                                 <td>
                                     @if($order->payment_status == 'SUCCESS')
                                         <span class="badge bg-success">Paid</span>
@@ -252,16 +292,28 @@
                                     @else
                                         <span class="badge bg-warning">Pending</span>
                                     @endif
-                                </td>
+                                 </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn status-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn-{{ $order->id }}">
+                                            {{ $order->order_status }}
+                                        </button>
+                                        <ul class="dropdown-menu" id="status-menu-{{ $order->id }}">
+                                            <li><a class="dropdown-item status-opt" href="#" data-id="{{ $order->id }}" data-status="Pending"><i class="fas fa-clock text-warning"></i> Pending</a></li>
+                                            <li><a class="dropdown-item status-opt" href="#" data-id="{{ $order->id }}" data-status="Confirmed"><i class="fas fa-check-circle text-primary"></i> Confirmed</a></li>
+                                            <li><a class="dropdown-item status-opt" href="#" data-id="{{ $order->id }}" data-status="Shipped"><i class="fas fa-truck text-info"></i> Shipped</a></li>
+                                            <li><a class="dropdown-item status-opt" href="#" data-id="{{ $order->id }}" data-status="Delivered"><i class="fas fa-check-double text-success"></i> Delivered</a></li>
+                                            <li><a class="dropdown-item status-opt" href="#" data-id="{{ $order->id }}" data-status="Cancelled"><i class="fas fa-times-circle text-danger"></i> Cancelled</a></li>
+                                            <li><a class="dropdown-item status-opt" href="#" data-id="{{ $order->id }}" data-status="Failed"><i class="fas fa-exclamation-triangle text-danger"></i> Failed</a></li>
+                                        </ul>
+                                    </div>
+                                 </td>
                                 <td>
                                     <button class="btn btn-sm btn-info" onclick="viewOrderDetails({{ $order->id }})" title="View Details">
                                         <i class="fas fa-eye"></i> View
                                     </button>
-                                    <button class="btn btn-sm btn-warning" onclick="updateOrderStatus({{ $order->id }}, '{{ $order->order_status }}')" title="Update Status">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                </td>
-                            </tr>
+                                 </td>
+                             </tr>
                             @empty
                             <tr>
                                 <td colspan="9" class="text-center">No orders found</td>
@@ -285,7 +337,7 @@
 </div>
 
 <!-- Order Details Modal -->
-<div class="modal fade order-details-modal" id="orderDetailsModal" tabindex="-1">
+<div class="modal fade order-details-modal" id="orderDetailsModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="order-header">
@@ -294,11 +346,8 @@
                 <span class="order-status-badge" id="modalOrderStatus">Pending</span>
             </div>
             <div class="modal-body p-0">
-                <!-- Order Info Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-info-circle"></i> Order Information
-                    </div>
+                    <div class="section-title"><i class="fas fa-info-circle"></i> Order Information</div>
                     <div class="info-row">
                         <div class="info-label">Order Date:</div>
                         <div class="info-value" id="modalOrderDate">-</div>
@@ -309,11 +358,8 @@
                     </div>
                 </div>
 
-                <!-- Customer Details Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-user-circle"></i> Customer Details
-                    </div>
+                    <div class="section-title"><i class="fas fa-user-circle"></i> Customer Details</div>
                     <div class="info-row">
                         <div class="info-label">Name:</div>
                         <div class="info-value" id="modalCustomerName">-</div>
@@ -328,34 +374,24 @@
                     </div>
                 </div>
 
-                <!-- Order Summary Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-receipt"></i> Order Summary
-                    </div>
+                    <div class="section-title"><i class="fas fa-receipt"></i> Order Summary</div>
                     <div class="info-row">
                         <div class="info-label">Total Amount:</div>
                         <div class="info-value" id="modalTotal">-</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Order Status:</div>
-                        <div class="info-value" id="modalOrderStatusText">-</div>
                     </div>
                 </div>
 
                 <!-- Shipping Address Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-map-marker-alt"></i> Shipping Address
+                    <div class="section-title"><i class="fas fa-map-marker-alt"></i> Shipping Address</div>
+                    <div class="address-card" id="modalShippingAddress">
+                        Loading address...
                     </div>
-                    <div class="address-card" id="modalShippingAddress">No address information available</div>
                 </div>
 
-                <!-- Payment Information Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-credit-card"></i> Payment Information
-                    </div>
+                    <div class="section-title"><i class="fas fa-credit-card"></i> Payment Information</div>
                     <div class="info-row">
                         <div class="info-label">Method:</div>
                         <div class="info-value" id="modalPaymentMethod">-</div>
@@ -364,17 +400,10 @@
                         <div class="info-label">Status:</div>
                         <div class="info-value" id="modalPaymentStatus">-</div>
                     </div>
-                    <div class="info-row" id="paymentIdRow" style="display: none;">
-                        <div class="info-label">Payment ID:</div>
-                        <div class="info-value" id="modalPaymentId">-</div>
-                    </div>
                 </div>
 
-                <!-- Order Items Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-box"></i> Order Items
-                    </div>
+                    <div class="section-title"><i class="fas fa-box"></i> Order Items</div>
                     <div id="modalOrderItems"></div>
                 </div>
             </div>
@@ -385,161 +414,123 @@
     </div>
 </div>
 
-<!-- Update Status Modal -->
-<div class="modal fade" id="statusModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Update Order Status</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="statusOrderId">
-                <div class="mb-3">
-                    <label class="form-label">Order Status</label>
-                    <select id="orderStatusSelect" class="form-select">
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Shipped">Shipped</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                        <option value="Failed">Failed</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveStatusUpdate()">Update Status</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<form id="delete-form" method="POST" style="display: none;">
-    @csrf
-    @method('DELETE')
-</form>
-
 <script>
-// Load order details when view button is clicked
-async function viewOrderDetails(orderId) {
-    try {
-        const response = await fetch(`/admin/payments/${orderId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const order = data.order;
-            
-            // Set modal header
-            document.getElementById('modalOrderNumber').innerText = '#' + order.order_number;
-            document.getElementById('modalOrderStatus').innerText = order.order_status;
-            document.getElementById('modalOrderStatus').className = 'order-status-badge ' + order.order_status;
-            
-            // Order Information
-            document.getElementById('modalOrderDate').innerText = new Date(order.order_date || order.created_at).toLocaleString();
-            document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
-            
-            // Customer Details
-            document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
-            document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
-            document.getElementById('modalCustomerPhone').innerText = order.shipping_address?.phone || order.user?.phone || 'N/A';
-            
-            // Order Summary
-            document.getElementById('modalTotal').innerText = '₹' + formatNumber(order.total_amount);
-            document.getElementById('modalOrderStatusText').innerHTML = getStatusBadge(order.order_status);
-            
-            // Shipping Address - Parse from payment_details or separate field
-            let addressHtml = 'No address information available';
-            if (order.shipping_address) {
-                let addr = typeof order.shipping_address === 'string' ? JSON.parse(order.shipping_address) : order.shipping_address;
-                addressHtml = `
-                    <strong>${addr.name || 'N/A'}</strong><br>
-                    ${addr.address || ''}${addr.address ? ', ' : ''}${addr.area || ''}<br>
-                    ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}<br>
-                    Phone: ${addr.phone || 'N/A'}
-                `;
-            } else if (order.payment_details) {
-                try {
-                    let details = typeof order.payment_details === 'string' ? JSON.parse(order.payment_details) : order.payment_details;
-                    if (details.shipping_address) {
-                        addressHtml = `
-                            <strong>${details.shipping_address.name || 'N/A'}</strong><br>
-                            ${details.shipping_address.address || ''}<br>
-                            ${details.shipping_address.city || ''}, ${details.shipping_address.state || ''} - ${details.shipping_address.pincode || ''}<br>
-                            Phone: ${details.shipping_address.phone || 'N/A'}
-                        `;
-                    }
-                } catch(e) {}
-            }
-            document.getElementById('modalShippingAddress').innerHTML = addressHtml;
-            
-            // Payment Information
-            document.getElementById('modalPaymentMethod').innerHTML = getPaymentMethodBadge(order.payment_method);
-            document.getElementById('modalPaymentStatus').innerHTML = getPaymentStatusBadge(order.payment_status);
-            
-            if (order.payment_id) {
-                document.getElementById('paymentIdRow').style.display = 'flex';
-                document.getElementById('modalPaymentId').innerText = order.payment_id;
-            } else {
-                document.getElementById('paymentIdRow').style.display = 'none';
-            }
-            
-            // Order Items
-            let itemsHtml = '';
-            if (order.items && order.items.length > 0) {
-                order.items.forEach(item => {
-                    itemsHtml += `
-                        <div class="order-item">
-                            <div class="order-item-image">
-                                ${item.product_image ? `<img src="/storage/${item.product_image}" alt="${item.product_name}">` : '<i class="fas fa-tshirt fa-2x text-muted"></i>'}
-                            </div>
-                            <div class="order-item-details">
-                                <div class="order-item-name">${item.product_name}</div>
-                                <div class="order-item-price">₹${formatNumber(item.price)}</div>
-                                <div class="order-item-quantity">Quantity: ${item.quantity}</div>
-                            </div>
-                            <div class="order-item-total">₹${formatNumber(item.price * item.quantity)}</div>
-                        </div>
-                    `;
-                });
-            } else {
-                itemsHtml = '<div class="text-muted">No items found</div>';
-            }
-            document.getElementById('modalOrderItems').innerHTML = itemsHtml;
-            
-            // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
-            modal.show();
-        } else {
-            alert('Error loading order details');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error loading order details');
+// Get CSRF token from meta tag
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+
+// Function to attach event listeners to status options
+function attachStatusEventListeners() {
+    document.querySelectorAll('.status-opt').forEach(function(link) {
+        link.removeEventListener('click', statusClickHandler);
+        link.addEventListener('click', statusClickHandler);
+    });
+}
+
+// Status click handler function
+function statusClickHandler(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    var orderId = this.getAttribute('data-id');
+    var newStatus = this.getAttribute('data-status');
+    var currentBtn = document.getElementById('status-btn-' + orderId);
+    var currentStatus = currentBtn ? currentBtn.innerText : '';
+    
+    if (confirm('Change order status from "' + currentStatus + '" to "' + newStatus + '"?')) {
+        updateOrderStatus(orderId, newStatus);
     }
 }
 
-function getStatusBadge(status) {
-    const badges = {
-        'Pending': '<span class="badge bg-warning">Pending</span>',
-        'Confirmed': '<span class="badge bg-primary">Confirmed</span>',
-        'Shipped': '<span class="badge bg-info">Shipped</span>',
-        'Delivered': '<span class="badge bg-success">Delivered</span>',
-        'Cancelled': '<span class="badge bg-danger">Cancelled</span>',
-        'Failed': '<span class="badge bg-danger">Failed</span>'
-    };
-    return badges[status] || `<span class="badge bg-secondary">${status}</span>`;
+// Update order status function
+function updateOrderStatus(orderId, newStatus) {
+    var dropdownBtn = document.getElementById('status-btn-' + orderId);
+    var originalText = dropdownBtn.innerText;
+    
+    dropdownBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    dropdownBtn.disabled = true;
+    
+    fetch('/admin/payments/' + orderId + '/status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ order_status: newStatus })
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        console.log('Response:', data);
+        
+        if (data.success) {
+            var statusBadge = document.getElementById('order-status-' + orderId);
+            if (statusBadge) {
+                var badgeClass = 'badge ';
+                if (newStatus == 'Confirmed') badgeClass += 'bg-primary';
+                else if (newStatus == 'Shipped') badgeClass += 'bg-info';
+                else if (newStatus == 'Delivered') badgeClass += 'bg-success';
+                else if (newStatus == 'Cancelled') badgeClass += 'bg-danger';
+                else if (newStatus == 'Failed') badgeClass += 'bg-danger';
+                else if (newStatus == 'Pending') badgeClass += 'bg-warning';
+                else badgeClass += 'bg-secondary';
+                
+                statusBadge.className = badgeClass;
+                statusBadge.innerText = newStatus;
+            }
+            
+            dropdownBtn.innerText = newStatus;
+            
+            var menu = document.getElementById('status-menu-' + orderId);
+            if (menu) {
+                var items = menu.querySelectorAll('.status-opt');
+                items.forEach(function(item) {
+                    item.setAttribute('data-id', orderId);
+                });
+            }
+            
+            attachStatusEventListeners();
+            alert('Order status updated successfully to "' + newStatus + '"!');
+        } else {
+            alert(data.message || 'Error updating status');
+            dropdownBtn.innerText = originalText;
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+        dropdownBtn.innerText = originalText;
+    })
+    .finally(function() {
+        dropdownBtn.disabled = false;
+    });
 }
 
+// Escape HTML function
+function escapeHtml(text) {
+    if (!text) return '';
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Format number function
+function formatNumber(num) {
+    return parseFloat(num).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Get payment method badge
 function getPaymentMethodBadge(method) {
-    const methods = {
-        'cod': '<span class="payment-method-badge"><i class="fas fa-money-bill-wave"></i> Cash on Delivery</span>',
-        'online': '<span class="payment-method-badge"><i class="fas fa-credit-card"></i> Online Payment</span>',
-        'card': '<span class="payment-method-badge"><i class="fas fa-credit-card"></i> Card</span>'
-    };
-    return methods[method] || `<span class="payment-method-badge">${method || 'N/A'}</span>`;
+    if (method === 'cod') {
+        return '<span class="payment-method-badge"><i class="fas fa-money-bill-wave"></i> Cash on Delivery</span>';
+    } else if (method === 'online' || method === 'card') {
+        return '<span class="payment-method-badge"><i class="fas fa-credit-card"></i> Online Payment</span>';
+    }
+    return '<span class="payment-method-badge">' + (method || 'N/A') + '</span>';
 }
 
+// Get payment status badge
 function getPaymentStatusBadge(status) {
     if (status === 'SUCCESS') {
         return '<span class="badge bg-success">Paid</span>';
@@ -549,87 +540,141 @@ function getPaymentStatusBadge(status) {
     return '<span class="badge bg-warning">Pending</span>';
 }
 
-function formatNumber(num) {
-    return parseFloat(num).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-// Update order status
-function updateOrderStatus(orderId, currentStatus) {
-    document.getElementById('statusOrderId').value = orderId;
-    document.getElementById('orderStatusSelect').value = currentStatus;
-    const modal = new bootstrap.Modal(document.getElementById('statusModal'));
-    modal.show();
-}
-
-async function saveStatusUpdate() {
-    const orderId = document.getElementById('statusOrderId').value;
-    const status = document.getElementById('orderStatusSelect').value;
+// View order details with shipping address
+function viewOrderDetails(orderId) {
+    // Show loading state
+    document.getElementById('modalShippingAddress').innerHTML = '<div class="address-card">Loading address...</div>';
     
-    try {
-        const response = await fetch(`/admin/payments/${orderId}/status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ order_status: status })
+    fetch('/admin/payments/' + orderId)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                var order = data.order;
+                
+                // Basic order info
+                document.getElementById('modalOrderNumber').innerText = order.order_number;
+                document.getElementById('modalOrderStatus').innerText = order.order_status;
+                document.getElementById('modalOrderStatus').className = 'order-status-badge ' + order.order_status;
+                document.getElementById('modalOrderDate').innerText = new Date(order.order_date || order.created_at).toLocaleString();
+                document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
+                document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
+                document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
+                document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
+                document.getElementById('modalTotal').innerText = '₹' + formatNumber(order.total_amount);
+                
+                // Payment info
+                document.getElementById('modalPaymentMethod').innerHTML = getPaymentMethodBadge(order.payment_method);
+                document.getElementById('modalPaymentStatus').innerHTML = getPaymentStatusBadge(order.payment_status);
+                
+                // Order Items
+                var itemsHtml = '';
+                if (order.items && order.items.length > 0) {
+                    for (var i = 0; i < order.items.length; i++) {
+                        var item = order.items[i];
+                        itemsHtml += '<div class="order-item">' +
+                            '<div class="order-item-image">' +
+                                (item.product_image ? '<img src="/storage/' + item.product_image + '" alt="' + item.product_name + '">' : '<i class="fas fa-tshirt fa-2x text-muted"></i>') +
+                            '</div>' +
+                            '<div class="order-item-details">' +
+                                '<div class="order-item-name">' + (item.product_name || 'Product') + '</div>' +
+                                '<div class="order-item-price">₹' + formatNumber(item.price) + '</div>' +
+                                '<div class="order-item-quantity">Quantity: ' + item.quantity + '</div>' +
+                            '</div>' +
+                            '<div class="order-item-total">₹' + formatNumber(item.price * item.quantity) + '</div>' +
+                        '</div>';
+                    }
+                } else {
+                    itemsHtml = '<div class="text-muted">No items found</div>';
+                }
+                document.getElementById('modalOrderItems').innerHTML = itemsHtml;
+                
+                // SHIPPING ADDRESS - Display directly from order data
+                var addressHtml = '<div class="address-card">No address information available</div>';
+                if (order.shipping_address) {
+                    var addr = order.shipping_address;
+                    var addressParts = [];
+                    
+                    if (addr.name && addr.name !== 'N/A' && addr.name !== '') {
+                        addressParts.push('<strong>' + escapeHtml(addr.name) + '</strong>');
+                    }
+                    if (addr.address && addr.address !== '') {
+                        addressParts.push(escapeHtml(addr.address));
+                    }
+                    if (addr.area && addr.area !== '') {
+                        addressParts.push(escapeHtml(addr.area));
+                    }
+                    if (addr.city && addr.city !== '' && addr.state && addr.state !== '') {
+                        addressParts.push(escapeHtml(addr.city) + ', ' + escapeHtml(addr.state));
+                    } else if (addr.city && addr.city !== '') {
+                        addressParts.push(escapeHtml(addr.city));
+                    } else if (addr.state && addr.state !== '') {
+                        addressParts.push(escapeHtml(addr.state));
+                    }
+                    if (addr.pincode && addr.pincode !== '') {
+                        addressParts.push('Pincode: ' + escapeHtml(addr.pincode));
+                    }
+                    if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') {
+                        addressParts.push('Phone: ' + escapeHtml(addr.phone));
+                    }
+                    
+                    if (addressParts.length > 0) {
+                        addressHtml = '<div class="address-card">' + addressParts.join('<br>') + '</div>';
+                    }
+                }
+                document.getElementById('modalShippingAddress').innerHTML = addressHtml;
+                
+                var modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                modal.show();
+            } else {
+                alert('Error loading order details: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(function(error) {
+            console.error('Error:', error);
+            document.getElementById('modalShippingAddress').innerHTML = '<div class="address-card">Error loading address</div>';
+            alert('Error loading order details');
         });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            alert('Order status updated successfully!');
-            location.reload();
-        } else {
-            alert('Error updating status');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error updating status');
-    }
 }
 
-function deleteOrder(id) {
-    if(confirm('Are you sure you want to delete this order?')) {
-        let form = document.getElementById('delete-form');
-        form.action = '/admin/payments/' + id;
-        form.submit();
-    }
-}
-
+// Apply filters function
 function applyFilters() {
-    let search = document.getElementById('searchInput').value;
-    let paymentStatus = document.getElementById('paymentStatusFilter').value;
-    let orderStatus = document.getElementById('orderStatusFilter').value;
-    let perPage = document.getElementById('perPageSelect').value;
+    var search = document.getElementById('searchInput').value;
+    var paymentStatus = document.getElementById('paymentStatusFilter').value;
+    var orderStatus = document.getElementById('orderStatusFilter').value;
+    var perPage = document.getElementById('perPageSelect').value;
     
-    let url = new URL(window.location.href);
+    var url = new URL(window.location.href);
     url.searchParams.set('search', search);
     url.searchParams.set('payment_status', paymentStatus);
     url.searchParams.set('order_status', orderStatus);
     url.searchParams.set('per_page', perPage);
     url.searchParams.set('page', 1);
-    
     window.location.href = url.toString();
 }
 
 function resetFilters() {
-    let url = new URL(window.location.href);
+    var url = new URL(window.location.href);
     url.searchParams.delete('search');
     url.searchParams.delete('payment_status');
     url.searchParams.delete('order_status');
     url.searchParams.delete('per_page');
     url.searchParams.set('page', 1);
-    
     window.location.href = url.toString();
 }
 
 function changePerPage() {
-    let perPage = document.getElementById('perPageSelect').value;
-    let url = new URL(window.location.href);
+    var perPage = document.getElementById('perPageSelect').value;
+    var url = new URL(window.location.href);
     url.searchParams.set('per_page', perPage);
     url.searchParams.set('page', 1);
     window.location.href = url.toString();
 }
+
+// Initialize event listeners when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    attachStatusEventListeners();
+});
 </script>
 @endsection

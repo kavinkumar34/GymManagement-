@@ -32,8 +32,11 @@ use App\Http\Controllers\Admin\SizeChartController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\Admin\DeliverablePincodeController;
 
-// ============ ADD THIS LINE ============
+// ============ MODELS ============
 use App\Models\UserAddress;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -89,6 +92,9 @@ Route::post('/payment/success', [PaymentController::class, 'paymentSuccess'])->n
 Route::post('/payment/failure', [PaymentController::class, 'paymentFailure'])->name('payment.failure');
 Route::get('/order/success/{id}', [PaymentController::class, 'orderSuccess'])->name('order.success')->middleware('auth');
 Route::get('/my-orders', [PaymentController::class, 'myOrders'])->name('my.orders')->middleware('auth');
+
+// ============ COD ORDER ROUTE ============
+Route::post('/place-cod-order', [PaymentController::class, 'placeCodOrder'])->name('place.cod.order')->middleware('auth');
 
 // ============ TRACK ORDER & ABOUT ============
 Route::get('/track-order', [TrackOrderController::class, 'index'])->name('track.order');
@@ -214,19 +220,20 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     
     // Payments/Orders
     Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');
-    Route::get('/payments/create', [AdminPaymentController::class, 'create'])->name('payments.create');
-    Route::post('/payments', [AdminPaymentController::class, 'store'])->name('payments.store');
+    Route::get('/payments/{id}', [AdminPaymentController::class, 'getOrderDetails'])->name('payments.details');
+    Route::post('/payments/{id}/status', [AdminPaymentController::class, 'updateOrderStatus'])->name('payments.status');
+    Route::post('/payments/{id}/shipment', [AdminPaymentController::class, 'updateShipment'])->name('payments.shipment');
     Route::get('/payments/{id}/edit', [AdminPaymentController::class, 'edit'])->name('payments.edit');
     Route::put('/payments/{id}', [AdminPaymentController::class, 'update'])->name('payments.update');
     Route::delete('/payments/{id}', [AdminPaymentController::class, 'destroy'])->name('payments.destroy');
-    Route::post('/payments/{id}/status', [AdminPaymentController::class, 'updateStatus'])->name('payments.status');
     Route::post('/payments/mark-viewed', [AdminPaymentController::class, 'markViewed'])->name('payments.mark-viewed');
     Route::get('/payments/check-new', [AdminPaymentController::class, 'getNewOrdersCount'])->name('payments.check-new');
-    Route::get('/payments/{id}', [AdminPaymentController::class, 'show'])->name('payments.show');
     
-    // Pincodes
+    // ============ PINCODE / STATE MANAGEMENT ROUTES ============
     Route::resource('pincodes', DeliverablePincodeController::class);
     Route::post('pincodes/bulk-import', [DeliverablePincodeController::class, 'bulkImport'])->name('pincodes.bulk');
+    Route::post('pincodes/bulk-update-shipping', [DeliverablePincodeController::class, 'bulkUpdateShipping'])->name('pincodes.bulk-update-shipping');
+    Route::post('pincodes/bulk-delete', [DeliverablePincodeController::class, 'bulkDelete'])->name('pincodes.bulk-delete');
 });
 
 // ============ TRAINER ROUTES ============
@@ -352,3 +359,115 @@ Route::get('/api/deliverable-pincodes', function () {
         'pincodes' => $pincodes
     ]);
 })->name('deliverable.pincodes');
+
+// ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ==========
+Route::get('/api/order-details/{id}', function ($id) {
+    if (!auth()->check()) {
+        return response()->json(['success' => false, 'message' => 'Not logged in']);
+    }
+    
+    try {
+        // Get order with user and items
+        $order = Order::with(['user', 'items'])
+            ->where('user_id', auth()->id())
+            ->find($id);
+        
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found']);
+        }
+        
+        // Get shipping address from user_addresses table
+        $shippingAddress = null;
+        
+        // Try to get address from payment_details first
+        if ($order->payment_details) {
+            try {
+                $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
+                if (isset($paymentDetails['shipping_address']) && !empty($paymentDetails['shipping_address'])) {
+                    $shippingAddress = $paymentDetails['shipping_address'];
+                } elseif (isset($paymentDetails['address']) && !empty($paymentDetails['address'])) {
+                    $shippingAddress = $paymentDetails['address'];
+                }
+            } catch (\Exception $e) {}
+        }
+        
+        // If no address in payment_details, get the default address from user_addresses table
+        if (!$shippingAddress || empty($shippingAddress['address'])) {
+            $userAddress = UserAddress::where('user_id', auth()->id())
+                ->orderBy('is_default', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->first();
+            
+            if ($userAddress) {
+                $shippingAddress = [
+                    'name' => $userAddress->name,
+                    'address' => $userAddress->address,
+                    'area' => $userAddress->area ?? '',
+                    'city' => $userAddress->city,
+                    'state' => $userAddress->state,
+                    'pincode' => $userAddress->pincode,
+                    'phone' => $userAddress->phone
+                ];
+            }
+        }
+        
+        // Calculate subtotal and format items
+        $subtotal = 0;
+        $items = [];
+        foreach ($order->items as $item) {
+            $itemTotal = $item->price * $item->quantity;
+            $subtotal += $itemTotal;
+            
+            // Get product image separately if needed
+            $productImage = null;
+            if ($item->product_id) {
+                $product = Product::find($item->product_id);
+                if ($product) {
+                    $productImage = $product->image;
+                }
+            }
+            
+            $items[] = [
+                'id' => $item->id,
+                'product_id' => $item->product_id,
+                'product_name' => $item->product_name,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+                'product_image' => $productImage
+            ];
+        }
+        
+        return response()->json([
+            'success' => true,
+            'order' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'total_amount' => $order->total_amount,
+                'payment_status' => $order->payment_status,
+                'order_status' => $order->order_status,
+                'payment_method' => $order->payment_method,
+                'transaction_id' => $order->transaction_id,
+                'payment_id' => $order->payment_id,
+                'payment_details' => $order->payment_details,
+                'created_at' => $order->created_at,
+                'user' => $order->user ? [
+                    'name' => $order->user->name,
+                    'email' => $order->user->email,
+                    'phone' => $order->user->phone ?? 'N/A'
+                ] : null,
+                'items' => $items,
+                'shipping_address' => $shippingAddress,
+                'subtotal' => $subtotal,
+                'shipping_cost' => 0
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+})->name('api.order.details')->middleware('auth');
+
+// ============ CANCEL ORDER ROUTE ============
+Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');

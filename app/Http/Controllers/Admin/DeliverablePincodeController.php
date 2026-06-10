@@ -10,7 +10,7 @@ class DeliverablePincodeController extends Controller
 {
     public function index()
     {
-        $pincodes = DeliverablePincode::orderBy('pincode')->paginate(20);
+        $pincodes = DeliverablePincode::orderBy('state')->paginate(20);
         return view('admin.pincodes.index', compact('pincodes'));
     }
     
@@ -22,17 +22,15 @@ class DeliverablePincodeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'pincode' => 'required|string|size:6|unique:deliverable_pincodes,pincode',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'delivery_days' => 'required|integer|min:1|max:15',
+            'state' => 'required|string|max:100|unique:deliverable_pincodes,state',
+            'shipping_charge' => 'required|numeric|min:0|max:1000',
             'is_active' => 'boolean'
         ]);
         
         DeliverablePincode::create($request->all());
         
         return redirect()->route('admin.pincodes.index')
-            ->with('success', 'Pincode added successfully!');
+            ->with('success', 'State added successfully!');
     }
     
     public function edit($id)
@@ -46,17 +44,15 @@ class DeliverablePincodeController extends Controller
         $pincode = DeliverablePincode::findOrFail($id);
         
         $request->validate([
-            'pincode' => 'required|string|size:6|unique:deliverable_pincodes,pincode,' . $id,
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'delivery_days' => 'required|integer|min:1|max:15',
+            'state' => 'required|string|max:100|unique:deliverable_pincodes,state,' . $id,
+            'shipping_charge' => 'required|numeric|min:0|max:1000',
             'is_active' => 'boolean'
         ]);
         
         $pincode->update($request->all());
         
         return redirect()->route('admin.pincodes.index')
-            ->with('success', 'Pincode updated successfully!');
+            ->with('success', 'State updated successfully!');
     }
     
     public function destroy($id)
@@ -65,26 +61,33 @@ class DeliverablePincodeController extends Controller
         $pincode->delete();
         
         return redirect()->route('admin.pincodes.index')
-            ->with('success', 'Pincode deleted successfully!');
+            ->with('success', 'State deleted successfully!');
     }
     
     public function bulkImport(Request $request)
     {
         $request->validate([
-            'pincodes' => 'required|string'
+            'states' => 'required|string'
         ]);
         
-        $pincodes = explode("\n", $request->pincodes);
+        $lines = explode("\n", $request->states);
         $added = 0;
         $skipped = 0;
         
-        foreach ($pincodes as $pincode) {
-            $pincode = trim($pincode);
-            if (strlen($pincode) === 6 && is_numeric($pincode)) {
-                if (!DeliverablePincode::where('pincode', $pincode)->exists()) {
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line)) continue;
+            
+            // Format: "State Name|shipping_charge" or just "State Name"
+            $parts = explode('|', $line);
+            $state = trim($parts[0]);
+            $shippingCharge = isset($parts[1]) ? floatval(trim($parts[1])) : 0;
+            
+            if (!empty($state)) {
+                if (!DeliverablePincode::where('state', $state)->exists()) {
                     DeliverablePincode::create([
-                        'pincode' => $pincode,
-                        'delivery_days' => 3,
+                        'state' => $state,
+                        'shipping_charge' => $shippingCharge,
                         'is_active' => 1
                     ]);
                     $added++;
@@ -95,6 +98,40 @@ class DeliverablePincodeController extends Controller
         }
         
         return redirect()->route('admin.pincodes.index')
-            ->with('success', "$added pincodes added, $skipped skipped (already exist)");
+            ->with('success', "$added states added, $skipped skipped (already exist)");
     }
+
+    // Bulk update shipping charges
+public function bulkUpdateShipping(Request $request)
+{
+    $request->validate([
+        'state_ids' => 'required|array',
+        'state_ids.*' => 'exists:deliverable_pincodes,id',
+        'shipping_charge' => 'required|numeric|min:0|max:1000'
+    ]);
+    
+    $updated = DeliverablePincode::whereIn('id', $request->state_ids)
+        ->update(['shipping_charge' => $request->shipping_charge]);
+    
+    return response()->json([
+        'success' => true,
+        'message' => "$updated states updated successfully"
+    ]);
+}
+
+// Bulk delete states
+public function bulkDelete(Request $request)
+{
+    $request->validate([
+        'state_ids' => 'required|array',
+        'state_ids.*' => 'exists:deliverable_pincodes,id'
+    ]);
+    
+    $deleted = DeliverablePincode::whereIn('id', $request->state_ids)->delete();
+    
+    return response()->json([
+        'success' => true,
+        'message' => "$deleted states deleted successfully"
+    ]);
+}
 }
