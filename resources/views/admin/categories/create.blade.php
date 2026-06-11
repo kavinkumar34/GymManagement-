@@ -45,12 +45,7 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Category Image</label>
                             <input type="file" name="image" class="form-control" accept="image/*">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Icon Class</label>
-                            <input type="text" name="icon" class="form-control" value="fas fa-tag" placeholder="fas fa-tag">
-                            <small class="text-muted">Font Awesome icon class</small>
+                            <small class="text-muted">Recommended size: 300x300 pixels</small>
                         </div>
 
                         <div class="col-md-6 mb-3">

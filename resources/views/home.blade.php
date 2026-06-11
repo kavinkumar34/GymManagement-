@@ -182,29 +182,38 @@
         margin-top: 15px;
     }
     
-    /* Category Section */
-    .category-card {
-        background: #292727;
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-bottom: 20px;
-    }
-    
-    .category-card:hover {
-        background: #dc3545;
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    }
-    
-    .category-icon {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-    }
-    
+/* Category Card with Image */
+.category-card {
+    background: linear-gradient(135deg, #1e293b 0%, #2d3a4b 100%);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+}
+
+.category-card:hover {
+    background: #dc3545;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.category-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid white;
+}
+
+.category-card h6 {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
     /* Search Bar */
     .search-bar {
         max-width: 500px;
@@ -611,30 +620,35 @@
     }
     
     // Load categories from database
-    async function loadCategories() {
-        try {
-            const response = await fetch('/api/categories');
-            const categories = await response.json();
-            const categoryContainer = document.getElementById('categoryContainer');
-            if (!categoryContainer) return;
-            
-            if (categories.length === 0) {
-                categoryContainer.innerHTML = '<div class="col-12 text-center">No categories found</div>';
-                return;
-            }
-            
-            categoryContainer.innerHTML = categories.map(cat => `
-                <div class="col-md-2 col-6">
-                    <div class="category-card" onclick="filterCategory(${cat.id})">
-                        <div class="category-icon"><i class="${cat.icon}"></i></div>
-                        <h6>${cat.name}</h6>
-                    </div>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error loading categories:', error);
+   // Load categories with images from database
+async function loadCategories() {
+    try {
+        const response = await fetch('/api/categories');
+        const categories = await response.json();
+        const categoryContainer = document.getElementById('categoryContainer');
+        if (!categoryContainer) return;
+        
+        if (categories.length === 0) {
+            categoryContainer.innerHTML = '<div class="col-12 text-center">No categories found</div>';
+            return;
         }
+        
+        categoryContainer.innerHTML = categories.map(cat => `
+            <div class="col-md-2 col-6">
+                <div class="category-card" onclick="filterCategory(${cat.id})" style="cursor: pointer;">
+                    ${cat.image ? 
+                        `<img src="/storage/${cat.image}" alt="${cat.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-bottom: 10px;">` : 
+                        `<div class="category-icon"><i class="fas fa-tag"></i></div>`
+                    }
+                    <h6 style="margin-top: 8px;">${cat.name}</h6>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading categories:', error);
     }
+}
     
     // Load products from database with image slider - Click goes to product detail page
     async function loadProducts() {

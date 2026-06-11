@@ -1,8 +1,8 @@
 @extends('layouts.admin-layout')
 
 @section('content')
-<div class="container-fluid">
-    <div class="card shadow-sm">
+<div class="container">
+    <div class="card shadow-sm" style="margin-left:150px;">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-folder me-2 text-primary"></i>Categories</h5>
             <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm">
