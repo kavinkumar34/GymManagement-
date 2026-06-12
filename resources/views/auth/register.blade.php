@@ -2,23 +2,185 @@
 
 @section('content')
 <style>
-    /* Hide navbar completely */
-    nav.navbar, .navbar {
-        display: none !important;
+    /* Card Styling - Navbar is now visible */
+    .admin-register-card {
+        border: none;
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        animation: fadeInUp 0.6s ease;
+        background: white;
     }
-    body {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    main.py-4 {
-        padding-top: 2rem !important;
+    
+    .admin-register-card .card-header {
+        background: #000000;
+        padding: 20px 20px;
+        border: none;
+    }
+    
+    .admin-register-card .card-header h4 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: white;
+    }
+    
+    .admin-register-card .card-header small {
+        font-size: 12px;
+        opacity: 0.8;
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .admin-register-card .card-body {
+        padding: 25px 30px;
+        background: white;
+    }
+    
+    /* Form Styling */
+    .form-label {
+        font-weight: 500;
+        color: #000000;
+        margin-bottom: 5px;
+        font-size: 13px;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        padding: 8px 12px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+    }
+    
+    .form-control:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        outline: none;
+    }
+    
+    /* Button Styling */
+    .btn-admin-register {
+        background: #000000;
+        border: none;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: white;
+        width: 100%;
+    }
+    
+    .btn-admin-register:hover {
+        background: #dc3545;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    /* Login Link */
+    .login-link {
+        color: #dc3545;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        font-size: 13px;
+    }
+    
+    .login-link:hover {
+        color: #000000;
+        text-decoration: underline;
+    }
+    
+    /* Captcha Image */
+    .captcha-img {
+        border-radius: 10px;
+        border: 2px solid #e0e0e0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 42px;
+        width: 100%;
+        object-fit: cover;
+    }
+    
+    .captcha-img:hover {
+        border-color: #dc3545;
+        transform: scale(0.98);
+    }
+    
+    /* Alert Styling */
+    .alert {
+        border-radius: 10px;
+        margin-bottom: 15px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+    
+    /* Move form */
+    .row.justify-content-center {
+        margin-top: 2rem !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .row.justify-content-center {
+            margin-top: 1rem !important;
+        }
+        .admin-register-card .card-body {
+            padding: 20px;
+        }
+        .admin-register-card .card-header {
+            padding: 15px 20px;
+        }
+        .admin-register-card .card-header h4 {
+            font-size: 20px;
+        }
+        .form-control {
+            padding: 6px 10px;
+        }
+        .btn-admin-register {
+            padding: 8px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .row.justify-content-center {
+            margin-top: 0.5rem !important;
+        }
+        .admin-register-card .card-body {
+            padding: 15px;
+        }
+        .form-label {
+            font-size: 12px;
+        }
+        .col-md-6 {
+            padding: 0 15px;
+        }
     }
 </style>
 
 <div class="row justify-content-center mt-5">
     <div class="col-md-6">
-        <div class="card">
-            <div class="card-header bg-dark text-white text-center">
+        <div class="card admin-register-card">
+            <div class="card-header text-center">
+                <i class="fas fa-dumbbell" style="font-size: 28px; margin-bottom: 8px; color: white;"></i>
                 <h4><i class="fas fa-user-plus"></i> Admin Registration</h4>
                 <small>Create Admin Account</small>
             </div>
@@ -35,42 +197,47 @@
                     @csrf
                     
                     <div class="mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                        <label class="form-label"><i class="fas fa-user me-2"></i>Full Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder="Enter your full name" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+                        <label class="form-label"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                        <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="Enter your email" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
+                        <label class="form-label"><i class="fas fa-lock me-2"></i>Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Create a password (min 6 characters)" required>
                         <small class="text-muted">Minimum 6 characters</small>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Confirm Password</label>
-                        <input type="password" name="password_confirmation" class="form-control" required>
+                        <label class="form-label"><i class="fas fa-lock me-2"></i>Confirm Password</label>
+                        <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm your password" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Captcha</label>
-                        <div class="row">
+                        <label class="form-label"><i class="fas fa-robot me-2"></i>Security Check</label>
+                        <div class="row g-2 align-items-center">
                             <div class="col-7">
-                                <input type="text" name="captcha" class="form-control" required>
+                                <input type="text" name="captcha" class="form-control" placeholder="Enter 6-digit code" required>
                             </div>
                             <div class="col-5">
-                                <img src="{{ url('/captcha') }}" id="captcha-img" onclick="refreshCaptcha()" style="cursor: pointer; height: 42px; border-radius: 5px;">
+                                <img src="{{ url('/captcha') }}" id="captcha-img" class="captcha-img" onclick="refreshCaptcha()">
                             </div>
                         </div>
+                        <small class="text-muted mt-1 d-block"><i class="fas fa-sync-alt me-1"></i>Click on the image to refresh</small>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100">Register Admin</button>
+                    <button type="submit" class="btn-admin-register">
+                        <i class="fas fa-user-plus me-2"></i>Register Admin
+                    </button>
                     
-                    <div class="text-center mt-3">
-                        <a href="{{ route('admin.login') }}">Already have account? Admin Login</a>
+                    <div class="text-center mt-4">
+                        <a href="{{ route('admin.login') }}" class="login-link">
+                            <i class="fas fa-sign-in-alt me-1"></i> Already have account? Admin Login
+                        </a>
                     </div>
                 </form>
             </div>
@@ -81,6 +248,9 @@
 
 <script>
 function refreshCaptcha() {
-    document.getElementById('captcha-img').src = '/captcha?' + Math.random();
+    const img = document.getElementById('captcha-img');
+    if (img) {
+        img.src = '/captcha?' + Math.random();
+    }
 }
 </script>

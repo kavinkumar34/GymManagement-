@@ -367,10 +367,13 @@
         </div>
         <div class="card-body">
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             @endif
 
-            @if($orders->count() > 0)
+            @if(isset($orders) && $orders->count() > 0)
                 @foreach($orders as $order)
                 <div class="order-card">
                     <div class="order-header">
@@ -499,7 +502,7 @@
                     <div class="payment-summary" id="modalPaymentSummary"></div>
                     
                     <div class="action-buttons" id="modalActions">
-                        <button class="btn-cancel-order" onclick="openCancelModal({{ $order->id }})">Cancel Order</button>
+                        <button class="btn-cancel-order" onclick="openCancelModalFromDetails()">Cancel Order</button>
                         <button class="btn-contact-support" onclick="contactSupport()">Contact Support</button>
                     </div>
                 </div>
@@ -575,6 +578,7 @@
 // CSRF Token
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
 let currentCancelOrderId = null;
+let currentOrderForCancel = null;
 
 // Select reason function
 function selectReason(element, reason) {
@@ -588,6 +592,15 @@ function selectReason(element, reason) {
     const radio = element.querySelector('input[type="radio"]');
     if (radio) {
         radio.checked = true;
+    }
+}
+
+// Open Cancel Modal from details page
+function openCancelModalFromDetails() {
+    if (currentOrderForCancel) {
+        openCancelModal(currentOrderForCancel);
+    } else {
+        alert('No order selected for cancellation');
     }
 }
 
@@ -678,14 +691,10 @@ async function viewOrderDetails(orderId, button) {
         const data = await response.json();
         
         if (data.success && data.order) {
+            currentOrderForCancel = orderId;
             renderModalWithOrderData(data.order);
             const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
             modal.show();
-            
-            const cancelBtn = document.querySelector('#modalActions .btn-cancel-order');
-            if (cancelBtn) {
-                cancelBtn.setAttribute('onclick', `openCancelModal(${orderId})`);
-            }
         } else {
             alert(data.message || 'Error loading order details');
         }

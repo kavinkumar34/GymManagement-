@@ -8,6 +8,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             background: linear-gradient(135deg, #e4e7f2 0%, #e6ddef 100%);
             min-height: 100vh;
@@ -59,38 +65,6 @@
             display: none;
         }
         
-        /* Navbar Dropdown Styles */
-        .navbar-nav .dropdown-menu {
-            background: #2d2d4a;
-            border: none;
-            border-radius: 8px;
-        }
-        
-        .navbar-nav .dropdown-item {
-            color: #a0a0c0;
-        }
-        
-        .navbar-nav .dropdown-item:hover {
-            background: #e94560;
-            color: white;
-        }
-        
-        /* Join Gym / My Dashboard Button */
-        .btn-join-gym, .btn-dashboard {
-            background: #ff4757;
-            color: white;
-            border-radius: 25px;
-            padding: 5px 15px;
-            margin-left: 10px;
-            transition: all 0.3s;
-        }
-        
-        .btn-join-gym:hover, .btn-dashboard:hover {
-            background: #ff6b6b;
-            transform: scale(1.05);
-            color: white;
-        }
-        
         /* Profile Icon */
         .profile-icon {
             width: 35px;
@@ -113,6 +87,265 @@
         .hide-sidebar .admin-main-content {
             display: none !important;
         }
+
+        /* Modern Navbar Styles */
+        .navbar {
+            background: #ffffff !important;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 15px 0 !important;
+            margin: 0 !important;
+            width: 100%;
+        }
+        
+        /* Fixed container for navbar - ensures consistent 30px margins on ALL pages */
+        .navbar-container {
+            width: 100%;
+            max-width: 100%;
+            padding-left: 30px !important;
+            padding-right: 30px !important;
+            margin: 0 auto;
+        }
+        
+        /* Top row - brand on left, icons on right */
+        .navbar-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eef2f6;
+            flex-wrap: wrap;
+        }
+        
+        .navbar-brand {
+            color: #1a1a2e !important;
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            color: #dc3545;
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        /* Right side icons container */
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        /* Search Wrapper */
+        .search-wrapper {
+            position: relative;
+        }
+        
+        .search-wrapper input {
+            border-radius: 30px;
+            border: 1px solid #e0e0e0;
+            padding: 8px 40px 8px 18px;
+            font-size: 0.85rem;
+            width: 240px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .search-wrapper input:focus {
+            outline: none;
+            border-color: #dc3545;
+            width: 280px;
+            background: white;
+            box-shadow: 0 0 0 2px rgba(220,53,69,0.1);
+        }
+        
+        .search-wrapper button {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .search-wrapper button:hover {
+            color: #dc3545;
+        }
+        
+        /* Nav Icons */
+        .nav-icon {
+            position: relative;
+            font-size: 1.2rem;
+            color: #1a1a2e;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-icon:hover {
+            color: #dc3545;
+        }
+        
+        /* Join Gym Button */
+        .btn-join-gym {
+            background: #dc3545;
+            color: white;
+            border-radius: 25px;
+            padding: 7px 20px;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-join-gym:hover {
+            background: #000000;
+            transform: scale(1.02);
+            color: white;
+        }
+        
+        /* Dashboard Button for logged in users */
+        .btn-dashboard-nav {
+            background: #28a745;
+            color: white;
+            border-radius: 25px;
+            padding: 7px 20px;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.85rem;
+        }
+        
+        .btn-dashboard-nav:hover {
+            background: #000000;
+            transform: scale(1.02);
+            color: white;
+        }
+        
+        /* Dropdown Styles */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 8px 0;
+            margin-top: 8px;
+        }
+        
+        .dropdown-item {
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            color: #333;
+            transition: all 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background: #dc3545;
+            color: white;
+        }
+        
+        /* User Dropdown Toggle */
+        .user-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #1a1a2e;
+            padding: 5px 10px;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+        
+        .user-dropdown:hover {
+            background: #f8f9fa;
+            color: #dc3545;
+        }
+        
+        /* Bottom row with menu items centered */
+        .navbar-bottom {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .navbar-nav {
+            display: inline-flex;
+            flex-direction: row;
+            gap: 0;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .navbar-nav .nav-item {
+            list-style: none;
+        }
+        
+        .navbar-nav .nav-link {
+            color: #1a1a2e !important;
+            font-weight: 500;
+            font-size: 0.85rem;
+            padding: 8px 16px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #dc3545 !important;
+        }
+        
+        /* Join Gym button in bottom nav */
+        .nav-join-gym {
+            margin-left: 10px;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .navbar-container {
+                padding-left: 15px !important;
+                padding-right: 15px !important;
+            }
+            .navbar-top {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .navbar-nav {
+                flex-direction: column;
+                width: 100%;
+            }
+            .search-wrapper input {
+                width: 100%;
+            }
+            .search-wrapper input:focus {
+                width: 100%;
+            }
+            .nav-icons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .navbar-brand {
+                justify-content: center;
+            }
+            .nav-join-gym {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
     </style>
 </head>
 <body class="@if(Route::is('admin.login') || Route::is('admin.register')) hide-sidebar @endif">
@@ -133,7 +366,6 @@
         }
     }
     
-    // Helper function for contact link - redirects to login only for guests
     if (!function_exists('getContactUrl')) {
         function getContactUrl() {
             if (auth()->check()) {
@@ -144,249 +376,149 @@
     }
 @endphp
 
-{{-- ROLE BASED NAVBAR --}}
-@auth('admin')
-    {{-- ONLY CHANGE: Show frontend navbar on home page instead of admin navbar --}}
-    @if(Route::is('home'))
-        {{-- FRONTEND NAVBAR FOR ADMIN ON HOME PAGE --}}
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    <i class="{{ App\Models\Setting::get('company_logo', 'fas fa-dumbbell') }} me-2"></i>
-                    <strong>{!! nl2br(e(App\Models\Setting::get('company_name', 'GYMMANAGEMENT'))) !!}</strong>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#storeNavbarAdmin">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="storeNavbarAdmin">
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('about') }}">About Us</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('contact') }}">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('track.order') }}">Track Order</a></li>
-                    </ul>
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                                <i class="fas fa-tachometer-alt"></i> Admin Panel
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-from-frontend').submit();">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <form id="admin-logout-from-frontend" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
-    @else
-        {{-- Admin Navbar (Only shown when admin is logged in on admin pages) --}}
-        @include('layouts.admin-navbar')
-    @endif
-@elseif(auth()->check())
-    {{-- STORE NAVBAR FOR LOGGED IN USERS (Member/Trainer) --}}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+{{-- 
+    ============================================================
+    UNIVERSAL SINGLE NAVBAR - SAME FOR BOTH LOGGED IN AND LOGGED OUT USERS
+    Navbar has 30px left and right margins on ALL pages
+    ============================================================
+--}}
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="navbar-top">
+            <!-- Brand on LEFT side -->
             <a class="navbar-brand" href="{{ url('/') }}">
-                <i class="{{ App\Models\Setting::get('company_logo', 'fas fa-dumbbell') }} me-2"></i>
-                <strong>{!! nl2br(e(App\Models\Setting::get('company_name', 'GYMMANAGEMENT'))) !!}</strong>
+                <i class="fas fa-dumbbell"></i>
+                <strong>Gym Management</strong>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#storeNavbarLogged">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="storeNavbarLogged">
-                <!-- Main Menu Links -->
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url('/') }}">Home</a>
-                    </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" href="#">Shop</a>
-                    </li> -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            Categories
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">🏋️ Gym Equipment</a></li>
-                            <li><a class="dropdown-item" href="#">👕 Gym Wear</a></li>
-                            <li><a class="dropdown-item" href="#">👟 Footwear</a></li>
-                            <li><a class="dropdown-item" href="#">💪 Supplements</a></li>
-                            <li><a class="dropdown-item" href="#">🎒 Accessories</a></li>
-                            <li><a class="dropdown-item" href="#">⌚ Fitness Trackers</a></li>
-                        </ul>
-                    </li>
-                    <!-- FIXED: My Orders link for logged-in users -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('my.orders') }}">
-                            <i class="fas fa-shopping-bag me-1"></i> My Orders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('contact') }}">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('track.order') }}">Track Order</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('about') }}">About Us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn-dashboard" href="{{ getDashboardUrl() }}">
-                            <i class="fas fa-sign-in-alt"></i> Join Gym
-                        </a>
-                    </li>
-                </ul>
+            
+            <!-- Icons on RIGHT side -->
+            <div class="nav-icons">
+                <!-- Search Box -->
+                <div class="search-wrapper">
+                    <form onsubmit="event.preventDefault(); searchProducts();">
+                        <input type="text" id="navbarSearch" placeholder="Search for products...">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
                 
-                <!-- Right Side: Search, Cart, Wishlist, Profile -->
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <!-- Search Form -->
-                    <li class="nav-item me-2">
-                        <form class="d-flex" onsubmit="event.preventDefault(); searchProducts();">
-                            <input class="form-control form-control-sm" type="search" placeholder="Search products..." id="navbarSearch" style="width: 180px; border-radius: 20px 0 0 20px;">
-                            <button class="btn btn-sm btn-primary" type="submit" style="border-radius: 0 20px 20px 0;">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form>
-                    </li>
-                    
-                    <!-- Cart Icon with Count (hides when 0) -->
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="{{ url('/cart') }}">
-                            <i class="fas fa-shopping-cart" style="font-size: 1.3rem;"></i>
-                            <span class="cart-count" id="navbarCartCount"></span>
+                <!-- Cart Icon - Same for all users -->
+                <a class="nav-icon position-relative" href="{{ url('/cart') }}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count" id="navbarCartCount"></span>
+                </a>
+                
+                <!-- Wishlist Icon - Same for all users -->
+                <a class="nav-icon position-relative" href="{{ route('wishlist') }}">
+                    <i class="fas fa-heart"></i>
+                    <span class="cart-count" id="navbarWishlistCount"></span>
+                </a>
+                
+                <!-- User Area - Changes based on login status -->
+                @auth('admin')
+                    {{-- Admin Logged In --}}
+                    <div class="dropdown">
+                        <a class="user-dropdown dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="profile-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <span>Admin</span>
                         </a>
-                    </li>
-                    
-                    <!-- Wishlist Icon with Count -->
-                    <li class="nav-item">
-                        <a class="nav-link position-relative" href="{{ route('wishlist') }}">
-                            <i class="fas fa-heart" style="font-size: 1.3rem;"></i>
-                            <span class="cart-count" id="navbarWishlistCount"></span>
-                        </a>
-                    </li>
-                    
-                    <!-- Profile Dropdown -->
-                    <li class="nav-item dropdown ms-2">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Admin Panel</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-from-navbar').submit();"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                @elseif(auth()->check())
+                    {{-- Regular User (Member/Trainer) Logged In --}}
+                    <div class="dropdown">
+                        <a class="user-dropdown dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <div class="profile-icon">
                                 <i class="fas fa-user"></i>
                             </div>
                             <span>{{ Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">
-                                <i class="fas fa-id-card me-2"></i> My Profile
-                            </a></li>
-                            <!-- FIXED: My Orders link in dropdown -->
-                            <li><a class="dropdown-item" href="{{ route('my.orders') }}">
-                                <i class="fas fa-shopping-bag me-2"></i> My Orders
-                            </a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-id-card me-2"></i> My Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ route('my.orders') }}"><i class="fas fa-shopping-bag me-2"></i> My Orders</a></li>
                             @if(auth()->user()->role == 'trainer')
-                                <li><a class="dropdown-item" href="{{ route('trainer.dashboard') }}">
-                                    <i class="fas fa-chalkboard-user me-2"></i> Trainer Dashboard
-                                </a></li>
+                                <li><a class="dropdown-item" href="{{ route('trainer.dashboard') }}"><i class="fas fa-chalkboard-user me-2"></i> Trainer Dashboard</a></li>
                             @else
-                                <li><a class="dropdown-item" href="{{ route('member.dashboard') }}">
-                                    <i class="fas fa-tachometer-alt me-2"></i> Member Dashboard
-                                </a></li>
+                                <li><a class="dropdown-item" href="{{ route('member.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Member Dashboard</a></li>
                             @endif
                             <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); localStorage.removeItem('cart'); localStorage.removeItem('wishlist'); document.getElementById('logout-form').submit();">
-                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); localStorage.removeItem('cart'); localStorage.removeItem('wishlist'); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                         </ul>
-                    </li>
-                </ul>
+                    </div>
+                @endif
             </div>
         </div>
-    </nav>
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-        @csrf
-    </form>
-@else
-{{-- STORE NAVBAR FOR GUESTS (Cart Icon without count) --}}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url('/') }}">
-            <i class="{{ App\Models\Setting::get('company_logo', 'fas fa-dumbbell') }} me-2"></i>
-            <strong>{!! nl2br(e(App\Models\Setting::get('company_name', 'GYMMANAGEMENT'))) !!}</strong>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#storeNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="storeNavbar">
-            <!-- Main Menu Links -->
-            <ul class="navbar-nav mx-auto">
+        
+        <!-- Bottom Navigation Menu -->
+        <div class="navbar-bottom">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">New Arrivals</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Men</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Women</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Apparel</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Footwear</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Gym Equipment</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Massagers</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Accessories</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Supplements</a></li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/') }}">Home</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="#">Shop</a>
-                </li> -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        Categories
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">🏋️ Gym Equipment</a></li>
-                        <li><a class="dropdown-item" href="#">👕 Gym Wear</a></li>
-                        <li><a class="dropdown-item" href="#">👟 Footwear</a></li>
-                        <li><a class="dropdown-item" href="#">💪 Supplements</a></li>
-                        <li><a class="dropdown-item" href="#">🎒 Accessories</a></li>
-                        <li><a class="dropdown-item" href="#">⌚ Fitness Trackers</a></li>
-                    </ul>
-                </li>
-                <!-- FIXED: My Orders link for guests redirects to login -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">
-                        <i class="fas fa-shopping-bag me-1"></i> My Orders
-                    </a>
+                    <a class="nav-link" href="{{ route('my.orders') }}">My Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('login') }}">Contact</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('track.order') }}">Track Order</a>
+                    <a class="nav-link" href="{{ route('contact') }}">Contact</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('about') }}">About Us</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn-join-gym" href="{{ route('login') }}">
-                        <i class="fas fa-sign-in-alt"></i> Join Gym
-                    </a>
-                </li>
-            </ul>
-            
-            <!-- Right Side: Search, Cart, Wishlist (No Count Badge for Guests) -->
-            <ul class="navbar-nav ms-auto align-items-center">
-                <!-- Search Form -->
-                <li class="nav-item me-2">
-                    <form class="d-flex" onsubmit="event.preventDefault(); searchProducts();">
-                        <input class="form-control form-control-sm" type="search" placeholder="Search products..." id="navbarSearch" style="width: 180px; border-radius: 20px 0 0 20px;">
-                        <button class="btn btn-sm btn-primary" type="submit" style="border-radius: 0 20px 20px 0;">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form>
-                </li>
-                
-                <!-- Cart Icon - No count badge for guests -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/cart') }}">
-                        <i class="fas fa-shopping-cart" style="font-size: 1.3rem;"></i>
-                    </a>
-                </li>
+                </li>                
+                <!-- Join Gym / Dashboard Button - Shows in bottom row after Bulk Orders -->
+                @auth('admin')
+                    {{-- Admin Logged In - Show Admin Panel button --}}
+                    <li class="nav-item nav-join-gym">
+                        <a class="btn-dashboard-nav" href="{{ route('admin.dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Admin Panel
+                        </a>
+                    </li>
+                @elseif(auth()->check())
+                    {{-- Regular User Logged In - Show Dashboard button --}}
+                    <li class="nav-item nav-join-gym">
+                        <a class="btn-dashboard-nav" href="{{ getDashboardUrl() }}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                        </a>
+                    </li>
+                @else
+                    {{-- No User Logged In - Show Join Gym button --}}
+                    <li class="nav-item nav-join-gym">
+                        <a class="btn-join-gym" href="{{ route('login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i> Join Gym
+                        </a>
+                    </li>
+                @endauth
             </ul>
         </div>
     </div>
 </nav>
+
+{{-- Hidden forms for logout --}}
+@auth('admin')
+    <form id="admin-logout-from-navbar" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+@elseif(auth()->check())
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+@endauth
+
+{{-- For admin dashboard pages, include the admin navbar --}}
+@auth('admin')
+    @if(!Route::is('home') && !Route::is('login') && !Route::is('admin.login') && !Route::is('admin.register'))
+        @include('layouts.admin-navbar')
+    @endif
 @endauth
 
 {{-- MAIN CONTENT --}}
@@ -412,11 +544,10 @@
 <footer class="footer mt-auto">
     <div class="container">
         <div class="row">
-            <!-- About Section -->
             <div class="col-md-4 mb-4">
                 <div class="footer-logo">
                     <i class="fas fa-dumbbell me-2"></i>
-                    <strong>{{ App\Models\Setting::get('company_name', 'GYMMANAGEMENT') }}</strong>
+                    <strong>Gym Management</strong>
                 </div>
                 <p class="footer-about mt-3">
                     Your complete fitness management solution. We provide gym management software, 
@@ -431,7 +562,6 @@
                 </div>
             </div>
 
-            <!-- Quick Links -->
             <div class="col-md-2 mb-4">
                 <h5>Quick Links</h5>
                 <ul class="footer-links">
@@ -442,7 +572,6 @@
                 </ul>
             </div>
 
-            <!-- Customer Service -->
             <div class="col-md-3 mb-4">
                 <h5>Customer Service</h5>
                 <ul class="footer-links">
@@ -455,7 +584,6 @@
                 </ul>
             </div>
 
-            <!-- Contact Info -->
             <div class="col-md-3 mb-4">
                 <h5>Get In Touch</h5>
                 <ul class="footer-contact">
@@ -479,10 +607,9 @@
             </div>
         </div>
 
-        <!-- Bottom Bar -->
         <div class="row bottom-bar">
             <div class="col-md-6 text-center text-md-start">
-                <p>&copy; {{ date('Y') }} {{ App\Models\Setting::get('company_name', 'Gym Management System') }}. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} Gym Management. All rights reserved.</p>
             </div>
             <div class="col-md-6 text-center text-md-end">
                 <div class="payment-methods">
@@ -499,7 +626,6 @@
 </footer>
 
 <style>
-    /* Footer Styles */
     .footer {
         background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
         color: #a0a0c0;
@@ -523,7 +649,6 @@
         font-size: 0.9rem;
     }
 
-    /* Social Icons */
     .social-icons a {
         display: inline-flex;
         align-items: center;
@@ -544,7 +669,6 @@
         transform: translateY(-3px);
     }
 
-    /* Footer Links */
     .footer h5 {
         color: white;
         font-size: 1.1rem;
@@ -595,7 +719,6 @@
         transform: translateX(3px);
     }
 
-    /* Contact Info */
     .footer-contact li {
         display: flex;
         align-items: flex-start;
@@ -613,7 +736,6 @@
         font-size: 0.9rem;
     }
 
-    /* Bottom Bar */
     .bottom-bar {
         padding: 20px 0;
         margin-top: 30px;
@@ -632,7 +754,6 @@
         color: #e94560;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
         .footer {
             text-align: center;
@@ -652,7 +773,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Refresh captcha function
     function refreshCaptcha() {
         const img = document.getElementById('captcha-img');
         if (img) {
@@ -660,43 +780,36 @@
         }
     }
     
-    // Update cart count in navbar - Only shows badge when count > 0
     function updateNavbarCartCount() {
-        @auth
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let count = cart.reduce((total, item) => total + item.quantity, 0);
-            let cartCountElement = document.getElementById('navbarCartCount');
-            if(cartCountElement) {
-                if(count > 0) {
-                    cartCountElement.textContent = count;
-                    cartCountElement.classList.remove('hide-badge');
-                } else {
-                    cartCountElement.textContent = '';
-                    cartCountElement.classList.add('hide-badge');
-                }
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let count = cart.reduce((total, item) => total + item.quantity, 0);
+        let cartCountElement = document.getElementById('navbarCartCount');
+        if(cartCountElement) {
+            if(count > 0) {
+                cartCountElement.textContent = count;
+                cartCountElement.classList.remove('hide-badge');
+            } else {
+                cartCountElement.textContent = '';
+                cartCountElement.classList.add('hide-badge');
             }
-        @endauth
+        }
     }
     
-    // Update wishlist count in navbar
     function updateNavbarWishlistCount() {
-        @auth
-            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-            let count = wishlist.length;
-            let wishlistCountElement = document.getElementById('navbarWishlistCount');
-            if(wishlistCountElement) {
-                if(count > 0) {
-                    wishlistCountElement.textContent = count;
-                    wishlistCountElement.classList.remove('hide-badge');
-                } else {
-                    wishlistCountElement.textContent = '';
-                    wishlistCountElement.classList.add('hide-badge');
-                }
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let count = wishlist.length;
+        let wishlistCountElement = document.getElementById('navbarWishlistCount');
+        if(wishlistCountElement) {
+            if(count > 0) {
+                wishlistCountElement.textContent = count;
+                wishlistCountElement.classList.remove('hide-badge');
+            } else {
+                wishlistCountElement.textContent = '';
+                wishlistCountElement.classList.add('hide-badge');
             }
-        @endauth
+        }
     }
     
-    // Search function for navbar
     function searchProducts() {
         let searchTerm = document.getElementById('navbarSearch').value.toLowerCase();
         if(searchTerm) {
@@ -704,7 +817,6 @@
         }
     }
     
-    // Update counts on page load
     document.addEventListener('DOMContentLoaded', function() {
         updateNavbarCartCount();
         updateNavbarWishlistCount();
