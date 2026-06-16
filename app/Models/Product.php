@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Product;
 use App\Models\ProductVariant;
+
 class Product extends Model
 
 {
@@ -67,5 +68,11 @@ class Product extends Model
     public function variants()
     {
         return $this->hasMany(ProductVariant::class);
+    }
+    
+    // ADD THIS RELATIONSHIP FOR PRODUCT IMAGES
+    public function productImages()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id')->orderBy('display_order', 'asc');
     }
 }

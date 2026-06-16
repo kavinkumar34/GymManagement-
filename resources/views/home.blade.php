@@ -32,6 +32,7 @@
         height: 100%;
         position: relative;
         background: white;
+        cursor: pointer;
     }
     
     .product-card:hover {
@@ -153,6 +154,7 @@
         color: white;
         transition: all 0.3s;
         font-size: 0.85rem;
+        cursor: pointer;
     }
     
     .btn-add-cart:hover {
@@ -168,6 +170,7 @@
         color: white;
         transition: all 0.3s;
         font-size: 0.85rem;
+        cursor: pointer;
     }
     
     .btn-buy-now:hover {
@@ -182,38 +185,120 @@
         margin-top: 15px;
     }
     
-/* Category Card with Image */
-.category-card {
-    background: linear-gradient(135deg, #1e293b 0%, #2d3a4b 100%);
-    border-radius: 15px;
-    padding: 20px;
-    text-align: center;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-bottom: 20px;
-}
-
-.category-card:hover {
-    background: #dc3545;
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-
-.category-card img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    border: 2px solid white;
-}
-
-.category-card h6 {
-    margin-top: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
+    /* Category Card - Full Image Cover, No Gradient Background */
+    .category-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+    }
+    
+    .category-image-wrapper {
+        width: 100%;
+        height: 280px;
+        overflow: hidden;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .category-image-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.3);
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 1;
+    }
+    
+    .category-card:hover .category-image-wrapper::before {
+        opacity: 1;
+    }
+    
+    .category-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .category-card:hover .category-image-wrapper img {
+        transform: scale(1.1);
+    }
+    
+    .category-icon-wrapper {
+        width: 100%;
+        height: 280px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .category-icon-wrapper i {
+        font-size: 5rem;
+        color: #999;
+        transition: transform 0.3s;
+    }
+    
+    .category-card:hover .category-icon-wrapper i {
+        transform: scale(1.1);
+        color: #dc3545;
+    }
+    
+    .category-info {
+        padding: 20px;
+        text-align: center;
+        background: white;
+    }
+    
+    .category-info h5 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1e293b;
+    }
+    
+    .category-info p {
+        font-size: 0.85rem;
+        color: #dc3545;
+        font-weight: 500;
+        margin-bottom: 0;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    
+    .category-card:hover .category-info p {
+        transform: translateX(5px);
+        color: #000000;
+    }
+    
+    .category-info p i {
+        font-size: 0.75rem;
+        transition: transform 0.3s;
+    }
+    
+    .category-card:hover .category-info p i {
+        transform: translateX(5px);
+    }
+    
     /* Search Bar */
     .search-bar {
         max-width: 500px;
@@ -334,6 +419,17 @@
         margin-bottom: 0;
     }
     
+    /* Category Row Gap */
+    .category-row {
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+    
+    .category-row > [class*="col-"] {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
     @media (max-width: 768px) {
         .banner-slider .carousel-item {
             height: 250px;
@@ -348,6 +444,35 @@
         }
         .banner-caption p {
             font-size: 0.7rem;
+        }
+        .category-image-wrapper, .category-icon-wrapper {
+            height: 220px;
+        }
+        .category-info h5 {
+            font-size: 1rem;
+        }
+        .category-row > [class*="col-"] {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .category-image-wrapper, .category-icon-wrapper {
+            height: 180px;
+        }
+        .category-info {
+            padding: 15px;
+        }
+        .category-info h5 {
+            font-size: 0.9rem;
+        }
+        .category-info p {
+            font-size: 0.75rem;
+        }
+        .category-row > [class*="col-"] {
+            padding-left: 10px;
+            padding-right: 10px;
         }
     }
 </style>
@@ -369,17 +494,17 @@
     </button>
 </div>
 
-<!-- Category Section -->
+<!-- Category Section - 3 cards per row with full image cover -->
 <div class="container mt-4">
     <h2 class="text-center mb-4" style="color: #000000;">Shop by Category</h2>
-    <div class="row" id="categoryContainer"></div>
+    <div class="row category-row" id="categoryContainer"></div>
 </div>
 
 <!-- Products Section -->
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 style="color: #000000;">🔥 Best Selling Products</h2>
-        <a href="#" style="color: #dc3545 !important;">View All →</a>
+        <a href="/shop" style="color: #dc3545 !important;">View All →</a>
     </div>
     
     <div id="productsLoader" class="loader" style="display: none;">
@@ -535,7 +660,9 @@
         }
     }
     
-    function addToCart(id, name, price, imageUrl) {
+    function addToCart(id, name, price, imageUrl, event) {
+        if (event) event.stopPropagation();
+        
         @if(!auth()->check())
             if(confirm('Please login to add products to cart. Go to login page?')) {
                 window.location.href = "{{ route('login') }}";
@@ -572,7 +699,9 @@
         showNotification(name + ' added to cart!', 'success');
     }
     
-    function buyNow(productId, productName, productPrice) {
+    function buyNow(productId, productName, productPrice, event) {
+        if (event) event.stopPropagation();
+        
         @if(!auth()->check())
             if(confirm('Please login to purchase. Go to login page?')) {
                 window.location.href = "{{ route('login') }}";
@@ -606,6 +735,17 @@
         form.submit();
     }
     
+    function goToProductDetail(productId, event) {
+        if (event.target.closest('.wishlist-btn') || 
+            event.target.closest('.btn-add-cart') || 
+            event.target.closest('.btn-buy-now') ||
+            event.target.closest('.carousel-control-prev') ||
+            event.target.closest('.carousel-control-next')) {
+            return;
+        }
+        window.location.href = `/product/${productId}`;
+    }
+    
     function showNotification(message, type) {
         let notification = document.createElement('div');
         notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'info') + ' alert-dismissible fade show';
@@ -619,38 +759,47 @@
         setTimeout(() => notification.remove(), 3000);
     }
     
-    // Load categories from database
-   // Load categories with images from database
-async function loadCategories() {
-    try {
-        const response = await fetch('/api/categories');
-        const categories = await response.json();
-        const categoryContainer = document.getElementById('categoryContainer');
-        if (!categoryContainer) return;
-        
-        if (categories.length === 0) {
-            categoryContainer.innerHTML = '<div class="col-12 text-center">No categories found</div>';
-            return;
-        }
-        
-        categoryContainer.innerHTML = categories.map(cat => `
-            <div class="col-md-2 col-6">
-                <div class="category-card" onclick="filterCategory(${cat.id})" style="cursor: pointer;">
-                    ${cat.image ? 
-                        `<img src="/storage/${cat.image}" alt="${cat.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; margin-bottom: 10px;">` : 
-                        `<div class="category-icon"><i class="fas fa-tag"></i></div>`
-                    }
-                    <h6 style="margin-top: 8px;">${cat.name}</h6>
-                </div>
-            </div>
-        `).join('');
-        
-    } catch (error) {
-        console.error('Error loading categories:', error);
+    // Function to navigate to category products page (separate shop page)
+    function goToCategoryProducts(categoryId, categoryName) {
+        window.location.href = `/shop?category=${categoryId}&name=${encodeURIComponent(categoryName)}`;
     }
-}
     
-    // Load products from database with image slider - Click goes to product detail page
+    // Load categories from database - 3 per row with full image cover
+    async function loadCategories() {
+        try {
+            const response = await fetch('/api/categories');
+            const categories = await response.json();
+            const categoryContainer = document.getElementById('categoryContainer');
+            if (!categoryContainer) return;
+            
+            if (categories.length === 0) {
+                categoryContainer.innerHTML = '<div class="col-12 text-center">No categories found</div>';
+                return;
+            }
+            
+            categoryContainer.innerHTML = categories.map(cat => `
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="category-card" onclick="goToCategoryProducts(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')">
+                        <div class="category-image-wrapper">
+                            ${cat.image ? 
+                                `<img src="/storage/${cat.image}" alt="${cat.name}">` : 
+                                `<div class="category-icon-wrapper"><i class="fas fa-tag"></i></div>`
+                            }
+                        </div>
+                        <div class="category-info">
+                            <h5>${cat.name}</h5>
+                            <p>View Products <i class="fas fa-arrow-right ms-1"></i></p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+        } catch (error) {
+            console.error('Error loading categories:', error);
+        }
+    }
+    
+    // Load products from database with image slider
     async function loadProducts() {
         const loader = document.getElementById('productsLoader');
         const container = document.getElementById('productsContainer');
@@ -692,7 +841,7 @@ async function loadCategories() {
                 
                 return `
                     <div class="col-md-3 col-sm-6 mb-4">
-                        <div class="product-card card">
+                        <div class="product-card card" onclick="goToProductDetail(${product.id}, event)">
                             ${discountBadge}
                             <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrls[0]}')">
                                 <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
@@ -702,9 +851,7 @@ async function loadCategories() {
                                 <div class="carousel-inner">
                                     ${imageUrls.map((imgUrl, idx) => `
                                         <div class="carousel-item ${idx === 0 ? 'active' : ''}">
-                                            <a href="/product/${product.id}" style="display: block; text-decoration: none;">
-                                                <img src="${imgUrl}" class="d-block w-100 product-image" alt="${product.name}" style="height: 200px; object-fit: cover; cursor: pointer;">
-                                            </a>
+                                            <img src="${imgUrl}" class="d-block w-100 product-image" alt="${product.name}" style="height: 200px; object-fit: cover;">
                                         </div>
                                     `).join('')}
                                 </div>
@@ -719,19 +866,17 @@ async function loadCategories() {
                             </div>
                             
                             <div class="card-body text-center">
-                                <a href="/product/${product.id}" style="text-decoration: none; color: inherit;">
-                                    <h5 class="card-title">${product.name}</h5>
-                                </a>
+                                <h5 class="card-title">${product.name}</h5>
                                 <p class="text-muted">${product.category ? product.category.name : 'Uncategorized'}</p>
                                 <div>
                                     ${oldPriceHtml}
                                     <span class="product-price">₹${parseFloat(displayPrice).toLocaleString()}</span>
                                 </div>
                                 <div class="product-actions">
-                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrls[0]}')">
+                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrls[0]}', event)">
                                         <i class="fas fa-shopping-cart"></i> Add
                                     </button>
-                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice})">
+                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice}, event)">
                                         <i class="fas fa-bolt"></i> Buy Now
                                     </button>
                                 </div>
@@ -765,7 +910,7 @@ async function loadCategories() {
             
             container.innerHTML = `
                 <div class="row">
-                    ${products.map((product, index) => `
+                    ${products.slice(0, 6).map((product, index) => `
                         <div class="col-md-4">
                             <div class="d-flex align-items-center mb-3">
                                 <span class="badge bg-warning me-3 p-2" style="background-color: #dc3545 !important;">#${index + 1}</span>
@@ -781,127 +926,6 @@ async function loadCategories() {
             `;
         } catch (error) {
             console.error('Error loading best sellers:', error);
-        }
-    }
-    
-    // Search products
-    async function searchProducts() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        if (!searchTerm) {
-            loadProducts();
-            return;
-        }
-        
-        const loader = document.getElementById('productsLoader');
-        const container = document.getElementById('productsContainer');
-        if (loader) loader.style.display = 'block';
-        
-        try {
-            const response = await fetch(`/api/products/search?q=${encodeURIComponent(searchTerm)}`);
-            const products = await response.json();
-            if (loader) loader.style.display = 'none';
-            
-            if (products.length === 0) {
-                container.innerHTML = '<div class="col-12"><div class="no-products">No products found matching your search</div></div>';
-                return;
-            }
-            
-            container.innerHTML = products.map(product => {
-                const displayPrice = product.discount_price ? product.discount_price : product.price;
-                const imageUrl = product.image ? '/storage/' + product.image : 'https://via.placeholder.com/300x200?text=No+Image';
-                const isInWishlist = wishlist.some(item => item.id === product.id);
-                const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
-                const escapeName = product.name.replace(/'/g, "\\'");
-                
-                return `
-                    <div class="col-md-3 col-sm-6 mb-4">
-                        <div class="product-card card">
-                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
-                                <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
-                            </button>
-                            <a href="/product/${product.id}" style="display: block;">
-                                <img src="${imageUrl}" class="product-image" alt="${product.name}" style="height: 200px; object-fit: cover; width: 100%;">
-                            </a>
-                            <div class="card-body text-center">
-                                <a href="/product/${product.id}" style="text-decoration: none; color: inherit;">
-                                    <h5 class="card-title">${product.name}</h5>
-                                </a>
-                                <p class="text-muted">${product.category ? product.category.name : 'Uncategorized'}</p>
-                                <span class="product-price">₹${parseFloat(displayPrice).toLocaleString()}</span>
-                                <div class="product-actions mt-3">
-                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
-                                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                                    </button>
-                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice})">
-                                        <i class="fas fa-bolt"></i> Buy Now
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            loadWishlistStatus();
-        } catch (error) {
-            console.error('Error searching products:', error);
-            if (loader) loader.style.display = 'none';
-        }
-    }
-    
-    // Filter by category
-    async function filterCategory(categoryId) {
-        const loader = document.getElementById('productsLoader');
-        const container = document.getElementById('productsContainer');
-        if (loader) loader.style.display = 'block';
-        
-        try {
-            const response = await fetch(`/api/products/category/${categoryId}`);
-            const products = await response.json();
-            if (loader) loader.style.display = 'none';
-            
-            if (products.length === 0) {
-                container.innerHTML = '<div class="col-12"><div class="no-products">No products in this category</div></div>';
-                return;
-            }
-            
-            container.innerHTML = products.map(product => {
-                const displayPrice = product.discount_price ? product.discount_price : product.price;
-                const imageUrl = product.image ? '/storage/' + product.image : 'https://via.placeholder.com/300x200?text=No+Image';
-                const isInWishlist = wishlist.some(item => item.id === product.id);
-                const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
-                const escapeName = product.name.replace(/'/g, "\\'");
-                
-                return `
-                    <div class="col-md-3 col-sm-6 mb-4">
-                        <div class="product-card card">
-                            <button class="wishlist-btn" onclick="toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
-                                <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
-                            </button>
-                            <a href="/product/${product.id}" style="display: block;">
-                                <img src="${imageUrl}" class="product-image" alt="${product.name}" style="height: 200px; object-fit: cover; width: 100%;">
-                            </a>
-                            <div class="card-body text-center">
-                                <a href="/product/${product.id}" style="text-decoration: none; color: inherit;">
-                                    <h5 class="card-title">${product.name}</h5>
-                                </a>
-                                <span class="product-price">₹${parseFloat(displayPrice).toLocaleString()}</span>
-                                <div class="product-actions mt-3">
-                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrl}')">
-                                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                                    </button>
-                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice})">
-                                        <i class="fas fa-bolt"></i> Buy Now
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            loadWishlistStatus();
-        } catch (error) {
-            console.error('Error filtering products:', error);
-            if (loader) loader.style.display = 'none';
         }
     }
     
