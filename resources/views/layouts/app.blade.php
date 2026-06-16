@@ -273,36 +273,39 @@
             color: #dc3545;
         }
         
-        /* Bottom row with menu items centered */
+        /* Bottom row with menu items centered - EQUAL SPACING */
         .navbar-bottom {
             text-align: center;
             margin-top: 10px;
         }
         
         .navbar-nav {
-            display: inline-flex;
+            display: flex;
             flex-direction: row;
-            gap: 0;
             justify-content: center;
             flex-wrap: wrap;
             margin: 0;
             padding: 0;
             list-style: none;
             align-items: center;
+            gap: 20px;
         }
         
         .navbar-nav .nav-item {
             list-style: none;
+            flex: 0 1 auto;
         }
         
         .navbar-nav .nav-link {
             color: #1a1a2e !important;
             font-weight: 500;
             font-size: 0.85rem;
-            padding: 8px 16px;
+            padding: 8px 14px;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
+            cursor: pointer;
+            white-space: nowrap;
         }
         
         .navbar-nav .nav-link:hover {
@@ -311,7 +314,7 @@
         
         /* Join Gym button in bottom nav */
         .nav-join-gym {
-            margin-left: 10px;
+            margin-left: 5px;
         }
         
         /* Responsive Styles */
@@ -326,6 +329,15 @@
             }
             .navbar-nav {
                 flex-direction: column;
+                width: 100%;
+                gap: 0;
+            }
+            .navbar-nav .nav-item {
+                width: 100%;
+                text-align: center;
+            }
+            .navbar-nav .nav-link {
+                padding: 10px 16px;
                 width: 100%;
             }
             .search-wrapper input {
@@ -343,7 +355,18 @@
             }
             .nav-join-gym {
                 margin-left: 0;
-                margin-top: 10px;
+                margin-top: 5px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar-nav .nav-link {
+                font-size: 0.75rem;
+                padding: 8px 10px;
+            }
+            .navbar-container {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
             }
         }
     </style>
@@ -372,6 +395,14 @@
                 return route('contact');
             }
             return route('login');
+        }
+    }
+    
+    // Get category ID by name
+    if (!function_exists('getCategoryIdByName')) {
+        function getCategoryIdByName($name) {
+            $category = \App\Models\Category::where('name', $name)->first();
+            return $category ? $category->id : null;
         }
     }
 @endphp
@@ -454,18 +485,30 @@
             </div>
         </div>
         
-        <!-- Bottom Navigation Menu -->
+        <!-- Bottom Navigation Menu - EQUAL SPACING -->
         <div class="navbar-bottom">
             <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">New Arrivals</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Men</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Women</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Apparel</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Footwear</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Gym Equipment</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Massagers</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Accessories</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Supplements</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Men') }}&name=Men">Men</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Women') }}&name=Women">Women</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Footwear') }}&name=Footwear">Footwear</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Gym Equipment') }}&name=Gym%20Equipment">Gym Equipment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Massagers') }}&name=Massagers">Massagers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Accessories') }}&name=Accessories">Accessories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Supplements') }}&name=Supplements">Supplements</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('my.orders') }}">My Orders</a>
                 </li>
@@ -474,24 +517,22 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('about') }}">About Us</a>
-                </li>                
-                <!-- Join Gym / Dashboard Button - Shows in bottom row after Bulk Orders -->
+                </li>
+                
+                <!-- Join Gym / Dashboard Button - Shows in bottom row -->
                 @auth('admin')
-                    {{-- Admin Logged In - Show Admin Panel button --}}
                     <li class="nav-item nav-join-gym">
                         <a class="btn-dashboard-nav" href="{{ route('admin.dashboard') }}">
                             <i class="fas fa-tachometer-alt me-1"></i> Admin Panel
                         </a>
                     </li>
                 @elseif(auth()->check())
-                    {{-- Regular User Logged In - Show Dashboard button --}}
                     <li class="nav-item nav-join-gym">
                         <a class="btn-dashboard-nav" href="{{ getDashboardUrl() }}">
                             <i class="fas fa-tachometer-alt me-1"></i> Dashboard
                         </a>
                     </li>
                 @else
-                    {{-- No User Logged In - Show Join Gym button --}}
                     <li class="nav-item nav-join-gym">
                         <a class="btn-join-gym" href="{{ route('login') }}">
                             <i class="fas fa-sign-in-alt me-1"></i> Join Gym

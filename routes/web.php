@@ -37,6 +37,7 @@ use App\Models\UserAddress;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\SubCategory;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -252,8 +253,18 @@ Route::get('/api/products', [ProductApiController::class, 'getProducts']);
 Route::get('/api/best-sellers', [ProductApiController::class, 'getBestSellers']);
 Route::get('/api/products/search', [ProductApiController::class, 'searchProducts']);
 Route::get('/api/products/category/{id}', [ProductApiController::class, 'getProductsByCategory']);
+Route::get('/api/products/subcategory/{id}', [ProductApiController::class, 'getProductsBySubCategory']);
 Route::get('/api/products/stocks', [ProductApiController::class, 'getProductStocks']);
 Route::get('/api/banners', [BannerApiController::class, 'getBanners']);
+
+// ============ SUB CATEGORIES API ============
+Route::get('/api/subcategories/{categoryId}', function($categoryId) {
+    $subCategories = SubCategory::where('category_id', $categoryId)
+        ->where('is_active', 1)
+        ->withCount('products')
+        ->get();
+    return response()->json($subCategories);
+})->name('api.subcategories');
 
 // ============ CART SESSION ROUTE ============
 Route::post('/api/set-checkout-cart', function (Request $request) {
@@ -470,4 +481,4 @@ Route::get('/api/order-details/{id}', function ($id) {
 })->name('api.order.details')->middleware('auth');
 
 // ============ CANCEL ORDER ROUTE ============
-Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');
+Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');  

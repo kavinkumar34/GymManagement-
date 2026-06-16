@@ -70,6 +70,19 @@ class ProductApiController extends Controller
         }));
     }
     
+    // ADD THIS METHOD FOR SUB-CATEGORY PRODUCTS
+public function getProductsBySubCategory($id)
+{
+    $products = Product::with('category', 'productImages')
+        ->where('status', 'Active')
+        ->where('sub_category_id', $id)
+        ->get();
+    
+    return response()->json($products->map(function($product) {
+        return $this->formatProduct($product);
+    }));
+}
+    
     public function getProductStocks()
     {
         $products = \App\Models\Product::select('id', 'stock')->get();
@@ -115,4 +128,6 @@ class ProductApiController extends Controller
             'status' => $product->status,
         ];
     }
+
+    
 }
