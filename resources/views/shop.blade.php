@@ -1092,14 +1092,7 @@
                                 ${oldPriceHtml}
                                 <span class="product-price-display">₹${parseFloat(displayPrice).toLocaleString()}</span>
                             </div>
-                            <div class="product-actions">
-                                <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${firstImage}', event)">
-                                    <i class="fas fa-shopping-cart"></i> Add
-                                </button>
-                                <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice}, event)">
-                                    <i class="fas fa-bolt"></i> Buy Now
-                                </button>
-                            </div>
+                        
                         </div>
                     </div>
                 </div>
