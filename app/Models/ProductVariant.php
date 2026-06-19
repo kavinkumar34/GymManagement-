@@ -9,20 +9,21 @@ class ProductVariant extends Model
     protected $table = 'product_variants';
     
     protected $fillable = [
-        'product_id', 'color', 'images'
+        'product_id', 
+        'size', 
+        'color', 
+        'value', 
+        'price', 
+        'stock'
     ];
     
     protected $casts = [
-        'images' => 'array'
+        'price' => 'decimal:2',
+        'stock' => 'integer',
     ];
     
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
-    
-    public function sizes()
-    {
-        return $this->hasMany(VariantSize::class, 'variant_id');
-    }
-}
+}   

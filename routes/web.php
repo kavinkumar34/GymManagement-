@@ -205,6 +205,9 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
     Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
     
+    // ⭐ GST ROUTE - Make sure this is INSIDE the admin group
+    Route::get('/get-gst-rate/{topCategoryId}', [ProductController::class, 'getGstRate'])->name('get.gst.rate');
+    
     // Contacts
     Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
     Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('contacts.show');
@@ -481,4 +484,4 @@ Route::get('/api/order-details/{id}', function ($id) {
 })->name('api.order.details')->middleware('auth');
 
 // ============ CANCEL ORDER ROUTE ============
-Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');  
+Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');

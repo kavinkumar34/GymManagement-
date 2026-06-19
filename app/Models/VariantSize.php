@@ -7,15 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class VariantSize extends Model
 {
     protected $table = 'variant_sizes';
-    public $timestamps = false;
     
     protected $fillable = [
-        'variant_id', 'size', 'stock', 'price', 'discount_type', 'discount_value'
+        'variant_id', 'size', 'price', 'stock'
     ];
     
     protected $casts = [
         'price' => 'decimal:2',
-        'discount_value' => 'decimal:2'
+        'stock' => 'integer',
     ];
     
     public function variant()
