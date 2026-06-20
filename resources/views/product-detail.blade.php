@@ -546,6 +546,144 @@
         background: #17a2b8;
     }
     
+    /* ⭐ NEW: Review Section Styles */
+    .reviews-section {
+        margin-top: 30px;
+        padding: 25px;
+        background: #f8f9fa;
+        border-radius: 15px;
+    }
+    
+    .reviews-section .section-title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .reviews-section .section-title i {
+        color: #dc3545;
+    }
+    
+    .review-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 4px solid #dc3545;
+        transition: transform 0.2s;
+    }
+    
+    .review-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    
+    .review-card .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .review-card .review-user {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+    }
+    
+    .review-card .review-user i {
+        color: #dc3545;
+        margin-right: 5px;
+    }
+    
+    .review-card .review-date {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+    
+    .review-card .review-stars {
+        color: #f59e0b;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+    
+    .review-card .review-stars .star-empty {
+        color: #e2e8f0;
+    }
+    
+    .review-card .review-text {
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 12px;
+    }
+    
+    .review-card .review-media {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 5px;
+    }
+    
+    .review-card .review-media .media-item {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    
+    .review-card .review-media .media-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .review-card .review-media .media-item img,
+    .review-card .review-media .media-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .review-card .review-verified {
+        display: inline-block;
+        background: #dcfce7;
+        color: #15803d;
+        font-size: 11px;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+        margin-top: 5px;
+    }
+    
+    .no-reviews {
+        text-align: center;
+        padding: 40px;
+        color: #94a3b8;
+    }
+    
+    .no-reviews i {
+        font-size: 40px;
+        margin-bottom: 15px;
+        display: block;
+    }
+    
+    .review-count-badge {
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 10px;
+        font-size: 14px;
+        margin-left: 8px;
+    }
+    
     @keyframes slideIn {
         from {
             transform: translateX(100%);
@@ -574,6 +712,10 @@
         }
         .btn-add-cart, .btn-buy-now, .btn-wishlist {
             width: 100%;
+        }
+        .review-card .review-header {
+            flex-direction: column;
+            align-items: flex-start;
         }
     }
 </style>
@@ -692,7 +834,7 @@
                         @endif
                     </div>
                     
-                    <!-- Delivery Information Box (Without Pincode Input) -->
+                    <!-- Delivery Information Box -->
                     <div class="delivery-box">
                         <div class="delivery-item">
                             <i class="fas fa-truck"></i>
@@ -816,6 +958,21 @@
         </div>
     </div>
     @endif
+
+    <!-- ⭐⭐⭐ NEW: REVIEWS SECTION ⭐⭐⭐ -->
+    <div class="reviews-section" id="reviewsSection">
+        <div class="section-title">
+            <i class="fas fa-star"></i> Customer Reviews
+            <span class="review-count-badge" id="reviewCountBadge">0</span>
+        </div>
+        <div id="reviewsContainer">
+            <div class="text-center" id="reviewsLoading">
+                <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                <p class="mt-2">Loading reviews...</p>
+            </div>
+            <div id="reviewsList"></div>
+        </div>
+    </div>
 </div>
 
 <div id="imageModal" class="image-modal" onclick="closeModal()">
@@ -843,6 +1000,20 @@
     </div>
 </div>
 
+<!-- ⭐ Lightbox Modal for Review Media -->
+<div class="modal fade" id="reviewMediaLightbox" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background: rgba(0,0,0,0.95);">
+            <div class="modal-body text-center p-0">
+                <button type="button" class="btn-close btn-close-white position-absolute" style="top: 15px; right: 15px; z-index: 10;" data-bs-dismiss="modal"></button>
+                <div id="reviewLightboxContent" style="max-height: 90vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                    <img id="reviewLightboxImage" src="" alt="Review Media" style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     let currentIndex = 0;
     let totalImages = {{ $allImages->count() }};
@@ -857,7 +1028,128 @@
     const wishlistBtn = document.getElementById('wishlistBtn');
     const addToCartBtn = document.getElementById('addToCartBtn');
     const buyNowBtn = document.getElementById('buyNowBtn');
-    
+
+    // ============ REVIEW FUNCTIONS ============
+    async function loadReviews() {
+        const container = document.getElementById('reviewsList');
+        const loading = document.getElementById('reviewsLoading');
+        const badge = document.getElementById('reviewCountBadge');
+        
+        try {
+            const response = await fetch(`/api/product-reviews/${productId}`);
+            const data = await response.json();
+            
+            loading.style.display = 'none';
+            
+            if (data.success && data.reviews && data.reviews.length > 0) {
+                badge.textContent = data.reviews.length;
+                container.innerHTML = data.reviews.map(review => renderReviewCard(review)).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="no-reviews">
+                        <i class="fas fa-comment-slash"></i>
+                        <h5>No reviews yet</h5>
+                        <p class="text-muted">Be the first to review this product!</p>
+                    </div>
+                `;
+                badge.textContent = '0';
+            }
+        } catch (error) {
+            console.error('Error loading reviews:', error);
+            loading.style.display = 'none';
+            container.innerHTML = `
+                <div class="no-reviews">
+                    <i class="fas fa-exclamation-circle text-danger"></i>
+                    <h5>Could not load reviews</h5>
+                    <p class="text-muted">Please try again later</p>
+                </div>
+            `;
+            badge.textContent = '0';
+        }
+    }
+
+    function renderReviewCard(review) {
+        // Generate stars
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= review.rating) {
+                starsHtml += '<i class="fas fa-star"></i>';
+            } else {
+                starsHtml += '<i class="fas fa-star star-empty"></i>';
+            }
+        }
+        
+        // Media HTML
+        let mediaHtml = '';
+        if (review.images && review.images.length > 0) {
+            mediaHtml += '<div class="review-media">';
+            review.images.forEach(function(image) {
+                mediaHtml += `
+                    <div class="media-item" onclick="openReviewMedia('${image}')">
+                        <img src="/storage/${image}" alt="Review Image">
+                    </div>
+                `;
+            });
+            mediaHtml += '</div>';
+        }
+        
+        if (review.videos && review.videos.length > 0) {
+            mediaHtml += '<div class="review-media">';
+            review.videos.forEach(function(video) {
+                mediaHtml += `
+                    <div class="media-item" onclick="openReviewMedia('${video}', 'video')">
+                        <video src="/storage/${video}"></video>
+                    </div>
+                `;
+            });
+            mediaHtml += '</div>';
+        }
+        
+        // Format date
+        const date = new Date(review.created_at);
+        const formattedDate = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        
+        return `
+            <div class="review-card">
+                <div class="review-header">
+                    <span class="review-user"><i class="fas fa-user-circle"></i> ${review.user_name || 'Anonymous'}</span>
+                    <span class="review-date">${formattedDate}</span>
+                </div>
+                <div class="review-stars">${starsHtml}</div>
+                <div class="review-text">${escapeHtml(review.description)}</div>
+                ${mediaHtml}
+                <span class="review-verified"><i class="fas fa-check-circle"></i> Verified Purchase</span>
+            </div>
+        `;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function openReviewMedia(src, type = 'image') {
+        const modal = new bootstrap.Modal(document.getElementById('reviewMediaLightbox'));
+        const content = document.getElementById('reviewLightboxContent');
+        
+        if (type === 'video') {
+            content.innerHTML = `
+                <video controls style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">
+                    <source src="/storage/${src}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            `;
+        } else {
+            content.innerHTML = `<img src="/storage/${src}" alt="Review Media" style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">`;
+        }
+        
+        modal.show();
+    }
+
+    // ============ EXISTING FUNCTIONS ============
+
     // Function to change main image
     function changeMainImage(index) {
         currentIndex = index;
@@ -1163,6 +1455,9 @@
                 }
             });
         }
+        
+        // Load reviews
+        loadReviews();
     });
 </script>
 @endsection

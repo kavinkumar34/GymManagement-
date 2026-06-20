@@ -574,19 +574,83 @@ function saveAddressesToLocal() {
     localStorage.setItem('user_addresses', JSON.stringify(savedAddresses));
 }
 
-// ============ PRODUCT DATA FUNCTIONS ============
+// ============ PRODUCT DATA FUNCTIONS - FIXED ============
 async function loadProductsData() {
     try {
+        // Get cart items first
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (cart.length === 0) {
+            return;
+        }
+        
+        // Try to get products from API
         const response = await fetch('/api/products');
         const products = await response.json();
-        products.forEach(product => {
-            productStock[product.id] = product.stock;
-            if (product.image) {
-                productImages[product.id] = '/storage/' + product.image;
+        
+        console.log('API Response for products:', products);
+        
+        // Check if products is an array
+        let productsArray = [];
+        if (Array.isArray(products)) {
+            productsArray = products;
+        } else if (products.data && Array.isArray(products.data)) {
+            productsArray = products.data;
+        }
+        
+        // Populate productStock and productImages
+        if (productsArray.length > 0) {
+            productsArray.forEach(product => {
+                if (product.id) {
+                    productStock[product.id] = parseInt(product.stock) || 0;
+                    if (product.image) {
+                        productImages[product.id] = '/storage/' + product.image;
+                    }
+                    console.log('Loaded product:', product.id, 'Stock:', productStock[product.id]);
+                }
+            });
+        }
+        
+        // If still no stock data, fetch individually for each cart item
+        let missingProducts = cart.filter(item => productStock[item.id] === undefined || productStock[item.id] === null);
+        
+        for (let item of missingProducts) {
+            try {
+                const singleResponse = await fetch(`/api/product-stock/${item.id}`);
+                const singleData = await singleResponse.json();
+                if (singleData && singleData.stock !== undefined) {
+                    productStock[item.id] = parseInt(singleData.stock) || 0;
+                    if (singleData.image) {
+                        productImages[item.id] = '/storage/' + singleData.image;
+                    }
+                    console.log('Fetched individual stock for product', item.id, ':', productStock[item.id]);
+                }
+            } catch (e) {
+                console.error('Error fetching stock for product', item.id, e);
+                // Set default stock
+                productStock[item.id] = 0;
+            }
+        }
+        
+        // For any remaining products without stock, set default
+        cart.forEach(item => {
+            if (productStock[item.id] === undefined || productStock[item.id] === null) {
+                productStock[item.id] = 0;
             }
         });
+        
+        console.log('Final productStock:', productStock);
+        
+        // Force refresh the cart display
+        displayCart();
+        
     } catch (error) {
         console.error('Error loading products:', error);
+        // Set default stock for cart items
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.forEach(item => {
+            productStock[item.id] = 0;
+        });
+        displayCart();
     }
 }
 
@@ -655,17 +719,14 @@ function goToSummary() {
         return;
     }
     
-    // If Pay Online is selected, directly proceed to payment
     if (selectedPayment === 'online') {
         redirectToPayment();
     } else {
-        // For COD, go to summary page
         currentStep = 'summary';
         displayCart();
     }
 }
 
-// NEW FUNCTION: Redirect to payment via API first then form
 async function redirectToPayment() {
     console.log('Starting payment process...');
     
@@ -679,7 +740,6 @@ async function redirectToPayment() {
         return;
     }
     
-    // Show loading state
     const continueBtn = document.querySelector('.next-btn');
     const originalText = continueBtn ? continueBtn.innerHTML : 'Continue';
     if (continueBtn) {
@@ -688,7 +748,6 @@ async function redirectToPayment() {
     }
     
     try {
-        // First, save cart to session
         const response = await fetch('/api/set-checkout-cart', {
             method: 'POST',
             headers: {
@@ -703,20 +762,16 @@ async function redirectToPayment() {
         
         if (data.success) {
             console.log('Cart saved to session, redirecting to payment...');
-            // Create a form to submit to buy-now
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/buy-now';
             
-            // Add CSRF token
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = '_token';
             csrfInput.value = csrfToken;
             form.appendChild(csrfInput);
             
-            // Add empty fields to satisfy the buy-now route
-            // The actual cart data is in session, so we don't need product_id
             const dummyInput = document.createElement('input');
             dummyInput.type = 'hidden';
             dummyInput.name = 'from_cart';
@@ -938,7 +993,6 @@ async function placeOrder() {
     }
     
     try {
-        // First save cart to session
         const saveResponse = await fetch('/api/set-checkout-cart', {
             method: 'POST',
             headers: {
@@ -951,19 +1005,16 @@ async function placeOrder() {
         const saveData = await saveResponse.json();
         
         if (saveData.success) {
-            // Create form for COD order
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/place-cod-order';
             
-            // Add CSRF token
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = '_token';
             csrfInput.value = csrfToken;
             form.appendChild(csrfInput);
             
-            // Add address data
             const addressInput = document.createElement('input');
             addressInput.type = 'hidden';
             addressInput.name = 'address';

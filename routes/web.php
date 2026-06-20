@@ -32,6 +32,10 @@ use App\Http\Controllers\Admin\SizeChartController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\Admin\DeliverablePincodeController;
 
+// ============ REVIEW CONTROLLERS ============
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\ProductReviewController;
+
 // ============ MODELS ============
 use App\Models\UserAddress;
 use App\Models\Order;
@@ -205,7 +209,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
     Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
     
-    // ⭐ GST ROUTE - Make sure this is INSIDE the admin group
+    // ⭐ GST ROUTE
     Route::get('/get-gst-rate/{topCategoryId}', [ProductController::class, 'getGstRate'])->name('get.gst.rate');
     
     // Contacts
@@ -238,7 +242,22 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('pincodes/bulk-import', [DeliverablePincodeController::class, 'bulkImport'])->name('pincodes.bulk');
     Route::post('pincodes/bulk-update-shipping', [DeliverablePincodeController::class, 'bulkUpdateShipping'])->name('pincodes.bulk-update-shipping');
     Route::post('pincodes/bulk-delete', [DeliverablePincodeController::class, 'bulkDelete'])->name('pincodes.bulk-delete');
+
+    // ============ ⭐⭐⭐ REVIEW ROUTES (ADMIN) ⭐⭐⭐ ============
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/pending', [ReviewController::class, 'pending'])->name('reviews.pending');
+    Route::get('/reviews/approved', [ReviewController::class, 'approved'])->name('reviews.approved');
+    Route::get('/reviews/rejected', [ReviewController::class, 'rejected'])->name('reviews.rejected');
+    Route::post('/reviews/{id}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    
+    // ⭐⭐⭐ NEW: REVIEW DETAILS ROUTE ⭐⭐⭐
+    Route::get('/reviews/{id}/details', [ReviewController::class, 'getDetails'])->name('reviews.details');
 });
+
+// ============ ⭐⭐⭐ REVIEW SUBMIT ROUTE (PUBLIC - FOR USERS) ⭐⭐⭐ ============
+Route::post('/submit-product-review', [ProductReviewController::class, 'store'])->name('submit.review')->middleware('auth');
 
 // ============ TRAINER ROUTES ============
 Route::middleware(['auth'])->prefix('trainer')->name('trainer.')->group(function () {
@@ -259,6 +278,9 @@ Route::get('/api/products/category/{id}', [ProductApiController::class, 'getProd
 Route::get('/api/products/subcategory/{id}', [ProductApiController::class, 'getProductsBySubCategory']);
 Route::get('/api/products/stocks', [ProductApiController::class, 'getProductStocks']);
 Route::get('/api/banners', [BannerApiController::class, 'getBanners']);
+
+// ============ SINGLE PRODUCT STOCK API ============
+Route::get('/api/product-stock/{id}', [ProductApiController::class, 'getProductStock']);
 
 // ============ SUB CATEGORIES API ============
 Route::get('/api/subcategories/{categoryId}', function($categoryId) {
@@ -307,7 +329,7 @@ Route::get('/api/user', function () {
     return response()->json(['success' => false, 'message' => 'Not logged in']);
 })->name('api.user');
 
-// ============ USER ADDRESSES API ==========
+// ============ USER ADDRESSES API ============
 Route::get('/api/user-addresses', function () {
     if (auth()->check()) {
         $addresses = UserAddress::where('user_id', auth()->id())
@@ -363,7 +385,7 @@ Route::delete('/api/user-addresses/{id}', function ($id) {
     return response()->json(['success' => false]);
 })->name('api.user.addresses.delete');
 
-// ============ DELIVERABLE PINCODES API ==========
+// ============ DELIVERABLE PINCODES API ============
 Route::get('/api/deliverable-pincodes', function () {
     $pincodes = \App\Models\DeliverablePincode::where('is_active', 1)
         ->select('pincode', 'city', 'state', 'delivery_days', 'is_active')
@@ -374,7 +396,7 @@ Route::get('/api/deliverable-pincodes', function () {
     ]);
 })->name('deliverable.pincodes');
 
-// ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ==========
+// ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ============
 Route::get('/api/order-details/{id}', function ($id) {
     if (!auth()->check()) {
         return response()->json(['success' => false, 'message' => 'Not logged in']);
@@ -485,3 +507,28 @@ Route::get('/api/order-details/{id}', function ($id) {
 
 // ============ CANCEL ORDER ROUTE ============
 Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');
+
+// ============ ⭐⭐⭐ NEW: PRODUCT REVIEWS API (PUBLIC) ⭐⭐⭐ ============
+Route::get('/api/product-reviews/{productId}', function($productId) {
+    $reviews = \App\Models\ProductReview::where('product_id', $productId)
+        ->where('status', 'approved')
+        ->with('user')
+        ->orderBy('created_at', 'desc')
+        ->get();
+    
+    return response()->json([
+        'success' => true,
+        'reviews' => $reviews->map(function($review) {
+            return [
+                'id' => $review->id,
+                'rating' => $review->rating,
+                'description' => $review->description,
+                'images' => $review->images ? json_decode($review->images, true) : [],
+                'videos' => $review->videos ? json_decode($review->videos, true) : [],
+                'created_at' => $review->created_at,
+                'user_name' => $review->user->name ?? 'Anonymous',
+                'status' => $review->status,
+            ];
+        })
+    ]);
+})->name('api.product.reviews');

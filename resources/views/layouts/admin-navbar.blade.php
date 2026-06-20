@@ -1,4 +1,45 @@
 <!-- Left Sidebar for Admin -->
+@php
+    use App\Models\ProductReview;
+    use App\Models\Contact;
+    use App\Models\Order;
+    use Illuminate\Support\Facades\Route;
+    use Illuminate\Support\Facades\Schema;
+
+    // Reviews count with error handling
+    $pendingReviewsCount = 0;
+    try {
+        if (Schema::hasTable('product_reviews')) {
+            $pendingReviewsCount = ProductReview::where('status', 'pending')->count();
+        }
+    } catch (\Exception $e) {
+        $pendingReviewsCount = 0;
+    }
+
+    // Contact messages count
+    $pendingCount = 0;
+    try {
+        if (Schema::hasTable('contacts')) {
+            $pendingCount = Contact::where('status', 'Pending')->count();
+        }
+    } catch (\Exception $e) {
+        $pendingCount = 0;
+    }
+
+    // New pending orders count
+    $newPendingOrders = 0;
+    try {
+        if (Schema::hasTable('orders')) {
+            $lastViewedAt = session('payments_last_viewed_at', now()->subDays(30));
+            $newPendingOrders = Order::where('payment_status', 'PENDING')
+                ->where('created_at', '>', $lastViewedAt)
+                ->count();
+        }
+    } catch (\Exception $e) {
+        $newPendingOrders = 0;
+    }
+@endphp
+
 <div class="admin-sidebar">
     <div class="sidebar-header">
         <a class="sidebar-brand" href="{{ route('admin.dashboard') }}">
@@ -69,14 +110,46 @@
             </ul>
         </li>
 
+        <!-- ⭐ REVIEWS DROPDOWN - REMOVED ROUTE CHECK -->
+        <li class="nav-item has-dropdown">
+            <a class="nav-link" href="#">
+                <i class="fas fa-star"></i> <span>Reviews</span>
+                <span class="dropdown-arrow">▼</span>
+                @if($pendingReviewsCount > 0)
+                    <span class="badge bg-warning ms-2" style="font-size: 0.7rem; padding: 2px 8px; border-radius: 10px;">{{ $pendingReviewsCount }}</span>
+                @endif
+            </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.reviews.index') }}">
+                        <i class="fas fa-list"></i> All Reviews
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.reviews.pending') }}">
+                        <i class="fas fa-clock"></i> Pending Reviews
+                        @if($pendingReviewsCount > 0)
+                            <span class="badge bg-warning ms-2" style="font-size: 0.6rem; padding: 1px 6px; border-radius: 8px;">{{ $pendingReviewsCount }}</span>
+                        @endif
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.reviews.approved') }}">
+                        <i class="fas fa-check-circle"></i> Approved Reviews
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.reviews.rejected') }}">
+                        <i class="fas fa-times-circle"></i> Rejected Reviews
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- Contact Messages -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.contacts.index') }}">
                 <i class="fas fa-envelope"></i> <span>Contact Messages</span>
-                @php 
-                    use App\Models\Contact;
-                    $pendingCount = Contact::where('status', 'Pending')->count(); 
-                @endphp
                 @if($pendingCount > 0)
                     <span class="badge bg-danger ms-2">{{ $pendingCount }}</span>
                 @endif
@@ -117,13 +190,6 @@
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.payments.index') }}" id="paymentsNavLink" onclick="markPaymentsViewed()">
                 <i class="fas fa-credit-card"></i> <span>Payments</span>
-                @php
-                    use App\Models\Order;
-                    $lastViewedAt = session('payments_last_viewed_at', now()->subDays(30));
-                    $newPendingOrders = Order::where('payment_status', 'PENDING')
-                        ->where('created_at', '>', $lastViewedAt)
-                        ->count();
-                @endphp
                 @if($newPendingOrders > 0)
                     <span class="badge bg-danger ms-2" id="pendingBadge">{{ $newPendingOrders }}</span>
                 @endif
@@ -143,17 +209,14 @@
                 <i class="fas fa-cog"></i> <span>Settings</span>
             </a>
         </li>
-@php
-    use Illuminate\Support\Facades\Route;
-@endphp
 
-@if(Route::has('admin.pincodes.index'))
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.pincodes.index') }}">
-        <i class="fas fa-map-marker-alt"></i> Deliverable Pincodes
-    </a>
-</li>
-@endif
+        @if(Route::has('admin.pincodes.index'))
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.pincodes.index') }}">
+                <i class="fas fa-map-marker-alt"></i> <span>Deliverable Pincodes</span>
+            </a>
+        </li>
+        @endif
     </ul>
 
     <div class="sidebar-footer">
@@ -384,6 +447,15 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
         margin-left: 260px;
         padding: 20px;
         min-height: 100vh;
+    }
+
+    /* Badge styling for reviews */
+    .badge.bg-warning {
+        background-color: #f59e0b !important;
+        color: #1a1a2e;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
     }
 
     @media (max-width: 768px) {

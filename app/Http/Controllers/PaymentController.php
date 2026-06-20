@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Mail\OrderConfirmationMail;
 
 class PaymentController extends Controller
 {
@@ -208,6 +210,9 @@ class PaymentController extends Controller
             session()->forget('pending_order_id');
             session()->forget('checkout_cart');
             
+            // ⭐⭐⭐ SEND EMAIL CONFIRMATION ⭐⭐⭐
+            $this->sendOrderConfirmationEmail($order);
+            
             // IMPORTANT: Return redirect with clear cart parameter
             return redirect()->route('order.success', ['id' => $order->id, 'clear_cart' => 1])->with('success', 'Payment successful!');
         } else {
@@ -291,207 +296,270 @@ class PaymentController extends Controller
         
         return view('payment.my-orders', compact('orders'));
     }
-    // Add this method to PaymentController class
-public function placeCodOrder(Request $request)
-{
-    if (!Auth::check()) {
-        return redirect()->route('login')->with('error', 'Please login to place order');
-    }
     
-    $user = Auth::user();
-    $cart = session()->get('checkout_cart');
-    
-    if (!$cart || count($cart) == 0) {
-        return redirect()->route('cart')->with('error', 'Your cart is empty');
-    }
-    
-    $totalAmount = 0;
-    $productItems = [];
-    
-    foreach ($cart as $item) {
-        $product = Product::find($item['id']);
-        if (!$product) {
-            continue;
+    public function placeCodOrder(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please login to place order');
         }
         
-        // Check stock
-        if ($item['quantity'] > $product->stock) {
-            return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
+        $user = Auth::user();
+        $cart = session()->get('checkout_cart');
+        
+        if (!$cart || count($cart) == 0) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty');
         }
         
-        $amount = $product->discount_price ?? $product->price;
-        $totalAmount += $amount * $item['quantity'];
-        $productItems[] = [
-            'product' => $product,
-            'quantity' => $item['quantity'],
-            'price' => $amount
-        ];
-    }
-    
-    $txnid = 'COD' . time() . rand(1000, 9999);
-    
-    // Create order
-    $order = Order::create([
-        'order_number' => $txnid,
-        'user_id' => $user->id,
-        'total_amount' => $totalAmount,
-        'payment_status' => 'PENDING',
-        'order_status' => 'Pending',
-        'payment_method' => 'COD',
-        'transaction_id' => $txnid,
-        'order_date' => now(),
-        'payment_details' => json_encode([
-            'shipping_address' => $request->address,
-            'payment_method' => 'COD'
-        ])
-    ]);
-    
-    // Create order items and update stock
-    foreach ($productItems as $item) {
-        OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $item['product']->id,
-            'product_name' => $item['product']->name,
-            'quantity' => $item['quantity'],
-            'price' => $item['price']
+        $totalAmount = 0;
+        $productItems = [];
+        
+        foreach ($cart as $item) {
+            $product = Product::find($item['id']);
+            if (!$product) {
+                continue;
+            }
+            
+            // Check stock
+            if ($item['quantity'] > $product->stock) {
+                return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
+            }
+            
+            $amount = $product->discount_price ?? $product->price;
+            $totalAmount += $amount * $item['quantity'];
+            $productItems[] = [
+                'product' => $product,
+                'quantity' => $item['quantity'],
+                'price' => $amount
+            ];
+        }
+        
+        $txnid = 'COD' . time() . rand(1000, 9999);
+        
+        // Create order
+        $order = Order::create([
+            'order_number' => $txnid,
+            'user_id' => $user->id,
+            'total_amount' => $totalAmount,
+            'payment_status' => 'PENDING',
+            'order_status' => 'Pending',
+            'payment_method' => 'COD',
+            'transaction_id' => $txnid,
+            'order_date' => now(),
+            'payment_details' => json_encode([
+                'shipping_address' => $request->address,
+                'payment_method' => 'COD'
+            ])
         ]);
         
-        // Update product stock
-        $item['product']->decrement('stock', $item['quantity']);
-    }
-    
-    // Clear the checkout cart session
-    session()->forget('checkout_cart');
-    
-    return redirect()->route('order.success', $order->id)->with('success', 'Order placed successfully! You will pay on delivery.');
-}
-// Cancel Order
-public function cancelOrder(Request $request)
-{
-    if (!Auth::check()) {
-        return response()->json(['success' => false, 'message' => 'Please login to cancel order']);
-    }
-    
-    $request->validate([
-        'order_id' => 'required|exists:orders,id',
-        'cancellation_reason' => 'required|string|max:100',
-        'cancellation_comment' => 'nullable|string'
-    ]);
-    
-    $order = Order::where('id', $request->order_id)
-        ->where('user_id', Auth::id())
-        ->first();
-    
-    if (!$order) {
-        return response()->json(['success' => false, 'message' => 'Order not found']);
-    }
-    
-    // Check if order can be cancelled (only pending or confirmed orders)
-    if (!in_array($order->order_status, ['Pending', 'Confirmed'])) {
-        return response()->json(['success' => false, 'message' => 'This order cannot be cancelled as it is already ' . $order->order_status]);
-    }
-    
-    // Create cancellation record
-    \App\Models\OrderCancellation::create([
-        'order_id' => $order->id,
-        'user_id' => Auth::id(),
-        'cancellation_reason' => $request->cancellation_reason,
-        'cancellation_comment' => $request->cancellation_comment
-    ]);
-    
-    // Update order status to Cancelled
-    $order->order_status = 'Cancelled';
-    $order->save();
-    
-    // Restore product stock
-    foreach ($order->items as $item) {
-        $product = Product::find($item->product_id);
-        if ($product) {
-            $product->increment('stock', $item->quantity);
+        // Create order items and update stock
+        foreach ($productItems as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item['product']->id,
+                'product_name' => $item['product']->name,
+                'quantity' => $item['quantity'],
+                'price' => $item['price']
+            ]);
+            
+            // Update product stock
+            $item['product']->decrement('stock', $item['quantity']);
         }
+        
+        // Clear the checkout cart session
+        session()->forget('checkout_cart');
+        
+        // ⭐⭐⭐ SEND EMAIL CONFIRMATION FOR COD ⭐⭐⭐
+        $this->sendOrderConfirmationEmail($order);
+        
+        return redirect()->route('order.success', $order->id)->with('success', 'Order placed successfully! You will pay on delivery.');
     }
     
-    return response()->json(['success' => true, 'message' => 'Order cancelled successfully']);
-}
-
-public function getOrderDetails($id)
-{
-    try {
-        $order = Order::with(['user', 'items'])->find($id);
+    public function cancelOrder(Request $request)
+    {
+        if (!Auth::check()) {
+            return response()->json(['success' => false, 'message' => 'Please login to cancel order']);
+        }
+        
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'cancellation_reason' => 'required|string|max:100',
+            'cancellation_comment' => 'nullable|string'
+        ]);
+        
+        $order = Order::where('id', $request->order_id)
+            ->where('user_id', Auth::id())
+            ->first();
         
         if (!$order) {
             return response()->json(['success' => false, 'message' => 'Order not found']);
         }
         
-        // Get user's saved address from user_addresses table
-        $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)
-            ->orderBy('is_default', 'desc')
-            ->first();
-        
-        // Try to get shipping address from payment_details
-        $shippingAddress = null;
-        if ($order->payment_details) {
-            try {
-                $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
-                if (isset($paymentDetails['shipping_address'])) {
-                    $shippingAddress = $paymentDetails['shipping_address'];
-                }
-            } catch (\Exception $e) {}
+        // Check if order can be cancelled (only pending or confirmed orders)
+        if (!in_array($order->order_status, ['Pending', 'Confirmed'])) {
+            return response()->json(['success' => false, 'message' => 'This order cannot be cancelled as it is already ' . $order->order_status]);
         }
         
-        // If no address in payment_details, use user's saved address
-        if ((!$shippingAddress || empty($shippingAddress['address'])) && $userAddress) {
-            $shippingAddress = [
-                'name' => $userAddress->name,
-                'address' => $userAddress->address,
-                'area' => $userAddress->area,
-                'city' => $userAddress->city,
-                'state' => $userAddress->state,
-                'pincode' => $userAddress->pincode,
-                'phone' => $userAddress->phone
-            ];
-        }
+        // Create cancellation record
+        \App\Models\OrderCancellation::create([
+            'order_id' => $order->id,
+            'user_id' => Auth::id(),
+            'cancellation_reason' => $request->cancellation_reason,
+            'cancellation_comment' => $request->cancellation_comment
+        ]);
         
-        $items = [];
+        // Update order status to Cancelled
+        $order->order_status = 'Cancelled';
+        $order->save();
+        
+        // Restore product stock
         foreach ($order->items as $item) {
-            $items[] = [
-                'id' => $item->id,
-                'product_id' => $item->product_id,
-                'product_name' => $item->product_name,
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-                'product_image' => $item->product_image ?? ($item->product ? $item->product->image : null)
-            ];
+            $product = Product::find($item->product_id);
+            if ($product) {
+                $product->increment('stock', $item->quantity);
+            }
         }
         
-        return response()->json([
-            'success' => true,
-            'order' => [
-                'id' => $order->id,
-                'order_number' => $order->order_number,
-                'total_amount' => $order->total_amount,
-                'payment_status' => $order->payment_status,
-                'order_status' => $order->order_status,
-                'payment_method' => $order->payment_method,
-                'transaction_id' => $order->transaction_id,
-                'payment_id' => $order->payment_id,
-                'payment_details' => $order->payment_details,
-                'order_date' => $order->order_date ?? $order->created_at,
-                'created_at' => $order->created_at,
-                'user' => $order->user ? [
-                    'name' => $order->user->name,
-                    'email' => $order->user->email,
-                    'phone' => $order->user->phone ?? 'N/A'
-                ] : null,
-                'items' => $items,
-                'shipping_address' => $shippingAddress
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
+        return response()->json(['success' => true, 'message' => 'Order cancelled successfully']);
     }
-}
+
+    public function getOrderDetails($id)
+    {
+        try {
+            $order = Order::with(['user', 'items'])->find($id);
+            
+            if (!$order) {
+                return response()->json(['success' => false, 'message' => 'Order not found']);
+            }
+            
+            // Get user's saved address from user_addresses table
+            $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)
+                ->orderBy('is_default', 'desc')
+                ->first();
+            
+            // Try to get shipping address from payment_details
+            $shippingAddress = null;
+            if ($order->payment_details) {
+                try {
+                    $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
+                    if (isset($paymentDetails['shipping_address'])) {
+                        $shippingAddress = $paymentDetails['shipping_address'];
+                    }
+                } catch (\Exception $e) {}
+            }
+            
+            // If no address in payment_details, use user's saved address
+            if ((!$shippingAddress || empty($shippingAddress['address'])) && $userAddress) {
+                $shippingAddress = [
+                    'name' => $userAddress->name,
+                    'address' => $userAddress->address,
+                    'area' => $userAddress->area,
+                    'city' => $userAddress->city,
+                    'state' => $userAddress->state,
+                    'pincode' => $userAddress->pincode,
+                    'phone' => $userAddress->phone
+                ];
+            }
+            
+            $items = [];
+            foreach ($order->items as $item) {
+                $items[] = [
+                    'id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product_name,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'product_image' => $item->product_image ?? ($item->product ? $item->product->image : null)
+                ];
+            }
+            
+            return response()->json([
+                'success' => true,
+                'order' => [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'total_amount' => $order->total_amount,
+                    'payment_status' => $order->payment_status,
+                    'order_status' => $order->order_status,
+                    'payment_method' => $order->payment_method,
+                    'transaction_id' => $order->transaction_id,
+                    'payment_id' => $order->payment_id,
+                    'payment_details' => $order->payment_details,
+                    'order_date' => $order->order_date ?? $order->created_at,
+                    'created_at' => $order->created_at,
+                    'user' => $order->user ? [
+                        'name' => $order->user->name,
+                        'email' => $order->user->email,
+                        'phone' => $order->user->phone ?? 'N/A'
+                    ] : null,
+                    'items' => $items,
+                    'shipping_address' => $shippingAddress
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * ⭐ NEW: Send Order Confirmation Email with Debugging
+     */
+    private function sendOrderConfirmationEmail($order)
+    {
+        try {
+            // Log that we're trying to send email
+            Log::info('Attempting to send order confirmation email for order: ' . $order->order_number);
+            
+            // Get user
+            $user = $order->user;
+            if (!$user) {
+                Log::error('No user found for order: ' . $order->order_number);
+                return;
+            }
+            
+            // Get shipping address
+            $shippingAddress = null;
+            if ($order->payment_details) {
+                $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
+                if (isset($paymentDetails['shipping_address']) && !empty($paymentDetails['shipping_address'])) {
+                    $shippingAddress = $paymentDetails['shipping_address'];
+                } elseif (isset($paymentDetails['address']) && !empty($paymentDetails['address'])) {
+                    $shippingAddress = $paymentDetails['address'];
+                }
+            }
+            
+            // If no address in payment_details, get from user_addresses
+            if (!$shippingAddress) {
+                $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)
+                    ->orderBy('is_default', 'desc')
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                
+                if ($userAddress) {
+                    $shippingAddress = [
+                        'name' => $userAddress->name,
+                        'address' => $userAddress->address,
+                        'area' => $userAddress->area ?? '',
+                        'city' => $userAddress->city,
+                        'state' => $userAddress->state,
+                        'pincode' => $userAddress->pincode,
+                        'phone' => $userAddress->phone
+                    ];
+                }
+            }
+            
+            $items = $order->items;
+            
+            // Send email
+            Mail::to($user->email)->send(new OrderConfirmationMail($order, $user, $items, $shippingAddress));
+            
+            Log::info('✅ Order confirmation email sent successfully to: ' . $user->email . ' for order: ' . $order->order_number);
+            
+        } catch (\Exception $e) {
+            Log::error('❌ Failed to send order confirmation email: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+        }
+    }
 }

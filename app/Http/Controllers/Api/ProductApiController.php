@@ -20,8 +20,7 @@ class ProductApiController extends Controller
         $products = Product::with('category', 'productImages')
             ->where('status', 'Active')
             ->orderBy('id', 'desc')
-            ->limit(12)
-            ->get();
+            ->get(); // ✅ Remove limit to get all products for cart
         
         return response()->json($products->map(function($product) {
             return $this->formatProduct($product);
@@ -70,26 +69,38 @@ class ProductApiController extends Controller
         }));
     }
     
-    // ADD THIS METHOD FOR SUB-CATEGORY PRODUCTS
-public function getProductsBySubCategory($id)
-{
-    $products = Product::with('category', 'productImages')
-        ->where('status', 'Active')
-        ->where('sub_category_id', $id)
-        ->get();
-    
-    return response()->json($products->map(function($product) {
-        return $this->formatProduct($product);
-    }));
-}
+    public function getProductsBySubCategory($id)
+    {
+        $products = Product::with('category', 'productImages')
+            ->where('status', 'Active') 
+            ->where('sub_category_id', $id)
+            ->get();
+        
+        return response()->json($products->map(function($product) {
+            return $this->formatProduct($product);
+        }));
+    }   
     
     public function getProductStocks()
     {
-        $products = \App\Models\Product::select('id', 'stock')->get();
+        $products = Product::select('id', 'stock')->get();
         return response()->json($products);
     }
     
-    // Helper method to format product with all images
+    // ✅ NEW: Get single product stock
+    public function getProductStock($id)
+    {
+        $product = Product::select('id', 'stock', 'image')->find($id);
+        if ($product) {
+            return response()->json([
+                'stock' => $product->stock,
+                'image' => $product->image
+            ]);
+        }
+        return response()->json(['stock' => 0, 'image' => null]);
+    }
+    
+    // Helper method to format product with all images - ✅ ADDED STOCK
     private function formatProduct($product)
     {
         $allImages = [];
@@ -118,8 +129,9 @@ public function getProductsBySubCategory($id)
             'name' => $product->name,
             'price' => $product->price,
             'discount_price' => $product->discount_price,
+            'stock' => $product->stock ?? 0, // ✅ ADDED STOCK
             'image' => $product->image,
-            'all_images' => $allImages, // This is the key - all images including gallery
+            'all_images' => $allImages,
             'category' => $product->category,
             'brand' => $product->brand,
             'gender' => $product->gender ?? null,
@@ -128,6 +140,4 @@ public function getProductsBySubCategory($id)
             'status' => $product->status,
         ];
     }
-
-    
 }

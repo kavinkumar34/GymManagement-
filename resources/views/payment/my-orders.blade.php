@@ -3,14 +3,29 @@
 
 @section('content')
 <style>
+    /* Order Grid - 2 per row */
+    .orders-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .orders-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
     /* Order Card Styles */
     .order-card {
         background: white;
         border-radius: 16px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-bottom: 20px;
         overflow: hidden;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
     .order-card:hover {
         transform: translateY(-2px);
@@ -37,10 +52,9 @@
     }
     .order-body {
         padding: 20px;
+        flex: 1;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 15px;
     }
     .order-info {
@@ -63,6 +77,7 @@
         border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
+        align-self: flex-start;
     }
     .order-status.Pending { background: #fef9c3; color: #854d0e; }
     .order-status.Confirmed { background: #dbeafe; color: #1d4ed8; }
@@ -87,6 +102,8 @@
     .order-actions {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 10px;
     }
     .btn-view-details {
         background: linear-gradient(135deg, #3b82f6, #8b5cf6);
@@ -106,6 +123,133 @@
         opacity: 0.6;
         cursor: not-allowed;
         transform: none;
+    }
+    
+    .btn-review {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 40px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-review:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+    }
+    .btn-review.reviewed {
+        background: #64748b;
+        cursor: not-allowed;
+    }
+    .btn-review.reviewed:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* Review Modal Styles */
+    .review-modal .modal-content {
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .review-modal .modal-header {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border-bottom: none;
+        padding: 20px;
+    }
+    .review-modal .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    
+    .review-stars {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 5px;
+        margin: 15px 0;
+    }
+    .review-stars input {
+        display: none;
+    }
+    .review-stars label {
+        font-size: 40px;
+        color: #ddd;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .review-stars label:hover,
+    .review-stars label:hover ~ label,
+    .review-stars input:checked ~ label {
+        color: #f59e0b;
+    }
+    
+    .review-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        resize: vertical;
+        font-size: 0.9rem;
+        min-height: 100px;
+    }
+    .review-textarea:focus {
+        outline: none;
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+    }
+    
+    .file-upload-area {
+        border: 2px dashed #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .file-upload-area:hover {
+        border-color: #10b981;
+        background: #f0fdf4;
+    }
+    .file-upload-area .file-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .file-upload-area .file-preview-item {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+    .file-upload-area .file-preview-item img,
+    .file-upload-area .file-preview-item video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .file-upload-area .file-preview-item .remove-file {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #ef4444;
+        color: white;
+        border: none;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     /* Cancel Modal Styles */
@@ -339,6 +483,7 @@
         display: flex;
         gap: 10px;
         margin-top: 15px;
+        flex-wrap: wrap;
     }
     .btn-cancel-order {
         background: #ef4444;
@@ -358,6 +503,28 @@
         font-size: 0.8rem;
         cursor: pointer;
     }
+    
+    .order-number-badge {
+        background: #1e293b;
+        color: white;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+    
+    .orders-grid {
+        margin-bottom: 20px;
+    }
+    .order-card-wrapper {
+        margin-bottom: 0;
+    }
+    
+    /* Error message styling */
+    .text-danger {
+        color: #dc3545;
+    }
 </style>
 
 <div class="container mt-4">
@@ -374,36 +541,86 @@
             @endif
 
             @if(isset($orders) && $orders->count() > 0)
-                @foreach($orders as $order)
-                <div class="order-card">
-                    <div class="order-header">
-                        <div>
-                            <span class="order-number">Order #{{ $order->order_number }}</span>
-                            <div class="order-date">{{ \Carbon\Carbon::parse($order->created_at)->format('j F Y \a\t h:i A') }}</div>
-                        </div>
-                        <div class="order-actions">
-                            <button class="btn-view-details" onclick="viewOrderDetails({{ $order->id }}, this)">
-                                <i class="fas fa-eye"></i> View Details
-                            </button>
-                        </div>
-                    </div>
-                    <div class="order-body">
-                        <div class="order-info">
-                            <div class="order-total">Total Amount: ₹{{ number_format($order->total_amount, 2) }}</div>
-                            <div class="order-items-count">{{ $order->items->count() }} item(s) • 
-                                @if($order->payment_status == 'SUCCESS')
-                                    <span class="payment-badge payment-paid"><i class="fas fa-check-circle"></i> PAID</span>
-                                @elseif($order->payment_status == 'FAILED')
-                                    <span class="payment-badge payment-failed"><i class="fas fa-times-circle"></i> FAILED</span>
-                                @else
-                                    <span class="payment-badge payment-pending"><i class="fas fa-clock"></i> PENDING</span>
-                                @endif
+                @php
+                    $sortedOrders = $orders->sortByDesc('created_at');
+                    $reviewedProductIds = \App\Models\ProductReview::where('user_id', auth()->id())
+                        ->pluck('product_id')
+                        ->toArray();
+                @endphp
+                
+                <div class="orders-grid">
+                    @foreach($sortedOrders as $order)
+                    <div class="order-card-wrapper">
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div>
+                                    <span class="order-number">
+                                        Order #{{ $order->order_number }}
+                                        <span class="order-number-badge">
+                                            <i class="fas fa-clock"></i> 
+                                            {{ \Carbon\Carbon::parse($order->created_at)->diffForHumans() }}
+                                        </span>
+                                    </span>
+                                    <div class="order-date">
+                                        <i class="far fa-calendar-alt"></i> 
+                                        {{ \Carbon\Carbon::parse($order->created_at)->format('j F Y \a\t h:i A') }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="order-status {{ $order->order_status }}">
+                                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i> 
+                                        {{ strtoupper($order->order_status) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="order-body">
+                                <div class="order-info">
+                                    <div class="order-total">
+                                        <i class="fas fa-rupee-sign"></i> {{ number_format($order->total_amount, 2) }}
+                                    </div>
+                                    <div class="order-items-count">
+                                        <i class="fas fa-box"></i> {{ $order->items->count() }} item(s) • 
+                                        @if($order->payment_status == 'SUCCESS')
+                                            <span class="payment-badge payment-paid"><i class="fas fa-check-circle"></i> PAID</span>
+                                        @elseif($order->payment_status == 'FAILED')
+                                            <span class="payment-badge payment-failed"><i class="fas fa-times-circle"></i> FAILED</span>
+                                        @else
+                                            <span class="payment-badge payment-pending"><i class="fas fa-clock"></i> PENDING</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                
+                                <div class="order-actions">
+                                    <button class="btn-view-details" onclick="viewOrderDetails({{ $order->id }}, this)">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                    
+                                    @if(strtolower($order->order_status) === 'delivered')
+                                        @php
+                                            $hasReviewed = false;
+                                            foreach($order->items as $item) {
+                                                if(in_array($item->product_id, $reviewedProductIds)) {
+                                                    $hasReviewed = true;
+                                                    break;
+                                                }
+                                            }
+                                        @endphp
+                                        @if(!$hasReviewed)
+                                            <button class="btn-review" onclick="openReviewModal({{ $order->id }})">
+                                                <i class="fas fa-star"></i> Write Review
+                                            </button>
+                                        @else
+                                            <button class="btn-review reviewed" disabled>
+                                                <i class="fas fa-check-circle"></i> Already Reviewed
+                                            </button>
+                                        @endif
+                                    @endif
+                                </div>
                             </div>
                         </div>
-                        <div class="order-status {{ $order->order_status }}">{{ strtoupper($order->order_status) }}</div>
                     </div>
+                    @endforeach
                 </div>
-                @endforeach
                 
                 <div class="mt-3">
                     {{ $orders->links('pagination::bootstrap-5') }}
@@ -420,6 +637,69 @@
     </div>
 </div>
 
+<!-- ⭐ Review Modal -->
+<div class="modal fade review-modal" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-star me-2"></i> Write a Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="review_order_id" value="">
+                
+                <div class="mb-3">
+                    <label class="fw-bold">Select Product <span class="text-danger">*</span></label>
+                    <select id="review_product_select" class="form-control" required>
+                        <option value="">-- Select Product --</option>
+                    </select>
+                    <small class="text-danger" id="product_select_error" style="display:none;">Please select a product</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="fw-bold">Your Rating <span class="text-danger">*</span></label>
+                    <div class="review-stars" id="reviewStars">
+                        <input type="radio" name="rating" value="5" id="review_star5">
+                        <label for="review_star5"><i class="fas fa-star"></i></label>
+                        <input type="radio" name="rating" value="4" id="review_star4">
+                        <label for="review_star4"><i class="fas fa-star"></i></label>
+                        <input type="radio" name="rating" value="3" id="review_star3">
+                        <label for="review_star3"><i class="fas fa-star"></i></label>
+                        <input type="radio" name="rating" value="2" id="review_star2">
+                        <label for="review_star2"><i class="fas fa-star"></i></label>
+                        <input type="radio" name="rating" value="1" id="review_star1" checked>
+                        <label for="review_star1"><i class="fas fa-star"></i></label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="fw-bold">Review Description <span class="text-danger">*</span></label>
+                    <textarea id="review_description" class="review-textarea" placeholder="Share your experience with this product..."></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="fw-bold">Upload Photos or Videos</label>
+                    <div class="file-upload-area" onclick="document.getElementById('review_files').click()">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-primary"></i>
+                        <p class="mb-0">Click to upload photos or videos</p>
+                        <small class="text-muted">You can upload multiple files</small>
+                        <input type="file" id="review_files" name="review_files[]" multiple accept="image/*,video/*" style="display:none" onchange="previewReviewFiles(this)">
+                        <div id="review_files_preview" class="file-preview"></div>
+                    </div>
+                </div>
+                
+                <div id="review_error_message" class="alert alert-danger" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="submitReview()">
+                    <i class="fas fa-paper-plane"></i> Submit Review
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Order Details Modal -->
 <div class="modal fade order-details-modal" id="orderDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -429,78 +709,34 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-0">
-                <!-- Order Status Steps -->
-                <div class="order-status-steps" id="statusSteps">
-                    <!-- Dynamic status steps will be injected -->
-                </div>
-                
-                <!-- Order Info Section -->
+                <div class="order-status-steps" id="statusSteps"></div>
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-info-circle"></i> Order Information
-                    </div>
+                    <div class="section-title"><i class="fas fa-info-circle"></i> Order Information</div>
                     <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Order Number</span>
-                            <span class="info-value" id="modalOrderNumber">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Placed On</span>
-                            <span class="info-value" id="modalOrderDate">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Transaction ID</span>
-                            <span class="info-value" id="modalTransactionId">-</span>
-                        </div>
+                        <div class="info-item"><span class="info-label">Order Number</span><span class="info-value" id="modalOrderNumber">-</span></div>
+                        <div class="info-item"><span class="info-label">Placed On</span><span class="info-value" id="modalOrderDate">-</span></div>
+                        <div class="info-item"><span class="info-label">Transaction ID</span><span class="info-value" id="modalTransactionId">-</span></div>
                     </div>
                 </div>
-                
-                <!-- Customer Details Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-user-circle"></i> Customer Details
-                    </div>
+                    <div class="section-title"><i class="fas fa-user-circle"></i> Customer Details</div>
                     <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Name</span>
-                            <span class="info-value" id="modalCustomerName">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Email</span>
-                            <span class="info-value" id="modalCustomerEmail">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Phone</span>
-                            <span class="info-value" id="modalCustomerPhone">-</span>
-                        </div>
+                        <div class="info-item"><span class="info-label">Name</span><span class="info-value" id="modalCustomerName">-</span></div>
+                        <div class="info-item"><span class="info-label">Email</span><span class="info-value" id="modalCustomerEmail">-</span></div>
+                        <div class="info-item"><span class="info-label">Phone</span><span class="info-value" id="modalCustomerPhone">-</span></div>
                     </div>
                 </div>
-                
-                <!-- Shipping Address Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-map-marker-alt"></i> Shipping Address
-                    </div>
-                    <div id="modalShippingAddress" class="address-block">
-                        No address information available
-                    </div>
+                    <div class="section-title"><i class="fas fa-map-marker-alt"></i> Shipping Address</div>
+                    <div id="modalShippingAddress" class="address-block">No address information available</div>
                 </div>
-                
-                <!-- Order Items Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-box"></i> Order Items
-                    </div>
+                    <div class="section-title"><i class="fas fa-box"></i> Order Items</div>
                     <div id="modalOrderItems" class="order-item-list"></div>
                 </div>
-                
-                <!-- Payment Summary Section -->
                 <div class="detail-section">
-                    <div class="section-title">
-                        <i class="fas fa-credit-card"></i> Payment Summary
-                    </div>
+                    <div class="section-title"><i class="fas fa-credit-card"></i> Payment Summary</div>
                     <div class="payment-summary" id="modalPaymentSummary"></div>
-                    
                     <div class="action-buttons" id="modalActions">
                         <button class="btn-cancel-order" onclick="openCancelModalFromDetails()">Cancel Order</button>
                         <button class="btn-contact-support" onclick="contactSupport()">Contact Support</button>
@@ -525,7 +761,6 @@
             <div class="modal-body">
                 <input type="hidden" id="cancelOrderId">
                 <p class="text-muted mb-3">Please select a reason for cancellation:</p>
-                
                 <div id="cancelReasons">
                     <div class="reason-option" onclick="selectReason(this, 'Changed my mind')">
                         <input type="radio" name="cancel_reason" value="Changed my mind">
@@ -556,12 +791,10 @@
                         <label>Other</label>
                     </div>
                 </div>
-                
                 <div class="mt-3">
                     <label class="form-label fw-bold">Additional Comments (Optional)</label>
                     <textarea id="cancelComment" class="cancel-comment" rows="3" placeholder="Please provide any additional details about your cancellation request..."></textarea>
                 </div>
-                
                 <div class="alert alert-warning mt-3">
                     <i class="fas fa-info-circle"></i> Once cancelled, your order will be processed for refund as per our policy.
                 </div>
@@ -575,27 +808,209 @@
 </div>
 
 <script>
-// CSRF Token
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
 let currentCancelOrderId = null;
 let currentOrderForCancel = null;
+let currentOrderId = null;
+let reviewFiles = [];
+let orderItemsData = [];
 
-// Select reason function
 function selectReason(element, reason) {
     document.querySelectorAll('.reason-option').forEach(opt => {
         opt.classList.remove('selected');
         const radio = opt.querySelector('input[type="radio"]');
         if (radio) radio.checked = false;
     });
-    
     element.classList.add('selected');
     const radio = element.querySelector('input[type="radio"]');
-    if (radio) {
-        radio.checked = true;
+    if (radio) radio.checked = true;
+}
+
+// ⭐ OPEN REVIEW MODAL
+function openReviewModal(orderId) {
+    currentOrderId = orderId;
+    document.getElementById('review_order_id').value = orderId;
+    document.getElementById('review_description').value = '';
+    document.getElementById('review_files_preview').innerHTML = '';
+    document.getElementById('review_error_message').style.display = 'none';
+    reviewFiles = [];
+    orderItemsData = [];
+    document.getElementById('product_select_error').style.display = 'none';
+    
+    document.querySelectorAll('#reviewStars input').forEach(input => input.checked = false);
+    document.getElementById('review_star1').checked = true;
+    
+    const select = document.getElementById('review_product_select');
+    select.innerHTML = '<option value="">-- Loading products... --</option>';
+    select.disabled = true;
+    
+    fetch(`/api/order-details/${orderId}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return res.json();
+        })
+        .then(data => {
+            select.innerHTML = '<option value="">-- Select Product --</option>';
+            select.disabled = false;
+            
+            if (data.success && data.order && data.order.items && data.order.items.length > 0) {
+                orderItemsData = data.order.items;
+                
+                data.order.items.forEach((item) => {
+                    const option = document.createElement('option');
+                    option.value = parseInt(item.product_id);
+                    option.textContent = item.product_name + ' (₹' + parseFloat(item.price).toFixed(2) + ')';
+                    select.appendChild(option);
+                });
+                
+                // Auto select if only one product
+                if (data.order.items.length === 1) {
+                    select.value = parseInt(data.order.items[0].product_id);
+                    console.log('Auto-selected product ID:', select.value);
+                }
+            } else {
+                select.innerHTML = '<option value="">-- No products found --</option>';
+                select.disabled = true;
+            }
+        })
+        .catch(err => {
+            console.error('Error loading products:', err);
+            select.innerHTML = '<option value="">-- Error loading products --</option>';
+            select.disabled = false;
+        });
+    
+    const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+    modal.show();
+}
+
+// ⭐ Preview Review Files
+function previewReviewFiles(input) {
+    const preview = document.getElementById('review_files_preview');
+    const files = Array.from(input.files);
+    
+    files.forEach((file) => {
+        reviewFiles.push(file);
+        const reader = new FileReader();
+        const fileIndex = reviewFiles.length - 1;
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'file-preview-item';
+            if (file.type.startsWith('image/')) {
+                div.innerHTML = `<img src="${e.target.result}" alt="Preview"><button class="remove-file" onclick="removeReviewFile(this, ${fileIndex})">×</button>`;
+            } else if (file.type.startsWith('video/')) {
+                div.innerHTML = `<video src="${e.target.result}"></video><button class="remove-file" onclick="removeReviewFile(this, ${fileIndex})">×</button>`;
+            }
+            preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// ⭐ Remove Review File
+function removeReviewFile(button, index) {
+    button.closest('.file-preview-item').remove();
+    reviewFiles.splice(index, 1);
+}
+
+// ⭐ SUBMIT REVIEW - FIXED
+async function submitReview() {
+    const orderId = document.getElementById('review_order_id').value;
+    const productSelect = document.getElementById('review_product_select');
+    const productId = productSelect.value;
+    const rating = document.querySelector('input[name="rating"]:checked');
+    const description = document.getElementById('review_description').value;
+    const errorDiv = document.getElementById('review_error_message');
+    
+    console.log('Submitting review with:', {
+        order_id: orderId,
+        product_id: productId,
+        rating: rating ? rating.value : null,
+        description: description
+    });
+    
+    // Validate
+    let hasError = false;
+    let errorMessages = [];
+    
+    if (!productId || productId === '' || productId === '0' || productId === 'null') {
+        document.getElementById('product_select_error').style.display = 'block';
+        productSelect.style.borderColor = 'red';
+        hasError = true;
+        errorMessages.push('Please select a product');
+    } else {
+        document.getElementById('product_select_error').style.display = 'none';
+        productSelect.style.borderColor = '';
+    }
+    
+    if (!rating) {
+        errorMessages.push('Please select a rating');
+        hasError = true;
+    }
+    
+    if (!description || description.trim() === '') {
+        errorMessages.push('Please write a review description');
+        hasError = true;
+    }
+    
+    if (hasError) {
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = errorMessages.join('<br>');
+        return;
+    }
+    
+    errorDiv.style.display = 'none';
+    
+    const submitBtn = document.querySelector('#reviewModal .btn-success');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('order_id', orderId);
+    formData.append('product_id', parseInt(productId));
+    formData.append('rating', parseInt(rating.value));
+    formData.append('description', description);
+    
+    reviewFiles.forEach(file => {
+        formData.append('review_files[]', file);
+    });
+    
+    try {
+        const response = await fetch('/submit-product-review', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        console.log('Server response:', data);
+        
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
+            if (modal) modal.hide();
+            
+            alert(data.message || 'Thank you! Your review has been submitted for approval.');
+            location.reload();
+        } else {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = data.message || 'Error submitting review';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = 'Network error. Please try again.';
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
     }
 }
 
-// Open Cancel Modal from details page
+// Open Cancel Modal
 function openCancelModalFromDetails() {
     if (currentOrderForCancel) {
         openCancelModal(currentOrderForCancel);
@@ -604,23 +1019,19 @@ function openCancelModalFromDetails() {
     }
 }
 
-// Open Cancel Modal
 function openCancelModal(orderId) {
     currentCancelOrderId = orderId;
     document.getElementById('cancelOrderId').value = orderId;
-    
     document.querySelectorAll('.reason-option').forEach(opt => {
         opt.classList.remove('selected');
         const radio = opt.querySelector('input[type="radio"]');
         if (radio) radio.checked = false;
     });
     document.getElementById('cancelComment').value = '';
-    
     const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
     modal.show();
 }
 
-// Submit Cancellation
 async function submitCancellation() {
     const orderId = document.getElementById('cancelOrderId').value;
     const selectedReason = document.querySelector('input[name="cancel_reason"]:checked');
@@ -652,13 +1063,11 @@ async function submitCancellation() {
         });
         
         const data = await response.json();
-        
         if (data.success) {
             const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
             const orderModal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
             if (cancelModal) cancelModal.hide();
             if (orderModal) orderModal.hide();
-            
             alert('Your cancellation request has been submitted successfully!');
             location.reload();
         } else {
@@ -673,7 +1082,6 @@ async function submitCancellation() {
     }
 }
 
-// View order details using API
 async function viewOrderDetails(orderId, button) {
     const originalText = button.innerHTML;
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
@@ -687,9 +1095,7 @@ async function viewOrderDetails(orderId, button) {
                 'X-CSRF-TOKEN': csrfToken
             }
         });
-        
         const data = await response.json();
-        
         if (data.success && data.order) {
             currentOrderForCancel = orderId;
             renderModalWithOrderData(data.order);
@@ -707,18 +1113,14 @@ async function viewOrderDetails(orderId, button) {
     }
 }
 
-// Render modal with order data
 function renderModalWithOrderData(order) {
-    // Status Steps
     const statusSteps = ['Pending', 'Confirmed', 'Shipped', 'Delivered'];
     const currentStatus = order.order_status;
     const currentIndex = statusSteps.indexOf(currentStatus);
-    
     let stepsHtml = '';
     statusSteps.forEach((step, index) => {
         let stepClass = '';
         let stepIcon = '';
-        
         if (index < currentIndex) {
             stepClass = 'completed';
             stepIcon = '<i class="fas fa-check"></i>';
@@ -728,74 +1130,39 @@ function renderModalWithOrderData(order) {
         } else {
             stepIcon = '<i class="far fa-circle"></i>';
         }
-        
-        stepsHtml += `
-            <div class="status-step ${stepClass}">
-                <div class="step-icon">${stepIcon}</div>
-                <div class="step-label">${step.toUpperCase()}</div>
-            </div>
-        `;
+        stepsHtml += `<div class="status-step ${stepClass}"><div class="step-icon">${stepIcon}</div><div class="step-label">${step.toUpperCase()}</div></div>`;
     });
     document.getElementById('statusSteps').innerHTML = stepsHtml;
     
-    // Order Information
     document.getElementById('modalOrderNumber').innerText = order.order_number;
-    document.getElementById('modalOrderDate').innerText = new Date(order.created_at).toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
+    document.getElementById('modalOrderDate').innerText = new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
-    
-    // Customer Details
     document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
     document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
     document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
     
-    // Shipping Address - Fetch from user_addresses table data
     let shippingHtml = '<div class="address-block">No address information available</div>';
     if (order.shipping_address) {
         let addr = order.shipping_address;
         let addressLines = [];
-        
-        if (addr.name && addr.name !== 'N/A' && addr.name !== '') {
-            addressLines.push('<strong>' + escapeHtml(addr.name) + '</strong>');
-        }
-        if (addr.address && addr.address !== '') {
-            addressLines.push(escapeHtml(addr.address));
-        }
-        if (addr.area && addr.area !== '') {
-            addressLines.push(escapeHtml(addr.area));
-        }
-        if (addr.city && addr.city !== '' && addr.state && addr.state !== '') {
-            addressLines.push(escapeHtml(addr.city) + ', ' + escapeHtml(addr.state));
-        } else if (addr.city && addr.city !== '') {
-            addressLines.push(escapeHtml(addr.city));
-        } else if (addr.state && addr.state !== '') {
-            addressLines.push(escapeHtml(addr.state));
-        }
-        if (addr.pincode && addr.pincode !== '') {
-            addressLines.push('Pincode: ' + escapeHtml(addr.pincode));
-        }
-        if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') {
-            addressLines.push('Phone: ' + escapeHtml(addr.phone));
-        }
-        
-        if (addressLines.length > 0) {
-            shippingHtml = '<div class="address-block">' + addressLines.join('<br>') + '</div>';
-        }
+        if (addr.name && addr.name !== 'N/A' && addr.name !== '') addressLines.push('<strong>' + escapeHtml(addr.name) + '</strong>');
+        if (addr.address && addr.address !== '') addressLines.push(escapeHtml(addr.address));
+        if (addr.area && addr.area !== '') addressLines.push(escapeHtml(addr.area));
+        if (addr.city && addr.city !== '' && addr.state && addr.state !== '') addressLines.push(escapeHtml(addr.city) + ', ' + escapeHtml(addr.state));
+        else if (addr.city && addr.city !== '') addressLines.push(escapeHtml(addr.city));
+        else if (addr.state && addr.state !== '') addressLines.push(escapeHtml(addr.state));
+        if (addr.pincode && addr.pincode !== '') addressLines.push('Pincode: ' + escapeHtml(addr.pincode));
+        if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') addressLines.push('Phone: ' + escapeHtml(addr.phone));
+        if (addressLines.length > 0) shippingHtml = '<div class="address-block">' + addressLines.join('<br>') + '</div>';
     }
     document.getElementById('modalShippingAddress').innerHTML = shippingHtml;
     
-    // Order Items
     let itemsHtml = '';
     let subtotal = 0;
-    
     if (order.items && order.items.length > 0) {
         order.items.forEach(function(item) {
             var itemTotal = item.price * item.quantity;
             subtotal += itemTotal;
-            
             itemsHtml += `
                 <div class="order-item-card">
                     <div class="order-item-image">
@@ -815,45 +1182,22 @@ function renderModalWithOrderData(order) {
     }
     document.getElementById('modalOrderItems').innerHTML = itemsHtml;
     
-    // Payment Summary
     const shippingCost = order.shipping_cost || 0;
     const total = order.total_amount;
     const paymentMethod = order.payment_method || 'Unknown';
     const paymentStatus = order.payment_status;
     const paymentStatusText = paymentStatus === 'SUCCESS' ? 'PAID' : (paymentStatus === 'FAILED' ? 'FAILED' : 'PENDING');
     const paymentStatusClass = paymentStatus === 'SUCCESS' ? 'payment-paid' : (paymentStatus === 'FAILED' ? 'payment-failed' : 'payment-pending');
-    
-    let paymentMethodDisplay = '';
-    if (paymentMethod === 'cod') {
-        paymentMethodDisplay = 'Cash on Delivery';
-    } else if (paymentMethod === 'online' || paymentMethod === 'card' || paymentMethod === 'PayU') {
-        paymentMethodDisplay = 'Online Payment (Card)';
-    } else {
-        paymentMethodDisplay = paymentMethod || 'Unknown';
-    }
-    
+    let paymentMethodDisplay = paymentMethod === 'cod' ? 'Cash on Delivery' : (paymentMethod === 'online' || paymentMethod === 'card' || paymentMethod === 'PayU' ? 'Online Payment (Card)' : paymentMethod || 'Unknown');
     const summaryHtml = `
-        <div class="summary-row">
-            <span>Subtotal</span>
-            <span>₹${formatNumber(subtotal)}</span>
-        </div>
-        <div class="summary-row">
-            <span>Shipping</span>
-            <span>₹${formatNumber(shippingCost)}</span>
-        </div>
-        <div class="summary-total">
-            <span>Total</span>
-            <span>₹${formatNumber(total)}</span>
-        </div>
-        <div class="summary-row mt-2">
-            <span>${paymentMethodDisplay}</span>
-            <span class="payment-badge ${paymentStatusClass}">${paymentStatusText}</span>
-        </div>
+        <div class="summary-row"><span>Subtotal</span><span>₹${formatNumber(subtotal)}</span></div>
+        <div class="summary-row"><span>Shipping</span><span>₹${formatNumber(shippingCost)}</span></div>
+        <div class="summary-total"><span>Total</span><span>₹${formatNumber(total)}</span></div>
+        <div class="summary-row mt-2"><span>${paymentMethodDisplay}</span><span class="payment-badge ${paymentStatusClass}">${paymentStatusText}</span></div>
     `;
     document.getElementById('modalPaymentSummary').innerHTML = summaryHtml;
 }
 
-// Contact Support
 function contactSupport() {
     window.location.href = '{{ route("contact") }}';
 }
