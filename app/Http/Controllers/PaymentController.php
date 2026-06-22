@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\UserAddress;
 use App\Mail\OrderConfirmationMail;
 
 class PaymentController extends Controller
@@ -432,7 +433,7 @@ class PaymentController extends Controller
             }
             
             // Get user's saved address from user_addresses table
-            $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)
+            $userAddress = UserAddress::where('user_id', $order->user_id)
                 ->orderBy('is_default', 'desc')
                 ->first();
             
@@ -504,53 +505,69 @@ class PaymentController extends Controller
     }
 
     /**
-     * ⭐ NEW: Send Order Confirmation Email with Debugging
+     * ⭐ Send Order Confirmation Email with Complete Error Handling
      */
     private function sendOrderConfirmationEmail($order)
     {
         try {
             // Log that we're trying to send email
-            Log::info('Attempting to send order confirmation email for order: ' . $order->order_number);
+            Log::info('📧 Attempting to send order confirmation email for order: ' . $order->order_number);
             
             // Get user
             $user = $order->user;
             if (!$user) {
-                Log::error('No user found for order: ' . $order->order_number);
+                Log::error('❌ No user found for order: ' . $order->order_number);
+                return;
+            }
+            
+            // Check if email is valid
+            if (empty($user->email) || !filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+                Log::error('❌ Invalid user email: ' . ($user->email ?? 'null'));
                 return;
             }
             
             // Get shipping address
             $shippingAddress = null;
             if ($order->payment_details) {
-                $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
-                if (isset($paymentDetails['shipping_address']) && !empty($paymentDetails['shipping_address'])) {
-                    $shippingAddress = $paymentDetails['shipping_address'];
-                } elseif (isset($paymentDetails['address']) && !empty($paymentDetails['address'])) {
-                    $shippingAddress = $paymentDetails['address'];
+                try {
+                    $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
+                    if (isset($paymentDetails['shipping_address']) && !empty($paymentDetails['shipping_address'])) {
+                        $shippingAddress = $paymentDetails['shipping_address'];
+                    } elseif (isset($paymentDetails['address']) && !empty($paymentDetails['address'])) {
+                        $shippingAddress = $paymentDetails['address'];
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Could not parse payment_details: ' . $e->getMessage());
                 }
             }
             
             // If no address in payment_details, get from user_addresses
             if (!$shippingAddress) {
-                $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)
-                    ->orderBy('is_default', 'desc')
-                    ->orderBy('created_at', 'desc')
-                    ->first();
-                
-                if ($userAddress) {
-                    $shippingAddress = [
-                        'name' => $userAddress->name,
-                        'address' => $userAddress->address,
-                        'area' => $userAddress->area ?? '',
-                        'city' => $userAddress->city,
-                        'state' => $userAddress->state,
-                        'pincode' => $userAddress->pincode,
-                        'phone' => $userAddress->phone
-                    ];
+                try {
+                    $userAddress = UserAddress::where('user_id', $order->user_id)
+                        ->orderBy('is_default', 'desc')
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+                    
+                    if ($userAddress) {
+                        $shippingAddress = [
+                            'name' => $userAddress->name ?? '',
+                            'address' => $userAddress->address ?? '',
+                            'area' => $userAddress->area ?? '',
+                            'city' => $userAddress->city ?? '',
+                            'state' => $userAddress->state ?? '',
+                            'pincode' => $userAddress->pincode ?? '',
+                            'phone' => $userAddress->phone ?? ''
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    Log::warning('Could not get user address: ' . $e->getMessage());
                 }
             }
             
             $items = $order->items;
+            
+            Log::info('📧 Sending email to: ' . $user->email);
             
             // Send email
             Mail::to($user->email)->send(new OrderConfirmationMail($order, $user, $items, $shippingAddress));

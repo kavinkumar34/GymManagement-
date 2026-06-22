@@ -369,6 +369,91 @@
                 padding-right: 10px !important;
             }
         }
+
+        /* WhatsApp Float Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            animation: pulse 2s infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+            }
+        }
+
+        /* WhatsApp Tooltip */
+        .whatsapp-tooltip {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            z-index: 999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .whatsapp-tooltip.show {
+            opacity: 1;
+        }
+
+        .whatsapp-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0,0,0,0.8);
+        }
+
+        @media (max-width: 768px) {
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
+                bottom: 20px;
+                right: 20px;
+            }
+            .whatsapp-tooltip {
+                bottom: 80px;
+                right: 20px;
+                font-size: 0.75rem;
+                padding: 8px 12px;
+            }
+        }
     </style>
 </head>
 <body class="@if(Route::is('admin.login') || Route::is('admin.register')) hide-sidebar @endif">
@@ -599,7 +684,7 @@
                     <a href="#"><i class="fab fa-instagram"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>
                     <a href="#"><i class="fab fa-youtube"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://wa.me/919025595190?text=Hi%20Gym%20Management%2C%20I%20need%20assistance." target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
 
@@ -644,6 +729,17 @@
                         <i class="fas fa-clock"></i>
                         <span>Mon - Sat: 6:00 AM - 10:00 PM</span>
                     </li>
+                    <!-- WhatsApp Contact Item -->
+                    <li>
+                        <i class="fab fa-whatsapp"></i>
+                        <span>
+                            <a href="https://wa.me/919025595190?text=Hi%20Gym%20Management%2C%20I%20need%20assistance." 
+                               target="_blank" rel="noopener noreferrer" 
+                               style="color: #25d366; text-decoration: none; font-weight: 500;">
+                                +91 90255 95190 (WhatsApp)
+                            </a>
+                        </span>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -665,6 +761,19 @@
         </div>
     </div>
 </footer>
+
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/919025595190?text=Hi%20Gym%20Management%2C%20I%20need%20assistance." 
+   target="_blank" rel="noopener noreferrer" 
+   class="whatsapp-float" 
+   aria-label="Chat on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- WhatsApp Tooltip -->
+<div class="whatsapp-tooltip" id="whatsappTooltip">
+    <i class="fas fa-comment-dots me-2"></i> Chat with us on WhatsApp
+</div>
 
 <style>
     .footer {
@@ -708,6 +817,10 @@
         background: #e94560;
         color: white;
         transform: translateY(-3px);
+    }
+
+    .social-icons a .fa-whatsapp:hover {
+        color: #25d366;
     }
 
     .footer h5 {
@@ -777,6 +890,10 @@
         font-size: 0.9rem;
     }
 
+    .footer-contact li .fa-whatsapp {
+        color: #25d366;
+    }
+
     .bottom-bar {
         padding: 20px 0;
         margin-top: 30px;
@@ -808,6 +925,9 @@
         }
         .payment-methods {
             margin-top: 10px;
+        }
+        .footer-contact li {
+            justify-content: center;
         }
     }
 </style>
@@ -857,10 +977,36 @@
             window.location.href = "{{ url('/') }}?search=" + searchTerm;
         }
     }
-    
+
+    // WhatsApp Tooltip Show/Hide
     document.addEventListener('DOMContentLoaded', function() {
         updateNavbarCartCount();
         updateNavbarWishlistCount();
+
+        // Show WhatsApp tooltip after 3 seconds
+        setTimeout(function() {
+            const tooltip = document.getElementById('whatsappTooltip');
+            if (tooltip) {
+                tooltip.classList.add('show');
+                // Hide tooltip after 5 seconds
+                setTimeout(function() {
+                    tooltip.classList.remove('show');
+                }, 5000);
+            }
+        }, 3000);
+
+        // Show tooltip on hover of WhatsApp button
+        const whatsappBtn = document.querySelector('.whatsapp-float');
+        const tooltip = document.getElementById('whatsappTooltip');
+        
+        if (whatsappBtn && tooltip) {
+            whatsappBtn.addEventListener('mouseenter', function() {
+                tooltip.classList.add('show');
+            });
+            whatsappBtn.addEventListener('mouseleave', function() {
+                tooltip.classList.remove('show');
+            });
+        }
     });
 </script>
 </body>

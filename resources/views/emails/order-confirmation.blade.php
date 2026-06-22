@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Order Confirmation</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
@@ -93,9 +94,6 @@
             margin: 15px 0;
             line-height: 1.8;
         }
-        .shipping-box strong {
-            color: #1e293b;
-        }
         .status-badge {
             display: inline-block;
             padding: 4px 14px;
@@ -136,6 +134,28 @@
             font-size: 18px;
             font-weight: 700;
             color: #dc3545;
+        }
+        /* ⭐ Add divider for better readability */
+        .divider {
+            border: none;
+            border-top: 2px solid #e2e8f0;
+            margin: 20px 0;
+        }
+        .whats-next {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .whats-next h3 {
+            font-size: 16px;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        .whats-next p {
+            color: #475569;
+            margin: 5px 0;
+            font-size: 14px;
         }
         @media (max-width: 480px) {
             .email-body {
@@ -187,7 +207,7 @@
                     </tr>
                     <tr>
                         <td>Payment Status</td>
-                        <td><span style="color: #28a745; font-weight: 600;">Paid</span></td>
+                        <td><span style="color: #28a745; font-weight: 600;">✅ Paid</span></td>
                     </tr>
                 </table>
             </div>
@@ -222,9 +242,9 @@
                         <td colspan="3" style="text-align: right; border-top: none;">Shipping</td>
                         <td style="text-align: right; border-top: none;">₹0.00</td>
                     </tr>
-                    <tr class="total-row">
-                        <td colspan="3" style="text-align: right; font-size: 16px;">Grand Total</td>
-                        <td style="text-align: right; font-size: 16px; color: #dc3545;">
+                    <tr class="total-row" style="background: #dc3545; color: white;">
+                        <td colspan="3" style="text-align: right; font-size: 16px; color: white;">Grand Total</td>
+                        <td style="text-align: right; font-size: 16px; color: white; font-weight: 800;">
                             ₹{{ number_format($order->total_amount, 2) }}
                         </td>
                     </tr>
@@ -245,10 +265,12 @@
             </div>
             @endif
 
+            <hr class="divider">
+
             <!-- What's Next -->
-            <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="font-size: 16px; color: #1e293b; margin-bottom: 5px;">📋 What's Next?</h3>
-                <p style="color: #475569; margin: 5px 0; font-size: 14px;">
+            <div class="whats-next">
+                <h3>📋 What's Next?</h3>
+                <p>
                     We'll send you a confirmation once your order is processed. You can track your order status in your account.
                 </p>
             </div>
@@ -256,10 +278,10 @@
             <!-- Buttons -->
             <div class="text-center">
                 <a href="{{ route('my.orders') }}" class="btn-order">
-                    <i class="fas fa-list"></i> View My Orders
+                    📋 View My Orders
                 </a>
                 <a href="{{ url('/') }}" style="display: inline-block; margin-top: 10px; color: #64748b; text-decoration: none; font-size: 14px; margin-left: 15px;">
-                    Continue Shopping →
+                    🛒 Continue Shopping →
                 </a>
             </div>
         </div>

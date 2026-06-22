@@ -532,3 +532,31 @@ Route::get('/api/product-reviews/{productId}', function($productId) {
         })
     ]);
 })->name('api.product.reviews');
+
+
+Route::get('/test-mail', function () {
+    try {
+        $order = \App\Models\Order::with('items')->latest()->first();
+        $user = \App\Models\User::where('email', 'praveenkavin241@gmail.com')->first();
+        
+        if (!$order) {
+            return 'No order found. Please place an order first.';
+        }
+        
+        if (!$user) {
+            return 'User not found.';
+        }
+        
+        $items = $order->items;
+        
+        \Illuminate\Support\Facades\Mail::to($user->email)
+            ->send(new \App\Mail\OrderConfirmationMail($order, $user, $items, null));
+        
+        return '✅ Email sent successfully to ' . $user->email . '! Check your inbox.';
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return 'Validation Error: ' . $e->getMessage();
+    } catch (\Exception $e) {
+        return '❌ Error: ' . $e->getMessage();
+    }
+});

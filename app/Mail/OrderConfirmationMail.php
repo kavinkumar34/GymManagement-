@@ -18,9 +18,6 @@ class OrderConfirmationMail extends Mailable
     public $items;
     public $shippingAddress;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(Order $order, $user, $items, $shippingAddress = null)
     {
         $this->order = $order;
@@ -29,19 +26,13 @@ class OrderConfirmationMail extends Mailable
         $this->shippingAddress = $shippingAddress;
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Order Confirmation - #' . $this->order->order_number,
+            subject: '🎉 Order Confirmed - #' . $this->order->order_number,
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -49,13 +40,8 @@ class OrderConfirmationMail extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];
     }
-}           
+}
