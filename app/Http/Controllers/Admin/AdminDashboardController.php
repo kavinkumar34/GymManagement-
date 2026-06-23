@@ -4,23 +4,26 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Order;
+use App\Models\Product;
 use Carbon\Carbon;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // Total members (both member and trainer roles)
+        // Total users (all members)
         $totalMembers = User::count();
         
-        // Active members (role = 'member')
-        $activeMembers = User::where('role', 'member')->count();
+        // Active members - all users are considered active
+        $activeMembers = User::where('is_verified', 1)->count();
         
-        // Total trainers
-        $totalTrainers = User::where('role', 'trainer')->count();
+        // Total trainers - Since role is removed, set to 0
+        // If you have a trainers table, use: $totalTrainers = Trainer::count();
+        $totalTrainers = 0;
         
-        // Member count
-        $memberCount = User::where('role', 'member')->count();
+        // Member count - all users
+        $memberCount = User::count();
         
         // New members this month
         $newThisMonth = User::whereMonth('created_at', Carbon::now()->month)

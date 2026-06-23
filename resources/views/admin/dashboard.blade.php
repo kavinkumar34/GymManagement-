@@ -15,7 +15,7 @@
                             <div class="card bg-primary text-white">
                                 <div class="card-body">
                                     <h5>Total Members</h5>
-                                    <h2>{{ $totalMembers }}</h2>
+                                    <h2>{{ $totalMembers ?? 0 }}</h2>
                                     <small>All registered users</small>
                                 </div>
                             </div>
@@ -24,7 +24,7 @@
                             <div class="card bg-success text-white">
                                 <div class="card-body">
                                     <h5>Active Members</h5>
-                                    <h2>{{ $activeMembers }}</h2>
+                                    <h2>{{ $activeMembers ?? 0 }}</h2>
                                     <small>Currently active</small>
                                 </div>
                             </div>
@@ -33,7 +33,7 @@
                             <div class="card bg-warning text-white">
                                 <div class="card-body">
                                     <h5>Trainers</h5>
-                                    <h2>{{ $totalTrainers }}</h2>
+                                    <h2>{{ $totalTrainers ?? 0 }}</h2>
                                     <small>Fitness trainers</small>
                                 </div>
                             </div>
@@ -42,7 +42,7 @@
                             <div class="card bg-info text-white">
                                 <div class="card-body">
                                     <h5>New This Month</h5>
-                                    <h2>{{ $newThisMonth }}</h2>
+                                    <h2>{{ $newThisMonth ?? 0 }}</h2>
                                     <small>Joined in {{ date('F Y') }}</small>
                                 </div>
                             </div>
@@ -85,24 +85,18 @@
                                                     <th>ID</th>
                                                     <th>Name</th>
                                                     <th>Email</th>
-                                                    <th>Role</th>
+                                                    <th>Phone</th>
                                                     <th>Joined Date</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse($recentMembers as $member)
+                                                @forelse($recentMembers ?? [] as $member)
                                                 <tr>
                                                     <td>{{ $member->id }}</td>
                                                     <td>{{ $member->name }}</td>
                                                     <td>{{ $member->email }}</td>
-                                                    <td>
-                                                        @if($member->role == 'trainer')
-                                                            <span class="badge bg-success">🏋️ Trainer</span>
-                                                        @else
-                                                            <span class="badge bg-primary">👤 Member</span>
-                                                        @endif
-                                                    </td>
+                                                    <td>{{ $member->phone ?? 'N/A' }}</td>
                                                     <td>{{ $member->created_at->format('d M Y') }}</td>
                                                     <td>
                                                         <span class="badge bg-success">Active</span>
@@ -125,35 +119,46 @@
                     <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="card">
-                                <div class="card-header">Role Summary</div>
+                                <div class="card-header">User Summary</div>
                                 <div class="card-body">
                                     <table class="table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>Role</th>
+                                                <th>Type</th>
                                                 <th>Count</th>
                                                 <th>Percentage</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td><span class="badge bg-primary">👤 Members</span></td>
-                                                <td>{{ $memberCount }}</td>
+                                                <td><span class="badge bg-primary">👤 Total Users</span></td>
+                                                <td>{{ $totalMembers ?? 0 }}</td>
                                                 <td>
                                                     <div class="progress">
-                                                        <div class="progress-bar bg-primary" style="width: {{ $totalMembers > 0 ? ($memberCount/$totalMembers)*100 : 0 }}%">
-                                                            {{ $totalMembers > 0 ? round(($memberCount/$totalMembers)*100) : 0 }}%
+                                                        <div class="progress-bar bg-primary" style="width: 100%">
+                                                            100%
                                                         </div>
                                                     </div>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td><span class="badge bg-success">🏋️ Trainers</span></td>
-                                                <td>{{ $totalTrainers }}</td>
+                                                <td>{{ $totalTrainers ?? 0 }}</td>
                                                 <td>
                                                     <div class="progress">
-                                                        <div class="progress-bar bg-success" style="width: {{ $totalMembers > 0 ? ($totalTrainers/$totalMembers)*100 : 0 }}%">
-                                                            {{ $totalMembers > 0 ? round(($totalTrainers/$totalMembers)*100) : 0 }}%
+                                                        <div class="progress-bar bg-success" style="width: {{ ($totalMembers ?? 1) > 0 ? (($totalTrainers ?? 0)/($totalMembers ?? 1))*100 : 0 }}%">
+                                                            {{ ($totalMembers ?? 1) > 0 ? round((($totalTrainers ?? 0)/($totalMembers ?? 1))*100) : 0 }}%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="badge bg-info">🆕 New This Month</span></td>
+                                                <td>{{ $newThisMonth ?? 0 }}</td>
+                                                <td>
+                                                    <div class="progress">
+                                                        <div class="progress-bar bg-info" style="width: {{ ($totalMembers ?? 1) > 0 ? (($newThisMonth ?? 0)/($totalMembers ?? 1))*100 : 0 }}%">
+                                                            {{ ($totalMembers ?? 1) > 0 ? round((($newThisMonth ?? 0)/($totalMembers ?? 1))*100) : 0 }}%
                                                         </div>
                                                     </div>
                                                 </td>
@@ -168,10 +173,10 @@
                                 <div class="card-header">Quick Actions</div>
                                 <div class="card-body">
                                     <div class="d-grid gap-2">
-                                        <a href="#" class="btn btn-primary">
+                                        <a href="{{ route('admin.member.create') }}" class="btn btn-primary">
                                             <i class="fas fa-user-plus"></i> Add New Member
                                         </a>
-                                        <a href="#" class="btn btn-success">
+                                        <a href="{{ route('admin.trainer.create') }}" class="btn btn-success">
                                             <i class="fas fa-chalkboard-user"></i> Add New Trainer
                                         </a>
                                         <a href="#" class="btn btn-info">
@@ -197,9 +202,12 @@
     new Chart(ctx1, {
         type: 'doughnut',
         data: {
-            labels: ['Members ({{ $memberCount }})', 'Trainers ({{ $totalTrainers }})'],
+            labels: ['Members', 'Trainers'],
             datasets: [{
-                data: [{{ $memberCount }}, {{ $totalTrainers }}],
+                data: [
+                    {{ ($totalMembers ?? 0) - ($totalTrainers ?? 0) }}, 
+                    {{ $totalTrainers ?? 0 }}
+                ],
                 backgroundColor: ['#3498db', '#2ecc71'],
                 borderWidth: 0
             }]
@@ -220,10 +228,10 @@
     new Chart(ctx2, {
         type: 'line',
         data: {
-            labels: {!! json_encode($last7Days) !!},
+            labels: {!! json_encode($last7Days ?? []) !!},
             datasets: [{
                 label: 'New Registrations',
-                data: {!! json_encode($registrationsPerDay) !!},
+                data: {!! json_encode($registrationsPerDay ?? []) !!},
                 borderColor: '#3498db',
                 backgroundColor: 'rgba(52, 152, 219, 0.1)',
                 tension: 0.4,

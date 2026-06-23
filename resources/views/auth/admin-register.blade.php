@@ -266,6 +266,11 @@
             padding: 20px 0;
         }
     }
+
+    /* Hide WhatsApp float button on admin pages */
+.whatsapp-float, .whatsapp-tooltip {
+    display: none !important;
+}
 </style>
 
 <div class="register-container">

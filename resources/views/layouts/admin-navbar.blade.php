@@ -38,6 +38,16 @@
     } catch (\Exception $e) {
         $newPendingOrders = 0;
     }
+
+    // Get admin name safely
+    $adminName = 'Admin';
+    try {
+        if (auth()->guard('admin')->check()) {
+            $adminName = auth()->guard('admin')->user()->name ?? 'Admin';
+        }
+    } catch (\Exception $e) {
+        $adminName = 'Admin';
+    }
 @endphp
 
 <div class="admin-sidebar">
@@ -47,7 +57,7 @@
             <strong>ADMIN<span class="text-danger">PANEL</span></strong>
         </a>
     </div>
-    <ul class="sidebar-nav">
+    <ul class="sidebar-nav" id="sidebarNav">
         <!-- Dashboard -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -57,7 +67,7 @@
 
         <!-- Products Dropdown -->
         <li class="nav-item has-dropdown">
-            <a class="nav-link" href="#">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-box"></i> <span>Products</span>
                 <span class="dropdown-arrow">▼</span>
             </a>
@@ -110,9 +120,9 @@
             </ul>
         </li>
 
-        <!-- ⭐ REVIEWS DROPDOWN - REMOVED ROUTE CHECK -->
+        <!-- Reviews Dropdown -->
         <li class="nav-item has-dropdown">
-            <a class="nav-link" href="#">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-star"></i> <span>Reviews</span>
                 <span class="dropdown-arrow">▼</span>
                 @if($pendingReviewsCount > 0)
@@ -158,7 +168,7 @@
 
         <!-- Members Dropdown -->
         <li class="nav-item has-dropdown">
-            <a class="nav-link" href="{{ route('admin.members') }}">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-users"></i> <span>Members</span>
                 <span class="dropdown-arrow">▼</span>
             </a>
@@ -173,7 +183,7 @@
 
         <!-- Trainers Dropdown -->
         <li class="nav-item has-dropdown">
-            <a class="nav-link" href="{{ route('admin.trainers') }}">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-chalkboard-user"></i> <span>Trainers</span>
                 <span class="dropdown-arrow">▼</span>
             </a>
@@ -196,9 +206,16 @@
             </a>
         </li>
 
+        <!-- Deliverable Pincodes -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url('/admin/pincodes') }}">
+                <i class="fas fa-map-marker-alt"></i> <span>Deliverable Pincodes</span>
+            </a>
+        </li>
+
         <!-- Banners -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.banners.index') }}">
+            <a class="nav-link" href="{{ url('/admin/banners') }}">
                 <i class="fas fa-image"></i> <span>Banners</span>
             </a>
         </li>
@@ -209,19 +226,13 @@
                 <i class="fas fa-cog"></i> <span>Settings</span>
             </a>
         </li>
-
-        @if(Route::has('admin.pincodes.index'))
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.pincodes.index') }}">
-                <i class="fas fa-map-marker-alt"></i> <span>Deliverable Pincodes</span>
-            </a>
-        </li>
-        @endif
     </ul>
 
+    <!-- Sidebar Footer -->
     <div class="sidebar-footer">
         <div class="user-info">
-            <i class="fas fa-user-shield"></i> {{ auth()->guard('admin')->user()->name ?? 'Admin' }}
+            <i class="fas fa-user-shield"></i> 
+            <span>{{ $adminName }}</span>
         </div>
         <a class="logout-btn" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
             <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
@@ -286,6 +297,72 @@ setInterval(checkNewOrders, 30000);
 
 // Check once when page loads
 document.addEventListener('DOMContentLoaded', checkNewOrders);
+
+// ============ DROPDOWN CLICK TOGGLE ============
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all dropdown toggle links
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    
+    dropdownToggles.forEach(function(toggle) {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const parent = this.parentElement;
+            const dropdownMenu = parent.querySelector('.dropdown-menu-custom');
+            
+            if (dropdownMenu) {
+                // Close all other dropdowns
+                document.querySelectorAll('.has-dropdown').forEach(function(item) {
+                    if (item !== parent) {
+                        item.classList.remove('active');
+                        const menu = item.querySelector('.dropdown-menu-custom');
+                        if (menu) {
+                            menu.style.display = 'none';
+                        }
+                        const arrow = item.querySelector('.dropdown-arrow');
+                        if (arrow) {
+                            arrow.style.transform = 'rotate(0deg)';
+                        }
+                    }
+                });
+                
+                // Toggle current dropdown
+                parent.classList.toggle('active');
+                if (parent.classList.contains('active')) {
+                    dropdownMenu.style.display = 'block';
+                    const arrow = toggle.querySelector('.dropdown-arrow');
+                    if (arrow) {
+                        arrow.style.transform = 'rotate(180deg)';
+                    }
+                } else {
+                    dropdownMenu.style.display = 'none';
+                    const arrow = toggle.querySelector('.dropdown-arrow');
+                    if (arrow) {
+                        arrow.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.has-dropdown')) {
+            document.querySelectorAll('.has-dropdown.active').forEach(function(item) {
+                item.classList.remove('active');
+                const menu = item.querySelector('.dropdown-menu-custom');
+                if (menu) {
+                    menu.style.display = 'none';
+                }
+                const arrow = item.querySelector('.dropdown-arrow');
+                if (arrow) {
+                    arrow.style.transform = 'rotate(0deg)';
+                }
+            });
+        }
+    });
+});
 </script>
 
 <style>
@@ -300,12 +377,29 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
         overflow-x: hidden;
         overflow-y: auto;
         z-index: 1000;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Custom scrollbar */
+    .admin-sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-track {
+        background: #1a1a2e;
+    }
+
+    .admin-sidebar::-webkit-scrollbar-thumb {
+        background: #e94560;
+        border-radius: 10px;
     }
 
     .sidebar-header {
         padding: 20px;
         text-align: center;
         border-bottom: 1px solid #2d2d4a;
+        flex-shrink: 0;
     }
 
     .sidebar-brand {
@@ -321,12 +415,19 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
     .sidebar-nav {
         list-style: none;
         padding: 0;
-        margin: 20px 0;
+        margin: 0;
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-bottom: 100px;
+        position: relative;
     }
 
     .sidebar-nav .nav-item {
-        margin: 5px 0;
+        margin: 0;
         position: relative;
+        display: block;
+        width: 100%;
     }
 
     .sidebar-nav .nav-link {
@@ -336,110 +437,160 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
         color: #a0a0c0;
         text-decoration: none;
         transition: all 0.3s;
-    }
-
-    .sidebar-nav .nav-link i {
-        width: 25px;
-        margin-right: 10px;
-        font-size: 1.1rem;
+        cursor: pointer;
+        position: relative;
+        border-left: 3px solid transparent;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .sidebar-nav .nav-link:hover {
         background: #2d2d4a;
         color: white;
+        border-left-color: #e94560;
     }
 
     .sidebar-nav .nav-link.active {
         background: #e94560;
         color: white;
+        border-left-color: #fff;
+    }
+
+    .sidebar-nav .nav-link i {
+        width: 25px;
+        margin-right: 12px;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
+    .sidebar-nav .nav-link span {
+        flex: 1;
+        white-space: nowrap;
     }
 
     .dropdown-arrow {
-        margin-left: auto;
+        margin-left: 8px;
         font-size: 10px;
         transition: transform 0.3s;
+        flex-shrink: 0;
     }
 
-    .has-dropdown:hover .dropdown-arrow {
-        transform: rotate(180deg);
-    }
-
+    /* Dropdown Menu - Pushes content below */
     .dropdown-menu-custom {
-        position: absolute;
-        left: 0;
-        top: 100%;
+        display: none;
         background: #2d2d4a;
-        border-radius: 8px;
-        min-width: 200px;
-        padding: 8px 0;
+        border-radius: 0;
+        padding: 0;
         margin: 0;
         list-style: none;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-        z-index: 1001;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        width: 100%;
+        position: relative;
+        overflow: hidden;
     }
 
-    .has-dropdown:hover .dropdown-menu-custom {
-        opacity: 1;
-        visibility: visible;
-        top: 100%;
+    .has-dropdown.active .dropdown-menu-custom {
+        display: block !important;
     }
 
     .dropdown-item-custom {
         display: flex;
         align-items: center;
-        padding: 10px 20px;
+        padding: 10px 20px 10px 57px;
         color: #a0a0c0;
         text-decoration: none;
-        white-space: nowrap;
         transition: all 0.3s;
-    }
-
-    .dropdown-item-custom i {
-        width: 25px;
-        margin-right: 10px;
-        font-size: 0.9rem;
+        white-space: nowrap;
+        width: 100%;
+        border-left: 3px solid transparent;
+        box-sizing: border-box;
     }
 
     .dropdown-item-custom:hover {
         background: #e94560;
         color: white;
+        border-left-color: #fff;
+    }
+
+    .dropdown-item-custom i {
+        width: 25px;
+        margin-right: 12px;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
+    .badge {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .badge.bg-warning {
+        background-color: #f59e0b !important;
+        color: #1a1a2e;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
     }
 
     .sidebar-footer {
-        position: absolute;
+        position: relative;
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 20px;
+        padding: 15px 20px;
         border-top: 1px solid #2d2d4a;
+        background: #1a1a2e;
+        flex-shrink: 0;
+        margin-top: auto;
     }
 
     .user-info {
-        padding: 10px 0;
+        padding: 8px 0;
         font-size: 0.9rem;
         color: #a0a0c0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .user-info i {
+        font-size: 1.1rem;
+        color: #e94560;
+        width: 25px;
+        flex-shrink: 0;
+        text-align: center;
     }
 
     .logout-btn {
         display: flex;
         align-items: center;
-        padding: 10px;
+        padding: 8px 0;
         color: #ff6b6b;
         text-decoration: none;
         border-radius: 5px;
         transition: all 0.3s;
+        cursor: pointer;
+        margin-top: 5px;
     }
 
     .logout-btn i {
         margin-right: 10px;
+        width: 25px;
+        flex-shrink: 0;
+        text-align: center;
     }
 
     .logout-btn:hover {
-        background: #ff6b6b;
-        color: white;
+        color: #ff4757;
     }
 
     /* Adjust main content to accommodate sidebar */
@@ -449,39 +600,81 @@ document.addEventListener('DOMContentLoaded', checkNewOrders);
         min-height: 100vh;
     }
 
-    /* Badge styling for reviews */
-    .badge.bg-warning {
-        background-color: #f59e0b !important;
-        color: #1a1a2e;
-        font-size: 0.7rem;
-        padding: 2px 8px;
-        border-radius: 10px;
-    }
-
     @media (max-width: 768px) {
         .admin-sidebar {
             width: 70px;
         }
         .admin-sidebar .sidebar-brand strong,
         .admin-sidebar .sidebar-nav .nav-link span,
-        .admin-sidebar .user-info,
+        .admin-sidebar .user-info span,
         .admin-sidebar .logout-btn span,
         .dropdown-arrow {
             display: none;
         }
-        .dropdown-menu-custom {
-            left: 70px;
-            top: 0;
-        }
-        .has-dropdown:hover .dropdown-menu-custom {
-            top: 0;
-            left: 70px;
-        }
         .admin-sidebar .sidebar-nav .nav-link i {
             margin-right: 0;
         }
+        .admin-sidebar .sidebar-nav .nav-link {
+            justify-content: center;
+            padding: 12px;
+            border-left: none;
+        }
+        .admin-sidebar .sidebar-nav .nav-link:hover {
+            border-left: none;
+        }
+        .dropdown-menu-custom {
+            position: fixed;
+            left: 70px;
+            top: 0;
+            width: 200px;
+            max-height: 100vh;
+            overflow-y: auto;
+            z-index: 1001;
+            border-radius: 0 8px 8px 0;
+        }
+        .dropdown-item-custom {
+            padding: 10px 15px 10px 20px;
+        }
         .admin-main-content {
             margin-left: 70px;
+        }
+        .sidebar-footer {
+            padding: 10px;
+        }
+        .user-info {
+            justify-content: center;
+            padding: 5px 0;
+        }
+        .logout-btn {
+            justify-content: center;
+            padding: 5px 0;
+        }
+        .badge {
+            display: none !important;
+        }
+        .admin-sidebar::-webkit-scrollbar {
+            width: 3px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .admin-sidebar {
+            width: 55px;
+        }
+        .admin-sidebar .sidebar-nav .nav-link {
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        .admin-sidebar .sidebar-nav .nav-link i {
+            font-size: 1rem;
+        }
+        .admin-main-content {
+            margin-left: 55px;
+            padding: 10px;
+        }
+        .dropdown-menu-custom {
+            left: 55px;
+            width: 180px;
         }
     }
 </style>

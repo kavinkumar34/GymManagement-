@@ -61,8 +61,15 @@ Route::get('/captcha', [CaptchaController::class, 'generate']);
 // ============ MEMBER/TRAINER LOGIN & REGISTER ============
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
+
+// ============ MEMBER REGISTER WITH OTP ============
 Route::get('/member/register', [MemberRegisterController::class, 'showRegisterForm'])->name('member.register');
-Route::post('/member/register', [MemberRegisterController::class, 'register'])->name('member.register.submit');
+Route::post('/member/register', [MemberRegisterController::class, 'register'])->name('register.submit');
+
+// ============ OTP VERIFICATION ROUTES ============
+Route::get('/verify-otp/{user_id}', [MemberRegisterController::class, 'showOTPForm'])->name('verify.otp.form');
+Route::post('/verify-otp', [MemberRegisterController::class, 'verifyOTP'])->name('verify.otp');
+Route::post('/resend-otp', [MemberRegisterController::class, 'resendOTP'])->name('resend.otp');
 
 // ============ ADMIN LOGIN & REGISTER ============
 Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
@@ -559,4 +566,153 @@ Route::get('/test-mail', function () {
     } catch (\Exception $e) {
         return '❌ Error: ' . $e->getMessage();
     }
+});
+
+
+Route::get('/test-msg91', function() {
+    $phone = '9025595190';
+    $otp = rand(100000, 999999);
+    
+    $otpService = new \App\Services\OTPService();
+    $result = $otpService->sendOTP($phone, $otp);
+    
+    return response()->json([
+        'success' => $result['success'],
+        'phone' => $phone,
+        'otp' => $otp,
+        'result' => $result,
+        'message' => $result['success'] ? '✅ SMS sent successfully!' : '❌ SMS failed. Check logs.',
+        'log_file' => storage_path('logs/laravel.log')
+    ]);
+});
+
+Route::get('/test-sms-final', function() {
+    $phone = '9025595190';
+    $otp = rand(100000, 999999);
+    
+    $otpService = new \App\Services\OTPService();
+    $result = $otpService->sendOTP($phone, $otp);
+    
+    return response()->json([
+        'success' => $result['success'],
+        'phone' => $phone,
+        'otp' => $otp,
+        'result' => $result,
+        'message' => $result['success'] ? '✅ SMS sent successfully!' : '❌ SMS failed. Check logs.',
+        'twilio_configured' => !empty(env('TWILIO_SID')),
+        'log_file' => storage_path('logs/laravel.log')
+    ]);
+});
+
+Route::get('/test-sms-now', function() {
+    $phone = '9025595190'; // Change to your phone number
+    $otp = rand(100000, 999999);
+    
+    $otpService = new \App\Services\OTPService();
+    $result = $otpService->sendOTP($phone, $otp);
+    
+    return response()->json([
+        'success' => $result['success'],
+        'phone' => $phone,
+        'otp' => $otp,
+        'result' => $result,
+        'message' => $result['success'] ? '✅ SMS sent successfully to ' . $phone : '❌ SMS failed. Check logs.',
+        'log_file' => storage_path('logs/laravel.log')
+    ]);
+});
+
+Route::get('/test-msg91-curl', function() {
+    $phone = '9025595190'; // Change to your number
+    $otp = rand(100000, 999999);
+    
+    $otpService = new \App\Services\OTPService();
+    $result = $otpService->sendOTP($phone, $otp);
+    
+    return response()->json([
+        'success' => $result['success'],
+        'phone' => $phone,
+        'otp' => $otp,
+        'result' => $result,
+        'message' => $result['success'] ? '✅ SMS sent successfully!' : '❌ SMS failed.',
+        'check_logs' => 'Check storage/logs/laravel.log'
+    ]);
+});
+
+
+
+
+// ============ DEBUG SMS ROUTE ============
+Route::get('/debug-sms', function() {
+    $phone = '9025595190'; // Change to your number
+    $otp = rand(100000, 999999);
+    
+    // Clean phone
+    $phone = preg_replace('/[^0-9]/', '', $phone);
+    $phone = ltrim($phone, '0');
+    if (strlen($phone) === 10) {
+        $phone = '91' . $phone;
+    }
+    
+    $message = "Dear customer, use this One Time Password {$otp} to log in to your ASCOXTECHNOSOFT profile registration. This OTP will be valid for the next 5 mins. - ASCOXTECHNOSOFT";
+    
+    $apiKey = 'a7a8ce65-3d35-4d13-a715-c2c33ffca8a5';
+    $senderId = 'ASCOXT';
+    $templateId = '1707173148047034884';
+    
+    $url = "https://api.msg91.com/api/sendhttp.php";
+    $params = [
+        'authkey' => $apiKey,
+        'mobiles' => $phone,
+        'message' => $message,
+        'sender' => $senderId,
+        'route' => 4,
+        'country' => 91,
+        'DLT_TE_ID' => $templateId,
+        'encrypt' => 0
+    ];
+    
+    $fullUrl = $url . '?' . http_build_query($params);
+    
+    // Send using cURL
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $fullUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+    
+    return response()->json([
+        'phone' => $phone,
+        'otp' => $otp,
+        'url' => $fullUrl,
+        'http_code' => $httpCode,
+        'response' => $response,
+        'curl_error' => $curlError,
+        'success' => $response && strpos($response, 'Success') !== false,
+        'message' => $response && strpos($response, 'Success') !== false ? '✅ SMS sent successfully!' : '❌ SMS failed'
+    ]);
+});
+
+
+
+Route::get('/test-sms-working', function() {
+    $phone = '9025595190'; // Your phone number
+    $otp = rand(100000, 999999);
+    
+    $otpService = new \App\Services\OTPService();
+    $result = $otpService->sendOTP($phone, $otp);
+    
+    return response()->json([
+        'phone' => $phone,
+        'otp' => $otp,
+        'success' => $result['success'],
+        'message' => $result['message'],
+        'result' => $result,
+        'note' => 'Check your phone for SMS. If not received, check MSG91 balance.'
+    ]);
 });
