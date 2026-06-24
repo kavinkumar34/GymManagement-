@@ -1,4 +1,4 @@
-<!-- Left Sidebar for Admin -->
+<!-- Left Sidebar for Admin - White Text Theme -->
 @php
     use App\Models\ProductReview;
     use App\Models\Contact;
@@ -54,7 +54,7 @@
     <div class="sidebar-header">
         <a class="sidebar-brand" href="{{ route('admin.dashboard') }}">
             <i class="fas fa-dumbbell me-2"></i>
-            <strong>ADMIN<span class="text-danger">PANEL</span></strong>
+            <strong>ADMIN<span class="text-accent">PANEL</span></strong>
         </a>
     </div>
     <ul class="sidebar-nav" id="sidebarNav">
@@ -126,7 +126,7 @@
                 <i class="fas fa-star"></i> <span>Reviews</span>
                 <span class="dropdown-arrow">▼</span>
                 @if($pendingReviewsCount > 0)
-                    <span class="badge bg-warning ms-2" style="font-size: 0.7rem; padding: 2px 8px; border-radius: 10px;">{{ $pendingReviewsCount }}</span>
+                    <span class="badge bg-warning ms-2">{{ $pendingReviewsCount }}</span>
                 @endif
             </a>
             <ul class="dropdown-menu-custom">
@@ -139,7 +139,7 @@
                     <a class="dropdown-item-custom" href="{{ route('admin.reviews.pending') }}">
                         <i class="fas fa-clock"></i> Pending Reviews
                         @if($pendingReviewsCount > 0)
-                            <span class="badge bg-warning ms-2" style="font-size: 0.6rem; padding: 1px 6px; border-radius: 8px;">{{ $pendingReviewsCount }}</span>
+                            <span class="badge bg-warning ms-2">{{ $pendingReviewsCount }}</span>
                         @endif
                     </a>
                 </li>
@@ -164,36 +164,6 @@
                     <span class="badge bg-danger ms-2">{{ $pendingCount }}</span>
                 @endif
             </a>
-        </li>
-
-        <!-- Members Dropdown -->
-        <li class="nav-item has-dropdown">
-            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-                <i class="fas fa-users"></i> <span>Members</span>
-                <span class="dropdown-arrow">▼</span>
-            </a>
-            <ul class="dropdown-menu-custom">
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.member.create') }}">
-                        <i class="fas fa-user-plus"></i> Add Member
-                    </a>
-                </li>
-            </ul>
-        </li>
-
-        <!-- Trainers Dropdown -->
-        <li class="nav-item has-dropdown">
-            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-                <i class="fas fa-chalkboard-user"></i> <span>Trainers</span>
-                <span class="dropdown-arrow">▼</span>
-            </a>
-            <ul class="dropdown-menu-custom">
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.trainer.create') }}">
-                        <i class="fas fa-user-plus"></i> Add Trainer
-                    </a>
-                </li>
-            </ul>
         </li>
 
         <!-- Payments -->
@@ -225,6 +195,41 @@
             <a class="nav-link" href="{{ route('admin.settings') }}">
                 <i class="fas fa-cog"></i> <span>Settings</span>
             </a>
+        </li>
+
+        <!-- ===== GYM ONE DIVIDER ===== -->
+        <li class="nav-divider">
+            <span class="divider-text">Gym One</span>
+        </li>
+
+        <!-- Members Dropdown -->
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-users"></i> <span>Members</span>
+                <span class="dropdown-arrow">▼</span>
+            </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.member.create') }}">
+                        <i class="fas fa-user-plus"></i> Add Member
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Trainers Dropdown -->
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-chalkboard-user"></i> <span>Trainers</span>
+                <span class="dropdown-arrow">▼</span>
+            </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.trainer.create') }}">
+                        <i class="fas fa-user-plus"></i> Add Trainer
+                    </a>
+                </li>
+            </ul>
         </li>
     </ul>
 
@@ -366,65 +371,86 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+    /* ===== DARK THEME SIDEBAR - ALL WHITE TEXT ===== */
     .admin-sidebar {
         position: fixed;
         left: 0;
         top: 0;
-        width: 260px;
+        width: 270px;
         height: 100vh;
-        background: #1a1a2e;
-        color: white;
+        background: linear-gradient(180deg, #0d1b2a 0%, #1b3a5c 50%, #0d1b2a 100%);
+        color: #ffffff;
         overflow-x: hidden;
         overflow-y: auto;
         z-index: 1000;
         display: flex;
         flex-direction: column;
+        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.5);
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     /* Custom scrollbar */
     .admin-sidebar::-webkit-scrollbar {
-        width: 5px;
+        width: 4px;
     }
 
     .admin-sidebar::-webkit-scrollbar-track {
-        background: #1a1a2e;
+        background: #0d1b2a;
     }
 
     .admin-sidebar::-webkit-scrollbar-thumb {
-        background: #e94560;
+        background: #4a9eff;
         border-radius: 10px;
     }
 
+    /* ===== HEADER ===== */
     .sidebar-header {
-        padding: 20px;
+        padding: 22px 20px;
         text-align: center;
-        border-bottom: 1px solid #2d2d4a;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         flex-shrink: 0;
+        background: rgba(0, 0, 0, 0.25);
     }
 
     .sidebar-brand {
-        color: white;
+        color: #ffffff;
         text-decoration: none;
         font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+
+    .sidebar-brand i {
+        color: #4a9eff;
+        font-size: 1.4rem;
+        text-shadow: 0 0 30px rgba(74, 158, 255, 0.2);
+    }
+
+    .sidebar-brand .text-accent {
+        color: #4a9eff !important;
+        font-weight: 800;
+        text-shadow: 0 0 30px rgba(74, 158, 255, 0.15);
     }
 
     .sidebar-brand:hover {
-        color: #e94560;
+        color: #4a9eff;
+        text-shadow: 0 0 30px rgba(74, 158, 255, 0.25);
     }
 
+    /* ===== NAVIGATION - ALL WHITE TEXT ===== */
     .sidebar-nav {
         list-style: none;
-        padding: 0;
+        padding: 10px 0;
         margin: 0;
         flex: 1;
         overflow-y: auto;
         overflow-x: hidden;
-        padding-bottom: 100px;
-        position: relative;
+        padding-bottom: 80px;
     }
 
     .sidebar-nav .nav-item {
-        margin: 0;
+        margin: 2px 0;
         position: relative;
         display: block;
         width: 100%;
@@ -433,8 +459,8 @@ document.addEventListener('DOMContentLoaded', function() {
     .sidebar-nav .nav-link {
         display: flex;
         align-items: center;
-        padding: 12px 20px;
-        color: #a0a0c0;
+        padding: 11px 20px;
+        color: #ffffff;
         text-decoration: none;
         transition: all 0.3s;
         cursor: pointer;
@@ -442,49 +468,71 @@ document.addEventListener('DOMContentLoaded', function() {
         border-left: 3px solid transparent;
         width: 100%;
         box-sizing: border-box;
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 0.3px;
     }
 
     .sidebar-nav .nav-link:hover {
-        background: #2d2d4a;
-        color: white;
-        border-left-color: #e94560;
+        background: rgba(74, 158, 255, 0.1);
+        color: #ffffff;
+        border-left-color: #4a9eff;
     }
 
     .sidebar-nav .nav-link.active {
-        background: #e94560;
-        color: white;
-        border-left-color: #fff;
+        background: rgba(74, 158, 255, 0.15);
+        color: #ffffff;
+        border-left-color: #4a9eff;
+        font-weight: 600;
     }
 
     .sidebar-nav .nav-link i {
-        width: 25px;
+        width: 28px;
         margin-right: 12px;
         font-size: 1.1rem;
         flex-shrink: 0;
         text-align: center;
+        color: #8ab4f8;
+        transition: all 0.3s;
+    }
+
+    .sidebar-nav .nav-link:hover i {
+        color: #4a9eff;
+    }
+
+    .sidebar-nav .nav-link.active i {
+        color: #4a9eff;
     }
 
     .sidebar-nav .nav-link span {
         flex: 1;
         white-space: nowrap;
+        color: #ffffff;
     }
 
     .dropdown-arrow {
         margin-left: 8px;
-        font-size: 10px;
+        font-size: 9px;
         transition: transform 0.3s;
         flex-shrink: 0;
+        color: #8ab4f8;
     }
 
-    /* Dropdown Menu - Pushes content below */
+    .has-dropdown.active .dropdown-arrow {
+        transform: rotate(180deg);
+        color: #4a9eff;
+    }
+
+    /* ===== DROPDOWN MENU - ALL WHITE TEXT ===== */
     .dropdown-menu-custom {
         display: none;
-        background: #2d2d4a;
+        background: rgba(0, 0, 0, 0.3);
         border-radius: 0;
-        padding: 0;
+        padding: 4px 0;
         margin: 0;
         list-style: none;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         width: 100%;
         position: relative;
         overflow: hidden;
@@ -492,71 +540,124 @@ document.addEventListener('DOMContentLoaded', function() {
 
     .has-dropdown.active .dropdown-menu-custom {
         display: block !important;
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .dropdown-item-custom {
         display: flex;
         align-items: center;
-        padding: 10px 20px 10px 57px;
-        color: #a0a0c0;
+        padding: 9px 20px 9px 60px;
+        color: #ffffff;
         text-decoration: none;
         transition: all 0.3s;
         white-space: nowrap;
         width: 100%;
         border-left: 3px solid transparent;
         box-sizing: border-box;
+        font-size: 13px;
     }
 
     .dropdown-item-custom:hover {
-        background: #e94560;
-        color: white;
-        border-left-color: #fff;
+        background: rgba(74, 158, 255, 0.1);
+        color: #ffffff;
+        border-left-color: #4a9eff;
     }
 
     .dropdown-item-custom i {
         width: 25px;
         margin-right: 12px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         flex-shrink: 0;
         text-align: center;
+        color: #8ab4f8;
     }
 
+    .dropdown-item-custom:hover i {
+        color: #4a9eff;
+    }
+
+    /* ===== GYM ONE DIVIDER ===== */
+    .nav-divider {
+        padding: 18px 20px 8px 20px;
+        position: relative;
+        margin: 8px 0 4px 0;
+    }
+
+    .nav-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        right: 20px;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(74, 158, 255, 0.4), transparent);
+        opacity: 0.5;
+    }
+
+    .divider-text {
+        display: inline-block;
+        background: #0d1b2a;
+        padding: 0 14px;
+        position: relative;
+        z-index: 1;
+        color: #4a9eff;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        text-align: center;
+        width: 100%;
+        text-shadow: 0 0 30px rgba(74, 158, 255, 0.15);
+    }
+
+    /* ===== BADGES ===== */
     .badge {
         margin-left: auto;
         flex-shrink: 0;
+        font-size: 0.6rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
     }
 
     .badge.bg-warning {
-        background-color: #f59e0b !important;
-        color: #1a1a2e;
-        font-size: 0.7rem;
-        padding: 2px 8px;
-        border-radius: 10px;
+        background-color: #ffa726 !important;
+        color: #0d1b2a;
     }
 
     .badge.bg-danger {
-        background-color: #dc3545 !important;
-        font-size: 0.7rem;
-        padding: 2px 8px;
-        border-radius: 10px;
+        background-color: #ef5350 !important;
+        color: #ffffff;
     }
 
+    /* ===== SIDEBAR FOOTER ===== */
     .sidebar-footer {
         position: relative;
         bottom: 0;
         left: 0;
         right: 0;
         padding: 15px 20px;
-        border-top: 1px solid #2d2d4a;
-        background: #1a1a2e;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(0, 0, 0, 0.3);
         flex-shrink: 0;
         margin-top: auto;
     }
 
     .user-info {
-        padding: 8px 0;
+        padding: 6px 0;
         font-size: 0.9rem;
-        color: #a0a0c0;
+        color: #ffffff;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -564,22 +665,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     .user-info i {
         font-size: 1.1rem;
-        color: #e94560;
+        color: #4a9eff;
         width: 25px;
         flex-shrink: 0;
         text-align: center;
+        text-shadow: 0 0 20px rgba(74, 158, 255, 0.2);
+    }
+
+    .user-info span {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        color: #ffffff;
     }
 
     .logout-btn {
         display: flex;
         align-items: center;
-        padding: 8px 0;
-        color: #ff6b6b;
+        padding: 6px 0;
+        color: #ef5350;
         text-decoration: none;
         border-radius: 5px;
         transition: all 0.3s;
         cursor: pointer;
-        margin-top: 5px;
+        margin-top: 3px;
+        font-size: 0.9rem;
     }
 
     .logout-btn i {
@@ -590,21 +699,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     .logout-btn:hover {
-        color: #ff4757;
+        color: #ff6b6b;
+        text-shadow: 0 0 25px rgba(239, 83, 80, 0.3);
     }
 
-    /* Adjust main content to accommodate sidebar */
+    /* ===== MAIN CONTENT ===== */
     .admin-main-content {
-        margin-left: 260px;
+        margin-left: 270px;
         padding: 20px;
         min-height: 100vh;
+        background: #f0f4f8;
     }
 
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
         .admin-sidebar {
             width: 70px;
         }
         .admin-sidebar .sidebar-brand strong,
+        .admin-sidebar .sidebar-brand .text-accent,
         .admin-sidebar .sidebar-nav .nav-link span,
         .admin-sidebar .user-info span,
         .admin-sidebar .logout-btn span,
@@ -622,6 +735,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .admin-sidebar .sidebar-nav .nav-link:hover {
             border-left: none;
         }
+        .nav-divider {
+            display: none;
+        }
         .dropdown-menu-custom {
             position: fixed;
             left: 70px;
@@ -631,6 +747,7 @@ document.addEventListener('DOMContentLoaded', function() {
             overflow-y: auto;
             z-index: 1001;
             border-radius: 0 8px 8px 0;
+            background: #1b3a5c;
         }
         .dropdown-item-custom {
             padding: 10px 15px 10px 20px;

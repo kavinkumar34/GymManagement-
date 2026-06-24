@@ -249,6 +249,10 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('pincodes/bulk-import', [DeliverablePincodeController::class, 'bulkImport'])->name('pincodes.bulk');
     Route::post('pincodes/bulk-update-shipping', [DeliverablePincodeController::class, 'bulkUpdateShipping'])->name('pincodes.bulk-update-shipping');
     Route::post('pincodes/bulk-delete', [DeliverablePincodeController::class, 'bulkDelete'])->name('pincodes.bulk-delete');
+    
+    // ===== NEW ROUTES FOR TOGGLE STATUS =====
+    Route::post('pincodes/toggle-status/{id}', [DeliverablePincodeController::class, 'toggleStatus'])->name('pincodes.toggle-status');
+    Route::post('pincodes/bulk-update-status', [DeliverablePincodeController::class, 'bulkUpdateStatus'])->name('pincodes.bulk-update-status');
 
     // ============ ⭐⭐⭐ REVIEW ROUTES (ADMIN) ⭐⭐⭐ ============
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
