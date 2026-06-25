@@ -185,6 +185,80 @@
         margin-top: 15px;
     }
     
+    /* ===== RATING STARS STYLES - FROM PRODUCT TABLE ===== */
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        justify-content: flex-start;
+    }
+    
+    .product-rating .stars {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .product-rating .stars i {
+        font-size: 0.85rem;
+        color: #e0e0e0;
+    }
+    
+    .product-rating .stars i.filled {
+        color: #f59e0b;
+    }
+    
+    .product-rating .stars i.half-filled {
+        color: #f59e0b;
+        position: relative;
+    }
+    
+    .product-rating .rating-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .product-rating .rating-count {
+        font-size: 0.8rem;
+        color: #999;
+    }
+    
+    /* ===== STOCK STYLES ===== */
+    .product-stock {
+        font-size: 0.95rem;
+        color: #10b981;
+        margin-top: 4px;
+        text-align: left;
+        font-weight: 600;
+    }
+    
+    .product-stock i {
+        font-size: 0.95rem;
+        margin-right: 4px;
+    }
+    
+    /* Product Card Body - Left Aligned */
+    .product-card .card-body {
+        text-align: left;
+        padding: 10px 12px;
+    }
+    
+    .product-card .card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #1e293b;
+        text-align: left;
+    }
+    
+    .product-card .product-price {
+        text-align: left;
+    }
+    
     /* Category Card - Full Image Cover, No Gradient Background */
     .category-card {
         background: white;
@@ -455,6 +529,18 @@
             padding-left: 12px;
             padding-right: 12px;
         }
+        .product-rating .stars i {
+            font-size: 0.75rem;
+        }
+        .product-rating .rating-value {
+            font-size: 0.8rem;
+        }
+        .product-rating .rating-count {
+            font-size: 0.7rem;
+        }
+        .product-stock {
+            font-size: 0.85rem;
+        }
     }
     
     @media (max-width: 576px) {
@@ -473,6 +559,18 @@
         .category-row > [class*="col-"] {
             padding-left: 10px;
             padding-right: 10px;
+        }
+        .product-rating .stars i {
+            font-size: 0.65rem;
+        }
+        .product-rating .rating-value {
+            font-size: 0.7rem;
+        }
+        .product-rating .rating-count {
+            font-size: 0.6rem;
+        }
+        .product-stock {
+            font-size: 0.8rem;
         }
     }
 </style>
@@ -799,7 +897,26 @@
         }
     }
     
-    // Load products from database with image slider
+    // Function to render star rating from product table
+    function renderStars(rating) {
+        const fullStars = Math.floor(rating);
+        const halfStar = rating - fullStars >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        
+        let starsHtml = '';
+        for (let i = 0; i < fullStars; i++) {
+            starsHtml += '<i class="fas fa-star filled"></i>';
+        }
+        if (halfStar) {
+            starsHtml += '<i class="fas fa-star-half-alt filled"></i>';
+        }
+        for (let i = 0; i < emptyStars; i++) {
+            starsHtml += '<i class="far fa-star"></i>';
+        }
+        return starsHtml;
+    }
+    
+    // Load products from database - ONLY STOCK >= 5 AND RATING FROM PRODUCT TABLE
     async function loadProducts() {
         const loader = document.getElementById('productsLoader');
         const container = document.getElementById('productsContainer');
@@ -810,12 +927,18 @@
             const products = await response.json();
             if (loader) loader.style.display = 'none';
             
-            if (products.length === 0) {
-                container.innerHTML = '<div class="col-12"><div class="no-products">No products available</div></div>';
+            // ===== FILTER: ONLY SHOW PRODUCTS WITH STOCK >= 5 =====
+            const filteredProducts = products.filter(product => {
+                const stock = parseInt(product.stock) || 0;
+                return stock >= 5;
+            });
+            
+            if (filteredProducts.length === 0) {
+                container.innerHTML = '<div class="col-12"><div class="no-products">No products available with sufficient stock</div></div>';
                 return;
             }
             
-            container.innerHTML = products.map(product => {
+            container.innerHTML = filteredProducts.map(product => {
                 const discountPercent = product.discount_price ? Math.round(((product.price - product.discount_price) / product.price) * 100) : 0;
                 const displayPrice = product.discount_price ? product.discount_price : product.price;
                 const oldPriceHtml = product.discount_price ? `<span class="product-old-price">₹${parseFloat(product.price).toLocaleString()}</span>` : '';
@@ -838,6 +961,14 @@
                 const isInWishlist = wishlist.some(item => item.id === product.id);
                 const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
                 const escapeName = product.name.replace(/'/g, "\\'");
+                
+                // ===== RATING DIRECTLY FROM PRODUCTS TABLE =====
+                const rating = parseFloat(product.rating) || 0;
+                const ratingCount = parseInt(product.rating_count) || 0;
+                const starsHtml = renderStars(rating);
+                
+                const stock = parseInt(product.stock) || 0;
+                const stockText = `${stock} in stock`;
                 
                 return `
                     <div class="col-md-3 col-sm-6 mb-4">
@@ -865,20 +996,24 @@
                                 ` : ''}
                             </div>
                             
-                            <div class="card-body text-center">
-                                <h5 class="card-title">${product.name}</h5>
-                                <p class="text-muted">${product.category ? product.category.name : 'Uncategorized'}</p>
-                                <div>
+                            <div class="card-body text-center" style="text-align: left !important;">
+                                <h5 class="card-title" style="text-align: left;">${product.name}</h5>
+                                <div style="text-align: left;">
                                     ${oldPriceHtml}
-                                    <span class="product-price">₹${parseFloat(displayPrice).toLocaleString()}</span>
+                                    <span class="product-price" style="text-align: left;">₹${parseFloat(displayPrice).toLocaleString()}</span>
                                 </div>
-                                <div class="product-actions">
-                                    <button class="btn-add-cart" onclick="addToCart(${product.id}, '${escapeName}', ${displayPrice}, '${imageUrls[0]}', event)">
-                                        <i class="fas fa-shopping-cart"></i> Add
-                                    </button>
-                                    <button class="btn-buy-now" onclick="buyNow(${product.id}, '${escapeName}', ${displayPrice}, event)">
-                                        <i class="fas fa-bolt"></i> Buy Now
-                                    </button>
+                                
+                                <!-- Rating Stars - Directly from products table -->
+                                <div class="product-rating" style="justify-content: flex-start;">
+                                    <div class="stars">${starsHtml}</div>
+                                    <span class="rating-value">${rating > 0 ? rating.toFixed(1) : '0.0'}</span>
+                                    <span class="rating-count">(${ratingCount} Reviews)</span>
+                                </div>
+                                
+                                <!-- Stock Status - Only shows for stock >= 5 -->
+                                <div class="product-stock" style="text-align: left;">
+                                    <i class="fas fa-check-circle"></i>
+                                    ${stockText}
                                 </div>
                             </div>
                         </div>

@@ -88,13 +88,16 @@
             display: none !important;
         }
 
-        /* Modern Navbar Styles */
+        /* Modern Navbar Styles - STICKY */
         .navbar {
             background: #ffffff !important;
             box-shadow: 0 2px 15px rgba(0,0,0,0.08);
             padding: 15px 0 !important;
             margin: 0 !important;
             width: 100%;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1040 !important;
         }
         
         /* Fixed container for navbar - ensures consistent 30px margins on ALL pages */
@@ -272,6 +275,100 @@
             background: #f8f9fa;
             color: #dc3545;
         }
+
+        /* ===== CATEGORY DROPDOWN WITH SUB MENU - REDUCED WIDTH ===== */
+        .nav-item-category {
+            position: relative;
+        }
+
+        .nav-item-category .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #1a1a2e !important;
+            padding: 8px 14px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-item-category .nav-link:hover {
+            color: #dc3545 !important;
+        }
+
+        /* Sub Category Dropdown Menu - REDUCED WIDTH */
+        .sub-category-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #ffffff;
+            min-width: 180px;
+            max-width: 200px;
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1050;
+            border: 1px solid #eef2f6;
+            pointer-events: none;
+        }
+
+        .nav-item-category:hover .sub-category-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* "All" link at top - left aligned */
+        .sub-category-dropdown .all-link {
+            display: block;
+            padding: 6px 16px 6px 16px;
+            color: #1a1a2e;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 1px solid #eef2f6;
+            margin: 0 0 4px 0;
+            text-align: left;
+        }
+
+        .sub-category-dropdown .all-link:hover {
+            color: #dc3545;
+            background: #f8fafc;
+        }
+
+        /* Sub category items - NO ARROWS, LEFT ALIGNED */
+        .sub-category-dropdown .sub-cat-item {
+            display: block;
+            padding: 5px 16px;
+            color: #4a5568;
+            text-decoration: none;
+            font-size: 0.78rem;
+            transition: all 0.3s;
+            font-weight: 400;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sub-category-dropdown .sub-cat-item:hover {
+            color: #dc3545;
+            background: #f8fafc;
+        }
+
+        .sub-category-dropdown .no-sub-text {
+            padding: 12px 16px;
+            color: #999;
+            font-size: 0.8rem;
+            text-align: center;
+        }
         
         /* Bottom row with menu items centered - EQUAL SPACING */
         .navbar-bottom {
@@ -356,6 +453,41 @@
             .nav-join-gym {
                 margin-left: 0;
                 margin-top: 5px;
+            }
+
+            /* Mobile dropdown - show on click */
+            .sub-category-dropdown {
+                position: static;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                border-top: 1px solid #eef2f6;
+                border-radius: 0;
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+                display: none;
+                background: #f8fafc;
+                padding: 5px 0;
+                min-width: 100%;
+                max-width: 100%;
+            }
+
+            .nav-item-category.active .sub-category-dropdown {
+                display: block;
+            }
+
+            .sub-category-dropdown .sub-cat-item {
+                padding: 8px 30px;
+                text-align: center;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+            }
+
+            .sub-category-dropdown .all-link {
+                text-align: center;
+                padding: 8px 30px;
             }
         }
         
@@ -454,6 +586,34 @@
                 padding: 8px 12px;
             }
         }
+
+        /* Alert Auto-hide animation */
+        .alert-auto-hide {
+            animation: fadeSlideIn 0.5s ease, fadeSlideOut 0.5s ease 4.5s forwards;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeSlideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="@if(Route::is('admin.login') || Route::is('admin.register')) hide-sidebar @endif">
@@ -490,11 +650,57 @@
             return $category ? $category->id : null;
         }
     }
+    
+    // Get subcategories for a category - FIFO ORDER (First In First Out - Oldest First)
+    if (!function_exists('getSubCategoriesForMenu')) {
+        function getSubCategoriesForMenu($categoryId) {
+            try {
+                return \App\Models\SubCategory::where('category_id', $categoryId)
+                    ->where('is_active', 1)
+                    ->orderBy('id', 'asc')
+                    ->get();
+            } catch (\Exception $e) {
+                return collect([]);
+            }
+        }
+    }
+    
+    // Get all active categories
+    if (!function_exists('getAllCategories')) {
+        function getAllCategories() {
+            try {
+                return \App\Models\Category::where('status', 'Active')
+                    ->orWhere('is_active', 1)
+                    ->orderBy('display_order', 'asc')
+                    ->orderBy('id', 'asc')
+                    ->get();
+            } catch (\Exception $e) {
+                return collect([]);
+            }
+        }
+    }
+
+    // Define category names to display in navbar
+    $categoryNames = ['Men', 'Women', 'Footwear', 'Gym Equipment', 'Massagers', 'Accessories', 'Supplements'];
+    
+    // Get categories with their subcategories
+    $navCategories = collect();
+    foreach ($categoryNames as $name) {
+        $category = \App\Models\Category::where('name', $name)->first();
+        if ($category) {
+            $subs = getSubCategoriesForMenu($category->id);
+            $navCategories->push([
+                'id' => $category->id,
+                'name' => $category->name,
+                'subcategories' => $subs
+            ]);
+        }
+    }
 @endphp
 
 {{-- 
     ============================================================
-    UNIVERSAL SINGLE NAVBAR - SAME FOR BOTH LOGGED IN AND LOGGED OUT USERS
+    UNIVERSAL SINGLE NAVBAR - STICKY AT TOP
     Navbar has 30px left and right margins on ALL pages
     ============================================================
 --}}
@@ -570,30 +776,34 @@
             </div>
         </div>
         
-        <!-- Bottom Navigation Menu - EQUAL SPACING -->
+        <!-- Bottom Navigation Menu with Dynamic Categories and Subcategories -->
         <div class="navbar-bottom">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Men') }}&name=Men">Men</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Women') }}&name=Women">Women</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Footwear') }}&name=Footwear">Footwear</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Gym Equipment') }}&name=Gym%20Equipment">Gym Equipment</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Massagers') }}&name=Massagers">Massagers</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Accessories') }}&name=Accessories">Accessories</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop?category={{ getCategoryIdByName('Supplements') }}&name=Supplements">Supplements</a>
-                </li>
+                <!-- Dynamic Category Items with Subcategory Dropdown - FIFO Order -->
+                @foreach($navCategories as $category)
+                    <li class="nav-item nav-item-category" data-category-id="{{ $category['id'] }}">
+                        <a class="nav-link" href="/shop?category={{ $category['id'] }}&name={{ urlencode($category['name']) }}">
+                            {{ $category['name'] }}
+                        </a>
+                        
+                        <!-- Subcategory Dropdown with "All" at top - FIFO Order (Oldest First) -->
+                        @if($category['subcategories']->count() > 0)
+                            <div class="sub-category-dropdown">
+                                <!-- "All" link at top -->
+                                <a class="all-link" href="/shop?category={{ $category['id'] }}&name={{ urlencode($category['name']) }}">
+                                    All
+                                </a>
+                                <!-- Subcategory items - FIFO Order (Oldest First) -->
+                                @foreach($category['subcategories'] as $sub)
+                                    <a class="sub-cat-item" href="/shop?subcategory={{ $sub->id }}&name={{ urlencode($sub->name) }}">
+                                        {{ $sub->name }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
+                    </li>
+                @endforeach
+                
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('my.orders') }}">My Orders</a>
                 </li>
@@ -651,13 +861,13 @@
 <main class="py-4">
     <div class="container">
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
+            <div class="alert alert-success alert-dismissible fade show alert-auto-hide" role="alert">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
+            <div class="alert alert-danger alert-dismissible fade show alert-auto-hide" role="alert">
                 <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
@@ -978,10 +1188,60 @@
         }
     }
 
-    // WhatsApp Tooltip Show/Hide
+    // Auto-hide alerts after 5 seconds with JavaScript
     document.addEventListener('DOMContentLoaded', function() {
+        // Auto-hide success alerts
+        const successAlerts = document.querySelectorAll('.alert-success');
+        successAlerts.forEach(function(alert) {
+            setTimeout(function() {
+                // Use Bootstrap's dismiss functionality
+                const closeBtn = alert.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.click();
+                } else {
+                    // Fallback: fade out and remove
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(function() {
+                        alert.remove();
+                    }, 500);
+                }
+            }, 5000); // 5 seconds
+        });
+
+        // Auto-hide error alerts
+        const errorAlerts = document.querySelectorAll('.alert-danger');
+        errorAlerts.forEach(function(alert) {
+            setTimeout(function() {
+                const closeBtn = alert.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.click();
+                } else {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(function() {
+                        alert.remove();
+                    }, 500);
+                }
+            }, 5000); // 5 seconds
+        });
+
+        // WhatsApp Tooltip Show/Hide
         updateNavbarCartCount();
         updateNavbarWishlistCount();
+
+        // Mobile: Toggle subcategory dropdown on click
+        if (window.innerWidth <= 992) {
+            document.querySelectorAll('.nav-item-category .nav-link').forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    const parent = this.closest('.nav-item-category');
+                    if (parent) {
+                        e.preventDefault();
+                        parent.classList.toggle('active');
+                    }
+                });
+            });
+        }
 
         // Show WhatsApp tooltip after 3 seconds
         setTimeout(function() {
@@ -1005,6 +1265,15 @@
             });
             whatsappBtn.addEventListener('mouseleave', function() {
                 tooltip.classList.remove('show');
+            });
+        }
+    });
+
+    // Handle window resize for mobile
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 992) {
+            document.querySelectorAll('.nav-item-category.active').forEach(function(el) {
+                el.classList.remove('active');
             });
         }
     });

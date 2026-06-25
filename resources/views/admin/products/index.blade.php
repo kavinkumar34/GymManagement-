@@ -1,7 +1,7 @@
 @extends('layouts.admin-layout')
 
 @section('content')
-<div class="container-fluid">
+<div class="container" style="margin-left:300px;">
     <div class="card shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-box me-2 text-primary"></i>Products</h5>
