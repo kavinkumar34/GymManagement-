@@ -185,7 +185,7 @@
         margin-top: 15px;
     }
     
-    /* ===== RATING STARS STYLES - FROM PRODUCT TABLE ===== */
+    /* ===== RATING STARS STYLES - YELLOW FILLED ===== */
     .product-rating {
         display: flex;
         align-items: center;
@@ -201,16 +201,15 @@
     
     .product-rating .stars i {
         font-size: 0.85rem;
-        color: #e0e0e0;
     }
     
-    .product-rating .stars i.filled {
-        color: #f59e0b;
+    .product-rating .stars i.fa-star,
+    .product-rating .stars i.fa-star-half-alt {
+        color: #f59e0b !important;
     }
     
-    .product-rating .stars i.half-filled {
-        color: #f59e0b;
-        position: relative;
+    .product-rating .stars i.far.fa-star {
+        color: #e0e0e0 !important;
     }
     
     .product-rating .rating-value {
@@ -219,23 +218,57 @@
         color: #1e293b;
     }
     
-    .product-rating .rating-count {
-        font-size: 0.8rem;
-        color: #999;
-    }
-    
-    /* ===== STOCK STYLES ===== */
-    .product-stock {
-        font-size: 0.95rem;
-        color: #10b981;
-        margin-top: 4px;
+    /* ===== LOW STOCK ALERT - Only for stock <= 5 ===== */
+    .product-stock-low {
+        font-size: 0.9rem;
+        color: #ef4444;
+        margin-top: 6px;
         text-align: left;
         font-weight: 600;
+        background: #fef2f2;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border-left: 3px solid #ef4444;
+        display: inline-block;
+        width: 100%;
     }
     
-    .product-stock i {
-        font-size: 0.95rem;
-        margin-right: 4px;
+    .product-stock-low i {
+        font-size: 0.9rem;
+        margin-right: 6px;
+        color: #ef4444;
+    }
+    
+    /* ===== OUT OF STOCK STYLES ===== */
+    .product-out-of-stock {
+        font-size: 0.9rem;
+        color: #ef4444;
+        margin-top: 6px;
+        text-align: left;
+        font-weight: 600;
+        background: #fef2f2;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border-left: 3px solid #ef4444;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .product-out-of-stock i {
+        font-size: 0.9rem;
+        margin-right: 6px;
+        color: #ef4444;
+    }
+    
+    .product-card.out-of-stock {
+        opacity: 0.7;
+    }
+    
+    .product-card.out-of-stock .btn-add-cart,
+    .product-card.out-of-stock .btn-buy-now {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
     }
     
     /* Product Card Body - Left Aligned */
@@ -535,11 +568,11 @@
         .product-rating .rating-value {
             font-size: 0.8rem;
         }
-        .product-rating .rating-count {
-            font-size: 0.7rem;
+        .product-stock-low {
+            font-size: 0.8rem;
         }
-        .product-stock {
-            font-size: 0.85rem;
+        .product-out-of-stock {
+            font-size: 0.8rem;
         }
     }
     
@@ -566,11 +599,11 @@
         .product-rating .rating-value {
             font-size: 0.7rem;
         }
-        .product-rating .rating-count {
-            font-size: 0.6rem;
+        .product-stock-low {
+            font-size: 0.75rem;
         }
-        .product-stock {
-            font-size: 0.8rem;
+        .product-out-of-stock {
+            font-size: 0.75rem;
         }
     }
 </style>
@@ -897,26 +930,34 @@
         }
     }
     
-    // Function to render star rating from product table
+    // Function to render star rating - YELLOW FILLED STARS
     function renderStars(rating) {
         const fullStars = Math.floor(rating);
         const halfStar = rating - fullStars >= 0.5;
         const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
         
         let starsHtml = '';
+        
+        // Full stars - YELLOW FILLED (fas fa-star)
         for (let i = 0; i < fullStars; i++) {
-            starsHtml += '<i class="fas fa-star filled"></i>';
+            starsHtml += '<i class="fas fa-star"></i>';
         }
+        
+        // Half star - YELLOW FILLED (fas fa-star-half-alt)
         if (halfStar) {
-            starsHtml += '<i class="fas fa-star-half-alt filled"></i>';
+            starsHtml += '<i class="fas fa-star-half-alt"></i>';
         }
+        
+        // Empty stars - GREY OUTLINE (far fa-star)
         for (let i = 0; i < emptyStars; i++) {
             starsHtml += '<i class="far fa-star"></i>';
         }
+        
         return starsHtml;
     }
     
-    // Load products from database - ONLY STOCK >= 5 AND RATING FROM PRODUCT TABLE
+    // Load products from database - SHOW ALL PRODUCTS WITH STOCK > 0
+    // Low stock alert shown for products with stock <= 5
     async function loadProducts() {
         const loader = document.getElementById('productsLoader');
         const container = document.getElementById('productsContainer');
@@ -927,14 +968,16 @@
             const products = await response.json();
             if (loader) loader.style.display = 'none';
             
-            // ===== FILTER: ONLY SHOW PRODUCTS WITH STOCK >= 5 =====
+            // ===== FILTER: SHOW ALL PRODUCTS WITH STOCK > 0 (NO MORE STOCK >= 5 FILTER) =====
             const filteredProducts = products.filter(product => {
                 const stock = parseInt(product.stock) || 0;
-                return stock >= 5;
+                return stock > 0; // Show all products with stock greater than 0
             });
             
+            console.log('All Products with stock > 0:', filteredProducts.length);
+            
             if (filteredProducts.length === 0) {
-                container.innerHTML = '<div class="col-12"><div class="no-products">No products available with sufficient stock</div></div>';
+                container.innerHTML = '<div class="col-12"><div class="no-products">No products available</div></div>';
                 return;
             }
             
@@ -964,11 +1007,20 @@
                 
                 // ===== RATING DIRECTLY FROM PRODUCTS TABLE =====
                 const rating = parseFloat(product.rating) || 0;
-                const ratingCount = parseInt(product.rating_count) || 0;
                 const starsHtml = renderStars(rating);
                 
                 const stock = parseInt(product.stock) || 0;
-                const stockText = `${stock} in stock`;
+                
+                // ===== LOW STOCK ALERT - SHOWS WHEN STOCK <= 5 =====
+                let stockAlertHtml = '';
+                if (stock <= 5 && stock > 0) {
+                    stockAlertHtml = `
+                        <div class="product-stock-low">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Only ${stock} left in stock!
+                        </div>
+                    `;
+                }
                 
                 return `
                     <div class="col-md-3 col-sm-6 mb-4">
@@ -1003,18 +1055,14 @@
                                     <span class="product-price" style="text-align: left;">₹${parseFloat(displayPrice).toLocaleString()}</span>
                                 </div>
                                 
-                                <!-- Rating Stars - Directly from products table -->
+                                <!-- Rating Stars - Yellow Filled from products table -->
                                 <div class="product-rating" style="justify-content: flex-start;">
                                     <div class="stars">${starsHtml}</div>
                                     <span class="rating-value">${rating > 0 ? rating.toFixed(1) : '0.0'}</span>
-                                    <span class="rating-count">(${ratingCount} Reviews)</span>
                                 </div>
                                 
-                                <!-- Stock Status - Only shows for stock >= 5 -->
-                                <div class="product-stock" style="text-align: left;">
-                                    <i class="fas fa-check-circle"></i>
-                                    ${stockText}
-                                </div>
+                                <!-- Low Stock Alert - Shows when stock <= 5 -->
+                                ${stockAlertHtml}
                             </div>
                         </div>
                     </div>

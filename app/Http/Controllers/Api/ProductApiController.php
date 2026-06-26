@@ -20,7 +20,7 @@ class ProductApiController extends Controller
         $products = Product::with('category', 'productImages')
             ->where('status', 'Active')
             ->orderBy('id', 'desc')
-            ->get(); // ✅ Remove limit to get all products for cart
+            ->get();
         
         return response()->json($products->map(function($product) {
             return $this->formatProduct($product);
@@ -87,20 +87,22 @@ class ProductApiController extends Controller
         return response()->json($products);
     }
     
-    // ✅ NEW: Get single product stock
+    // Get single product stock with rating
     public function getProductStock($id)
     {
-        $product = Product::select('id', 'stock', 'image')->find($id);
+        $product = Product::select('id', 'stock', 'image', 'rating', 'rating_count')->find($id);
         if ($product) {
             return response()->json([
                 'stock' => $product->stock,
-                'image' => $product->image
+                'image' => $product->image,
+                'rating' => $product->rating ?? 0,
+                'rating_count' => $product->rating_count ?? 0
             ]);
         }
-        return response()->json(['stock' => 0, 'image' => null]);
+        return response()->json(['stock' => 0, 'image' => null, 'rating' => 0, 'rating_count' => 0]);
     }
     
-    // Helper method to format product with all images - ✅ ADDED STOCK
+    // Helper method to format product with all images - INCLUDES RATING
     private function formatProduct($product)
     {
         $allImages = [];
@@ -129,7 +131,7 @@ class ProductApiController extends Controller
             'name' => $product->name,
             'price' => $product->price,
             'discount_price' => $product->discount_price,
-            'stock' => $product->stock ?? 0, // ✅ ADDED STOCK
+            'stock' => $product->stock ?? 0,
             'image' => $product->image,
             'all_images' => $allImages,
             'category' => $product->category,
@@ -138,6 +140,9 @@ class ProductApiController extends Controller
             'size' => $product->size ?? null,
             'color' => $product->color ?? null,
             'status' => $product->status,
+            // ===== RATING FIELDS ADDED =====
+            'rating' => $product->rating ?? 0,
+            'rating_count' => $product->rating_count ?? 0,
         ];
     }
 }

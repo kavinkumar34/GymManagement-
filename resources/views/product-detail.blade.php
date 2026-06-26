@@ -469,17 +469,6 @@
         display: inline-block;
     }
     
-    .related-card {
-        transition: transform 0.3s;
-        border: none;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        height: 100%;
-    }
-    
-    .related-card:hover {
-        transform: translateY(-5px);
-    }
-    
     .breadcrumb {
         background: transparent;
         padding: 0;
@@ -544,6 +533,174 @@
     
     .notification.info {
         background: #17a2b8;
+    }
+    
+    /* ===== CUSTOM LOGIN MODAL STYLES ===== */
+    .custom-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(5px);
+        z-index: 99999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        animation: fadeInModal 0.3s ease;
+    }
+    
+    .custom-modal-overlay.active {
+        display: flex;
+    }
+    
+    @keyframes fadeInModal {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .custom-modal-box {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 450px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        position: relative;
+        animation: slideUpModal 0.4s ease;
+    }
+    
+    @keyframes slideUpModal {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .custom-modal-box .modal-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2.5rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+    }
+    
+    .custom-modal-box .modal-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 10px;
+    }
+    
+    .custom-modal-box .modal-subtitle {
+        font-size: 0.95rem;
+        color: #64748b;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+    
+    .custom-modal-box .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .custom-modal-box .btn-modal-primary {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        color: white;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .custom-modal-box .btn-modal-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    .custom-modal-box .btn-modal-secondary {
+        background: #e2e8f0;
+        color: #64748b;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .custom-modal-box .btn-modal-secondary:hover {
+        background: #cbd5e1;
+        color: #1a1a2e;
+    }
+    
+    .custom-modal-box .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #999;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .custom-modal-box .modal-close:hover {
+        color: #dc3545;
+        transform: rotate(90deg);
+    }
+    
+    @media (max-width: 576px) {
+        .custom-modal-box {
+            padding: 30px 20px;
+        }
+        .custom-modal-box .modal-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 2rem;
+        }
+        .custom-modal-box .modal-title {
+            font-size: 1.2rem;
+        }
+        .custom-modal-box .modal-subtitle {
+            font-size: 0.85rem;
+        }
+        .custom-modal-box .modal-buttons {
+            flex-direction: column;
+        }
+        .custom-modal-box .btn-modal-primary,
+        .custom-modal-box .btn-modal-secondary {
+            width: 100%;
+            text-align: center;
+        }
     }
     
     /* ⭐ NEW: Review Section Styles */
@@ -695,6 +852,235 @@
         }
     }
     
+    /* ===== RELATED PRODUCTS SECTION - FIXED IMAGE GAP ===== */
+    .related-products-section {
+        margin-top: 40px;
+        padding: 20px 0;
+    }
+    
+    .related-products-section .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .related-products-section .section-title i {
+        color: #dc3545;
+    }
+    
+    .related-product-card {
+        border: none;
+        border-radius: 15px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        overflow: hidden;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        height: 100%;
+        position: relative;
+        background: white;
+        cursor: pointer;
+    }
+    
+    .related-product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    
+    /* FIX: Image slider container - removed padding-top: 100% and using aspect-ratio instead */
+    .related-product-card .product-image-slider {
+        position: relative;
+        overflow: hidden;
+        background: #f5f5f5;
+        width: 100%;
+        aspect-ratio: 1 / 1; /* This creates square aspect ratio without extra gap */
+    }
+    
+    .related-product-card .product-image-slider .carousel-inner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .related-product-card .product-image-slider .carousel-item {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .related-product-card .product-image-slider .carousel-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        background: #f5f5f5;
+    }
+    
+    .related-product-card .product-image-slider .carousel-control-prev,
+    .related-product-card .product-image-slider .carousel-control-next {
+        opacity: 0;
+        transition: opacity 0.3s;
+        width: 28px;
+        height: 28px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.5);
+        border-radius: 50%;
+        z-index: 10;
+    }
+    
+    .related-product-card:hover .product-image-slider .carousel-control-prev,
+    .related-product-card:hover .product-image-slider .carousel-control-next {
+        opacity: 1;
+    }
+    
+    .related-product-card .product-image-slider .carousel-control-prev {
+        left: 6px;
+    }
+    
+    .related-product-card .product-image-slider .carousel-control-next {
+        right: 6px;
+    }
+    
+    .related-product-card .product-image-slider .carousel-control-prev-icon,
+    .related-product-card .product-image-slider .carousel-control-next-icon {
+        background-size: 60%;
+        width: 14px;
+        height: 14px;
+    }
+    
+    .related-product-card .card-body {
+        text-align: left;
+        padding: 10px 12px;
+    }
+    
+    .related-product-card .card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #1e293b;
+        text-align: left;
+    }
+    
+    .related-product-card .product-price-display {
+        font-size: 1rem;
+        font-weight: bold;
+        color: #dc3545;
+    }
+    
+    .related-product-card .product-old-price-display {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.8rem;
+        margin-right: 8px;
+    }
+    
+    .related-product-card .discount-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        z-index: 5;
+    }
+    
+    .related-product-card .wishlist-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: white;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.3s;
+    }
+    
+    .related-product-card .wishlist-btn i {
+        font-size: 1.1rem;
+        transition: all 0.3s;
+    }
+    
+    .related-product-card .wishlist-btn i.far {
+        color: #999;
+    }
+    
+    .related-product-card .wishlist-btn i.fas {
+        color: #dc3545;
+    }
+    
+    .related-product-card .wishlist-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .related-product-card .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        justify-content: flex-start;
+    }
+    
+    .related-product-card .product-rating .stars {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .related-product-card .product-rating .stars i {
+        font-size: 0.85rem;
+    }
+    
+    .related-product-card .product-rating .stars i.fa-star,
+    .related-product-card .product-rating .stars i.fa-star-half-alt {
+        color: #f59e0b !important;
+    }
+    
+    .related-product-card .product-rating .stars i.far.fa-star {
+        color: #e0e0e0 !important;
+    }
+    
+    .related-product-card .product-rating .rating-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .related-product-card .product-stock-low {
+        font-size: 0.9rem;
+        color: #ef4444;
+        margin-top: 6px;
+        text-align: left;
+        font-weight: 600;
+        background: #fef2f2;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border-left: 3px solid #ef4444;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .related-product-card .product-stock-low i {
+        font-size: 0.9rem;
+        margin-right: 6px;
+        color: #ef4444;
+    }
+    
     @media (max-width: 768px) {
         .product-gallery-wrapper {
             flex-direction: column-reverse;
@@ -716,6 +1102,25 @@
         .review-card .review-header {
             flex-direction: column;
             align-items: flex-start;
+        }
+        .related-product-card .product-image-slider .carousel-control-prev,
+        .related-product-card .product-image-slider .carousel-control-next {
+            opacity: 1;
+            width: 24px;
+            height: 24px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .related-product-card .product-image-slider .carousel-control-prev,
+        .related-product-card .product-image-slider .carousel-control-next {
+            width: 20px;
+            height: 20px;
+        }
+        .related-product-card .product-image-slider .carousel-control-prev-icon,
+        .related-product-card .product-image-slider .carousel-control-next-icon {
+            width: 10px;
+            height: 10px;
         }
     }
 </style>
@@ -866,9 +1271,7 @@
                         <button class="btn-add-cart" id="addToCartBtn" onclick="addToCartDetail()">
                             <i class="fas fa-shopping-cart"></i> Add to Cart
                         </button>
-                        <button class="btn-buy-now" id="buyNowBtn" onclick="buyNowDetail()">
-                            <i class="fas fa-bolt"></i> Buy Now
-                        </button>
+                       
                     </div>
                     
                     <div class="product-info-tabs">
@@ -934,23 +1337,112 @@
         </div>
     </div>
     
+    <!-- ===== RELATED PRODUCTS SECTION - FIXED IMAGE GAP ===== -->
     @if(isset($relatedProducts) && $relatedProducts->count() > 0)
-    <div class="mt-5">
-        <h3 class="mb-4">You May Also Like</h3>
+    <div class="related-products-section">
+        <h3 class="section-title">
+            <i class="fas fa-sync-alt"></i> You May Also Like
+        </h3>
         <div class="row">
             @foreach($relatedProducts as $related)
-            <div class="col-md-3 mb-4">
-                <div class="card related-card">
-                    <img src="{{ asset('storage/' . $related->image) }}" class="card-img-top" style="height: 180px; object-fit: cover;">
-                    <div class="card-body text-center">
-                        <h6>{{ Str::limit($related->name, 35) }}</h6>
-                        @if($related->discount_price)
-                            <span class="text-danger fw-bold">₹{{ number_format($related->discount_price, 2) }}</span>
-                            <span class="text-muted text-decoration-line-through ms-1 small">₹{{ number_format($related->price, 2) }}</span>
-                        @else
-                            <span class="text-danger fw-bold">₹{{ number_format($related->price, 2) }}</span>
+            @php
+                // Get images for related product
+                $relatedImages = [];
+                if ($related->image) {
+                    $relatedImages[] = $related->image;
+                }
+                if (isset($related->gallery_images) && is_array($related->gallery_images)) {
+                    $relatedImages = array_merge($relatedImages, $related->gallery_images);
+                }
+                if (empty($relatedImages)) {
+                    $relatedImages = ['https://via.placeholder.com/300x300?text=No+Image'];
+                }
+                $relatedImageUrls = array_map(function($img) {
+                    return strpos($img, 'http') === 0 ? $img : '/storage/' . $img;
+                }, $relatedImages);
+                $relatedCarouselId = 'relatedCarousel-' . $related->id;
+                $hasMultipleRelatedImages = count($relatedImageUrls) > 1;
+                
+                // Rating - Yellow Filled Stars
+                $relatedRating = floatval($related->rating ?? 0);
+                $fullStars = floor($relatedRating);
+                $halfStar = $relatedRating - $fullStars >= 0.5;
+                $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
+                $relatedStarsHtml = '';
+                for ($i = 0; $i < $fullStars; $i++) {
+                    $relatedStarsHtml .= '<i class="fas fa-star"></i>';
+                }
+                if ($halfStar) {
+                    $relatedStarsHtml .= '<i class="fas fa-star-half-alt"></i>';
+                }
+                for ($i = 0; $i < $emptyStars; $i++) {
+                    $relatedStarsHtml .= '<i class="far fa-star"></i>';
+                }
+                
+                // Stock Alert - Only when stock <= 5
+                $relatedStock = intval($related->stock ?? 0);
+                $relatedStockAlertHtml = '';
+                if ($relatedStock <= 5 && $relatedStock > 0) {
+                    $relatedStockAlertHtml = '
+                        <div class="product-stock-low">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Only ' . $relatedStock . ' left in stock!
+                        </div>
+                    ';
+                }
+                
+                // Discount
+                $relatedDiscountPercent = 0;
+                if ($related->discount_price && $related->discount_price < $related->price) {
+                    $relatedDiscountPercent = round((($related->price - $related->discount_price) / $related->price) * 100);
+                }
+            @endphp
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="related-product-card" onclick="window.location.href='/product/{{ $related->id }}'">
+                    @if($relatedDiscountPercent > 0)
+                        <div class="discount-badge">-{{ $relatedDiscountPercent }}%</div>
+                    @endif
+                    <button class="wishlist-btn" onclick="event.stopPropagation(); toggleRelatedWishlist({{ $related->id }}, '{{ addslashes($related->name) }}', {{ $related->discount_price ?? $related->price }}, '{{ $relatedImageUrls[0] ?? '' }}')">
+                        <i class="far fa-heart" id="related-wishlist-icon-{{ $related->id }}"></i>
+                    </button>
+                    
+                    <div id="{{ $relatedCarouselId }}" class="carousel slide product-image-slider" data-bs-ride="false" data-bs-interval="false">
+                        <div class="carousel-inner">
+                            @foreach($relatedImageUrls as $idx => $imgUrl)
+                                <div class="carousel-item {{ $idx == 0 ? 'active' : '' }}">
+                                    <img src="{{ $imgUrl }}" alt="{{ $related->name }}">
+                                </div>
+                            @endforeach
+                        </div>
+                        @if($hasMultipleRelatedImages)
+                            <button class="carousel-control-prev" type="button" data-bs-target="#{{ $relatedCarouselId }}" data-bs-slide="prev" onclick="event.stopPropagation()">
+                                <span class="carousel-control-prev-icon"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#{{ $relatedCarouselId }}" data-bs-slide="next" onclick="event.stopPropagation()">
+                                <span class="carousel-control-next-icon"></span>
+                            </button>
                         @endif
-                        <a href="/product/{{ $related->id }}" class="btn btn-outline-primary btn-sm mt-2 d-block">View</a>
+                    </div>
+                    
+                    <div class="card-body">
+                        <h5 class="card-title">{{ Str::limit($related->name, 35) }}</h5>
+                        <div>
+                            @if($related->discount_price)
+                                <span class="product-old-price-display">₹{{ number_format($related->price, 2) }}</span>
+                                <span class="product-price-display">₹{{ number_format($related->discount_price, 2) }}</span>
+                            @else
+                                <span class="product-price-display">₹{{ number_format($related->price, 2) }}</span>
+                            @endif
+                        </div>
+                        
+                        <!-- Rating Stars - Yellow Filled -->
+                        <div class="product-rating">
+                            <div class="stars">{!! $relatedStarsHtml !!}</div>
+                            <span class="rating-value">{{ $relatedRating > 0 ? number_format($relatedRating, 1) : '0.0' }}</span>
+                        </div>
+                        
+                        <!-- Low Stock Alert -->
+                        {!! $relatedStockAlertHtml !!}
                     </div>
                 </div>
             </div>
@@ -971,6 +1463,35 @@
                 <p class="mt-2">Loading reviews...</p>
             </div>
             <div id="reviewsList"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CUSTOM LOGIN MODAL - GREEN BUTTON WITH CORRECT LINKS ===== -->
+<div class="custom-modal-overlay" id="loginModal">
+    <div class="custom-modal-box">
+        <button class="modal-close" onclick="closeLoginModal()">✕</button>
+        <div class="modal-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h2 class="modal-title">Login Required</h2>
+        <p class="modal-subtitle">
+            Please login to your account to continue. <br>
+            <span style="color: #28a745; font-weight: 500;">Don't have an account? Register now!</span>
+        </p>
+        <div class="modal-buttons">
+            <a href="{{ route('login') }}" class="btn-modal-primary">
+                <i class="fas fa-sign-in-alt me-2"></i> Login Now
+            </a>
+            <button class="btn-modal-secondary" onclick="closeLoginModal()">
+                <i class="fas fa-times me-2"></i> Cancel
+            </button>
+        </div>
+        <div style="margin-top: 15px; font-size: 0.8rem; color: #999;">
+            <i class="fas fa-user-plus me-1"></i> 
+            <a href="{{ route('member.register') }}" style="color: #28a745; text-decoration: none; font-weight: 500;">
+                Create new account
+            </a>
         </div>
     </div>
 </div>
@@ -1015,6 +1536,64 @@
 </div>
 
 <script>
+    // ===== CUSTOM LOGIN MODAL FUNCTIONS =====
+    let pendingAction = null;
+    let pendingData = null;
+    
+    function showLoginModal(action, data) {
+        pendingAction = action;
+        pendingData = data;
+        document.getElementById('loginModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeLoginModal() {
+        document.getElementById('loginModal').classList.remove('active');
+        document.body.style.overflow = '';
+        pendingAction = null;
+        pendingData = null;
+    }
+    
+    // Close modal on overlay click
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('loginModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLoginModal();
+            }
+        });
+    });
+
+    // ===== RELATED PRODUCTS WISHLIST =====
+    function toggleRelatedWishlist(id, name, price, image) {
+        @if(!auth()->check())
+            showLoginModal('wishlist', { id: id, name: name, price: price, image: image });
+            return;
+        @endif
+        
+        let currentWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        const existingIndex = currentWishlist.findIndex(item => item.id === id);
+        const icon = document.getElementById(`related-wishlist-icon-${id}`);
+        
+        if (existingIndex !== -1) {
+            currentWishlist.splice(existingIndex, 1);
+            if (icon) icon.className = 'far fa-heart';
+            showNotification('Removed from wishlist!', 'info');
+        } else {
+            currentWishlist.push({
+                id: id,
+                name: name,
+                price: price,
+                image: image,
+                added_at: new Date().toISOString()
+            });
+            if (icon) icon.className = 'fas fa-heart';
+            showNotification('Added to wishlist!', 'success');
+        }
+        
+        localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
+        updateWishlistCount();
+    }
+
     let currentIndex = 0;
     let totalImages = {{ $allImages->count() }};
     const images = @json($allImages->map(function($img) { return asset('storage/' . $img->image_path); }));
@@ -1027,7 +1606,6 @@
     
     const wishlistBtn = document.getElementById('wishlistBtn');
     const addToCartBtn = document.getElementById('addToCartBtn');
-    const buyNowBtn = document.getElementById('buyNowBtn');
 
     // ============ REVIEW FUNCTIONS ============
     async function loadReviews() {
@@ -1210,9 +1788,7 @@
     
     function toggleWishlistDetail() {
         @if(!auth()->check())
-            if(confirm('Please login to add items to wishlist. Go to login page?')) {
-                window.location.href = "{{ route('login') }}";
-            }
+            showLoginModal('wishlist', { id: productId, name: productName, price: productPrice, image: productImage });
             return;
         @endif
         
@@ -1270,9 +1846,7 @@
     
     function addToCartDetail() {
         @if(!auth()->check())
-            if(confirm('Please login to add products to cart. Go to login page?')) {
-                window.location.href = "{{ route('login') }}";
-            }
+            showLoginModal('cart', { id: productId, name: productName, price: productPrice, image: productImage });
             return;
         @endif
         
@@ -1306,9 +1880,7 @@
     
     function buyNowDetail() {
         @if(!auth()->check())
-            if(confirm('Please login to purchase. Go to login page?')) {
-                window.location.href = "{{ route('login') }}";
-            }
+            showLoginModal('buynow', { productId: productId, productName: productName, productPrice: productPrice });
             return;
         @endif
         

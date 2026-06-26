@@ -223,7 +223,7 @@
         font-weight: 500;
     }
     
-    /* Product Card - Full Image Cover */
+    /* ===== PRODUCT CARD - SAME AS HOME PAGE ===== */
     .product-card {
         border: none;
         border-radius: 12px;
@@ -308,17 +308,19 @@
     }
     
     .product-card .card-body {
+        text-align: left;
         padding: 10px 12px;
     }
     
     .product-card .card-title {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: 600;
         margin-bottom: 2px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         color: #1e293b;
+        text-align: left;
     }
     
     .product-card .product-category-name {
@@ -422,6 +424,92 @@
         gap: 4px;
         justify-content: center;
         margin-top: 6px;
+    }
+    
+    /* ===== RATING STARS STYLES - YELLOW FILLED ===== */
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        justify-content: flex-start;
+    }
+    
+    .product-rating .stars {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .product-rating .stars i {
+        font-size: 0.85rem;
+    }
+    
+    .product-rating .stars i.fa-star,
+    .product-rating .stars i.fa-star-half-alt {
+        color: #f59e0b !important;
+    }
+    
+    .product-rating .stars i.far.fa-star {
+        color: #e0e0e0 !important;
+    }
+    
+    .product-rating .rating-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    /* ===== LOW STOCK ALERT - Only for stock <= 5 ===== */
+    .product-stock-low {
+        font-size: 0.9rem;
+        color: #ef4444;
+        margin-top: 6px;
+        text-align: left;
+        font-weight: 600;
+        background: #fef2f2;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border-left: 3px solid #ef4444;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .product-stock-low i {
+        font-size: 0.9rem;
+        margin-right: 6px;
+        color: #ef4444;
+    }
+    
+    /* ===== OUT OF STOCK STYLES ===== */
+    .product-out-of-stock {
+        font-size: 0.9rem;
+        color: #ef4444;
+        margin-top: 6px;
+        text-align: left;
+        font-weight: 600;
+        background: #fef2f2;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border-left: 3px solid #ef4444;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .product-out-of-stock i {
+        font-size: 0.9rem;
+        margin-right: 6px;
+        color: #ef4444;
+    }
+    
+    .product-card.out-of-stock {
+        opacity: 0.7;
+    }
+    
+    .product-card.out-of-stock .btn-add-cart,
+    .product-card.out-of-stock .btn-buy-now {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
     }
     
     /* Filter Sidebar */
@@ -674,6 +762,15 @@
             width: 24px;
             height: 24px;
         }
+        .product-rating .stars i {
+            font-size: 0.75rem;
+        }
+        .product-rating .rating-value {
+            font-size: 0.8rem;
+        }
+        .product-stock-low {
+            font-size: 0.8rem;
+        }
     }
     
     @media (max-width: 576px) {
@@ -702,6 +799,15 @@
         .product-image-slider .carousel-control-next-icon {
             width: 10px;
             height: 10px;
+        }
+        .product-rating .stars i {
+            font-size: 0.65rem;
+        }
+        .product-rating .rating-value {
+            font-size: 0.7rem;
+        }
+        .product-stock-low {
+            font-size: 0.75rem;
         }
     }
 </style>
@@ -970,6 +1076,32 @@
         loadProducts();
     }
     
+    // Function to render star rating - YELLOW FILLED STARS
+    function renderStars(rating) {
+        const fullStars = Math.floor(rating);
+        const halfStar = rating - fullStars >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        
+        let starsHtml = '';
+        
+        // Full stars - YELLOW FILLED (fas fa-star)
+        for (let i = 0; i < fullStars; i++) {
+            starsHtml += '<i class="fas fa-star"></i>';
+        }
+        
+        // Half star - YELLOW FILLED (fas fa-star-half-alt)
+        if (halfStar) {
+            starsHtml += '<i class="fas fa-star-half-alt"></i>';
+        }
+        
+        // Empty stars - GREY OUTLINE (far fa-star)
+        for (let i = 0; i < emptyStars; i++) {
+            starsHtml += '<i class="far fa-star"></i>';
+        }
+        
+        return starsHtml;
+    }
+    
     async function loadProducts() {
         const loader = document.getElementById('loader');
         const container = document.getElementById('productsContainer');
@@ -1059,6 +1191,23 @@
             
             const firstImage = images.length > 0 ? images[0] : '';
             
+            // ===== RATING DIRECTLY FROM PRODUCTS TABLE =====
+            const rating = parseFloat(product.rating) || 0;
+            const starsHtml = renderStars(rating);
+            
+            const stock = parseInt(product.stock) || 0;
+            
+            // ===== LOW STOCK ALERT - SHOWS WHEN STOCK <= 5 =====
+            let stockAlertHtml = '';
+            if (stock <= 5 && stock > 0) {
+                stockAlertHtml = `
+                    <div class="product-stock-low">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Only ${stock} left in stock!
+                    </div>
+                `;
+            }
+            
             return `
                 <div class="col-md-4 col-sm-6 mb-4">
                     <div class="product-card card" onclick="goToProductDetail(${product.id}, event)">
@@ -1085,14 +1234,21 @@
                             ` : ''}
                         </div>
                         
-                        <div class="card-body text-center">
-                            <h5 class="card-title">${product.name}</h5>
-                            <p class="product-category-name">${product.gender || (product.category ? product.category.name : 'Uncategorized')}</p>
-                            <div>
+                        <div class="card-body text-center" style="text-align: left !important;">
+                            <h5 class="card-title" style="text-align: left;">${product.name}</h5>
+                            <div style="text-align: left;">
                                 ${oldPriceHtml}
-                                <span class="product-price-display">₹${parseFloat(displayPrice).toLocaleString()}</span>
+                                <span class="product-price-display" style="text-align: left;">₹${parseFloat(displayPrice).toLocaleString()}</span>
                             </div>
-                        
+                            
+                            <!-- Rating Stars - Yellow Filled from products table -->
+                            <div class="product-rating" style="justify-content: flex-start;">
+                                <div class="stars">${starsHtml}</div>
+                                <span class="rating-value">${rating > 0 ? rating.toFixed(1) : '0.0'}</span>
+                            </div>
+                            
+                            <!-- Low Stock Alert - Shows when stock <= 5 -->
+                            ${stockAlertHtml}
                         </div>
                     </div>
                 </div>
