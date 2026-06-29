@@ -32,6 +32,10 @@ use App\Http\Controllers\Admin\SizeChartController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\Admin\DeliverablePincodeController;
 
+// ============ OFFER CONTROLLERS ============
+use App\Http\Controllers\Admin\OfferController;
+use App\Http\Controllers\OfferController as PublicOfferController;
+
 // ============ REVIEW CONTROLLERS ============
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\ProductReviewController;
@@ -113,6 +117,14 @@ Route::get('/track-order', [TrackOrderController::class, 'index'])->name('track.
 Route::get('/about', function () {
     return view('about');
 })->name('about');
+
+// ============ OFFER ROUTES (PUBLIC) ============
+Route::get('/offers', [PublicOfferController::class, 'index'])->name('offers.index');
+Route::get('/offers/{offer_code}/apply', [PublicOfferController::class, 'apply'])->name('offers.apply');
+Route::post('/offers/validate', [PublicOfferController::class, 'validateOffer'])->name('offers.validate');
+Route::get('/api/offers/active', [PublicOfferController::class, 'getActiveOffers'])->name('api.offers.active');
+Route::get('/api/offers/product/{product_id}', [PublicOfferController::class, 'getProductOffers'])->name('api.offers.product');
+Route::get('/api/offers/category/{category_id}', [PublicOfferController::class, 'getCategoryOffers'])->name('api.offers.category');
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -265,6 +277,31 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     
     // ⭐⭐⭐ NEW: REVIEW DETAILS ROUTE ⭐⭐⭐
     Route::get('/reviews/{id}/details', [ReviewController::class, 'getDetails'])->name('reviews.details');
+
+    // ============ ⭐⭐⭐⭐⭐ OFFER ROUTES (ADMIN) ⭐⭐⭐⭐⭐ ============
+    Route::prefix('offers')->name('offers.')->group(function () {
+        // Main CRUD
+        Route::get('/', [OfferController::class, 'index'])->name('index');
+        Route::get('/create', [OfferController::class, 'create'])->name('create');
+        Route::post('/', [OfferController::class, 'store'])->name('store');
+        Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('edit');
+        Route::put('/{offer}', [OfferController::class, 'update'])->name('update');
+        Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('destroy');
+        
+        // Status Management
+        Route::post('/{offer}/toggle', [OfferController::class, 'toggle'])->name('toggle');
+        Route::post('/{offer}/duplicate', [OfferController::class, 'duplicate'])->name('duplicate');
+        
+        // View by status
+        Route::get('/status/{status}', [OfferController::class, 'index'])->name('status');
+        
+        // AJAX/API endpoints
+        Route::get('/get-products', [OfferController::class, 'getProducts'])->name('get-products');
+        Route::get('/get-categories', [OfferController::class, 'getCategories'])->name('get-categories');
+        Route::get('/get-offer-stats', [OfferController::class, 'getStats'])->name('get-stats');
+        Route::post('/bulk-delete', [OfferController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::post('/bulk-status', [OfferController::class, 'bulkStatus'])->name('bulk-status');
+    });
 });
 
 // ============ ⭐⭐⭐ REVIEW SUBMIT ROUTE (PUBLIC - FOR USERS) ⭐⭐⭐ ============

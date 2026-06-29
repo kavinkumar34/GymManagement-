@@ -3,6 +3,7 @@
     use App\Models\ProductReview;
     use App\Models\Contact;
     use App\Models\Order;
+    use App\Models\Offer;
     use Illuminate\Support\Facades\Route;
     use Illuminate\Support\Facades\Schema;
 
@@ -37,6 +38,19 @@
         }
     } catch (\Exception $e) {
         $newPendingOrders = 0;
+    }
+
+    // Active offers count
+    $activeOffersCount = 0;
+    try {
+        if (Schema::hasTable('offers')) {
+            $activeOffersCount = Offer::where('status', 'active')
+                ->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->count();
+        }
+    } catch (\Exception $e) {
+        $activeOffersCount = 0;
     }
 
     // Get admin name safely
@@ -195,6 +209,52 @@
             <a class="nav-link" href="{{ route('admin.settings') }}">
                 <i class="fas fa-cog"></i> <span>Settings</span>
             </a>
+        </li>
+
+        <!-- ===== OFFERS MENU - NEW ===== -->
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-tags"></i> <span>Offers</span>
+                <span class="dropdown-arrow">▼</span>
+                @if($activeOffersCount > 0)
+                    <span class="badge bg-success ms-2">{{ $activeOffersCount }}</span>
+                @endif
+            </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.offers.create') }}">
+                        <i class="fas fa-plus"></i> Create Offer
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.offers.index') }}">
+                        <i class="fas fa-list"></i> All Offers
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'active') }}">
+                        <i class="fas fa-check-circle text-success"></i> Active Offers
+                        @if($activeOffersCount > 0)
+                            <span class="badge bg-success ms-2">{{ $activeOffersCount }}</span>
+                        @endif
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'scheduled') }}">
+                        <i class="fas fa-clock text-warning"></i> Scheduled Offers
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'expired') }}">
+                        <i class="fas fa-hourglass-end text-muted"></i> Expired Offers
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'inactive') }}">
+                        <i class="fas fa-pause-circle text-danger"></i> Inactive Offers
+                    </a>
+                </li>
+            </ul>
         </li>
 
         <!-- ===== GYM ONE DIVIDER ===== -->
@@ -638,6 +698,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     .badge.bg-danger {
         background-color: #ef5350 !important;
+        color: #ffffff;
+    }
+
+    .badge.bg-success {
+        background-color: #4caf50 !important;
         color: #ffffff;
     }
 
