@@ -875,4 +875,4 @@
         document.getElementById('end_date').addEventListener('change', validateDates);
     });
 </script>
-@endsection
+@endsection 
