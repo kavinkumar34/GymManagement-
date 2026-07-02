@@ -40,6 +40,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         // Validation
         $request->validate([
             'name' => 'required|string|max:255',
@@ -72,8 +73,8 @@ class ProductController extends Controller
             // Create product
             $product = Product::create([
                 'name' => $request->name,
-                'slug' => Str::slug($request->name) . '-' . time(),
-                'sku' => $sku,
+                // 'slug' => Str::slug($request->name) . '-' . time(),
+                // 'sku' => $sku,
                 'top_category_id' => $request->top_category_id,
                 'brand_id' => $request->brand_id,
                 'category_id' => $request->category_id,
@@ -91,17 +92,17 @@ class ProductController extends Controller
                 
                 'stock' => $request->stock,
                 'min_stock_alert' => $request->min_stock_alert ?? 5,
-                'weight' => $request->weight,
+                // 'weight' => $request->weight,
                 'weight_unit' => $request->weight_unit ?? 'kg',
-                'dimensions' => $request->dimensions,
+                // 'dimensions' => $request->dimensions,
                 
-                'video_url' => $request->video_url,
+                // 'video_url' => $request->video_url,
                 'description' => $request->description,
                 'short_description' => $request->short_description,
-                'description_title' => $request->description_title,
+                // 'description_title' => $request->description_title,
                 'description_details' => $request->description_details,
                 
-                'attributes' => $attributesJson,
+                // 'attributes' => $attributesJson,
                 'rating' => $request->rating ?? 0,
                 'discount_type' => $request->discount_type ?? 'flat',
                 'discount_value' => $request->discount_value ?? 0,
@@ -109,9 +110,12 @@ class ProductController extends Controller
                 'status' => $request->status ?? 'Draft',
                 'return_days' => $request->return_days ?? 30,
                 'warranty_months' => $request->warranty_months ?? 0,
-                'shipping_info' => $request->shipping_info,
+                // 'shipping_info' => $request->shipping_info,
                 'return_policy' => $request->return_policy,
                 'created_by' => auth()->id(),
+                'cod_available' => $request->has('cod_available') ? 1 : 0,
+
+                'return_exchange_policy' => $request->return_exchange_policy,
             ]);
 
             // ⭐ SAVE VARIANTS

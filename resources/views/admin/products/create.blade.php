@@ -468,7 +468,7 @@
                                             </div>
                                             <div class="col-md-6 mb-3">
                                                 <label>Discount Value</label>
-                                                <input type="number" step="0.01" name="discount_value" id="discount_value" class="form-control" min="0" value="0">
+                                                <input type="number" step="0.01" name="discount_price" id="discount_value" class="form-control" min="0" value="0">
                                                 <small class="text-muted" id="discount_value_hint">Enter discount amount</small>
                                             </div>
                                         </div>

@@ -12,23 +12,21 @@ class Product extends Model
     protected $table = 'products';
     
     protected $fillable = [
-        'name', 'slug', 'sku', 
+        'name', 
         'top_category_id', 'brand_id',
         'category_id', 'sub_category_id', 'product_type_id', 'size_chart_id',
         'price', 'discount_price', 'mrp', 'gst_percentage',
         'gst_amount', 'total_price', 'profit',
         'stock', 'min_stock_alert',
-        'weight', 'weight_unit', 'dimensions',
-        'image', 'video_url',
+         'weight_unit',
+        'image', 
         'description', 'short_description',
-        'description_title', 'description_details',
-        'is_featured', 'is_best_seller', 'is_new_arrival', 'is_trending',
+        
         'status',
         'return_days', 'warranty_months',
-        'attributes',
         'rating', 'rating_count',
         'discount_type', 'discount_value',
-        'shipping_info', 'return_policy',
+         'return_policy',
         'created_by',
     ];
     
