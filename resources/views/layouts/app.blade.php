@@ -14,11 +14,45 @@
             box-sizing: border-box;
         }
         
+        /* ===== PREVENT HORIZONTAL SCROLL ===== */
+        html {
+            overflow-x: hidden !important;
+            width: 100% !important;
+        }
+        
         body {
-            background: linear-gradient(135deg, #e4e7f2 0%, #e6ddef 100%);
+            overflow-x: hidden !important;
+            width: 100% !important;
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
         }
+        
+        /* ===== FIXED NAVBAR - STAYS AT TOP ===== */
+        .navbar {
+            background: #ffffff !important;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            padding: 15px 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 9999 !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        /* ===== NAVBAR SPACER - MINIMAL GAP ===== */
+        .navbar-spacer {
+            width: 100%;
+            height: 105px; /* Just enough to clear the navbar */
+            display: block;
+        }
+        
         .captcha-img {
             cursor: pointer;
             border-radius: 8px;
@@ -88,19 +122,7 @@
             display: none !important;
         }
 
-        /* Modern Navbar Styles - STICKY */
-        .navbar {
-            background: #ffffff !important;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            padding: 15px 0 !important;
-            margin: 0 !important;
-            width: 100%;
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 1040 !important;
-        }
-        
-        /* Fixed container for navbar - ensures consistent 30px margins on ALL pages */
+        /* Fixed container for navbar */
         .navbar-container {
             width: 100%;
             max-width: 100%;
@@ -276,7 +298,7 @@
             color: #dc3545;
         }
 
-        /* ===== CATEGORY DROPDOWN WITH SUB MENU - REDUCED WIDTH ===== */
+        /* ===== CATEGORY DROPDOWN WITH SUB MENU ===== */
         .nav-item-category {
             position: relative;
         }
@@ -297,7 +319,7 @@
             color: #dc3545 !important;
         }
 
-        /* Sub Category Dropdown Menu - REDUCED WIDTH */
+        /* Sub Category Dropdown Menu */
         .sub-category-dropdown {
             position: absolute;
             top: 100%;
@@ -312,7 +334,7 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-            z-index: 1050;
+            z-index: 99999;
             border: 1px solid #eef2f6;
             pointer-events: none;
         }
@@ -324,7 +346,6 @@
             pointer-events: auto;
         }
 
-        /* "All" link at top - left aligned */
         .sub-category-dropdown .all-link {
             display: block;
             padding: 6px 16px 6px 16px;
@@ -343,7 +364,6 @@
             background: #f8fafc;
         }
 
-        /* Sub category items - NO ARROWS, LEFT ALIGNED */
         .sub-category-dropdown .sub-cat-item {
             display: block;
             padding: 5px 16px;
@@ -370,7 +390,7 @@
             text-align: center;
         }
         
-        /* Bottom row with menu items centered - EQUAL SPACING */
+        /* Bottom row with menu items */
         .navbar-bottom {
             text-align: center;
             margin-top: 10px;
@@ -409,13 +429,15 @@
             color: #dc3545 !important;
         }
         
-        /* Join Gym button in bottom nav */
         .nav-join-gym {
             margin-left: 5px;
         }
         
         /* Responsive Styles */
         @media (max-width: 992px) {
+            .navbar-spacer {
+                height: 90px;
+            }
             .navbar-container {
                 padding-left: 15px !important;
                 padding-right: 15px !important;
@@ -455,7 +477,6 @@
                 margin-top: 5px;
             }
 
-            /* Mobile dropdown - show on click */
             .sub-category-dropdown {
                 position: static;
                 transform: none;
@@ -492,6 +513,9 @@
         }
         
         @media (max-width: 576px) {
+            .navbar-spacer {
+                height: 75px;
+            }
             .navbar-nav .nav-link {
                 font-size: 0.75rem;
                 padding: 8px 10px;
@@ -700,8 +724,7 @@
 
 {{-- 
     ============================================================
-    UNIVERSAL SINGLE NAVBAR - STICKY AT TOP
-    Navbar has 30px left and right margins on ALL pages
+    FIXED NAVBAR - STAYS AT TOP ALWAYS
     ============================================================
 --}}
 <nav class="navbar">
@@ -723,21 +746,20 @@
                     </form>
                 </div>
                 
-                <!-- Cart Icon - Same for all users -->
+                <!-- Cart Icon -->
                 <a class="nav-icon position-relative" href="{{ url('/cart') }}">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count" id="navbarCartCount"></span>
                 </a>
                 
-                <!-- Wishlist Icon - Same for all users -->
+                <!-- Wishlist Icon -->
                 <a class="nav-icon position-relative" href="{{ route('wishlist') }}">
                     <i class="fas fa-heart"></i>
                     <span class="cart-count" id="navbarWishlistCount"></span>
                 </a>
                 
-                <!-- User Area - Changes based on login status -->
+                <!-- User Area -->
                 @auth('admin')
-                    {{-- Admin Logged In --}}
                     <div class="dropdown">
                         <a class="user-dropdown dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <div class="profile-icon">
@@ -752,7 +774,6 @@
                         </ul>
                     </div>
                 @elseif(auth()->check())
-                    {{-- Regular User (Member/Trainer) Logged In --}}
                     <div class="dropdown">
                         <a class="user-dropdown dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <div class="profile-icon">
@@ -776,24 +797,20 @@
             </div>
         </div>
         
-        <!-- Bottom Navigation Menu with Dynamic Categories and Subcategories -->
+        <!-- Bottom Navigation Menu -->
         <div class="navbar-bottom">
             <ul class="navbar-nav">
-                <!-- Dynamic Category Items with Subcategory Dropdown - FIFO Order -->
                 @foreach($navCategories as $category)
                     <li class="nav-item nav-item-category" data-category-id="{{ $category['id'] }}">
                         <a class="nav-link" href="/shop?category={{ $category['id'] }}&name={{ urlencode($category['name']) }}">
                             {{ $category['name'] }}
                         </a>
                         
-                        <!-- Subcategory Dropdown with "All" at top - FIFO Order (Oldest First) -->
                         @if($category['subcategories']->count() > 0)
                             <div class="sub-category-dropdown">
-                                <!-- "All" link at top -->
                                 <a class="all-link" href="/shop?category={{ $category['id'] }}&name={{ urlencode($category['name']) }}">
                                     All
                                 </a>
-                                <!-- Subcategory items - FIFO Order (Oldest First) -->
                                 @foreach($category['subcategories'] as $sub)
                                     <a class="sub-cat-item" href="/shop?subcategory={{ $sub->id }}&name={{ urlencode($sub->name) }}">
                                         {{ $sub->name }}
@@ -814,7 +831,6 @@
                     <a class="nav-link" href="{{ route('about') }}">About Us</a>
                 </li>
                 
-                <!-- Join Gym / Dashboard Button - Shows in bottom row -->
                 @auth('admin')
                     <li class="nav-item nav-join-gym">
                         <a class="btn-dashboard-nav" href="{{ route('admin.dashboard') }}">
@@ -839,6 +855,9 @@
     </div>
 </nav>
 
+<!-- ===== NAVBAR SPACER - MINIMAL GAP ===== -->
+<div class="navbar-spacer"></div>
+
 {{-- Hidden forms for logout --}}
 @auth('admin')
     <form id="admin-logout-from-navbar" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
@@ -858,22 +877,24 @@
 @endauth
 
 {{-- MAIN CONTENT --}}
-<main class="py-4">
-    <div class="container">
-        @if(session('success'))
+<main style="margin: 0; padding: 0; overflow-x: hidden !important; width: 100%;">
+    @if(session('success'))
+        <div class="container" style="padding-left: 15px; padding-right: 15px;">
             <div class="alert alert-success alert-dismissible fade show alert-auto-hide" role="alert">
                 <i class="fas fa-check-circle"></i> {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        @endif
-        @if(session('error'))
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="container" style="padding-left: 15px; padding-right: 15px;">
             <div class="alert alert-danger alert-dismissible fade show alert-auto-hide" role="alert">
                 <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        @endif
-        @yield('content')
-    </div>
+        </div>
+    @endif
+    @yield('content')
 </main>
 
 <!-- FOOTER SECTION -->
@@ -939,7 +960,6 @@
                         <i class="fas fa-clock"></i>
                         <span>Mon - Sat: 6:00 AM - 10:00 PM</span>
                     </li>
-                    <!-- WhatsApp Contact Item -->
                     <li>
                         <i class="fab fa-whatsapp"></i>
                         <span>
@@ -1188,25 +1208,22 @@
         }
     }
 
-    // Auto-hide alerts after 5 seconds with JavaScript
     document.addEventListener('DOMContentLoaded', function() {
         // Auto-hide success alerts
         const successAlerts = document.querySelectorAll('.alert-success');
         successAlerts.forEach(function(alert) {
             setTimeout(function() {
-                // Use Bootstrap's dismiss functionality
                 const closeBtn = alert.querySelector('.btn-close');
                 if (closeBtn) {
                     closeBtn.click();
                 } else {
-                    // Fallback: fade out and remove
                     alert.style.transition = 'opacity 0.5s';
                     alert.style.opacity = '0';
                     setTimeout(function() {
                         alert.remove();
                     }, 500);
                 }
-            }, 5000); // 5 seconds
+            }, 5000);
         });
 
         // Auto-hide error alerts
@@ -1223,10 +1240,9 @@
                         alert.remove();
                     }, 500);
                 }
-            }, 5000); // 5 seconds
+            }, 5000);
         });
 
-        // WhatsApp Tooltip Show/Hide
         updateNavbarCartCount();
         updateNavbarWishlistCount();
 
@@ -1248,7 +1264,6 @@
             const tooltip = document.getElementById('whatsappTooltip');
             if (tooltip) {
                 tooltip.classList.add('show');
-                // Hide tooltip after 5 seconds
                 setTimeout(function() {
                     tooltip.classList.remove('show');
                 }, 5000);

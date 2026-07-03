@@ -21,15 +21,15 @@
                 @if(session('error'))
                     <div class="alert alert-danger alert-dismissible fade show">
                         <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-                        <button type="button" class btn-close" data-bs-dismiss="alert"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
 
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover">
-                        <thead class="table-dark">
+                        <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>#</th>
                                 <th>Image</th>
                                 <th>Link</th>
                                 <th>Order</th>
@@ -38,50 +38,52 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($banners as $banner)
-                            <tr>
-                                <td>{{ $banner->id }}</div>
-                                <td>
-                                    @if($banner->image)
-                                        <img src="{{ Storage::url($banner->image) }}" width="80" height="50" style="object-fit: cover; border-radius: 8px;">
-                                    @else
-                                        <span class="text-muted">No Image</span>
-                                    @endif
-                                </div>
-                                <td>
-                                    @if($banner->link)
-                                        <a href="{{ $banner->link }}" target="_blank">{{ Str::limit($banner->link, 30) }}</a>
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
-                                </div>
-                                <td>{{ $banner->order }}</div>
-                                <td>
-                                    @if($banner->status == 'Active')
-                                        <span class="badge bg-success">Active</span>
-                                    @else
-                                        <span class="badge bg-danger">Inactive</span>
-                                    @endif
-                                </div>
-                                <td>
-                                    <a href="{{ route('admin.banners.edit', $banner->id) }}" class="btn btn-sm btn-warning" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteBanner({{ $banner->id }})" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                             </div>
+                            @forelse($banners as $key => $banner)
+                                <tr>
+                                    <td>{{ $banners->firstItem() + $key }}</td>
+                                    <td>
+                                        @if($banner->image)
+                                            <img src="{{ Storage::url($banner->image) }}" alt="Banner" style="width: 80px; height: 50px; object-fit: cover;">
+                                        @else
+                                            <span class="text-muted">No Image</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($banner->link)
+                                            <a href="{{ $banner->link }}" target="_blank">{{ Str::limit($banner->link, 30) }}</a>
+                                        @else
+                                            <span class="text-muted">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $banner->order }}</td>
+                                    <td>
+                                        <span class="badge {{ $banner->status == 'Active' ? 'bg-success' : 'bg-danger' }}">
+                                            {{ $banner->status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('admin.banners.edit', $banner->id) }}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.banners.destroy', $banner->id) }}" method="POST" style="display: inline-block;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
                             @empty
-                             </div>
-                                <td colspan="6" class="text-center">No banners found</div>
-                             </div>
+                                <tr>
+                                    <td colspan="6" class="text-center">No banners found.</td>
+                                </tr>
                             @endforelse
                         </tbody>
-                    </div>
+                    </table>
                 </div>
                 
-                <div class="mt-3">
+                <div class="d-flex justify-content-center">
                     {{ $banners->links() }}
                 </div>
             </div>
@@ -89,18 +91,32 @@
     </div>
 </div>
 
-<form id="delete-form" method="POST" style="display: none;">
-    @csrf
-    @method('DELETE')
-</form>
-
+<!-- ====== ADD THIS CODE - AUTO HIDE ALERT AFTER 5 SECONDS ====== -->
 <script>
-    function deleteBanner(id) {
-        if(confirm('Are you sure you want to delete this banner?')) {
-            let form = document.getElementById('delete-form');
-            form.action = '/admin/banners/' + id;
-            form.submit();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto hide success alert after 5 seconds
+        var successAlert = document.querySelector('.alert-success');
+        if (successAlert) {
+            setTimeout(function() {
+                successAlert.style.transition = 'opacity 0.5s ease';
+                successAlert.style.opacity = '0';
+                setTimeout(function() {
+                    successAlert.style.display = 'none';
+                }, 500);
+            }, 5000);
         }
-    }
+        
+        // Auto hide error alert after 5 seconds
+        var errorAlert = document.querySelector('.alert-danger');
+        if (errorAlert) {
+            setTimeout(function() {
+                errorAlert.style.transition = 'opacity 0.5s ease';
+                errorAlert.style.opacity = '0';
+                setTimeout(function() {
+                    errorAlert.style.display = 'none';
+                }, 500);
+            }, 5000);
+        }
+    });
 </script>
 @endsection

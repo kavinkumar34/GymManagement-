@@ -2,7 +2,84 @@
 
 @section('content')
 <style>
-    /* Sale Banner */
+    /* ===== PREVENT HORIZONTAL SCROLL ===== */
+    html, body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* ===== FULL WIDTH BANNER - NO GAPS ===== */
+    .banner-full-width {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        left: 0;
+        right: 0;
+    }
+
+    .banner-full-width .carousel {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .banner-full-width .carousel-inner {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .banner-full-width .carousel-item {
+        width: 100%;
+        height: 550px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .banner-full-width .carousel-item img {
+        width: 100%;
+        height: 550px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .banner-full-width .carousel-control-prev,
+    .banner-full-width .carousel-control-next {
+        width: 40px;
+        height: 40px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.3);
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .banner-full-width:hover .carousel-control-prev,
+    .banner-full-width:hover .carousel-control-next {
+        opacity: 1;
+    }
+
+    .banner-full-width .carousel-control-prev {
+        left: 15px;
+    }
+
+    .banner-full-width .carousel-control-next {
+        right: 15px;
+    }
+
+    .banner-full-width .carousel-control-prev-icon,
+    .banner-full-width .carousel-control-next-icon {
+        width: 20px;
+        height: 20px;
+        background-size: 100% 100%;
+    }
+
+    /* ===== SALE BANNER ===== */
     .sale-banner {
         background: #dc3545;
         padding: 15px;
@@ -21,7 +98,7 @@
         100% { transform: scale(1); }
     }
     
-    /* Product Card */
+    /* ===== PRODUCT CARD ===== */
     .product-card {
         border: none;
         border-radius: 15px;
@@ -46,7 +123,6 @@
         width: 100%;
     }
     
-    /* Product Image Slider Styles */
     .product-image-slider {
         position: relative;
         overflow: hidden;
@@ -110,7 +186,6 @@
         z-index: 1;
     }
     
-    /* Wishlist Button */
     .wishlist-btn {
         position: absolute;
         top: 10px;
@@ -185,7 +260,6 @@
         margin-top: 15px;
     }
     
-    /* ===== RATING STARS STYLES - YELLOW FILLED ===== */
     .product-rating {
         display: flex;
         align-items: center;
@@ -218,7 +292,6 @@
         color: #1e293b;
     }
     
-    /* ===== LOW STOCK ALERT - Only for stock <= 5 ===== */
     .product-stock-low {
         font-size: 0.9rem;
         color: #ef4444;
@@ -239,39 +312,6 @@
         color: #ef4444;
     }
     
-    /* ===== OUT OF STOCK STYLES ===== */
-    .product-out-of-stock {
-        font-size: 0.9rem;
-        color: #ef4444;
-        margin-top: 6px;
-        text-align: left;
-        font-weight: 600;
-        background: #fef2f2;
-        padding: 4px 10px;
-        border-radius: 6px;
-        border-left: 3px solid #ef4444;
-        display: inline-block;
-        width: 100%;
-    }
-    
-    .product-out-of-stock i {
-        font-size: 0.9rem;
-        margin-right: 6px;
-        color: #ef4444;
-    }
-    
-    .product-card.out-of-stock {
-        opacity: 0.7;
-    }
-    
-    .product-card.out-of-stock .btn-add-cart,
-    .product-card.out-of-stock .btn-buy-now {
-        opacity: 0.5;
-        cursor: not-allowed;
-        pointer-events: none;
-    }
-    
-    /* Product Card Body - Left Aligned */
     .product-card .card-body {
         text-align: left;
         padding: 10px 12px;
@@ -288,11 +328,7 @@
         text-align: left;
     }
     
-    .product-card .product-price {
-        text-align: left;
-    }
-    
-    /* Category Card - Full Image Cover, No Gradient Background */
+    /* ===== CATEGORY CARD ===== */
     .category-card {
         background: white;
         border-radius: 20px;
@@ -406,39 +442,17 @@
         transform: translateX(5px);
     }
     
-    /* Search Bar */
-    .search-bar {
-        max-width: 500px;
-        margin: 20px auto;
+    .category-row {
+        margin-left: -15px;
+        margin-right: -15px;
     }
     
-    .search-bar input {
-        border-radius: 30px 0 0 30px;
-        padding: 12px 20px;
-        border: 2px solid #ddd;
+    .category-row > [class*="col-"] {
+        padding-left: 15px;
+        padding-right: 15px;
     }
     
-    .search-bar button {
-        border-radius: 0 30px 30px 0;
-        background: #000000;
-        border: none;
-        padding: 12px 25px;
-        color: white;
-    }
-    
-    .search-bar button:hover {
-        background: #dc3545;
-    }
-    
-    /* No products message */
-    .no-products {
-        text-align: center;
-        padding: 50px;
-        background: white;
-        border-radius: 15px;
-    }
-    
-    /* Loading spinner */
+    /* ===== LOADER ===== */
     .loader {
         text-align: center;
         padding: 50px;
@@ -455,12 +469,13 @@
         100% { transform: rotate(360deg); }
     }
     
-    /* Headings */
-    h2, .section-title {
-        color: #000000;
+    .no-products {
+        text-align: center;
+        padding: 50px;
+        background: white;
+        border-radius: 15px;
     }
-    
-    /* Best Sellers Card */
+
     .best-sellers-card {
         background: white;
         border: 1px solid #eee;
@@ -471,113 +486,24 @@
         color: white !important;
         border-radius: 15px 15px 0 0;
     }
-    
-    .text-primary {
-        color: #dc3545 !important;
-    }
-    
-    .text-primary:hover {
-        color: #000000 !important;
-    }
-    
-    /* Banner Slider Styles */
-    .banner-slider {
-        margin: 0 !important;
-        padding: 0 !important;
-        border-radius: 0 !important;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        width: 100%;
-        position: relative;
-        left: 0;
-        right: 0;
-    }
-    
-    .banner-slider .carousel-item {
-        height: 450px;
-        width: 100%;
-    }
-    
-    .banner-slider .carousel-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .banner-caption {
-        position: absolute;
-        bottom: 20%;
-        left: 10%;
-        color: white;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        background: rgba(0,0,0,0.4);
-        padding: 15px 25px;
-        border-radius: 10px;
-    }
-    
-    .banner-caption h3 {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .banner-caption p {
-        font-size: 1.2rem;
-        margin-bottom: 0;
-    }
-    
-    /* Category Row Gap */
-    .category-row {
-        margin-left: -15px;
-        margin-right: -15px;
-    }
-    
-    .category-row > [class*="col-"] {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-    
+
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-        .banner-slider .carousel-item {
+        .banner-full-width .carousel-item,
+        .banner-full-width .carousel-item img {
             height: 250px;
         }
-        .banner-caption {
-            bottom: 10%;
-            left: 5%;
-            padding: 8px 15px;
-        }
-        .banner-caption h3 {
-            font-size: 1rem;
-        }
-        .banner-caption p {
-            font-size: 0.7rem;
-        }
-        .category-image-wrapper, .category-icon-wrapper {
+        .category-image-wrapper {
             height: 220px;
         }
-        .category-info h5 {
-            font-size: 1rem;
-        }
-        .category-row > [class*="col-"] {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-        .product-rating .stars i {
-            font-size: 0.75rem;
-        }
-        .product-rating .rating-value {
-            font-size: 0.8rem;
-        }
-        .product-stock-low {
-            font-size: 0.8rem;
-        }
-        .product-out-of-stock {
-            font-size: 0.8rem;
-        }
     }
-    
+
     @media (max-width: 576px) {
-        .category-image-wrapper, .category-icon-wrapper {
+        .banner-full-width .carousel-item,
+        .banner-full-width .carousel-item img {
+            height: 180px;
+        }
+        .category-image-wrapper {
             height: 180px;
         }
         .category-info {
@@ -589,49 +515,36 @@
         .category-info p {
             font-size: 0.75rem;
         }
-        .category-row > [class*="col-"] {
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-        .product-rating .stars i {
-            font-size: 0.65rem;
-        }
-        .product-rating .rating-value {
-            font-size: 0.7rem;
-        }
-        .product-stock-low {
-            font-size: 0.75rem;
-        }
-        .product-out-of-stock {
-            font-size: 0.75rem;
-        }
     }
 </style>
 
-<!-- Banner Slider Section -->
-<div id="bannerSlider" class="carousel slide banner-slider" data-bs-ride="carousel" style="margin: 0; padding: 0; width: 100%;">
-    <div class="carousel-inner" id="bannerContainer" style="width: 100%;">
-        <div class="carousel-item active">
-            <div style="height:450px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;width:100%;">
-                <i class="fas fa-spinner fa-spin fa-2x"></i> <span class="ms-2">Loading banners...</span>
+<!-- ===== FULL WIDTH BANNER - NO GAPS ===== -->
+<div class="banner-full-width">
+    <div id="bannerSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-inner" id="bannerContainer">
+            <div class="carousel-item active">
+                <div style="height:550px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;width:100%;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                    <span class="ms-2">Loading banners...</span>
+                </div>
             </div>
         </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#bannerSlider" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#bannerSlider" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#bannerSlider" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#bannerSlider" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
 </div>
 
-<!-- Category Section - 3 cards per row with full image cover -->
+<!-- ===== CATEGORY SECTION ===== -->
 <div class="container mt-4">
     <h2 class="text-center mb-4" style="color: #000000;">Shop by Category</h2>
     <div class="row category-row" id="categoryContainer"></div>
 </div>
 
-<!-- Products Section -->
+<!-- ===== PRODUCTS SECTION ===== -->
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 style="color: #000000;">🔥 Best Selling Products</h2>
@@ -646,7 +559,7 @@
     <div class="row" id="productsContainer"></div>
 </div>
 
-<!-- Best Sellers List -->
+<!-- ===== BEST SELLERS LIST ===== -->
 <div class="container mt-5 mb-5">
     <div class="card best-sellers-card">
         <div class="card-header best-sellers-header">
@@ -657,7 +570,7 @@
 </div>
 
 <script>
-    // Banner loading function
+    // ===== BANNER LOADING =====
     async function loadBanners() {
         try {
             const response = await fetch('/api/banners');
@@ -675,7 +588,7 @@
                 bannerHtml += `
                     <div class="carousel-item ${index === 0 ? 'active' : ''}" style="width:100%;">
                         ${banner.link ? `<a href="${banner.link}" target="_blank" style="display:block;width:100%;">` : ''}
-                            <img src="${banner.image_url}" alt="Banner" style="width:100%; height:450px; object-fit:cover;">
+                            <img src="${banner.image_url}" alt="Banner" style="width:100%; height:550px; object-fit:cover;">
                         ${banner.link ? `</a>` : ''}
                     </div>
                 `;
@@ -690,55 +603,36 @@
         loadBanners();
     }
 
-    function checkAndHideWishlistCountIfViewed() {
-        let permanentHide = localStorage.getItem('wishlist_permanent_hide') === 'true';
-        let wishlistCountElement = document.getElementById('navbarWishlistCount');
-        
-        if (permanentHide && wishlistCountElement) {
-            wishlistCountElement.style.display = 'none';
-        } else if (!permanentHide && wishlistCountElement) {
-            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-            let count = wishlist.length;
-            if (count > 0) {
-                wishlistCountElement.style.display = '';
-                wishlistCountElement.textContent = count;
-                wishlistCountElement.classList.remove('hide-badge');
-            } else {
-                wishlistCountElement.style.display = 'none';
-            }
-        }
-    }
-
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    // ===== WISHLIST FUNCTIONS =====
     let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-    
-    function updateCartCount() {
-        let count = cart.reduce((total, item) => total + item.quantity, 0);
-        let cartCountElement = document.getElementById('navbarCartCount');
-        if (cartCountElement) {
-            cartCountElement.textContent = count;
-            if(count > 0) {
-                cartCountElement.classList.remove('hide-badge');
-            } else {
-                cartCountElement.classList.add('hide-badge');
-            }
-        }
-    }
-    
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
     function updateWishlistCount() {
         let count = wishlist.length;
         let wishlistCountElement = document.getElementById('navbarWishlistCount');
         if (wishlistCountElement) {
             if (count > 0) {
                 wishlistCountElement.textContent = count;
-                wishlistCountElement.classList.remove('hide-badge');
+                wishlistCountElement.style.display = '';
             } else {
-                wishlistCountElement.textContent = '';
-                wishlistCountElement.classList.add('hide-badge');
+                wishlistCountElement.style.display = 'none';
             }
         }
     }
-    
+
+    function updateCartCount() {
+        let count = cart.reduce((total, item) => total + item.quantity, 0);
+        let cartCountElement = document.getElementById('navbarCartCount');
+        if (cartCountElement) {
+            if(count > 0) {
+                cartCountElement.textContent = count;
+                cartCountElement.style.display = '';
+            } else {
+                cartCountElement.style.display = 'none';
+            }
+        }
+    }
+
     function loadWishlistStatus() {
         wishlist.forEach(item => {
             const icon = document.getElementById(`wishlist-icon-${item.id}`);
@@ -747,7 +641,7 @@
             }
         });
     }
-    
+
     function toggleWishlist(id, name, price, image) {
         @if(!auth()->check())
             if(confirm('Please login to add items to wishlist. Go to login page?')) {
@@ -778,19 +672,9 @@
         
         localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
         wishlist = currentWishlist;
-        localStorage.removeItem('wishlist_permanent_hide');
-        
-        let count = wishlist.length;
-        let wishlistCountElement = document.getElementById('navbarWishlistCount');
-        if (wishlistCountElement && count > 0) {
-            wishlistCountElement.style.display = '';
-            wishlistCountElement.textContent = count;
-            wishlistCountElement.classList.remove('hide-badge');
-        } else {
-            wishlistCountElement.style.display = 'none';
-        }
+        updateWishlistCount();
     }
-    
+
     function addToCart(id, name, price, imageUrl, event) {
         if (event) event.stopPropagation();
         
@@ -829,7 +713,7 @@
         updateCartCount();
         showNotification(name + ' added to cart!', 'success');
     }
-    
+
     function buyNow(productId, productName, productPrice, event) {
         if (event) event.stopPropagation();
         
@@ -865,7 +749,7 @@
         document.body.appendChild(form);
         form.submit();
     }
-    
+
     function goToProductDetail(productId, event) {
         if (event.target.closest('.wishlist-btn') || 
             event.target.closest('.btn-add-cart') || 
@@ -876,7 +760,7 @@
         }
         window.location.href = `/product/${productId}`;
     }
-    
+
     function showNotification(message, type) {
         let notification = document.createElement('div');
         notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'info') + ' alert-dismissible fade show';
@@ -889,13 +773,12 @@
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
     }
-    
-    // Function to navigate to category products page (separate shop page)
+
     function goToCategoryProducts(categoryId, categoryName) {
         window.location.href = `/shop?category=${categoryId}&name=${encodeURIComponent(categoryName)}`;
     }
-    
-    // Load categories from database - 3 per row with full image cover
+
+    // ===== LOAD CATEGORIES =====
     async function loadCategories() {
         try {
             const response = await fetch('/api/categories');
@@ -929,35 +812,27 @@
             console.error('Error loading categories:', error);
         }
     }
-    
-    // Function to render star rating - YELLOW FILLED STARS
+
+    // ===== RENDER STARS =====
     function renderStars(rating) {
         const fullStars = Math.floor(rating);
         const halfStar = rating - fullStars >= 0.5;
         const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
         
         let starsHtml = '';
-        
-        // Full stars - YELLOW FILLED (fas fa-star)
         for (let i = 0; i < fullStars; i++) {
             starsHtml += '<i class="fas fa-star"></i>';
         }
-        
-        // Half star - YELLOW FILLED (fas fa-star-half-alt)
         if (halfStar) {
             starsHtml += '<i class="fas fa-star-half-alt"></i>';
         }
-        
-        // Empty stars - GREY OUTLINE (far fa-star)
         for (let i = 0; i < emptyStars; i++) {
             starsHtml += '<i class="far fa-star"></i>';
         }
-        
         return starsHtml;
     }
-    
-    // Load products from database - SHOW ALL PRODUCTS WITH STOCK > 0
-    // Low stock alert shown for products with stock <= 5
+
+    // ===== LOAD PRODUCTS =====
     async function loadProducts() {
         const loader = document.getElementById('productsLoader');
         const container = document.getElementById('productsContainer');
@@ -968,13 +843,10 @@
             const products = await response.json();
             if (loader) loader.style.display = 'none';
             
-            // ===== FILTER: SHOW ALL PRODUCTS WITH STOCK > 0 (NO MORE STOCK >= 5 FILTER) =====
             const filteredProducts = products.filter(product => {
                 const stock = parseInt(product.stock) || 0;
-                return stock > 0; // Show all products with stock greater than 0
+                return stock > 0;
             });
-            
-            console.log('All Products with stock > 0:', filteredProducts.length);
             
             if (filteredProducts.length === 0) {
                 container.innerHTML = '<div class="col-12"><div class="no-products">No products available</div></div>';
@@ -1005,13 +877,11 @@
                 const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
                 const escapeName = product.name.replace(/'/g, "\\'");
                 
-                // ===== RATING DIRECTLY FROM PRODUCTS TABLE =====
                 const rating = parseFloat(product.rating) || 0;
                 const starsHtml = renderStars(rating);
                 
                 const stock = parseInt(product.stock) || 0;
                 
-                // ===== LOW STOCK ALERT - SHOWS WHEN STOCK <= 5 =====
                 let stockAlertHtml = '';
                 if (stock <= 5 && stock > 0) {
                     stockAlertHtml = `
@@ -1055,13 +925,11 @@
                                     <span class="product-price" style="text-align: left;">₹${parseFloat(displayPrice).toLocaleString()}</span>
                                 </div>
                                 
-                                <!-- Rating Stars - Yellow Filled from products table -->
                                 <div class="product-rating" style="justify-content: flex-start;">
                                     <div class="stars">${starsHtml}</div>
                                     <span class="rating-value">${rating > 0 ? rating.toFixed(1) : '0.0'}</span>
                                 </div>
                                 
-                                <!-- Low Stock Alert - Shows when stock <= 5 -->
                                 ${stockAlertHtml}
                             </div>
                         </div>
@@ -1077,8 +945,8 @@
             container.innerHTML = '<div class="col-12"><div class="no-products text-danger">Error loading products. Please try again.</div></div>';
         }
     }
-    
-    // Load best sellers
+
+    // ===== LOAD BEST SELLERS =====
     async function loadBestSellers() {
         try {
             const response = await fetch('/api/best-sellers');
@@ -1111,8 +979,8 @@
             console.error('Error loading best sellers:', error);
         }
     }
-    
-    // Initialize page
+
+    // ===== INITIALIZE =====
     document.addEventListener('DOMContentLoaded', function() {
         loadBanners();
         wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
@@ -1121,7 +989,7 @@
         loadProducts();
         loadBestSellers();
         updateCartCount();
-        checkAndHideWishlistCountIfViewed();
+        updateWishlistCount();
     });
 </script>
 @endsection

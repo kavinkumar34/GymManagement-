@@ -38,8 +38,12 @@
                     </div>
                     
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">Create Banner</button>
-                        <a href="{{ route('admin.banners.index') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Create Banner
+                        </button>
+                        <a href="{{ route('admin.banners.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i> Cancel
+                        </a>
                     </div>
                 </form>
             </div>
