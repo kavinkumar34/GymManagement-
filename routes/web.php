@@ -236,14 +236,13 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/contacts/{id}', [AdminContactController::class, 'show'])->name('contacts.show');
     Route::delete('/contacts/{id}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
     Route::post('/contacts/{id}/status', [AdminContactController::class, 'updateStatus'])->name('contacts.status');
-    
-    // Banners
-    Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
-    Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
-    Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
-    Route::get('/banners/{id}/edit', [BannerController::class, 'edit'])->name('banners.edit');
-    Route::put('/banners/{id}', [BannerController::class, 'update'])->name('banners.update');
-    Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
+// Banners
+Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
+Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
+Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
+Route::get('/banners/{id}/edit', [BannerController::class, 'edit'])->name('banners.edit');
+Route::put('/banners/{id}', [BannerController::class, 'update'])->name('banners.update');
+Route::delete('/banners/{id}', [BannerController::class, 'destroy'])->name('banners.destroy');
     
     // Payments/Orders
     Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');

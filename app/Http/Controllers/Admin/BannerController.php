@@ -42,7 +42,8 @@ class BannerController extends Controller
             'status' => $request->status
         ]);
         
-        return redirect()->route('admin.banners')->with('success', 'Banner created successfully!');
+        // FIX: Changed from 'admin.banners' to 'admin.banners.index'
+        return redirect()->route('admin.banners.index')->with('success', 'Banner created successfully!');
     }
     
     public function edit($id)
@@ -64,7 +65,8 @@ class BannerController extends Controller
         
         // Handle image upload
         if ($request->hasFile('image')) {
-            if ($banner->image) {
+            // Delete old image if exists
+            if ($banner->image && Storage::disk('public')->exists($banner->image)) {
                 Storage::disk('public')->delete($banner->image);
             }
             $banner->image = $request->file('image')->store('banners', 'public');
@@ -76,17 +78,22 @@ class BannerController extends Controller
             'status' => $request->status
         ]);
         
-        return redirect()->route('admin.banners')->with('success', 'Banner updated successfully!');
+        // FIX: Changed from 'admin.banners' to 'admin.banners.index'
+        return redirect()->route('admin.banners.index')->with('success', 'Banner updated successfully!');
     }
     
     public function destroy($id)
     {
         $banner = Banner::findOrFail($id);
-        if ($banner->image) {
+        
+        // Delete image if exists
+        if ($banner->image && Storage::disk('public')->exists($banner->image)) {
             Storage::disk('public')->delete($banner->image);
         }
+        
         $banner->delete();
         
-        return redirect()->route('admin.banners')->with('success', 'Banner deleted successfully!');
+        // FIX: Changed from 'admin.banners' to 'admin.banners.index'
+        return redirect()->route('admin.banners.index')->with('success', 'Banner deleted successfully!');
     }
 }

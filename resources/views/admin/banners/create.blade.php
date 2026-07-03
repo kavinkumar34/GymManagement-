@@ -39,7 +39,7 @@
                     
                     <div class="mt-4">
                         <button type="submit" class="btn btn-primary">Create Banner</button>
-                        <a href="{{ route('admin.banners') }}" class="btn btn-secondary">Cancel</a>
+                        <a href="{{ route('admin.banners.index') }}" class="btn btn-secondary">Cancel</a>
                     </div>
                 </form>
             </div>
