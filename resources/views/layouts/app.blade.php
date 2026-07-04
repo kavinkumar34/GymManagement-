@@ -49,7 +49,7 @@
         /* ===== NAVBAR SPACER - MINIMAL GAP ===== */
         .navbar-spacer {
             width: 100%;
-            height: 105px; /* Just enough to clear the navbar */
+            height: 105px;
             display: block;
         }
         
@@ -71,12 +71,6 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             transition: 0.3s;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            color: white;
-            margin-top: 50px;
         }
         
         /* Cart Count Badge */
@@ -638,6 +632,302 @@
                 display: none;
             }
         }
+
+        /* ===== PROFILE MODAL STYLES ===== */
+        .profile-modal .modal-content {
+            border-radius: 20px;
+            overflow: hidden;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .profile-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: none;
+            padding: 20px;
+        }
+        .profile-modal .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+        .profile-modal .modal-body {
+            padding: 25px;
+        }
+        .profile-modal .modal-footer {
+            padding: 15px 25px 25px;
+            border-top: none;
+        }
+        .profile-avatar-lg {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 35px;
+            color: white;
+        }
+        .profile-info-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #eef2f6;
+        }
+        .profile-info-item:last-child {
+            border-bottom: none;
+        }
+        .profile-info-label {
+            width: 100px;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 14px;
+        }
+        .profile-info-value {
+            flex: 1;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .profile-info-value .edit-input {
+            display: none;
+            width: 100%;
+            padding: 6px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .profile-info-value .edit-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .profile-info-value .edit-input.show {
+            display: block;
+        }
+        .profile-info-value .display-text.hide {
+            display: none;
+        }
+        .btn-edit-profile-modal {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-edit-profile-modal:hover {
+            background: #5a4bd1;
+            transform: translateY(-2px);
+        }
+        .btn-save-profile-modal {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+        .btn-save-profile-modal:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        .btn-cancel-profile-modal {
+            background: #e2e8f0;
+            color: #64748b;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: none;
+        }
+        .btn-cancel-profile-modal:hover {
+            background: #cbd5e1;
+        }
+        .btn-save-profile-modal.show,
+        .btn-cancel-profile-modal.show {
+            display: inline-block;
+        }
+        /* ===== PROFILE MODAL - RIGHT SIDE STYLES ===== */
+/* ===== PROFILE MODAL - RIGHT SIDE WITH REDUCED HEIGHT ===== */
+.profile-modal {
+    z-index: 99999 !important;
+}
+
+.profile-modal .modal-dialog {
+    margin: 50px 20px 20px auto !important;
+    max-width: 380px !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    z-index: 99999 !important;
+}
+
+.profile-modal .modal-content {
+    border-radius: 16px !important;
+    min-height: 0 !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    border: none !important;
+    box-shadow: -5px 0 30px rgba(0,0,0,0.1) !important;
+    background: #ffffff !important;
+    z-index: 99999 !important;
+}
+
+.modal-backdrop {
+    z-index: 99998 !important;
+    background-color: rgba(0,0,0,0.3) !important;
+}
+
+.profile-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-bottom: none !important;
+    padding: 20px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+.profile-modal .modal-header .btn-close {
+    filter: brightness(0) invert(1) !important;
+    opacity: 0.8 !important;
+}
+
+.profile-modal .modal-body {
+    padding: 20px !important;
+}
+
+.profile-modal .modal-footer {
+    padding: 15px 20px 20px !important;
+    border-top: none !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    background: white !important;
+    border-radius: 0 0 16px 16px !important;
+}
+
+.profile-avatar-lg {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 26px;
+    color: white;
+}
+
+.profile-info-item {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #eef2f6;
+}
+.profile-info-item:last-child {
+    border-bottom: none;
+}
+.profile-info-label {
+    width: 85px;
+    font-weight: 600;
+    color: #64748b;
+    font-size: 12px;
+}
+.profile-info-value {
+    flex: 1;
+    color: #1e293b;
+    font-size: 13px;
+}
+.profile-info-value .edit-input {
+    display: none;
+    width: 100%;
+    padding: 4px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.profile-info-value .edit-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+.profile-info-value .edit-input.show {
+    display: block;
+}
+.profile-info-value .display-text.hide {
+    display: none;
+}
+
+.btn-edit-profile-modal,
+.btn-save-profile-modal,
+.btn-cancel-profile-modal {
+    width: 100%;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    font-weight: 500;
+}
+
+.btn-edit-profile-modal {
+    background: #667eea;
+    color: white;
+}
+.btn-edit-profile-modal:hover {
+    background: #5a4bd1;
+    transform: translateY(-2px);
+}
+
+.btn-save-profile-modal {
+    background: #10b981;
+    color: white;
+    display: none;
+}
+.btn-save-profile-modal:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.btn-cancel-profile-modal {
+    background: #e2e8f0;
+    color: #64748b;
+    display: none;
+}
+.btn-cancel-profile-modal:hover {
+    background: #cbd5e1;
+}
+
+.btn-save-profile-modal.show,
+.btn-cancel-profile-modal.show {
+    display: block;
+}
+
+/* Animation for right side modal */
+.profile-modal .modal-dialog {
+    transform: translateX(100%) !important;
+    transition: transform 0.3s ease !important;
+}
+
+.profile-modal.show .modal-dialog {
+    transform: translateX(0) !important;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .profile-modal .modal-dialog {
+        margin: 20px 10px 10px auto !important;
+        max-width: 100% !important;
+    }
+}
     </style>
 </head>
 <body class="@if(Route::is('admin.login') || Route::is('admin.register')) hide-sidebar @endif">
@@ -782,7 +1072,7 @@
                             <span>{{ Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-id-card me-2"></i> My Profile</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="openProfileModal(); return false;"><i class="fas fa-id-card me-2"></i> My Profile</a></li>
                             <li><a class="dropdown-item" href="{{ route('my.orders') }}"><i class="fas fa-shopping-bag me-2"></i> My Orders</a></li>
                             @if(auth()->user()->role == 'trainer')
                                 <li><a class="dropdown-item" href="{{ route('trainer.dashboard') }}"><i class="fas fa-chalkboard-user me-2"></i> Trainer Dashboard</a></li>
@@ -897,11 +1187,277 @@
     @yield('content')
 </main>
 
-<!-- FOOTER SECTION -->
+<!-- ===== PROFILE MODAL ===== -->
+@auth
+<!-- ===== PROFILE MODAL - RIGHT SIDE ===== -->
+@auth
+<div class="modal fade profile-modal" id="profileModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-end" style="max-width: 380px; margin: 0 0 0 auto; height: 100vh; display: flex; align-items: stretch;">
+        <div class="modal-content" style="border-radius: 0; min-height: 100vh; max-height: 100vh; overflow-y: auto; border: none; box-shadow: -5px 0 30px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom: none; padding: 20px; position: sticky; top: 0; z-index: 10;">
+                <div class="text-center w-100">
+                    <div class="profile-avatar-lg">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h5 class="mb-0" id="modalProfileName">{{ Auth::user()->name }}</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div class="profile-info-item">
+                    <div class="profile-info-label">Full Name</div>
+                    <div class="profile-info-value">
+                        <span class="display-text" id="modalNameDisplay">{{ Auth::user()->name }}</span>
+                        <input type="text" class="edit-input" id="modalNameInput" value="{{ Auth::user()->name }}">
+                    </div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-label">Email</div>
+                    <div class="profile-info-value">
+                        <span class="display-text">{{ Auth::user()->email }}</span>
+                    </div>
+                </div>
+                <div class="profile-info-item">
+                    <div class="profile-info-label">Phone</div>
+                    <div class="profile-info-value">
+                        <span class="display-text">{{ Auth::user()->phone ?? 'Not provided' }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 15px 20px 20px; border-top: none; position: sticky; bottom: 0; background: white;">
+                <button class="btn-edit-profile-modal" id="modalEditProfileBtn" onclick="enableModalProfileEdit()" style="width: 100%;">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                <button class="btn-save-profile-modal" id="modalSaveProfileBtn" onclick="saveModalProfile()" style="width: 100%; display: none;">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="btn-cancel-profile-modal" id="modalCancelProfileBtn" onclick="cancelModalProfileEdit()" style="width: 100%; display: none;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endauth
+@endauth
+
+<script>
+// ===== PROFILE MODAL FUNCTIONS =====
+function openProfileModal() {
+    // Reset to view mode
+    cancelModalProfileEdit();
+    const modal = new bootstrap.Modal(document.getElementById('profileModal'), {
+        backdrop: true,
+        keyboard: true
+    });
+    modal.show();
+}
+
+function enableModalProfileEdit() {
+    document.getElementById('modalNameDisplay').style.display = 'none';
+    document.getElementById('modalNameInput').style.display = 'block';
+    document.getElementById('modalEditProfileBtn').style.display = 'none';
+    document.getElementById('modalSaveProfileBtn').style.display = 'block';
+    document.getElementById('modalCancelProfileBtn').style.display = 'block';
+    document.getElementById('modalNameInput').focus();
+}
+
+function cancelModalProfileEdit() {
+    document.getElementById('modalNameDisplay').style.display = 'block';
+    document.getElementById('modalNameInput').style.display = 'none';
+    document.getElementById('modalEditProfileBtn').style.display = 'block';
+    document.getElementById('modalSaveProfileBtn').style.display = 'none';
+    document.getElementById('modalCancelProfileBtn').style.display = 'none';
+    document.getElementById('modalNameInput').value = document.getElementById('modalNameDisplay').textContent;
+}
+
+async function saveModalProfile() {
+    const name = document.getElementById('modalNameInput').value.trim();
+    
+    if (!name) {
+        alert('Name cannot be empty!');
+        return;
+    }
+    
+    const saveBtn = document.getElementById('modalSaveProfileBtn');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    saveBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/api/update-profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ name: name })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('modalProfileName').textContent = name;
+            document.getElementById('modalNameDisplay').textContent = name;
+            
+            // Update navbar name
+            const navbarName = document.querySelector('.user-dropdown span');
+            if (navbarName) {
+                navbarName.textContent = name;
+            }
+            
+            alert('Profile updated successfully!');
+            cancelModalProfileEdit();
+        } else {
+            alert(data.message || 'Error updating profile');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+    } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+    }
+}
+
+// ===== CART & WISHLIST FUNCTIONS =====
+function refreshCaptcha() {
+    const img = document.getElementById('captcha-img');
+    if (img) {
+        img.src = '{{ url("/captcha") }}?' + Math.random();
+    }
+}
+
+function updateNavbarCartCount() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    let count = cart.reduce((total, item) => total + item.quantity, 0);
+    let cartCountElement = document.getElementById('navbarCartCount');
+    if(cartCountElement) {
+        if(count > 0) {
+            cartCountElement.textContent = count;
+            cartCountElement.classList.remove('hide-badge');
+        } else {
+            cartCountElement.textContent = '';
+            cartCountElement.classList.add('hide-badge');
+        }
+    }
+}
+
+function updateNavbarWishlistCount() {
+    let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    let count = wishlist.length;
+    let wishlistCountElement = document.getElementById('navbarWishlistCount');
+    if(wishlistCountElement) {
+        if(count > 0) {
+            wishlistCountElement.textContent = count;
+            wishlistCountElement.classList.remove('hide-badge');
+        } else {
+            wishlistCountElement.textContent = '';
+            wishlistCountElement.classList.add('hide-badge');
+        }
+    }
+}
+
+function searchProducts() {
+    let searchTerm = document.getElementById('navbarSearch').value.toLowerCase();
+    if(searchTerm) {
+        window.location.href = "{{ url('/') }}?search=" + searchTerm;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide success alerts
+    const successAlerts = document.querySelectorAll('.alert-success');
+    successAlerts.forEach(function(alert) {
+        setTimeout(function() {
+            const closeBtn = alert.querySelector('.btn-close');
+            if (closeBtn) {
+                closeBtn.click();
+            } else {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }
+        }, 5000);
+    });
+
+    // Auto-hide error alerts
+    const errorAlerts = document.querySelectorAll('.alert-danger');
+    errorAlerts.forEach(function(alert) {
+        setTimeout(function() {
+            const closeBtn = alert.querySelector('.btn-close');
+            if (closeBtn) {
+                closeBtn.click();
+            } else {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            }
+        }, 5000);
+    });
+
+    updateNavbarCartCount();
+    updateNavbarWishlistCount();
+
+    // Mobile: Toggle subcategory dropdown on click
+    if (window.innerWidth <= 992) {
+        document.querySelectorAll('.nav-item-category .nav-link').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                const parent = this.closest('.nav-item-category');
+                if (parent) {
+                    e.preventDefault();
+                    parent.classList.toggle('active');
+                }
+            });
+        });
+    }
+
+    // Show WhatsApp tooltip after 3 seconds
+    setTimeout(function() {
+        const tooltip = document.getElementById('whatsappTooltip');
+        if (tooltip) {
+            tooltip.classList.add('show');
+            setTimeout(function() {
+                tooltip.classList.remove('show');
+            }, 5000);
+        }
+    }, 3000);
+
+    // Show tooltip on hover of WhatsApp button
+    const whatsappBtn = document.querySelector('.whatsapp-float');
+    const tooltip = document.getElementById('whatsappTooltip');
+    
+    if (whatsappBtn && tooltip) {
+        whatsappBtn.addEventListener('mouseenter', function() {
+            tooltip.classList.add('show');
+        });
+        whatsappBtn.addEventListener('mouseleave', function() {
+            tooltip.classList.remove('show');
+        });
+    }
+});
+
+// Handle window resize for mobile
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 992) {
+        document.querySelectorAll('.nav-item-category.active').forEach(function(el) {
+            el.classList.remove('active');
+        });
+    }
+});
+</script>
+
+<!-- ===== SINGLE FOOTER SECTION ===== -->
 <footer class="footer mt-auto">
     <div class="container">
         <div class="row">
-            <div class="col-md-4 mb-4">
+            <!-- Column 1: Logo & About -->
+            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                 <div class="footer-logo">
                     <i class="fas fa-dumbbell me-2"></i>
                     <strong>Gym Management</strong>
@@ -919,21 +1475,21 @@
                 </div>
             </div>
 
-            <div class="col-md-2 mb-4">
+            <!-- Column 2: Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
                 <h5>Quick Links</h5>
                 <ul class="footer-links">
                     <li><a href="{{ url('/') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
                     <li><a href="{{ route('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
                     <li><a href="@if(auth()->check()) {{ route('contact') }} @else {{ route('login') }} @endif"><i class="fas fa-chevron-right"></i> Contact</a></li>
-                    <li><a href="#"><i class="fas fa-chevron-right"></i> Blog</a></li>
+                    <li><a href="@if(auth()->check()) {{ route('my.orders') }} @else {{ route('login') }} @endif"><i class="fas fa-chevron-right"></i> My Orders</a></li>
                 </ul>
             </div>
 
-            <div class="col-md-3 mb-4">
+            <!-- Column 3: Customer Service -->
+            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
                 <h5>Customer Service</h5>
                 <ul class="footer-links">
-                    <li><a href="@if(auth()->check()) {{ route('my.orders') }} @else {{ route('login') }} @endif"><i class="fas fa-chevron-right"></i> My Account</a></li>
-                    <li><a href="{{ route('track.order') }}"><i class="fas fa-chevron-right"></i> Track Order</a></li>
                     <li><a href="#"><i class="fas fa-chevron-right"></i> Returns & Exchange</a></li>
                     <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
                     <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
@@ -941,7 +1497,8 @@
                 </ul>
             </div>
 
-            <div class="col-md-3 mb-4">
+            <!-- Column 4: Get In Touch -->
+            <div class="col-lg-4 col-md-6">
                 <h5>Get In Touch</h5>
                 <ul class="footer-contact">
                     <li>
@@ -957,16 +1514,12 @@
                         <span>info@gymmanagement.com</span>
                     </li>
                     <li>
-                        <i class="fas fa-clock"></i>
-                        <span>Mon - Sat: 6:00 AM - 10:00 PM</span>
-                    </li>
-                    <li>
                         <i class="fab fa-whatsapp"></i>
                         <span>
                             <a href="https://wa.me/919025595190?text=Hi%20Gym%20Management%2C%20I%20need%20assistance." 
                                target="_blank" rel="noopener noreferrer" 
-                               style="color: #25d366; text-decoration: none; font-weight: 500;">
-                                +91 90255 95190 (WhatsApp)
+                               style="color: #a0a0c0; text-decoration: none; font-weight: 500;">
+                                +91 90255 95190
                             </a>
                         </span>
                     </li>
@@ -974,19 +1527,10 @@
             </div>
         </div>
 
+        <!-- Bottom Bar -->
         <div class="row bottom-bar">
-            <div class="col-md-6 text-center text-md-start">
-                <p>&copy; {{ date('Y') }} Gym Management. All rights reserved.</p>
-            </div>
-            <div class="col-md-6 text-center text-md-end">
-                <div class="payment-methods">
-                    <i class="fab fa-cc-visa"></i>
-                    <i class="fab fa-cc-mastercard"></i>
-                    <i class="fab fa-cc-amex"></i>
-                    <i class="fab fa-cc-paypal"></i>
-                    <i class="fas fa-credit-card"></i>
-                    <i class="fas fa-mobile-alt"></i>
-                </div>
+            <div class="col-12 text-center">
+                <p class="mb-0">&copy; {{ date('Y') }} Gym Management. All rights reserved.</p>
             </div>
         </div>
     </div>
@@ -1027,6 +1571,7 @@
     .footer-about {
         line-height: 1.6;
         font-size: 0.9rem;
+        max-width: 350px;
     }
 
     .social-icons a {
@@ -1049,16 +1594,12 @@
         transform: translateY(-3px);
     }
 
-    .social-icons a .fa-whatsapp:hover {
-        color: #25d366;
-    }
-
     .footer h5 {
         color: white;
         font-size: 1.1rem;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         position: relative;
-        padding-bottom: 10px;
+        padding-bottom: 12px;
     }
 
     .footer h5::after {
@@ -1071,42 +1612,50 @@
         background: #e94560;
     }
 
-    .footer-links, .footer-contact {
+    /* Quick Links & Customer Service */
+    .footer-links {
         list-style: none;
-        padding: 0;
         margin: 0;
+        padding: 0;
     }
 
-    .footer-links li, .footer-contact li {
+    .footer-links li {
         margin-bottom: 12px;
     }
 
-    .footer-links a {
+    .footer-links li a {
+        display: flex;
+        align-items: center;
         color: #a0a0c0;
         text-decoration: none;
-        transition: all 0.3s;
-        display: inline-block;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
     }
 
-    .footer-links a i {
+    .footer-links li a i {
+        width: 16px;
+        margin-right: 10px;
         font-size: 10px;
-        margin-right: 8px;
-        transition: all 0.3s;
+        color: #e94560;
     }
 
-    .footer-links a:hover {
+    .footer-links li a:hover {
         color: #e94560;
         transform: translateX(5px);
     }
 
-    .footer-links a:hover i {
-        transform: translateX(3px);
+    /* Contact Info */
+    .footer-contact {
+        list-style: none;
+        margin: 0;
+        padding: 0;
     }
 
     .footer-contact li {
         display: flex;
         align-items: flex-start;
         gap: 12px;
+        margin-bottom: 14px;
     }
 
     .footer-contact li i {
@@ -1118,12 +1667,11 @@
 
     .footer-contact li span {
         font-size: 0.9rem;
+        line-height: 1.5;
     }
 
-    .footer-contact li .fa-whatsapp {
-        color: #25d366;
-    }
 
+    /* Bottom Bar */
     .bottom-bar {
         padding: 20px 0;
         margin-top: 30px;
@@ -1131,167 +1679,51 @@
         font-size: 0.85rem;
     }
 
-    .payment-methods i {
-        font-size: 1.5rem;
-        margin-left: 10px;
-        color: #a0a0c0;
-        transition: all 0.3s;
-    }
-
-    .payment-methods i:hover {
-        color: #e94560;
+    /* Responsive */
+    @media (max-width: 992px) {
+        .footer h5::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .footer-about {
+            max-width: 100%;
+            text-align: center;
+        }
+        .footer .social-icons {
+            text-align: center;
+        }
+        .footer-contact li {
+            justify-content: center;
+        }
+        .footer-links li a {
+            justify-content: center;
+        }
     }
 
     @media (max-width: 768px) {
         .footer {
             text-align: center;
+            padding-top: 40px;
+        }
+        .footer h5 {
+            margin-top: 20px;
         }
         .footer h5::after {
             left: 50%;
             transform: translateX(-50%);
         }
-        .bottom-bar {
-            text-align: center;
-        }
-        .payment-methods {
-            margin-top: 10px;
+        .footer-links li a {
+            justify-content: center;
         }
         .footer-contact li {
             justify-content: center;
+        }
+        .bottom-bar {
+            text-align: center;
         }
     }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function refreshCaptcha() {
-        const img = document.getElementById('captcha-img');
-        if (img) {
-            img.src = '{{ url("/captcha") }}?' + Math.random();
-        }
-    }
-    
-    function updateNavbarCartCount() {
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        let count = cart.reduce((total, item) => total + item.quantity, 0);
-        let cartCountElement = document.getElementById('navbarCartCount');
-        if(cartCountElement) {
-            if(count > 0) {
-                cartCountElement.textContent = count;
-                cartCountElement.classList.remove('hide-badge');
-            } else {
-                cartCountElement.textContent = '';
-                cartCountElement.classList.add('hide-badge');
-            }
-        }
-    }
-    
-    function updateNavbarWishlistCount() {
-        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        let count = wishlist.length;
-        let wishlistCountElement = document.getElementById('navbarWishlistCount');
-        if(wishlistCountElement) {
-            if(count > 0) {
-                wishlistCountElement.textContent = count;
-                wishlistCountElement.classList.remove('hide-badge');
-            } else {
-                wishlistCountElement.textContent = '';
-                wishlistCountElement.classList.add('hide-badge');
-            }
-        }
-    }
-    
-    function searchProducts() {
-        let searchTerm = document.getElementById('navbarSearch').value.toLowerCase();
-        if(searchTerm) {
-            window.location.href = "{{ url('/') }}?search=" + searchTerm;
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto-hide success alerts
-        const successAlerts = document.querySelectorAll('.alert-success');
-        successAlerts.forEach(function(alert) {
-            setTimeout(function() {
-                const closeBtn = alert.querySelector('.btn-close');
-                if (closeBtn) {
-                    closeBtn.click();
-                } else {
-                    alert.style.transition = 'opacity 0.5s';
-                    alert.style.opacity = '0';
-                    setTimeout(function() {
-                        alert.remove();
-                    }, 500);
-                }
-            }, 5000);
-        });
-
-        // Auto-hide error alerts
-        const errorAlerts = document.querySelectorAll('.alert-danger');
-        errorAlerts.forEach(function(alert) {
-            setTimeout(function() {
-                const closeBtn = alert.querySelector('.btn-close');
-                if (closeBtn) {
-                    closeBtn.click();
-                } else {
-                    alert.style.transition = 'opacity 0.5s';
-                    alert.style.opacity = '0';
-                    setTimeout(function() {
-                        alert.remove();
-                    }, 500);
-                }
-            }, 5000);
-        });
-
-        updateNavbarCartCount();
-        updateNavbarWishlistCount();
-
-        // Mobile: Toggle subcategory dropdown on click
-        if (window.innerWidth <= 992) {
-            document.querySelectorAll('.nav-item-category .nav-link').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    const parent = this.closest('.nav-item-category');
-                    if (parent) {
-                        e.preventDefault();
-                        parent.classList.toggle('active');
-                    }
-                });
-            });
-        }
-
-        // Show WhatsApp tooltip after 3 seconds
-        setTimeout(function() {
-            const tooltip = document.getElementById('whatsappTooltip');
-            if (tooltip) {
-                tooltip.classList.add('show');
-                setTimeout(function() {
-                    tooltip.classList.remove('show');
-                }, 5000);
-            }
-        }, 3000);
-
-        // Show tooltip on hover of WhatsApp button
-        const whatsappBtn = document.querySelector('.whatsapp-float');
-        const tooltip = document.getElementById('whatsappTooltip');
-        
-        if (whatsappBtn && tooltip) {
-            whatsappBtn.addEventListener('mouseenter', function() {
-                tooltip.classList.add('show');
-            });
-            whatsappBtn.addEventListener('mouseleave', function() {
-                tooltip.classList.remove('show');
-            });
-        }
-    });
-
-    // Handle window resize for mobile
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 992) {
-            document.querySelectorAll('.nav-item-category.active').forEach(function(el) {
-                el.classList.remove('active');
-            });
-        }
-    });
-</script>
 </body>
 </html>

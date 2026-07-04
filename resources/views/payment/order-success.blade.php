@@ -158,9 +158,7 @@
             <i class="fas fa-check-circle"></i>
             <h3>Payment Successful!</h3>
             <p class="sub-text">Thank you for your purchase!</p>
-            <span class="email-sent-badge">
-                <i class="fas fa-envelope"></i> Confirmation sent to your email
-            </span>
+          
         </div>
         <div class="success-body p-4">
             <!-- Email Confirmation Notice -->
@@ -178,8 +176,8 @@
                     <h5 style="margin-bottom: 15px; color: #333;"><i class="fas fa-receipt"></i> Order Details</h5>
                     <table class="order-details-table">
                         <tr><td>Order Number</td><td><strong>{{ $order->order_number }}</strong></td></tr>
-                        <tr><td>Order Date</td><td>{{ \Carbon\Carbon::parse($order->order_date ?? $order->created_at)->format('d M Y, h:i A') }}</td></tr>
-                        <tr><td>Payment Status</td><td><span class="badge bg-success">Paid</span></td></tr>
+<tr><td>Order Date</td><td>{{ \Carbon\Carbon::parse($order->order_date ?? $order->created_at)->setTimezone('Asia/Kolkata')->format('d M Y, g:i A') }}</td></tr>                        
+<tr><td>Payment Status</td><td><span class="badge bg-success">Paid</span></td></tr>
                         <tr><td>Total Amount</td><td><strong style="color: #28a745;">₹{{ number_format($order->total_amount, 2) }}</strong></td></tr>
                     </table>
                 </div>

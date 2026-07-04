@@ -151,19 +151,28 @@
         box-shadow: none;
     }
     
-    /* Review Modal Styles */
+    /* Review Modal Styles - REDUCED SIZE */
+    .review-modal .modal-dialog {
+        max-width: 500px;
+    }
     .review-modal .modal-content {
-        border-radius: 20px;
+        border-radius: 16px;
         overflow: hidden;
     }
     .review-modal .modal-header {
         background: linear-gradient(135deg, #10b981, #059669);
         color: white;
         border-bottom: none;
-        padding: 20px;
+        padding: 15px 20px;
     }
     .review-modal .modal-header .btn-close {
         filter: brightness(0) invert(1);
+    }
+    .review-modal .modal-body {
+        padding: 20px;
+    }
+    .review-modal .modal-footer {
+        padding: 10px 20px 20px;
     }
     
     .review-stars {
@@ -171,13 +180,13 @@
         flex-direction: row-reverse;
         justify-content: flex-end;
         gap: 5px;
-        margin: 15px 0;
+        margin: 10px 0;
     }
     .review-stars input {
         display: none;
     }
     .review-stars label {
-        font-size: 40px;
+        font-size: 30px;
         color: #ddd;
         cursor: pointer;
         transition: 0.2s;
@@ -190,12 +199,12 @@
     
     .review-textarea {
         width: 100%;
-        padding: 12px;
+        padding: 10px 12px;
         border: 1px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 10px;
         resize: vertical;
         font-size: 0.9rem;
-        min-height: 100px;
+        min-height: 80px;
     }
     .review-textarea:focus {
         outline: none;
@@ -205,8 +214,8 @@
     
     .file-upload-area {
         border: 2px dashed #e2e8f0;
-        border-radius: 12px;
-        padding: 20px;
+        border-radius: 10px;
+        padding: 12px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s;
@@ -223,8 +232,8 @@
     }
     .file-upload-area .file-preview-item {
         position: relative;
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
         border-radius: 8px;
         overflow: hidden;
         border: 1px solid #e2e8f0;
@@ -239,13 +248,13 @@
         position: absolute;
         top: -6px;
         right: -6px;
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         border-radius: 50%;
         background: #ef4444;
         color: white;
         border: none;
-        font-size: 12px;
+        font-size: 10px;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -525,10 +534,118 @@
     .text-danger {
         color: #dc3545;
     }
+    /* ===== FIX: MODAL Z-INDEX TO SHOW ABOVE NAVBAR ===== */
+    .modal {
+        z-index: 99999 !important;
+    }
+    
+    .modal-backdrop {
+        z-index: 99998 !important;
+    }
+    
+    .order-details-modal .modal {
+        z-index: 99999 !important;
+    }
+    
+    .order-details-modal .modal-backdrop {
+        z-index: 99998 !important;
+    }
+    
+    /* Also ensure any dropdowns don't overlap */
+    .modal-open {
+        overflow: auto !important;
+        padding-right: 0 !important;
+    }
+    
+    .modal-open .navbar {
+        z-index: 9999 !important;
+    }
+    
+    /* Review Modal Form Label */
+    .review-modal .form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .review-modal .form-control {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+    }
+    .review-modal .text-danger {
+        font-size: 0.8rem;
+    }
 </style>
 
-<div class="container mt-4">
-    <div class="card">
+<div class="container mt-5 pt-3 pb-5 mb-4">
+    <!-- ===== SEARCH & FILTER SECTION ===== -->
+    <div class="card-body border-bottom bg-light">
+        <form method="GET" action="{{ route('my.orders') }}" id="orderFilterForm">
+            <div class="row g-3 align-items-end">
+                <!-- Search by Order ID -->
+                <div class="col-md-3">
+                    <label class="form-label fw-bold mb-1">Search Order</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                        <input type="text" 
+                               name="search" 
+                               class="form-control" 
+                               placeholder="Order # or Product..." 
+                               value="{{ request('search') }}">
+                    </div>
+                </div>
+                
+                <!-- Filter by Status -->
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Status</label>
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Status</option>
+                        <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="Confirmed" {{ request('status') == 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
+                        <option value="Shipped" {{ request('status') == 'Shipped' ? 'selected' : '' }}>Shipped</option>
+                        <option value="Delivered" {{ request('status') == 'Delivered' ? 'selected' : '' }}>Delivered</option>
+                        <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="Failed" {{ request('status') == 'Failed' ? 'selected' : '' }}>Failed</option>
+                    </select>
+                </div>
+                
+                <!-- Filter by Payment Status -->
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">Payment</label>
+                    <select name="payment_status" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Payments</option>
+                        <option value="SUCCESS" {{ request('payment_status') == 'SUCCESS' ? 'selected' : '' }}>Paid</option>
+                        <option value="PENDING" {{ request('payment_status') == 'PENDING' ? 'selected' : '' }}>Pending</option>
+                        <option value="FAILED" {{ request('payment_status') == 'FAILED' ? 'selected' : '' }}>Failed</option>
+                    </select>
+                </div>
+                
+                <!-- Date Range -->
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">From Date</label>
+                    <input type="date" name="from_date" class="form-control" value="{{ request('from_date') }}">
+                </div>
+                
+                <div class="col-md-2">
+                    <label class="form-label fw-bold mb-1">To Date</label>
+                    <input type="date" name="to_date" class="form-control" value="{{ request('to_date') }}">
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="col-md-1">
+                    <label class="form-label fw-bold mb-1">&nbsp;</label>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                        <a href="{{ route('my.orders') }}" class="btn btn-secondary w-100" title="Clear Filters">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card mt-3">
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0"><i class="fas fa-shopping-bag"></i> My Orders</h4>
         </div>
@@ -548,79 +665,100 @@
                         ->toArray();
                 @endphp
                 
-                <div class="orders-grid">
-                    @foreach($sortedOrders as $order)
-                    <div class="order-card-wrapper">
-                        <div class="order-card">
-                            <div class="order-header">
-                                <div>
-                                    <span class="order-number">
-                                        Order #{{ $order->order_number }}
-                                        <span class="order-number-badge">
-                                            <i class="fas fa-clock"></i> 
-                                            {{ \Carbon\Carbon::parse($order->created_at)->diffForHumans() }}
-                                        </span>
-                                    </span>
-                                    <div class="order-date">
-                                        <i class="far fa-calendar-alt"></i> 
-                                        {{ \Carbon\Carbon::parse($order->created_at)->format('j F Y \a\t h:i A') }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="order-status {{ $order->order_status }}">
-                                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i> 
-                                        {{ strtoupper($order->order_status) }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="order-body">
-                                <div class="order-info">
-                                    <div class="order-total">
-                                        <i class="fas fa-rupee-sign"></i> {{ number_format($order->total_amount, 2) }}
-                                    </div>
-                                    <div class="order-items-count">
-                                        <i class="fas fa-box"></i> {{ $order->items->count() }} item(s) • 
-                                        @if($order->payment_status == 'SUCCESS')
-                                            <span class="payment-badge payment-paid"><i class="fas fa-check-circle"></i> PAID</span>
-                                        @elseif($order->payment_status == 'FAILED')
-                                            <span class="payment-badge payment-failed"><i class="fas fa-times-circle"></i> FAILED</span>
-                                        @else
-                                            <span class="payment-badge payment-pending"><i class="fas fa-clock"></i> PENDING</span>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="order-actions">
-                                    <button class="btn-view-details" onclick="viewOrderDetails({{ $order->id }}, this)">
-                                        <i class="fas fa-eye"></i> View Details
-                                    </button>
-                                    
-                                    @if(strtolower($order->order_status) === 'delivered')
-                                        @php
-                                            $hasReviewed = false;
-                                            foreach($order->items as $item) {
-                                                if(in_array($item->product_id, $reviewedProductIds)) {
-                                                    $hasReviewed = true;
-                                                    break;
-                                                }
-                                            }
-                                        @endphp
-                                        @if(!$hasReviewed)
-                                            <button class="btn-review" onclick="openReviewModal({{ $order->id }})">
-                                                <i class="fas fa-star"></i> Write Review
-                                            </button>
-                                        @else
-                                            <button class="btn-review reviewed" disabled>
-                                                <i class="fas fa-check-circle"></i> Already Reviewed
-                                            </button>
-                                        @endif
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
+         <div class="orders-grid">
+    @foreach($sortedOrders as $order)
+    <div class="order-card-wrapper">
+        <div class="order-card">
+            <div class="order-header">
+                <div>
+                    <span class="order-number">
+                        Order #{{ $order->order_number }}
+                        <span class="order-number-badge">
+                            <i class="fas fa-clock"></i> 
+                            {{ \Carbon\Carbon::parse($order->created_at)->diffForHumans() }}
+                        </span>
+                    </span>
+                    <div class="order-date">
+                        <i class="far fa-calendar-alt"></i> 
+                        {{ \Carbon\Carbon::parse($order->created_at)->format('j F Y \a\t h:i A') }}
                     </div>
-                    @endforeach
                 </div>
+                <div>
+                    <span class="order-status {{ $order->order_status }}">
+                        <i class="fas fa-circle" style="font-size: 0.5rem;"></i> 
+                        {{ strtoupper($order->order_status) }}
+                    </span>
+                </div>
+            </div>
+            <div class="order-body">
+                <div class="order-info">
+                    <!-- ===== PRODUCT IMAGE - ADD THIS ===== -->
+                    <div class="order-product-image" style="margin-bottom: 10px;">
+                        @php
+                            $firstItem = $order->items->first();
+                            $productImage = null;
+                            if ($firstItem) {
+                                $product = \App\Models\Product::find($firstItem->product_id);
+                                if ($product && $product->image) {
+                                    $productImage = $product->image;
+                                }
+                            }
+                        @endphp
+                        @if($productImage)
+                            <img src="{{ asset('storage/' . $productImage) }}" alt="Product" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #eef2f6;">
+                        @else
+                            <div style="width: 60px; height: 60px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #eef2f6;">
+                                <i class="fas fa-box text-muted"></i>
+                            </div>
+                        @endif
+                    </div>
+                    
+                    <div class="order-total">
+                        <i class="fas fa-rupee-sign"></i> {{ number_format($order->total_amount, 2) }}
+                    </div>
+                    <div class="order-items-count">
+                        <i class="fas fa-box"></i> {{ $order->items->count() }} item(s) • 
+                        @if($order->payment_status == 'SUCCESS')
+                            <span class="payment-badge payment-paid"><i class="fas fa-check-circle"></i> PAYMENT PAID</span>
+                        @elseif($order->payment_status == 'FAILED')
+                            <span class="payment-badge payment-failed"><i class="fas fa-times-circle"></i>PAYMENT FAILED</span>
+                        @else
+                            <span class="payment-badge payment-pending"><i class="fas fa-clock"></i>PAYMENT PENDING</span>
+                        @endif
+                    </div>
+                </div>
+                
+                <div class="order-actions">
+                    <button class="btn-view-details" onclick="viewOrderDetails({{ $order->id }}, this)">
+                        <i class="fas fa-eye"></i> View Details
+                    </button>
+                    
+                    @if(strtolower($order->order_status) === 'delivered')
+                        @php
+                            $hasReviewed = false;
+                            foreach($order->items as $item) {
+                                if(in_array($item->product_id, $reviewedProductIds)) {
+                                    $hasReviewed = true;
+                                    break;
+                                }
+                            }
+                        @endphp
+                        @if(!$hasReviewed)
+                            <button class="btn-review" onclick="openReviewModal({{ $order->id }})">
+                                <i class="fas fa-star"></i> Write Review
+                            </button>
+                        @else
+                            <button class="btn-review reviewed" disabled>
+                                <i class="fas fa-check-circle"></i> Already Reviewed
+                            </button>
+                        @endif
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
                 
                 <div class="mt-3">
                     {{ $orders->links('pagination::bootstrap-5') }}
@@ -637,9 +775,9 @@
     </div>
 </div>
 
-<!-- ⭐ Review Modal -->
-<div class="modal fade review-modal" id="reviewModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+<!-- ===== REVIEW MODAL - REDUCED SIZE ===== -->
+<div class="modal fade review-modal" id="reviewModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="fas fa-star me-2"></i> Write a Review</h5>
@@ -649,15 +787,15 @@
                 <input type="hidden" id="review_order_id" value="">
                 
                 <div class="mb-3">
-                    <label class="fw-bold">Select Product <span class="text-danger">*</span></label>
-                    <select id="review_product_select" class="form-control" required>
+                    <label class="form-label fw-bold">Select Product <span class="text-danger">*</span></label>
+                    <select id="review_product_select" class="form-control form-control-sm" required>
                         <option value="">-- Select Product --</option>
                     </select>
                     <small class="text-danger" id="product_select_error" style="display:none;">Please select a product</small>
                 </div>
                 
                 <div class="mb-3">
-                    <label class="fw-bold">Your Rating <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold">Your Rating <span class="text-danger">*</span></label>
                     <div class="review-stars" id="reviewStars">
                         <input type="radio" name="rating" value="5" id="review_star5">
                         <label for="review_star5"><i class="fas fa-star"></i></label>
@@ -673,26 +811,26 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label class="fw-bold">Review Description <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold">Review <span class="text-danger">*</span></label>
                     <textarea id="review_description" class="review-textarea" placeholder="Share your experience with this product..."></textarea>
                 </div>
                 
-                <div class="mb-3">
-                    <label class="fw-bold">Upload Photos or Videos</label>
+                <div class="mb-2">
+                    <label class="form-label fw-bold">Upload Photos</label>
                     <div class="file-upload-area" onclick="document.getElementById('review_files').click()">
-                        <i class="fas fa-cloud-upload-alt fa-2x text-primary"></i>
-                        <p class="mb-0">Click to upload photos or videos</p>
+                        <i class="fas fa-cloud-upload-alt text-primary"></i>
+                        <p class="mb-0 small">Click to upload photos or videos</p>
                         <small class="text-muted">You can upload multiple files</small>
                         <input type="file" id="review_files" name="review_files[]" multiple accept="image/*,video/*" style="display:none" onchange="previewReviewFiles(this)">
                         <div id="review_files_preview" class="file-preview"></div>
                     </div>
                 </div>
                 
-                <div id="review_error_message" class="alert alert-danger" style="display:none;"></div>
+                <div id="review_error_message" class="alert alert-danger" style="display:none; padding: 8px 12px; font-size: 0.85rem;"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="submitReview()">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-success" id="submitReviewBtn" onclick="submitReview()">
                     <i class="fas fa-paper-plane"></i> Submit Review
                 </button>
             </div>
@@ -826,68 +964,113 @@ function selectReason(element, reason) {
     if (radio) radio.checked = true;
 }
 
-// ⭐ OPEN REVIEW MODAL
+// ⭐ OPEN REVIEW MODAL - FIXED
 function openReviewModal(orderId) {
-    currentOrderId = orderId;
-    document.getElementById('review_order_id').value = orderId;
-    document.getElementById('review_description').value = '';
-    document.getElementById('review_files_preview').innerHTML = '';
-    document.getElementById('review_error_message').style.display = 'none';
-    reviewFiles = [];
-    orderItemsData = [];
-    document.getElementById('product_select_error').style.display = 'none';
-    
-    document.querySelectorAll('#reviewStars input').forEach(input => input.checked = false);
-    document.getElementById('review_star1').checked = true;
-    
-    const select = document.getElementById('review_product_select');
-    select.innerHTML = '<option value="">-- Loading products... --</option>';
-    select.disabled = true;
-    
-    fetch(`/api/order-details/${orderId}`)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return res.json();
-        })
-        .then(data => {
-            select.innerHTML = '<option value="">-- Select Product --</option>';
-            select.disabled = false;
-            
-            if (data.success && data.order && data.order.items && data.order.items.length > 0) {
-                orderItemsData = data.order.items;
-                
-                data.order.items.forEach((item) => {
-                    const option = document.createElement('option');
-                    option.value = parseInt(item.product_id);
-                    option.textContent = item.product_name + ' (₹' + parseFloat(item.price).toFixed(2) + ')';
-                    select.appendChild(option);
-                });
-                
-                // Auto select if only one product
-                if (data.order.items.length === 1) {
-                    select.value = parseInt(data.order.items[0].product_id);
-                    console.log('Auto-selected product ID:', select.value);
+    try {
+        currentOrderId = orderId;
+        
+        // Set order ID
+        const orderIdInput = document.getElementById('review_order_id');
+        if (orderIdInput) {
+            orderIdInput.value = orderId;
+        }
+        
+        // Clear previous values
+        const descriptionTextarea = document.getElementById('review_description');
+        if (descriptionTextarea) {
+            descriptionTextarea.value = '';
+        }
+        
+        const filesPreview = document.getElementById('review_files_preview');
+        if (filesPreview) {
+            filesPreview.innerHTML = '';
+        }
+        
+        const errorDiv = document.getElementById('review_error_message');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        
+        reviewFiles = [];
+        orderItemsData = [];
+        
+        const productError = document.getElementById('product_select_error');
+        if (productError) {
+            productError.style.display = 'none';
+        }
+        
+        // Reset stars
+        document.querySelectorAll('#reviewStars input').forEach(input => input.checked = false);
+        const star1 = document.getElementById('review_star1');
+        if (star1) {
+            star1.checked = true;
+        }
+        
+        // Load products
+        const select = document.getElementById('review_product_select');
+        if (select) {
+            select.innerHTML = '<option value="">-- Loading products... --</option>';
+            select.disabled = true;
+        }
+        
+        fetch(`/api/order-details/${orderId}`)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
                 }
-            } else {
-                select.innerHTML = '<option value="">-- No products found --</option>';
-                select.disabled = true;
-            }
-        })
-        .catch(err => {
-            console.error('Error loading products:', err);
-            select.innerHTML = '<option value="">-- Error loading products --</option>';
-            select.disabled = false;
-        });
-    
-    const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
-    modal.show();
+                return res.json();
+            })
+            .then(data => {
+                if (select) {
+                    select.innerHTML = '<option value="">-- Select Product --</option>';
+                    select.disabled = false;
+                }
+                
+                if (data.success && data.order && data.order.items && data.order.items.length > 0) {
+                    orderItemsData = data.order.items;
+                    
+                    data.order.items.forEach((item) => {
+                        const option = document.createElement('option');
+                        option.value = parseInt(item.product_id);
+                        option.textContent = item.product_name + ' (₹' + parseFloat(item.price).toFixed(2) + ')';
+                        if (select) {
+                            select.appendChild(option);
+                        }
+                    });
+                    
+                    // Auto select if only one product
+                    if (data.order.items.length === 1 && select) {
+                        select.value = parseInt(data.order.items[0].product_id);
+                        console.log('Auto-selected product ID:', select.value);
+                    }
+                } else {
+                    if (select) {
+                        select.innerHTML = '<option value="">-- No products found --</option>';
+                        select.disabled = true;
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Error loading products:', err);
+                if (select) {
+                    select.innerHTML = '<option value="">-- Error loading products --</option>';
+                    select.disabled = false;
+                }
+            });
+        
+        const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Error in openReviewModal:', error);
+        alert('Error opening review modal. Please try again.');
+    }
 }
 
 // ⭐ Preview Review Files
 function previewReviewFiles(input) {
     const preview = document.getElementById('review_files_preview');
+    if (!preview) return;
+    
     const files = Array.from(input.files);
     
     files.forEach((file) => {
@@ -914,70 +1097,98 @@ function removeReviewFile(button, index) {
     reviewFiles.splice(index, 1);
 }
 
-// ⭐ SUBMIT REVIEW - FIXED
+// ⭐ SUBMIT REVIEW - FIXED WITH CONSOLE LOGS
 async function submitReview() {
-    const orderId = document.getElementById('review_order_id').value;
-    const productSelect = document.getElementById('review_product_select');
-    const productId = productSelect.value;
-    const rating = document.querySelector('input[name="rating"]:checked');
-    const description = document.getElementById('review_description').value;
-    const errorDiv = document.getElementById('review_error_message');
-    
-    console.log('Submitting review with:', {
-        order_id: orderId,
-        product_id: productId,
-        rating: rating ? rating.value : null,
-        description: description
-    });
-    
-    // Validate
-    let hasError = false;
-    let errorMessages = [];
-    
-    if (!productId || productId === '' || productId === '0' || productId === 'null') {
-        document.getElementById('product_select_error').style.display = 'block';
-        productSelect.style.borderColor = 'red';
-        hasError = true;
-        errorMessages.push('Please select a product');
-    } else {
-        document.getElementById('product_select_error').style.display = 'none';
-        productSelect.style.borderColor = '';
-    }
-    
-    if (!rating) {
-        errorMessages.push('Please select a rating');
-        hasError = true;
-    }
-    
-    if (!description || description.trim() === '') {
-        errorMessages.push('Please write a review description');
-        hasError = true;
-    }
-    
-    if (hasError) {
-        errorDiv.style.display = 'block';
-        errorDiv.innerHTML = errorMessages.join('<br>');
-        return;
-    }
-    
-    errorDiv.style.display = 'none';
-    
-    const submitBtn = document.querySelector('#reviewModal .btn-success');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-    submitBtn.disabled = true;
-    
-    const formData = new FormData();
-    formData.append('order_id', orderId);
-    formData.append('product_id', parseInt(productId));
-    formData.append('rating', parseInt(rating.value));
-    formData.append('description', description);
-    
-    reviewFiles.forEach(file => {
-        formData.append('review_files[]', file);
-    });
+    console.log('submitReview function called!');
     
     try {
+        const orderId = document.getElementById('review_order_id').value;
+        const productSelect = document.getElementById('review_product_select');
+        const productId = productSelect ? productSelect.value : null;
+        const rating = document.querySelector('input[name="rating"]:checked');
+        const description = document.getElementById('review_description').value;
+        const errorDiv = document.getElementById('review_error_message');
+        const submitBtn = document.getElementById('submitReviewBtn');
+        
+        console.log('Form Data:', {
+            order_id: orderId,
+            product_id: productId,
+            rating: rating ? rating.value : null,
+            description: description
+        });
+        
+        // Validate
+        let hasError = false;
+        let errorMessages = [];
+        
+        if (!productId || productId === '' || productId === '0' || productId === 'null') {
+            const productError = document.getElementById('product_select_error');
+            if (productError) {
+                productError.style.display = 'block';
+            }
+            if (productSelect) {
+                productSelect.style.borderColor = 'red';
+            }
+            hasError = true;
+            errorMessages.push('Please select a product');
+        } else {
+            const productError = document.getElementById('product_select_error');
+            if (productError) {
+                productError.style.display = 'none';
+            }
+            if (productSelect) {
+                productSelect.style.borderColor = '';
+            }
+        }
+        
+        if (!rating) {
+            errorMessages.push('Please select a rating');
+            hasError = true;
+        }
+        
+        if (!description || description.trim() === '') {
+            errorMessages.push('Please write a review description');
+            hasError = true;
+        }
+        
+        if (hasError) {
+            if (errorDiv) {
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = errorMessages.join('<br>');
+            } else {
+                alert(errorMessages.join('\n'));
+            }
+            return;
+        }
+        
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        
+        if (!submitBtn) {
+            alert('Error: Submit button not found.');
+            return;
+        }
+        
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        submitBtn.disabled = true;
+        
+        const formData = new FormData();
+        formData.append('order_id', orderId);
+        formData.append('product_id', parseInt(productId));
+        formData.append('rating', parseInt(rating.value));
+        formData.append('description', description);
+        
+        // Add review files if any
+        if (reviewFiles && reviewFiles.length > 0) {
+            reviewFiles.forEach(function(file) {
+                formData.append('review_files[]', file);
+            });
+        }
+        
+        console.log('Sending request to /submit-product-review');
+        
         const response = await fetch('/submit-product-review', {
             method: 'POST',
             headers: {
@@ -992,21 +1203,35 @@ async function submitReview() {
         
         if (data.success) {
             const modal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
-            if (modal) modal.hide();
-            
+            if (modal) {
+                modal.hide();
+            }
             alert(data.message || 'Thank you! Your review has been submitted for approval.');
             location.reload();
         } else {
-            errorDiv.style.display = 'block';
-            errorDiv.innerHTML = data.message || 'Error submitting review';
+            if (errorDiv) {
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = data.message || 'Error submitting review';
+            } else {
+                alert(data.message || 'Error submitting review');
+            }
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     } catch (error) {
-        console.error('Error:', error);
-        errorDiv.style.display = 'block';
-        errorDiv.innerHTML = 'Network error. Please try again.';
-    } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+        console.error('Error in submitReview:', error);
+        const errorDiv = document.getElementById('review_error_message');
+        if (errorDiv) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerHTML = 'Network error: ' + error.message;
+        } else {
+            alert('Network error: ' + error.message);
+        }
+        const submitBtn = document.getElementById('submitReviewBtn');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+            submitBtn.disabled = false;
+        }
     }
 }
 

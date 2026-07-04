@@ -200,42 +200,41 @@ public function getOrderDetails($id)
     }
 }
     
- public function updateOrderStatus(Request $request, $id)
+public function updateOrderStatus(Request $request, $id)
 {
     try {
-        $order = Order::find($id);
-        
-        if (!$order) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Order not found'
-            ]);
-        }
-        
+        $order = Order::findOrFail($id);
         $newStatus = $request->order_status;
         
-        // Validate the status
+        // Validate status
         $validStatuses = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Failed'];
         if (!in_array($newStatus, $validStatuses)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid status'
+                'message' => 'Invalid order status'
             ]);
         }
         
-        // Update the order status
         $order->order_status = $newStatus;
+        
+        // ===== NEW: Auto update payment status to PAID for COD when Delivered =====
+        if ($newStatus === 'Delivered' && $order->payment_method === 'COD') {
+            $order->payment_status = 'SUCCESS';
+        }
+        
         $order->save();
         
         return response()->json([
             'success' => true,
             'message' => 'Order status updated successfully',
-            'new_status' => $order->order_status
+            'order_status' => $order->order_status,
+            'payment_status' => $order->payment_status
         ]);
+        
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
-            'message' => $e->getMessage()
+            'message' => 'Error: ' . $e->getMessage()
         ]);
     }
 }

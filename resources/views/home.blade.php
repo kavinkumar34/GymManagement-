@@ -559,15 +559,7 @@
     <div class="row" id="productsContainer"></div>
 </div>
 
-<!-- ===== BEST SELLERS LIST ===== -->
-<div class="container mt-5 mb-5">
-    <div class="card best-sellers-card">
-        <div class="card-header best-sellers-header">
-            <h4 class="mb-0"><i class="fas fa-trophy"></i> Best Selling Products</h4>
-        </div>
-        <div class="card-body" id="bestSellersList"></div>
-    </div>
-</div>
+
 
 <script>
     // ===== BANNER LOADING =====

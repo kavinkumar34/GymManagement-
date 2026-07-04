@@ -284,15 +284,15 @@
                                     @endphp
                                     <span class="badge bg-{{ $statusClass }} order-status-badge-{{ $order->id }}" id="order-status-{{ $order->id }}">{{ $order->order_status }}</span>
                                  </td>
-                                <td>
-                                    @if($order->payment_status == 'SUCCESS')
-                                        <span class="badge bg-success">Paid</span>
-                                    @elseif($order->payment_status == 'FAILED')
-                                        <span class="badge bg-danger">Failed</span>
-                                    @else
-                                        <span class="badge bg-warning">Pending</span>
-                                    @endif
-                                 </td>
+                            <td>
+    @if($order->payment_status == 'SUCCESS')
+        <span class="badge bg-success" id="payment-status-{{ $order->id }}">Paid</span>
+    @elseif($order->payment_status == 'FAILED')
+        <span class="badge bg-danger" id="payment-status-{{ $order->id }}">Failed</span>
+    @else
+        <span class="badge bg-warning" id="payment-status-{{ $order->id }}">Pending</span>
+    @endif
+</td>
                                 <td>
                                     <div class="dropdown">
                                         <button class="btn status-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" id="status-btn-{{ $order->id }}">
@@ -442,6 +442,8 @@ function statusClickHandler(e) {
 }
 
 // Update order status function
+// Update order status function
+// Update order status function
 function updateOrderStatus(orderId, newStatus) {
     var dropdownBtn = document.getElementById('status-btn-' + orderId);
     var originalText = dropdownBtn.innerText;
@@ -465,6 +467,7 @@ function updateOrderStatus(orderId, newStatus) {
         console.log('Response:', data);
         
         if (data.success) {
+            // Update Order Status Badge
             var statusBadge = document.getElementById('order-status-' + orderId);
             if (statusBadge) {
                 var badgeClass = 'badge ';
@@ -481,6 +484,35 @@ function updateOrderStatus(orderId, newStatus) {
             }
             
             dropdownBtn.innerText = newStatus;
+            
+            // ===== UPDATE PAYMENT STATUS TO PAID FOR COD ORDERS WHEN DELIVERED =====
+            if (newStatus === 'Delivered') {
+                // Check if payment status was updated in backend
+                if (data.payment_status === 'SUCCESS') {
+                    // Update payment badge
+                    var paymentBadge = document.getElementById('payment-status-' + orderId);
+                    if (paymentBadge) {
+                        paymentBadge.className = 'badge bg-success';
+                        paymentBadge.innerText = 'Paid';
+                    } else {
+                        // Fallback: find by row
+                        var row = document.getElementById('order-row-' + orderId);
+                        if (row) {
+                            var cells = row.querySelectorAll('td');
+                            if (cells.length >= 7) {
+                                var paymentCell = cells[6];
+                                var badge = paymentCell.querySelector('.badge');
+                                if (badge) {
+                                    badge.className = 'badge bg-success';
+                                    badge.innerText = 'Paid';
+                                } else {
+                                    paymentCell.innerHTML = '<span class="badge bg-success">Paid</span>';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
             var menu = document.getElementById('status-menu-' + orderId);
             if (menu) {

@@ -284,19 +284,51 @@ class PaymentController extends Controller
         return view('payment.order-success', compact('order', 'clearCart'));
     }
     
-    public function myOrders()
-    {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to view orders');
-        }
-        
-        $orders = Order::with('items')
-            ->where('user_id', Auth::id())
-            ->orderBy('id', 'desc')
-            ->paginate(10);
-        
-        return view('payment.my-orders', compact('orders'));
+public function myOrders(Request $request)
+{
+    if (!Auth::check()) {
+        return redirect()->route('login')->with('error', 'Please login to view orders');
     }
+    
+    $query = Order::with('items')
+        ->where('user_id', Auth::id());
+    
+    // Search by Order ID or Product Name
+    if ($request->search) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('order_number', 'LIKE', "%{$search}%")
+              ->orWhereHas('items', function($itemQuery) use ($search) {
+                  $itemQuery->where('product_name', 'LIKE', "%{$search}%");
+              });
+        });
+    }
+    
+    // Filter by Order Status
+    if ($request->status) {
+        $query->where('order_status', $request->status);
+    }
+    
+    // Filter by Payment Status
+    if ($request->payment_status) {
+        $query->where('payment_status', $request->payment_status);
+    }
+    
+    // Filter by Date Range
+    if ($request->from_date) {
+        $query->whereDate('created_at', '>=', $request->from_date);
+    }
+    if ($request->to_date) {
+        $query->whereDate('created_at', '<=', $request->to_date);
+    }
+    
+    $orders = $query->orderBy('id', 'desc')->paginate(10);
+    
+    // Preserve query parameters in pagination
+    $orders->appends($request->all());
+    
+    return view('payment.my-orders', compact('orders'));
+}
     
     public function placeCodOrder(Request $request)
     {
@@ -372,7 +404,7 @@ class PaymentController extends Controller
         // ⭐⭐⭐ SEND EMAIL CONFIRMATION FOR COD ⭐⭐⭐
         $this->sendOrderConfirmationEmail($order);
         
-        return redirect()->route('order.success', $order->id)->with('success', 'Order placed successfully! You will pay on delivery.');
+return redirect()->route('order.success', $order->id);
     }
     
     public function cancelOrder(Request $request)

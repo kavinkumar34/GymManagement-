@@ -758,3 +758,19 @@ Route::get('/test-sms-working', function() {
         'note' => 'Check your phone for SMS. If not received, check MSG91 balance.'
     ]);
 });
+
+Route::post('/api/update-profile', function (Illuminate\Http\Request $request) {
+    if (!auth()->check()) {
+        return response()->json(['success' => false, 'message' => 'Not authenticated']);
+    }
+    
+    $request->validate([
+        'name' => 'required|string|max:255'
+    ]);
+    
+    $user = auth()->user();
+    $user->name = $request->name;
+    $user->save();
+    
+    return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
+})->name('api.update.profile');

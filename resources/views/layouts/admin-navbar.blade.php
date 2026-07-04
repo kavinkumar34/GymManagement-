@@ -183,7 +183,7 @@
         <!-- Payments -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.payments.index') }}" id="paymentsNavLink" onclick="markPaymentsViewed()">
-                <i class="fas fa-credit-card"></i> <span>Payments</span>
+                <i class="fas fa-credit-card"></i> <span>Orders</span>
                 @if($newPendingOrders > 0)
                     <span class="badge bg-danger ms-2" id="pendingBadge">{{ $newPendingOrders }}</span>
                 @endif

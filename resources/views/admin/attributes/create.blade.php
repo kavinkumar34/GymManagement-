@@ -58,20 +58,6 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-12">
-                        <table class="table table-bordered" id="values_table">
-                            <thead>
-                                <tr>
-                                    <th>Value</th>
-                                    <th>Additional Price (₹)</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
 
                 <div class="mt-3">
                     <button type="submit" class="btn btn-primary">Save Attribute</button>
