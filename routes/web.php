@@ -436,13 +436,21 @@ Route::delete('/api/user-addresses/{id}', function ($id) {
 
 // ============ DELIVERABLE PINCODES API ============
 Route::get('/api/deliverable-pincodes', function () {
-    $pincodes = \App\Models\DeliverablePincode::where('is_active', 1)
-        ->select('pincode', 'city', 'state', 'delivery_days', 'is_active')
-        ->get();
-    return response()->json([
-        'success' => true,
-        'pincodes' => $pincodes
-    ]);
+    try {
+        $pincodes = \App\Models\DeliverablePincode::where('is_active', 1)
+            ->select('id', 'state', 'shipping_charge', 'is_active')
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'pincodes' => $pincodes
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
 })->name('deliverable.pincodes');
 
 // ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ============
