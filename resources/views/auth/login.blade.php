@@ -140,9 +140,10 @@
     }
     
     /* Move form UP - Reduced top margin */
-    .row.justify-content-center {
-        margin-top: 2rem !important;
-    }
+   .row.justify-content-center {
+    margin-top: 70px !important;   /* Gap below navbar */
+    margin-bottom: 80px !important; /* Gap above footer */
+}
     
     /* Responsive */
     @media (max-width: 768px) {
@@ -187,8 +188,7 @@
         <div class="card user-login-card">
             <div class="card-header text-center">
                 <i class="fas fa-dumbbell" style="font-size: 28px; margin-bottom: 8px; color: white;"></i>
-                <h4><i class="fas fa-sign-in-alt"></i> Login to Gym Management</h4>
-                <small>Member & Trainer Login</small>
+                <h4><i class="fas fa-sign-in-alt"></i> Login</h4>
             </div>
             <div class="card-body">
                 @if(session('error'))

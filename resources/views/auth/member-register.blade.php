@@ -30,11 +30,11 @@
         }
     }
     
-    .user-register-card .card-header {
-        background: #000000;
-        padding: 20px 20px;
-        border: none;
-    }
+.user-register-card .card-header {
+    background: #000000;
+    padding: 15px 20px;
+    border: none;
+}
     
     .user-register-card .card-header h4 {
         font-size: 24px;
@@ -49,10 +49,10 @@
         color: rgba(255,255,255,0.7);
     }
     
-    .user-register-card .card-body {
-        padding: 25px 30px;
-        background: white;
-    }
+.user-register-card .card-body {
+    padding: 20px 25px;
+    background: white;
+}
     
     /* Form Styling */
     .form-label {
@@ -190,9 +190,10 @@
     }
     
     /* Move form UP */
-    .row.justify-content-center {
-        margin-top: 2rem !important;
-    }
+.row.justify-content-center {
+    margin-top: 100px !important;
+    margin-bottom: 50px !important;
+}
     
     /* Phone input with country code */
     .phone-input-group {
@@ -281,12 +282,11 @@
 </style>
 
 <div class="row justify-content-center mt-2">
-    <div class="col-md-6">
-        <div class="card user-register-card">
+<div class="col-lg-5 col-md-6">
+            <div class="card user-register-card">
             <div class="card-header text-center">
                 <i class="fas fa-dumbbell" style="font-size: 28px; margin-bottom: 8px; color: white;"></i>
                 <h4><i class="fas fa-user-plus"></i> Create Your Account</h4>
-                <small>Join our gym family today!</small>
             </div>
             <div class="card-body">
                 @if(session('error'))
@@ -355,16 +355,7 @@
                         @enderror
                         <small class="text-muted">Minimum 6 characters</small>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-lock me-2"></i>Confirm Password</label>
-                        <div class="password-wrapper">
-                            <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirm your password" required>
-                            <button type="button" class="password-toggle" onclick="togglePassword('password_confirmation', this)">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
+            
                     
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-robot me-2"></i>Security Check</label>

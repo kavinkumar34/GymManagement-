@@ -161,15 +161,14 @@
     }
     
     /* Captcha Image */
-    .captcha-img {
-        border-radius: 8px;
-        border: 2px solid #e0e0e0;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        height: 38px;
-        width: 100%;
-        object-fit: cover;
-    }
+ .captcha-img{
+    width:160px;
+    height:42px;
+    border-radius:8px;
+    border:2px solid #e0e0e0;
+    cursor:pointer;
+    object-fit:cover;
+}
     
     .captcha-img:hover {
         border-color: #dc3545;
@@ -271,6 +270,19 @@
 .whatsapp-float, .whatsapp-tooltip {
     display: none !important;
 }
+
+#togglePassword,
+#toggleConfirmPassword{
+    color:#6c757d;
+    cursor:pointer;
+    z-index:10;
+    font-size:16px;
+}
+
+#togglePassword:hover,
+#toggleConfirmPassword:hover{
+    color:#dc3545;
+}
 </style>
 
 <div class="register-container">
@@ -303,30 +315,77 @@
                         <input type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="Enter your email" required>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-lock me-2"></i>Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Create a password" required>
-                        <small class="text-muted">Minimum 6 characters</small>
-                    </div>
+                <div class="mb-3">
+    <label class="form-label">
+        <i class="fas fa-lock me-2"></i>Password
+    </label>
+
+    <div class="position-relative">
+        <input type="password"
+               id="password"
+               name="password"
+               class="form-control pe-5"
+               placeholder="Create a password"
+               autocomplete="new-password"
+               required>
+
+        <span id="togglePassword"
+              class="position-absolute top-50 end-0 translate-middle-y me-3"
+              style="cursor:pointer;">
+            <i class="fas fa-eye"></i>
+        </span>
+    </div>
+
+    <small class="text-muted">Minimum 6 characters</small>
+</div>
                     
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-lock me-2"></i>Confirm Password</label>
-                        <input type="password" name="password_confirmation" class="form-control" placeholder="Confirm your password" required>
-                    </div>
+                <div class="mb-3">
+    <label class="form-label">
+        <i class="fas fa-lock me-2"></i>Confirm Password
+    </label>
+
+    <div class="position-relative">
+        <input type="password"
+               id="confirmPassword"
+               name="password_confirmation"
+               class="form-control pe-5"
+               placeholder="Confirm your password"
+               autocomplete="new-password"
+               required>
+
+        <span id="toggleConfirmPassword"
+              class="position-absolute top-50 end-0 translate-middle-y me-3"
+              style="cursor:pointer;">
+            <i class="fas fa-eye"></i>
+        </span>
+    </div>
+</div>
                     
-                    <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-robot me-2"></i>Security Check</label>
-                        <div class="row g-2 align-items-center">
-                            <div class="col-7">
-                                <input type="text" name="captcha" class="form-control" placeholder="Enter 6-digit code" required>
-                            </div>
-                            <div class="col-5">
-                                <img src="{{ url('/captcha') }}" id="captcha-img" class="captcha-img" onclick="refreshCaptcha()">
-                            </div>
-                        </div>
-                        <small class="text-muted mt-1 d-block"><i class="fas fa-sync-alt me-1"></i>Click on the image to refresh</small>
-                    </div>
-                    
+ <div class="mb-3">
+    <label class="form-label">
+        <i class="fas fa-robot me-2"></i>Security Check
+    </label>
+
+    <div class="d-flex align-items-center gap-2">
+        <input type="text"
+               name="captcha"
+               class="form-control"
+               placeholder="Enter 6-digit code"
+               required
+               style="flex:1;">
+
+        <img src="{{ url('/captcha') }}"
+             id="captcha-img"
+             class="captcha-img"
+             onclick="refreshCaptcha()"
+             style="width:160px;height:42px;flex-shrink:0;">
+    </div>
+
+    <small class="text-muted d-block mt-2">
+        <i class="fas fa-sync-alt me-1"></i>
+        Click on the image to refresh
+    </small>
+</div>            
                     <button type="submit" class="btn-admin-register">
                         <i class="fas fa-user-plus me-2"></i>Register Admin
                     </button>
@@ -350,4 +409,30 @@ function refreshCaptcha() {
         img.src = '/captcha?' + Math.random();
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    function togglePassword(inputId, iconId) {
+
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        icon.addEventListener("click", function () {
+
+            if (input.type === "password") {
+                input.type = "text";
+                this.querySelector("i").classList.replace("fa-eye", "fa-eye-slash");
+            } else {
+                input.type = "password";
+                this.querySelector("i").classList.replace("fa-eye-slash", "fa-eye");
+            }
+
+        });
+
+    }
+
+    togglePassword("password", "togglePassword");
+    togglePassword("confirmPassword", "toggleConfirmPassword");
+
+});
 </script>

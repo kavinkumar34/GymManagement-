@@ -238,11 +238,56 @@
 .whatsapp-float, .whatsapp-tooltip {
     display: none !important;
 }
+
+/* Hide navbar spacer */
+.navbar-spacer {
+    display: none !important;
+    height: 0 !important;
+}
+
+/* Remove main spacing */
+main {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh;
+}
+
+/* Perfect center */
+.container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 !important;
+    margin: 0 auto;
+}
+
+.row {
+    width: 100%;
+    justify-content: center;
+    margin: 0;
+}
+
+.admin-card {
+    margin: 0 !important;
+}
+.container-fluid{
+    padding:0 !important;
+}
+#togglePassword {
+    color: #6c757d;
+    font-size: 16px;
+    z-index: 10;
+}
+
+#togglePassword:hover {
+    color: #dc3545;
+}
 </style>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
+<div class="container-fluid">
+<div class="row justify-content-center align-items-center" style="min-height:100vh;">
+            <div class="col-md-5 col-lg-4">
             <div class="card admin-card">
                 <div class="card-header text-center">
                     <i class="fas fa-dumbbell" style="font-size: 32px; margin-bottom: 8px; color: white;"></i>
@@ -265,10 +310,27 @@
                             <input type="email" name="email" class="form-control" placeholder="Enter your email" required autofocus>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-lock me-2"></i>Password</label>
-                            <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
-                        </div>
+                      <div class="mb-3">
+    <label class="form-label">
+        <i class="fas fa-lock me-2"></i>Password
+    </label>
+
+    <div class="position-relative">
+     <input type="password"
+       id="password"
+       name="password"
+       class="form-control pe-5"
+       placeholder="Enter your password"
+       autocomplete="current-password"
+       required>
+
+        <span id="togglePassword"
+              class="position-absolute top-50 end-0 translate-middle-y me-3"
+              style="cursor:pointer;">
+            <i class="fas fa-eye"></i>
+        </span>
+    </div>  
+</div>
                         
                         <div class="mb-3">
                             <label class="form-label"><i class="fas fa-robot me-2"></i>Security Check</label>
@@ -307,4 +369,25 @@ function refreshCaptcha() {
         img.src = '/captcha?' + Math.random();
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const togglePassword = document.getElementById("togglePassword");
+    const password = document.getElementById("password");
+
+    togglePassword.addEventListener("click", function () {
+
+        if (password.type === "password") {
+            password.type = "text";
+            this.querySelector("i").classList.remove("fa-eye");
+            this.querySelector("i").classList.add("fa-eye-slash");
+        } else {
+            password.type = "password";
+            this.querySelector("i").classList.remove("fa-eye-slash");
+            this.querySelector("i").classList.add("fa-eye");
+        }
+
+    });
+
+});
 </script>

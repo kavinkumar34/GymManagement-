@@ -9,18 +9,24 @@ use Illuminate\Http\Request;
 
 class ProductApiController extends Controller
 {
-    public function getCategories()
-    {
-        $categories = Category::where('status', 'Active')->get();
-        return response()->json($categories);
-    }
+  public function getCategories()
+{
+    $categories = Category::where('is_active', 1)
+        ->orderBy('id', 'asc')
+        ->get();
+
+    return response()->json($categories);
+}
     
     public function getProducts()
     {
-        $products = Product::with('category', 'productImages')
-            ->where('status', 'Active')
-            ->orderBy('id', 'desc')
-            ->get();
+      $products = Product::with('category', 'productImages')
+    ->where('status', 'Active')
+    ->whereHas('category', function ($query) {
+        $query->where('is_active', 1);
+    })
+    ->orderBy('id', 'desc')
+    ->get();
         
         return response()->json($products->map(function($product) {
             return $this->formatProduct($product);
@@ -29,12 +35,15 @@ class ProductApiController extends Controller
     
     public function getBestSellers()
     {
-        $products = Product::with('category', 'productImages')
-            ->where('status', 'Active')
-            ->where('is_best_seller', 1)
-            ->orderBy('id', 'desc')
-            ->limit(3)
-            ->get();
+      $products = Product::with('category', 'productImages')
+    ->where('status', 'Active')
+    ->where('is_best_seller', 1)
+    ->whereHas('category', function ($query) {
+        $query->where('is_active', 1);
+    })
+    ->orderBy('id', 'desc')
+    ->limit(3)
+    ->get();
         
         return response()->json($products->map(function($product) {
             $formatted = $this->formatProduct($product);
@@ -45,12 +54,14 @@ class ProductApiController extends Controller
     
     public function searchProducts(Request $request)
     {
-        $query = $request->get('q');
-        $products = Product::with('category', 'productImages')
-            ->where('status', 'Active')
-            ->where('name', 'like', "%{$query}%")
-            ->limit(20)
-            ->get();
+     $products = Product::with('category', 'productImages')
+    ->where('status', 'Active')
+    ->whereHas('category', function ($query) {
+        $query->where('is_active', 1);
+    })
+    ->where('name', 'like', "%{$query}%")
+    ->limit(20)
+    ->get();
         
         return response()->json($products->map(function($product) {
             return $this->formatProduct($product);
@@ -59,10 +70,13 @@ class ProductApiController extends Controller
     
     public function getProductsByCategory($id)
     {
-        $products = Product::with('category', 'productImages')
-            ->where('status', 'Active')
-            ->where('category_id', $id)
-            ->get();
+   $products = Product::with('category', 'productImages')
+    ->where('status', 'Active')
+    ->whereHas('category', function ($query) {
+        $query->where('is_active', 1);
+    })
+    ->where('category_id', $id)
+    ->get();
         
         return response()->json($products->map(function($product) {
             return $this->formatProduct($product);
@@ -71,10 +85,13 @@ class ProductApiController extends Controller
     
     public function getProductsBySubCategory($id)
     {
-        $products = Product::with('category', 'productImages')
-            ->where('status', 'Active') 
-            ->where('sub_category_id', $id)
-            ->get();
+       $products = Product::with('category', 'productImages')
+    ->where('status', 'Active')
+    ->whereHas('category', function ($query) {
+        $query->where('is_active', 1);
+    })
+    ->where('sub_category_id', $id)
+    ->get();
         
         return response()->json($products->map(function($product) {
             return $this->formatProduct($product);

@@ -994,22 +994,18 @@
         }
     }
 
-    // Define category names to display in navbar
-    $categoryNames = ['Men', 'Women', 'Footwear', 'Gym Equipment', 'Massagers', 'Accessories', 'Supplements'];
-    
-    // Get categories with their subcategories
-    $navCategories = collect();
-    foreach ($categoryNames as $name) {
-        $category = \App\Models\Category::where('name', $name)->first();
-        if ($category) {
-            $subs = getSubCategoriesForMenu($category->id);
-            $navCategories->push([
-                'id' => $category->id,
-                'name' => $category->name,
-                'subcategories' => $subs
-            ]);
-        }
-    }
+$navCategories = \App\Models\Category::where('is_active',1)
+    ->orderBy('id','asc')
+    ->get()
+    ->map(function($category){
+
+        return [
+            'id' => $category->id,
+            'name' => $category->name,
+            'subcategories' => getSubCategoriesForMenu($category->id)
+        ];
+
+    });
 @endphp
 
 {{-- 
@@ -1074,11 +1070,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" onclick="openProfileModal(); return false;"><i class="fas fa-id-card me-2"></i> My Profile</a></li>
                             <li><a class="dropdown-item" href="{{ route('my.orders') }}"><i class="fas fa-shopping-bag me-2"></i> My Orders</a></li>
-                            @if(auth()->user()->role == 'trainer')
-                                <li><a class="dropdown-item" href="{{ route('trainer.dashboard') }}"><i class="fas fa-chalkboard-user me-2"></i> Trainer Dashboard</a></li>
-                            @else
-                                <li><a class="dropdown-item" href="{{ route('member.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i> Member Dashboard</a></li>
-                            @endif
+                      
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); localStorage.removeItem('cart'); localStorage.removeItem('wishlist'); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                         </ul>
@@ -1307,15 +1299,13 @@ async function saveModalProfile() {
                 navbarName.textContent = name;
             }
             
-            alert('Profile updated successfully!');
+showToast("Profile updated successfully!");
             cancelModalProfileEdit();
         } else {
-            alert(data.message || 'Error updating profile');
-        }
+showToast(data.message || "Error updating profile");        }
     } catch (error) {
         console.error('Error:', error);
-        alert('Network error. Please try again.');
-    } finally {
+showToast("Network error. Please try again.");    } finally {
         saveBtn.innerHTML = originalText;
         saveBtn.disabled = false;
     }
@@ -1450,6 +1440,19 @@ window.addEventListener('resize', function() {
         });
     }
 });
+function showToast(message)
+{
+    const toast=document.getElementById("customToast");
+    const msg=document.getElementById("toastMessage");
+
+    msg.innerText=message;
+
+    toast.classList.add("show");
+
+    setTimeout(function(){
+        toast.classList.remove("show");
+    },3000);
+}
 </script>
 
 <!-- ===== SINGLE FOOTER SECTION ===== -->
@@ -1547,6 +1550,10 @@ window.addEventListener('resize', function() {
 <!-- WhatsApp Tooltip -->
 <div class="whatsapp-tooltip" id="whatsappTooltip">
     <i class="fas fa-comment-dots me-2"></i> Chat with us on WhatsApp
+</div>
+<div id="customToast" class="custom-toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage"></span>
 </div>
 
 <style>
@@ -1722,6 +1729,34 @@ window.addEventListener('resize', function() {
             text-align: center;
         }
     }
+    .custom-toast{
+    position:fixed;
+    top:25px;
+    right:25px;
+    background:#10b981;
+    color:#fff;
+    padding:15px 22px;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,.2);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    z-index:999999;
+    opacity:0;
+    transform:translateX(100%);
+    transition:.4s;
+    font-size:15px;
+    font-weight:500;
+}
+
+.custom-toast.show{
+    opacity:1;
+    transform:translateX(0);
+}
+
+.custom-toast i{
+    font-size:20px;
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
