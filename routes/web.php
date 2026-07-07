@@ -40,6 +40,9 @@ use App\Http\Controllers\OfferController as PublicOfferController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\ProductReviewController;
 
+// ============ COUPON CONTROLLER ============
+use App\Http\Controllers\Admin\CouponController;
+
 // ============ MODELS ============
 use App\Models\UserAddress;
 use App\Models\Order;
@@ -49,7 +52,6 @@ use App\Models\SubCategory;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-
 
 // ============ HOME PAGE ============
 Route::get('/', function () {
@@ -228,7 +230,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
     Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
     
-    // ⭐ GST ROUTE
+    // GST ROUTE
     Route::get('/get-gst-rate/{topCategoryId}', [ProductController::class, 'getGstRate'])->name('get.gst.rate');
     
     // Contacts
@@ -237,8 +239,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::delete('/contacts/{id}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
     Route::post('/contacts/{id}/status', [AdminContactController::class, 'updateStatus'])->name('contacts.status');
     
-    // Banners - Already in your web.php
-   // Banners - CORRECT
+    // Banners
     Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
     Route::get('/banners/create', [BannerController::class, 'create'])->name('banners.create');
     Route::post('/banners', [BannerController::class, 'store'])->name('banners.store');
@@ -257,17 +258,15 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/payments/mark-viewed', [AdminPaymentController::class, 'markViewed'])->name('payments.mark-viewed');
     Route::get('/payments/check-new', [AdminPaymentController::class, 'getNewOrdersCount'])->name('payments.check-new');
     
-    // ============ PINCODE / STATE MANAGEMENT ROUTES ============
+    // Pincode / State Management
     Route::resource('pincodes', DeliverablePincodeController::class);
     Route::post('pincodes/bulk-import', [DeliverablePincodeController::class, 'bulkImport'])->name('pincodes.bulk');
     Route::post('pincodes/bulk-update-shipping', [DeliverablePincodeController::class, 'bulkUpdateShipping'])->name('pincodes.bulk-update-shipping');
     Route::post('pincodes/bulk-delete', [DeliverablePincodeController::class, 'bulkDelete'])->name('pincodes.bulk-delete');
-    
-    // ===== NEW ROUTES FOR TOGGLE STATUS =====
     Route::post('pincodes/toggle-status/{id}', [DeliverablePincodeController::class, 'toggleStatus'])->name('pincodes.toggle-status');
     Route::post('pincodes/bulk-update-status', [DeliverablePincodeController::class, 'bulkUpdateStatus'])->name('pincodes.bulk-update-status');
 
-    // ============ ⭐⭐⭐ REVIEW ROUTES (ADMIN) ⭐⭐⭐ ============
+    // Reviews (Admin)
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
     Route::get('/reviews/pending', [ReviewController::class, 'pending'])->name('reviews.pending');
     Route::get('/reviews/approved', [ReviewController::class, 'approved'])->name('reviews.approved');
@@ -275,37 +274,35 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/reviews/{id}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
     Route::post('/reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
-    
-    // ⭐⭐⭐ NEW: REVIEW DETAILS ROUTE ⭐⭐⭐
     Route::get('/reviews/{id}/details', [ReviewController::class, 'getDetails'])->name('reviews.details');
 
-    // ============ ⭐⭐⭐⭐⭐ OFFER ROUTES (ADMIN) ⭐⭐⭐⭐⭐ ============
+    // Offers (Admin)
     Route::prefix('offers')->name('offers.')->group(function () {
-        // Main CRUD
         Route::get('/', [OfferController::class, 'index'])->name('index');
         Route::get('/create', [OfferController::class, 'create'])->name('create');
         Route::post('/', [OfferController::class, 'store'])->name('store');
         Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('edit');
         Route::put('/{offer}', [OfferController::class, 'update'])->name('update');
         Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('destroy');
-        
-        // Status Management
         Route::post('/{offer}/toggle', [OfferController::class, 'toggle'])->name('toggle');
         Route::post('/{offer}/duplicate', [OfferController::class, 'duplicate'])->name('duplicate');
-        
-        // View by status
         Route::get('/status/{status}', [OfferController::class, 'index'])->name('status');
-        
-        // AJAX/API endpoints
         Route::get('/get-products', [OfferController::class, 'getProducts'])->name('get-products');
         Route::get('/get-categories', [OfferController::class, 'getCategories'])->name('get-categories');
         Route::get('/get-offer-stats', [OfferController::class, 'getStats'])->name('get-stats');
         Route::post('/bulk-delete', [OfferController::class, 'bulkDelete'])->name('bulk-delete');
         Route::post('/bulk-status', [OfferController::class, 'bulkStatus'])->name('bulk-status');
     });
+
+    // ============ ⭐ COUPON ROUTES (ADMIN) ⭐ ============
+    // Add this inside the admin routes group (around line where other coupon routes are)
+Route::get('coupons/{id}/view', [CouponController::class, 'view'])->name('admin.coupons.view');
+    Route::resource('coupons', CouponController::class);
+    Route::get('coupons/toggle/{id}', [CouponController::class, 'toggleStatus'])->name('coupons.toggle');
+    Route::get('coupons/check-code', [CouponController::class, 'checkCode'])->name('admin.coupons.check-code');
 });
 
-// ============ ⭐⭐⭐ REVIEW SUBMIT ROUTE (PUBLIC - FOR USERS) ⭐⭐⭐ ============
+// ============ REVIEW SUBMIT ROUTE (PUBLIC - FOR USERS) ============
 Route::post('/submit-product-review', [ProductReviewController::class, 'store'])->name('submit.review')->middleware('auth');
 
 // ============ TRAINER ROUTES ============
@@ -460,7 +457,6 @@ Route::get('/api/order-details/{id}', function ($id) {
     }
     
     try {
-        // Get order with user and items
         $order = Order::with(['user', 'items'])
             ->where('user_id', auth()->id())
             ->find($id);
@@ -469,10 +465,8 @@ Route::get('/api/order-details/{id}', function ($id) {
             return response()->json(['success' => false, 'message' => 'Order not found']);
         }
         
-        // Get shipping address from user_addresses table
         $shippingAddress = null;
         
-        // Try to get address from payment_details first
         if ($order->payment_details) {
             try {
                 $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
@@ -484,7 +478,6 @@ Route::get('/api/order-details/{id}', function ($id) {
             } catch (\Exception $e) {}
         }
         
-        // If no address in payment_details, get the default address from user_addresses table
         if (!$shippingAddress || empty($shippingAddress['address'])) {
             $userAddress = UserAddress::where('user_id', auth()->id())
                 ->orderBy('is_default', 'desc')
@@ -504,14 +497,12 @@ Route::get('/api/order-details/{id}', function ($id) {
             }
         }
         
-        // Calculate subtotal and format items
         $subtotal = 0;
         $items = [];
         foreach ($order->items as $item) {
             $itemTotal = $item->price * $item->quantity;
             $subtotal += $itemTotal;
             
-            // Get product image separately if needed
             $productImage = null;
             if ($item->product_id) {
                 $product = Product::find($item->product_id);
@@ -565,7 +556,7 @@ Route::get('/api/order-details/{id}', function ($id) {
 // ============ CANCEL ORDER ROUTE ============
 Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');
 
-// ============ ⭐⭐⭐ NEW: PRODUCT REVIEWS API (PUBLIC) ⭐⭐⭐ ============
+// ============ PRODUCT REVIEWS API (PUBLIC) ============
 Route::get('/api/product-reviews/{productId}', function($productId) {
     $reviews = \App\Models\ProductReview::where('product_id', $productId)
         ->where('status', 'approved')
@@ -589,7 +580,6 @@ Route::get('/api/product-reviews/{productId}', function($productId) {
         })
     ]);
 })->name('api.product.reviews');
-
 
 Route::get('/test-mail', function () {
     try {
@@ -617,7 +607,6 @@ Route::get('/test-mail', function () {
         return '❌ Error: ' . $e->getMessage();
     }
 });
-
 
 Route::get('/test-msg91', function() {
     $phone = '9025595190';
@@ -655,7 +644,7 @@ Route::get('/test-sms-final', function() {
 });
 
 Route::get('/test-sms-now', function() {
-    $phone = '9025595190'; // Change to your phone number
+    $phone = '9025595190';
     $otp = rand(100000, 999999);
     
     $otpService = new \App\Services\OTPService();
@@ -672,7 +661,7 @@ Route::get('/test-sms-now', function() {
 });
 
 Route::get('/test-msg91-curl', function() {
-    $phone = '9025595190'; // Change to your number
+    $phone = '9025595190';
     $otp = rand(100000, 999999);
     
     $otpService = new \App\Services\OTPService();
@@ -688,15 +677,10 @@ Route::get('/test-msg91-curl', function() {
     ]);
 });
 
-
-
-
-// ============ DEBUG SMS ROUTE ============
 Route::get('/debug-sms', function() {
-    $phone = '9025595190'; // Change to your number
+    $phone = '9025595190';
     $otp = rand(100000, 999999);
     
-    // Clean phone
     $phone = preg_replace('/[^0-9]/', '', $phone);
     $phone = ltrim($phone, '0');
     if (strlen($phone) === 10) {
@@ -723,7 +707,6 @@ Route::get('/debug-sms', function() {
     
     $fullUrl = $url . '?' . http_build_query($params);
     
-    // Send using cURL
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $fullUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -748,10 +731,8 @@ Route::get('/debug-sms', function() {
     ]);
 });
 
-
-
 Route::get('/test-sms-working', function() {
-    $phone = '9025595190'; // Your phone number
+    $phone = '9025595190';
     $otp = rand(100000, 999999);
     
     $otpService = new \App\Services\OTPService();
@@ -782,3 +763,53 @@ Route::post('/api/update-profile', function (Illuminate\Http\Request $request) {
     
     return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
 })->name('api.update.profile');
+
+// ============ COUPON VALIDATION API ============
+Route::post('/api/validate-coupon', [App\Http\Controllers\CouponController::class, 'validateCoupon']);
+
+// ============ AVAILABLE COUPONS API ============
+Route::get('/api/available-coupons', function() {
+    try {
+        $coupons = \App\Models\Coupon::where('is_active', 1)
+            ->where(function($q) {
+                $q->whereNull('end_date')
+                  ->orWhere('end_date', '>=', Carbon\Carbon::now());
+            })
+            ->where(function($q) {
+                $q->whereNull('usage_limit')
+                  ->orWhereRaw('used_count < usage_limit');
+            })
+            ->select('id', 'code', 'name', 'type', 'value')
+            ->orderBy('id', 'desc')
+            ->limit(5)
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'coupons' => $coupons
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ]);
+    }
+});
+
+// ============ DEBUG COUPON ROUTE ============
+Route::get('/debug-coupon/{code}', function($code) {
+    $coupon = \App\Models\Coupon::where('code', strtoupper($code))->first();
+    
+    if ($coupon) {
+        return response()->json([
+            'found' => true,
+            'coupon' => $coupon,
+            'is_valid' => $coupon->isValid()
+        ]);
+    }
+    
+    return response()->json([
+        'found' => false,
+        'message' => 'Coupon not found'
+    ]);
+});

@@ -139,7 +139,7 @@
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-star"></i> <span>Reviews</span>
                 <span class="dropdown-arrow">▼</span>
-                @if($pendingReviewsCount > 0)
+                @if ($pendingReviewsCount > 0)
                     <span class="badge bg-warning ms-2">{{ $pendingReviewsCount }}</span>
                 @endif
             </a>
@@ -152,7 +152,7 @@
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.reviews.pending') }}">
                         <i class="fas fa-clock"></i> Pending Reviews
-                        @if($pendingReviewsCount > 0)
+                        @if ($pendingReviewsCount > 0)
                             <span class="badge bg-warning ms-2">{{ $pendingReviewsCount }}</span>
                         @endif
                     </a>
@@ -174,7 +174,7 @@
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.contacts.index') }}">
                 <i class="fas fa-envelope"></i> <span>Contact Messages</span>
-                @if($pendingCount > 0)
+                @if ($pendingCount > 0)
                     <span class="badge bg-danger ms-2">{{ $pendingCount }}</span>
                 @endif
             </a>
@@ -182,9 +182,10 @@
 
         <!-- Payments -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.payments.index') }}" id="paymentsNavLink" onclick="markPaymentsViewed()">
+            <a class="nav-link" href="{{ route('admin.payments.index') }}" id="paymentsNavLink"
+                onclick="markPaymentsViewed()">
                 <i class="fas fa-credit-card"></i> <span>Orders</span>
-                @if($newPendingOrders > 0)
+                @if ($newPendingOrders > 0)
                     <span class="badge bg-danger ms-2" id="pendingBadge">{{ $newPendingOrders }}</span>
                 @endif
             </a>
@@ -193,7 +194,7 @@
         <!-- Deliverable Pincodes -->
         <li class="nav-item">
             <a class="nav-link" href="{{ url('/admin/pincodes') }}">
-                <i class="fas fa-map-marker-alt"></i> <span>Deliverable Pincodes</span>
+                <i class="fas fa-map-marker-alt"></i> <span>Shipping Charges</span>
             </a>
         </li>
 
@@ -216,7 +217,7 @@
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-tags"></i> <span>Offers</span>
                 <span class="dropdown-arrow">▼</span>
-                @if($activeOffersCount > 0)
+                @if ($activeOffersCount > 0)
                     <span class="badge bg-success ms-2">{{ $activeOffersCount }}</span>
                 @endif
             </a>
@@ -234,7 +235,7 @@
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'active') }}">
                         <i class="fas fa-check-circle text-success"></i> Active Offers
-                        @if($activeOffersCount > 0)
+                        @if ($activeOffersCount > 0)
                             <span class="badge bg-success ms-2">{{ $activeOffersCount }}</span>
                         @endif
                     </a>
@@ -256,7 +257,35 @@
                 </li>
             </ul>
         </li>
-
+        <!-- ===== COUPONS MENU ===== -->
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-ticket-alt"></i> <span>Coupons</span>
+                <span class="dropdown-arrow">▼</span>
+            </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.coupons.create') }}">
+                        <i class="fas fa-plus"></i> Add Coupon
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.coupons.index') }}">
+                        <i class="fas fa-list"></i> All Coupons
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.coupons.index') }}?status=active">
+                        <i class="fas fa-check-circle text-success"></i> Active Coupons
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.coupons.index') }}?status=expired">
+                        <i class="fas fa-clock text-warning"></i> Expired Coupons
+                    </a>
+                </li>
+            </ul>
+        </li>
         <!-- ===== GYM ONE DIVIDER ===== -->
         <li class="nav-divider">
             <span class="divider-text">Gym One</span>
@@ -296,10 +325,11 @@
     <!-- Sidebar Footer -->
     <div class="sidebar-footer">
         <div class="user-info">
-            <i class="fas fa-user-shield"></i> 
+            <i class="fas fa-user-shield"></i>
             <span>{{ $adminName }}</span>
         </div>
-        <a class="logout-btn" href="#" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
+        <a class="logout-btn" href="#"
+            onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
             <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
         </a>
     </div>
@@ -310,76 +340,33 @@
 </form>
 
 <script>
-// Function to mark payments as viewed when clicked
-function markPaymentsViewed() {
-    fetch('{{ route("admin.payments.mark-viewed") }}', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Content-Type': 'application/json'
-        }
-    }).then(response => response.json())
-      .then(data => {
-          if (data.success) {
-              const badge = document.getElementById('pendingBadge');
-              if (badge) {
-                  badge.style.display = 'none';
-              }
-          }
-      });
-}
+    // ============ DROPDOWN CLICK TOGGLE - IMPROVED ============
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all dropdown toggle links
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
 
-// Function to check for new orders periodically
-function checkNewOrders() {
-    fetch('{{ route("admin.payments.check-new") }}')
-        .then(response => response.json())
-        .then(data => {
-            const badge = document.getElementById('pendingBadge');
-            if (data.new_count > 0) {
-                if (badge) {
-                    badge.textContent = data.new_count;
-                    badge.style.display = 'inline-block';
-                } else {
-                    const navLink = document.getElementById('paymentsNavLink');
-                    if (navLink) {
-                        const newBadge = document.createElement('span');
-                        newBadge.className = 'badge bg-danger ms-2';
-                        newBadge.id = 'pendingBadge';
-                        newBadge.textContent = data.new_count;
-                        navLink.appendChild(newBadge);
+        dropdownToggles.forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const parent = this.closest('.has-dropdown');
+                const dropdownMenu = parent.querySelector('.dropdown-menu-custom');
+
+                if (dropdownMenu) {
+                    // If this dropdown is already open, close it
+                    if (parent.classList.contains('active')) {
+                        parent.classList.remove('active');
+                        dropdownMenu.style.display = 'none';
+                        const arrow = this.querySelector('.dropdown-arrow');
+                        if (arrow) {
+                            arrow.style.transform = 'rotate(0deg)';
+                        }
+                        return;
                     }
-                }
-            } else {
-                if (badge) {
-                    badge.style.display = 'none';
-                }
-            }
-        });
-}
 
-// Check for new orders every 30 seconds
-setInterval(checkNewOrders, 30000);
-
-// Check once when page loads
-document.addEventListener('DOMContentLoaded', checkNewOrders);
-
-// ============ DROPDOWN CLICK TOGGLE ============
-document.addEventListener('DOMContentLoaded', function() {
-    // Get all dropdown toggle links
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    
-    dropdownToggles.forEach(function(toggle) {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const parent = this.parentElement;
-            const dropdownMenu = parent.querySelector('.dropdown-menu-custom');
-            
-            if (dropdownMenu) {
-                // Close all other dropdowns
-                document.querySelectorAll('.has-dropdown').forEach(function(item) {
-                    if (item !== parent) {
+                    // Close all other dropdowns
+                    document.querySelectorAll('.has-dropdown.active').forEach(function(item) {
                         item.classList.remove('active');
                         const menu = item.querySelector('.dropdown-menu-custom');
                         if (menu) {
@@ -389,45 +376,90 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (arrow) {
                             arrow.style.transform = 'rotate(0deg)';
                         }
-                    }
-                });
-                
-                // Toggle current dropdown
-                parent.classList.toggle('active');
-                if (parent.classList.contains('active')) {
+                    });
+
+                    // Open this dropdown
+                    parent.classList.add('active');
                     dropdownMenu.style.display = 'block';
-                    const arrow = toggle.querySelector('.dropdown-arrow');
+                    const arrow = this.querySelector('.dropdown-arrow');
                     if (arrow) {
                         arrow.style.transform = 'rotate(180deg)';
                     }
-                } else {
-                    dropdownMenu.style.display = 'none';
-                    const arrow = toggle.querySelector('.dropdown-arrow');
+                }
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.has-dropdown')) {
+                document.querySelectorAll('.has-dropdown.active').forEach(function(item) {
+                    item.classList.remove('active');
+                    const menu = item.querySelector('.dropdown-menu-custom');
+                    if (menu) {
+                        menu.style.display = 'none';
+                    }
+                    const arrow = item.querySelector('.dropdown-arrow');
                     if (arrow) {
                         arrow.style.transform = 'rotate(0deg)';
                     }
-                }
+                });
             }
         });
-    });
-    
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.has-dropdown')) {
-            document.querySelectorAll('.has-dropdown.active').forEach(function(item) {
-                item.classList.remove('active');
-                const menu = item.querySelector('.dropdown-menu-custom');
-                if (menu) {
-                    menu.style.display = 'none';
-                }
-                const arrow = item.querySelector('.dropdown-arrow');
-                if (arrow) {
-                    arrow.style.transform = 'rotate(0deg)';
-                }
-            });
+
+        // ===== Function to mark payments as viewed =====
+        function markPaymentsViewed() {
+            fetch('{{ route('admin.payments.mark-viewed') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const badge = document.getElementById('pendingBadge');
+                        if (badge) {
+                            badge.style.display = 'none';
+                        }
+                    }
+                });
         }
+
+        // Make markPaymentsViewed globally accessible
+        window.markPaymentsViewed = markPaymentsViewed;
+
+        // ===== Check for new orders periodically =====
+        function checkNewOrders() {
+            fetch('{{ route('admin.payments.check-new') }}')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('pendingBadge');
+                    if (data.new_count > 0) {
+                        if (badge) {
+                            badge.textContent = data.new_count;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            const navLink = document.getElementById('paymentsNavLink');
+                            if (navLink) {
+                                const newBadge = document.createElement('span');
+                                newBadge.className = 'badge bg-danger ms-2';
+                                newBadge.id = 'pendingBadge';
+                                newBadge.textContent = data.new_count;
+                                navLink.appendChild(newBadge);
+                            }
+                        }
+                    } else {
+                        if (badge) {
+                            badge.style.display = 'none';
+                        }
+                    }
+                });
+        }
+
+        // Check for new orders every 30 seconds
+        setInterval(checkNewOrders, 30000);
+        checkNewOrders();
     });
-});
 </script>
 
 <style>
@@ -598,6 +630,7 @@ document.addEventListener('DOMContentLoaded', function() {
         overflow: hidden;
     }
 
+
     .has-dropdown.active .dropdown-menu-custom {
         display: block !important;
         animation: slideDown 0.3s ease;
@@ -608,6 +641,7 @@ document.addEventListener('DOMContentLoaded', function() {
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -781,6 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .admin-sidebar {
             width: 70px;
         }
+
         .admin-sidebar .sidebar-brand strong,
         .admin-sidebar .sidebar-brand .text-accent,
         .admin-sidebar .sidebar-nav .nav-link span,
@@ -789,20 +824,25 @@ document.addEventListener('DOMContentLoaded', function() {
         .dropdown-arrow {
             display: none;
         }
+
         .admin-sidebar .sidebar-nav .nav-link i {
             margin-right: 0;
         }
+
         .admin-sidebar .sidebar-nav .nav-link {
             justify-content: center;
             padding: 12px;
             border-left: none;
         }
+
         .admin-sidebar .sidebar-nav .nav-link:hover {
             border-left: none;
         }
+
         .nav-divider {
             display: none;
         }
+
         .dropdown-menu-custom {
             position: fixed;
             left: 70px;
@@ -814,26 +854,33 @@ document.addEventListener('DOMContentLoaded', function() {
             border-radius: 0 8px 8px 0;
             background: #1b3a5c;
         }
+
         .dropdown-item-custom {
             padding: 10px 15px 10px 20px;
         }
+
         .admin-main-content {
             margin-left: 70px;
         }
+
         .sidebar-footer {
             padding: 10px;
         }
+
         .user-info {
             justify-content: center;
             padding: 5px 0;
         }
+
         .logout-btn {
             justify-content: center;
             padding: 5px 0;
         }
+
         .badge {
             display: none !important;
         }
+
         .admin-sidebar::-webkit-scrollbar {
             width: 3px;
         }
@@ -843,17 +890,21 @@ document.addEventListener('DOMContentLoaded', function() {
         .admin-sidebar {
             width: 55px;
         }
+
         .admin-sidebar .sidebar-nav .nav-link {
             padding: 10px;
             font-size: 0.9rem;
         }
+
         .admin-sidebar .sidebar-nav .nav-link i {
             font-size: 1rem;
         }
+
         .admin-main-content {
             margin-left: 55px;
             padding: 10px;
         }
+
         .dropdown-menu-custom {
             left: 55px;
             width: 180px;

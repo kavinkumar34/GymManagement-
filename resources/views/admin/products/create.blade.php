@@ -298,7 +298,7 @@
     }
 </style>
 
-<div class="container-fluid">
+<div class="container">
     <div class="row" style="margin-left:220px; margin-right:20px;"> 
         <div class="col-12">
             <div class="form-section">

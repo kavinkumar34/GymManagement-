@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\UserAddress;
+use App\Models\Coupon;
 use App\Mail\OrderConfirmationMail;
 
 class PaymentController extends Controller
@@ -20,21 +21,16 @@ class PaymentController extends Controller
 
     public function buyNow(Request $request)
     {
-        // Check login
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please login to purchase');
         }
 
         $user = Auth::user();
-        
-        // Check if coming from cart (multiple items) or single product
         $checkoutCart = session()->get('checkout_cart');
         
         if ($checkoutCart && count($checkoutCart) > 0) {
-            // Process multiple items from cart
             return $this->processCartCheckout($request, $user, $checkoutCart);
         } else {
-            // Process single product
             return $this->processSingleProduct($request, $user);
         }
     }
@@ -44,7 +40,6 @@ class PaymentController extends Controller
         $product = Product::findOrFail($request->product_id);
         $quantity = $request->quantity ?? 1;
         
-        // Check stock
         $stock = $product->stock;
         if ($quantity > $stock) {
             return redirect()->back()->with('error', "Only {$stock} items available for {$product->name}");
@@ -55,7 +50,6 @@ class PaymentController extends Controller
         $txnid = 'TXN' . time() . rand(1000, 9999);
         $productInfo = substr(preg_replace('/[^A-Za-z0-9 ]/', '', $product->name), 0, 100);
         
-        // Create order
         $order = $this->createOrder($txnid, $user->id, $totalAmount);
         
         OrderItem::create([
@@ -66,7 +60,6 @@ class PaymentController extends Controller
             'price' => $amount
         ]);
         
-        // Update product stock
         $product->decrement('stock', $quantity);
         
         return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
@@ -74,23 +67,32 @@ class PaymentController extends Controller
     
     private function processCartCheckout($request, $user, $checkoutCart)
     {
-        $totalAmount = 0;
+        // Get total amount from request or calculate
+        $totalAmount = $request->input('total_amount');
+        if (!$totalAmount) {
+            $totalAmount = 0;
+            foreach ($checkoutCart as $item) {
+                $product = Product::find($item['id']);
+                if ($product) {
+                    $amount = $product->discount_price ?? $product->price;
+                    $totalAmount += $amount * $item['quantity'];
+                }
+            }
+        }
+        $totalAmount = (float) $totalAmount;
+        
         $productItems = [];
         $productInfo = '';
         
         foreach ($checkoutCart as $item) {
             $product = Product::find($item['id']);
-            if (!$product) {
-                continue;
-            }
+            if (!$product) continue;
             
-            // Check stock for each item
             if ($item['quantity'] > $product->stock) {
-                return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}. Please update your cart.");
+                return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
             }
             
             $amount = $product->discount_price ?? $product->price;
-            $totalAmount += $amount * $item['quantity'];
             $productItems[] = [
                 'product' => $product,
                 'quantity' => $item['quantity'],
@@ -102,10 +104,8 @@ class PaymentController extends Controller
         $productInfo = substr(rtrim($productInfo, ', '), 0, 100);
         $txnid = 'TXN' . time() . rand(1000, 9999);
         
-        // Create order
         $order = $this->createOrder($txnid, $user->id, $totalAmount);
         
-        // Create order items and update stock
         foreach ($productItems as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
@@ -114,12 +114,17 @@ class PaymentController extends Controller
                 'quantity' => $item['quantity'],
                 'price' => $item['price']
             ]);
-            
-            // Update product stock
             $item['product']->decrement('stock', $item['quantity']);
         }
         
-        // Clear the checkout cart session
+        // ===== RECORD COUPON USAGE =====
+        $couponCode = $request->input('coupon_code');
+        $couponDiscount = $request->input('coupon_discount') ?? 0;
+        
+        if ($couponCode && $couponDiscount > 0) {
+            $this->recordCouponUsage($order, $couponCode, $couponDiscount);
+        }
+        
         session()->forget('checkout_cart');
         
         return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
@@ -141,13 +146,11 @@ class PaymentController extends Controller
     
     private function redirectToPayU($user, $txnid, $totalAmount, $productInfo, $orderId)
     {
-        // Correct PayU Hash Format
         $hashString = $this->merchantKey . '|' . $txnid . '|' . $totalAmount . '|' . $productInfo . '|' . 
                       $user->name . '|' . $user->email . '|' . '||||||||||' . $this->merchantSalt;
         
         $hash = hash('sha512', $hashString);
         
-        // Store order ID in session
         session(['pending_order_id' => $orderId]);
         session(['pending_user_id' => $user->id]);
 
@@ -189,12 +192,10 @@ class PaymentController extends Controller
             return redirect()->route('home')->with('error', 'Order not found');
         }
 
-        // Check if already processed
         if ($order->payment_status == 'SUCCESS') {
             return redirect()->route('order.success', $order->id)->with('success', 'Payment already confirmed!');
         }
 
-        // Restore user session using order's user_id
         if (!Auth::check() && $order->user_id) {
             Auth::loginUsingId($order->user_id);
         }
@@ -211,13 +212,10 @@ class PaymentController extends Controller
             session()->forget('pending_order_id');
             session()->forget('checkout_cart');
             
-            // ⭐⭐⭐ SEND EMAIL CONFIRMATION ⭐⭐⭐
             $this->sendOrderConfirmationEmail($order);
             
-            // IMPORTANT: Return redirect with clear cart parameter
             return redirect()->route('order.success', ['id' => $order->id, 'clear_cart' => 1])->with('success', 'Payment successful!');
         } else {
-            // Restore stock if payment failed
             foreach ($order->items as $item) {
                 $product = Product::find($item->product_id);
                 if ($product) {
@@ -244,12 +242,10 @@ class PaymentController extends Controller
         $order = Order::where('order_number', $txnid)->first();
 
         if ($order) {
-            // Restore user session
             if (!Auth::check() && $order->user_id) {
                 Auth::loginUsingId($order->user_id);
             }
             
-            // Restore stock
             foreach ($order->items as $item) {
                 $product = Product::find($item->product_id);
                 if ($product) {
@@ -278,57 +274,49 @@ class PaymentController extends Controller
             abort(403);
         }
 
-        // Pass clear_cart flag to view
         $clearCart = request()->has('clear_cart');
         
         return view('payment.order-success', compact('order', 'clearCart'));
     }
     
-public function myOrders(Request $request)
-{
-    if (!Auth::check()) {
-        return redirect()->route('login')->with('error', 'Please login to view orders');
+    public function myOrders(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please login to view orders');
+        }
+        
+        $query = Order::with('items')->where('user_id', Auth::id());
+        
+        if ($request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('items', function($itemQuery) use ($search) {
+                      $itemQuery->where('product_name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+        
+        if ($request->status) {
+            $query->where('order_status', $request->status);
+        }
+        
+        if ($request->payment_status) {
+            $query->where('payment_status', $request->payment_status);
+        }
+        
+        if ($request->from_date) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->to_date) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+        
+        $orders = $query->orderBy('id', 'desc')->paginate(10);
+        $orders->appends($request->all());
+        
+        return view('payment.my-orders', compact('orders'));
     }
-    
-    $query = Order::with('items')
-        ->where('user_id', Auth::id());
-    
-    // Search by Order ID or Product Name
-    if ($request->search) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('order_number', 'LIKE', "%{$search}%")
-              ->orWhereHas('items', function($itemQuery) use ($search) {
-                  $itemQuery->where('product_name', 'LIKE', "%{$search}%");
-              });
-        });
-    }
-    
-    // Filter by Order Status
-    if ($request->status) {
-        $query->where('order_status', $request->status);
-    }
-    
-    // Filter by Payment Status
-    if ($request->payment_status) {
-        $query->where('payment_status', $request->payment_status);
-    }
-    
-    // Filter by Date Range
-    if ($request->from_date) {
-        $query->whereDate('created_at', '>=', $request->from_date);
-    }
-    if ($request->to_date) {
-        $query->whereDate('created_at', '<=', $request->to_date);
-    }
-    
-    $orders = $query->orderBy('id', 'desc')->paginate(10);
-    
-    // Preserve query parameters in pagination
-    $orders->appends($request->all());
-    
-    return view('payment.my-orders', compact('orders'));
-}
     
     public function placeCodOrder(Request $request)
     {
@@ -343,22 +331,31 @@ public function myOrders(Request $request)
             return redirect()->route('cart')->with('error', 'Your cart is empty');
         }
         
-        $totalAmount = 0;
+        // Get total amount from request
+        $totalAmount = $request->input('total_amount');
+        if (!$totalAmount) {
+            $totalAmount = 0;
+            foreach ($cart as $item) {
+                $product = Product::find($item['id']);
+                if ($product) {
+                    $amount = $product->discount_price ?? $product->price;
+                    $totalAmount += $amount * $item['quantity'];
+                }
+            }
+        }
+        $totalAmount = (float) $totalAmount;
+        
         $productItems = [];
         
         foreach ($cart as $item) {
             $product = Product::find($item['id']);
-            if (!$product) {
-                continue;
-            }
+            if (!$product) continue;
             
-            // Check stock
             if ($item['quantity'] > $product->stock) {
                 return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
             }
             
             $amount = $product->discount_price ?? $product->price;
-            $totalAmount += $amount * $item['quantity'];
             $productItems[] = [
                 'product' => $product,
                 'quantity' => $item['quantity'],
@@ -368,7 +365,6 @@ public function myOrders(Request $request)
         
         $txnid = 'COD' . time() . rand(1000, 9999);
         
-        // Create order
         $order = Order::create([
             'order_number' => $txnid,
             'user_id' => $user->id,
@@ -380,11 +376,15 @@ public function myOrders(Request $request)
             'order_date' => now(),
             'payment_details' => json_encode([
                 'shipping_address' => $request->address,
-                'payment_method' => 'COD'
+                'payment_method' => 'COD',
+                'total_amount' => $totalAmount,
+                'subtotal' => $request->input('subtotal'),
+                'shipping_charge' => $request->input('shipping_charge'),
+                'coupon_discount' => $request->input('coupon_discount'),
+                'coupon_code' => $request->input('coupon_code')
             ])
         ]);
         
-        // Create order items and update stock
         foreach ($productItems as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
@@ -393,18 +393,62 @@ public function myOrders(Request $request)
                 'quantity' => $item['quantity'],
                 'price' => $item['price']
             ]);
-            
-            // Update product stock
             $item['product']->decrement('stock', $item['quantity']);
         }
         
-        // Clear the checkout cart session
+        // ===== RECORD COUPON USAGE FOR COD =====
+        $couponCode = $request->input('coupon_code');
+        $couponDiscount = $request->input('coupon_discount') ?? 0;
+        
+        if ($couponCode && $couponDiscount > 0) {
+            $this->recordCouponUsage($order, $couponCode, $couponDiscount);
+        }
+        
         session()->forget('checkout_cart');
         
-        // ⭐⭐⭐ SEND EMAIL CONFIRMATION FOR COD ⭐⭐⭐
         $this->sendOrderConfirmationEmail($order);
         
-return redirect()->route('order.success', $order->id);
+        return redirect()->route('order.success', $order->id);
+    }
+    
+    /**
+     * Record coupon usage after successful order
+     */
+    private function recordCouponUsage($order, $couponCode, $couponDiscount)
+    {
+        if (!$couponCode || !$couponDiscount) {
+            return;
+        }
+        
+        try {
+            $coupon = Coupon::where('code', $couponCode)->first();
+            if (!$coupon) {
+                return;
+            }
+            
+            // Check if already recorded
+            $exists = \DB::table('coupon_usage')
+                ->where('coupon_id', $coupon->id)
+                ->where('order_id', $order->id)
+                ->exists();
+            
+            if (!$exists) {
+                \DB::table('coupon_usage')->insert([
+                    'coupon_id' => $coupon->id,
+                    'user_id' => $order->user_id,
+                    'order_id' => $order->id,
+                    'discount_amount' => $couponDiscount,
+                    'used_at' => now()
+                ]);
+                
+                // Increment used count in coupons table
+                $coupon->increment('used_count');
+                
+                Log::info('✅ Coupon usage recorded for order: ' . $order->order_number . ', Coupon: ' . $couponCode);
+            }
+        } catch (\Exception $e) {
+            Log::error('❌ Failed to record coupon usage: ' . $e->getMessage());
+        }
     }
     
     public function cancelOrder(Request $request)
@@ -427,12 +471,10 @@ return redirect()->route('order.success', $order->id);
             return response()->json(['success' => false, 'message' => 'Order not found']);
         }
         
-        // Check if order can be cancelled (only pending or confirmed orders)
         if (!in_array($order->order_status, ['Pending', 'Confirmed'])) {
             return response()->json(['success' => false, 'message' => 'This order cannot be cancelled as it is already ' . $order->order_status]);
         }
         
-        // Create cancellation record
         \App\Models\OrderCancellation::create([
             'order_id' => $order->id,
             'user_id' => Auth::id(),
@@ -440,11 +482,9 @@ return redirect()->route('order.success', $order->id);
             'cancellation_comment' => $request->cancellation_comment
         ]);
         
-        // Update order status to Cancelled
         $order->order_status = 'Cancelled';
         $order->save();
         
-        // Restore product stock
         foreach ($order->items as $item) {
             $product = Product::find($item->product_id);
             if ($product) {
@@ -464,12 +504,10 @@ return redirect()->route('order.success', $order->id);
                 return response()->json(['success' => false, 'message' => 'Order not found']);
             }
             
-            // Get user's saved address from user_addresses table
             $userAddress = UserAddress::where('user_id', $order->user_id)
                 ->orderBy('is_default', 'desc')
                 ->first();
             
-            // Try to get shipping address from payment_details
             $shippingAddress = null;
             if ($order->payment_details) {
                 try {
@@ -480,7 +518,6 @@ return redirect()->route('order.success', $order->id);
                 } catch (\Exception $e) {}
             }
             
-            // If no address in payment_details, use user's saved address
             if ((!$shippingAddress || empty($shippingAddress['address'])) && $userAddress) {
                 $shippingAddress = [
                     'name' => $userAddress->name,
@@ -536,29 +573,22 @@ return redirect()->route('order.success', $order->id);
         }
     }
 
-    /**
-     * ⭐ Send Order Confirmation Email with Complete Error Handling
-     */
     private function sendOrderConfirmationEmail($order)
     {
         try {
-            // Log that we're trying to send email
             Log::info('📧 Attempting to send order confirmation email for order: ' . $order->order_number);
             
-            // Get user
             $user = $order->user;
             if (!$user) {
                 Log::error('❌ No user found for order: ' . $order->order_number);
                 return;
             }
             
-            // Check if email is valid
             if (empty($user->email) || !filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
                 Log::error('❌ Invalid user email: ' . ($user->email ?? 'null'));
                 return;
             }
             
-            // Get shipping address
             $shippingAddress = null;
             if ($order->payment_details) {
                 try {
@@ -573,7 +603,6 @@ return redirect()->route('order.success', $order->id);
                 }
             }
             
-            // If no address in payment_details, get from user_addresses
             if (!$shippingAddress) {
                 try {
                     $userAddress = UserAddress::where('user_id', $order->user_id)
@@ -601,7 +630,6 @@ return redirect()->route('order.success', $order->id);
             
             Log::info('📧 Sending email to: ' . $user->email);
             
-            // Send email
             Mail::to($user->email)->send(new OrderConfirmationMail($order, $user, $items, $shippingAddress));
             
             Log::info('✅ Order confirmation email sent successfully to: ' . $user->email . ' for order: ' . $order->order_number);
