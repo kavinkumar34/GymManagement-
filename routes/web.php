@@ -275,24 +275,24 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::get('/reviews/{id}/details', [ReviewController::class, 'getDetails'])->name('reviews.details');
-
-    // Offers (Admin)
-    Route::prefix('offers')->name('offers.')->group(function () {
-        Route::get('/', [OfferController::class, 'index'])->name('index');
-        Route::get('/create', [OfferController::class, 'create'])->name('create');
-        Route::post('/', [OfferController::class, 'store'])->name('store');
-        Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('edit');
-        Route::put('/{offer}', [OfferController::class, 'update'])->name('update');
-        Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('destroy');
-        Route::post('/{offer}/toggle', [OfferController::class, 'toggle'])->name('toggle');
-        Route::post('/{offer}/duplicate', [OfferController::class, 'duplicate'])->name('duplicate');
-        Route::get('/status/{status}', [OfferController::class, 'index'])->name('status');
-        Route::get('/get-products', [OfferController::class, 'getProducts'])->name('get-products');
-        Route::get('/get-categories', [OfferController::class, 'getCategories'])->name('get-categories');
-        Route::get('/get-offer-stats', [OfferController::class, 'getStats'])->name('get-stats');
-        Route::post('/bulk-delete', [OfferController::class, 'bulkDelete'])->name('bulk-delete');
-        Route::post('/bulk-status', [OfferController::class, 'bulkStatus'])->name('bulk-status');
-    });
+// Offers (Admin) - Combo Offers Manager
+Route::prefix('offers')->name('offers.')->group(function () {
+    Route::get('/', [OfferController::class, 'index'])->name('index');
+    Route::get('/create', [OfferController::class, 'create'])->name('create');
+    Route::post('/', [OfferController::class, 'store'])->name('store');
+    Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('edit');
+    Route::put('/{offer}', [OfferController::class, 'update'])->name('update');
+    Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('destroy');
+    Route::post('/{offer}/toggle', [OfferController::class, 'toggle'])->name('toggle');
+    Route::post('/{offer}/duplicate', [OfferController::class, 'duplicate'])->name('duplicate');
+    Route::get('/status/{status}', [OfferController::class, 'index'])->name('status');
+    Route::get('/get-products', [OfferController::class, 'getProducts'])->name('get-products');
+    Route::get('/get-offer-stats', [OfferController::class, 'getStats'])->name('get-stats');
+    Route::post('/bulk-delete', [OfferController::class, 'bulkDelete'])->name('bulk-delete');
+    Route::post('/bulk-status', [OfferController::class, 'bulkStatus'])->name('bulk-status');
+    Route::post('/apply-offer', [OfferController::class, 'applyOffer'])->name('apply');
+    Route::get('/validate/{code}', [OfferController::class, 'validateOffer'])->name('validate');
+});
 
     // ============ ⭐ COUPON ROUTES (ADMIN) ⭐ ============
     // Add this inside the admin routes group (around line where other coupon routes are)
