@@ -11,7 +11,7 @@ class SizeChartController extends Controller
 {
     public function index()
     {
-        $sizeCharts = SizeChart::orderBy('id', 'desc')->paginate(12);
+        $sizeCharts = SizeChart::orderBy('id', 'desc')->paginate(15);
         return view('admin.sizecharts.index', compact('sizeCharts'));
     }
 
@@ -22,36 +22,72 @@ class SizeChartController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'gender' => 'required|in:men,women,kids,unisex',
-            'category_type' => 'required|in:topwear,bottomwear,footwear',
+            'gender' => 'nullable|string|in:men,women,kids,unisex',
+            'category_type' => 'required|string|in:topwear,bottomwear,footwear',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'default_unit' => 'nullable|string|in:in,cm',
+            'sizes' => 'nullable|array',
+            'sizes.*.size' => 'required|string',
         ]);
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('sizecharts', 'public');
-        }
+        try {
+            $data = [
+                'title' => $request->title,
+                'gender' => $request->gender ?? 'unisex',
+                'category_type' => $request->category_type,
+                'default_unit' => $request->default_unit ?? 'in',
+            ];
 
-        $sizes = [];
-        if ($request->has('sizes')) {
-            foreach ($request->sizes as $size) {
-                if (!empty($size['size'])) {
-                    $sizes[] = $size;
+            // Process sizes based on category type
+            $sizes = [];
+            if ($request->has('sizes')) {
+                foreach ($request->sizes as $size) {
+                    if (!empty($size['size'])) {
+                        $sizeData = ['size' => $size['size']];
+                        
+                        // Add fields based on category type
+                        if ($request->category_type == 'topwear') {
+                            $sizeData['chest'] = $size['chest'] ?? null;
+                            $sizeData['waist'] = $size['waist'] ?? null;
+                            $sizeData['length'] = $size['length'] ?? null;
+                            $sizeData['sleeve'] = $size['sleeve'] ?? null;
+                        } elseif ($request->category_type == 'bottomwear') {
+                            $sizeData['waist'] = $size['waist'] ?? null;
+                            $sizeData['length'] = $size['length'] ?? null;
+                            $sizeData['inseam'] = $size['inseam'] ?? null;
+                        } elseif ($request->category_type == 'footwear') {
+                            $sizeData['length'] = $size['length'] ?? null;
+                            $sizeData['width'] = $size['width'] ?? null;
+                            $sizeData['heel'] = $size['heel'] ?? null;
+                        }
+                        
+                        $sizes[] = $sizeData;
+                    }
                 }
             }
+            
+            $data['sizes'] = json_encode($sizes);
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $filename = time() . '_' . str_replace(' ', '_', $request->title) . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('size-charts', $filename, 'public');
+                $data['image'] = $path;
+            }
+
+            $sizeChart = SizeChart::create($data);
+
+            return redirect()->route('admin.sizecharts.index')
+                ->with('success', 'Size Chart "' . $request->title . '" created successfully with ' . count($sizes) . ' sizes!');
+
+        } catch (\Exception $e) {
+            \Log::error('Size Chart Store Error: ' . $e->getMessage());
+            return back()
+                ->with('error', 'Error: ' . $e->getMessage())
+                ->withInput();
         }
-
-        SizeChart::create([
-            'title' => $request->title,
-            'gender' => $request->gender,
-            'category_type' => $request->category_type,
-            'image' => $imagePath,
-            'default_unit' => $request->default_unit ?? 'in',
-            'sizes' => json_encode($sizes),
-        ]);
-
-        return redirect()->route('admin.sizecharts.index')->with('success', 'Size chart created successfully!');
     }
 
     public function edit($id)
@@ -63,55 +99,133 @@ class SizeChartController extends Controller
     public function update(Request $request, $id)
     {
         $sizeChart = SizeChart::findOrFail($id);
-        
-        $request->validate([
+
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'gender' => 'required|in:men,women,kids,unisex',
-            'category_type' => 'required|in:topwear,bottomwear,footwear',
+            'gender' => 'nullable|string|in:men,women,kids,unisex',
+            'category_type' => 'required|string|in:topwear,bottomwear,footwear',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'default_unit' => 'nullable|string|in:in,cm',
+            'sizes' => 'nullable|array',
+            'sizes.*.size' => 'required|string',
         ]);
 
-        if ($request->hasFile('image')) {
-            if ($sizeChart->image && Storage::disk('public')->exists($sizeChart->image)) {
-                Storage::disk('public')->delete($sizeChart->image);
-            }
-            $imagePath = $request->file('image')->store('sizecharts', 'public');
-            $sizeChart->image = $imagePath;
-        }
+        try {
+            $data = [
+                'title' => $request->title,
+                'gender' => $request->gender ?? 'unisex',
+                'category_type' => $request->category_type,
+                'default_unit' => $request->default_unit ?? 'in',
+            ];
 
-        $sizes = [];
-        if ($request->has('sizes')) {
-            foreach ($request->sizes as $size) {
-                if (!empty($size['size'])) {
-                    $sizes[] = $size;
+            // Process sizes based on category type
+            $sizes = [];
+            if ($request->has('sizes')) {
+                foreach ($request->sizes as $size) {
+                    if (!empty($size['size'])) {
+                        $sizeData = ['size' => $size['size']];
+                        
+                        if ($request->category_type == 'topwear') {
+                            $sizeData['chest'] = $size['chest'] ?? null;
+                            $sizeData['waist'] = $size['waist'] ?? null;
+                            $sizeData['length'] = $size['length'] ?? null;
+                            $sizeData['sleeve'] = $size['sleeve'] ?? null;
+                        } elseif ($request->category_type == 'bottomwear') {
+                            $sizeData['waist'] = $size['waist'] ?? null;
+                            $sizeData['length'] = $size['length'] ?? null;
+                            $sizeData['inseam'] = $size['inseam'] ?? null;
+                        } elseif ($request->category_type == 'footwear') {
+                            $sizeData['length'] = $size['length'] ?? null;
+                            $sizeData['width'] = $size['width'] ?? null;
+                            $sizeData['heel'] = $size['heel'] ?? null;
+                        }
+                        
+                        $sizes[] = $sizeData;
+                    }
                 }
             }
+            
+            $data['sizes'] = json_encode($sizes);
+
+            if ($request->hasFile('image')) {
+                if ($sizeChart->image && Storage::disk('public')->exists($sizeChart->image)) {
+                    Storage::disk('public')->delete($sizeChart->image);
+                }
+                $image = $request->file('image');
+                $filename = time() . '_' . str_replace(' ', '_', $request->title) . '.' . $image->getClientOriginalExtension();
+                $path = $image->storeAs('size-charts', $filename, 'public');
+                $data['image'] = $path;
+            }
+
+            $sizeChart->update($data);
+
+            return redirect()->route('admin.sizecharts.index')
+                ->with('success', 'Size Chart "' . $request->title . '" updated successfully!');
+
+        } catch (\Exception $e) {
+            \Log::error('Size Chart Update Error: ' . $e->getMessage());
+            return back()->with('error', 'Error: ' . $e->getMessage())->withInput();
         }
-
-        $sizeChart->update([
-            'title' => $request->title,
-            'gender' => $request->gender,
-            'category_type' => $request->category_type,
-            'default_unit' => $request->default_unit ?? 'in',
-            'sizes' => json_encode($sizes),
-        ]);
-
-        return redirect()->route('admin.sizecharts.index')->with('success', 'Size chart updated successfully!');
     }
 
     public function destroy($id)
     {
+        try {
+            $sizeChart = SizeChart::findOrFail($id);
+            
+            if ($sizeChart->image && Storage::disk('public')->exists($sizeChart->image)) {
+                Storage::disk('public')->delete($sizeChart->image);
+            }
+            
+            $sizeChart->delete();
+
+            return redirect()->route('admin.sizecharts.index')
+                ->with('success', 'Size Chart deleted successfully!');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get size chart details for AJAX view modal
+     */
+   /**
+ * Get size chart details for AJAX view modal
+ */
+public function getDetails($id)
+{
+    try {
         $sizeChart = SizeChart::findOrFail($id);
         
-        if ($sizeChart->image && Storage::disk('public')->exists($sizeChart->image)) {
-            Storage::disk('public')->delete($sizeChart->image);
+        $sizes = [];
+        if ($sizeChart->sizes) {
+            if (is_array($sizeChart->sizes)) {
+                $sizes = $sizeChart->sizes;
+            } else {
+                $sizes = json_decode($sizeChart->sizes, true) ?: [];
+            }
         }
         
-        $sizeChart->delete();
-        
-        if (request()->ajax()) {
-            return response()->json(['success' => true]);
-        }
-        
-        return redirect()->route('admin.sizecharts.index')->with('success', 'Size chart deleted!');
+        return response()->json([
+            'success' => true,
+            'sizeChart' => [
+                'id' => $sizeChart->id,
+                'title' => $sizeChart->title,
+                'gender' => $sizeChart->gender,
+                'category_type' => $sizeChart->category_type,
+                'image' => $sizeChart->image,
+                'default_unit' => $sizeChart->default_unit ?? 'in',
+                'sizes' => $sizes,
+                'created_at' => $sizeChart->created_at,
+                'updated_at' => $sizeChart->updated_at,
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 404);
     }
+}w
 }

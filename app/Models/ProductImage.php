@@ -11,9 +11,13 @@ class ProductImage extends Model
     // Disable timestamps if your table doesn't have updated_at
     public $timestamps = true;  // Set to true if you have created_at and updated_at
     
-    protected $fillable = [
-        'product_id', 'image_path', 'is_main', 'display_order'
-    ];
+protected $fillable = [
+    'product_id',
+    'variant_id',
+    'image_path',
+    'is_main',
+    'display_order'
+];
     
     public function product()
     {

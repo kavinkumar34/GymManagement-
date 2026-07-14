@@ -12,13 +12,29 @@ class ProductVariant extends Model
         'product_id', 
         'size', 
         'color', 
-        'value', 
-        'price', 
+        'price',
+        'cost_price',
+        'mrp',
+        'gst_percentage',
+        'gst_amount',
+        'total_price',
+        'final_price',
+        'discount_type',
+        'discount_value',
+        'discount_amount',
         'stock'
     ];
     
     protected $casts = [
         'price' => 'decimal:2',
+        'cost_price' => 'decimal:2',
+        'mrp' => 'decimal:2',
+        'gst_percentage' => 'decimal:2',
+        'gst_amount' => 'decimal:2',
+        'total_price' => 'decimal:2',
+        'final_price' => 'decimal:2',
+        'discount_value' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'stock' => 'integer',
     ];
     
@@ -26,4 +42,4 @@ class ProductVariant extends Model
     {
         return $this->belongsTo(Product::class);
     }
-}   
+}

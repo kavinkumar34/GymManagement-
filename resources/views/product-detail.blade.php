@@ -3,30 +3,115 @@
 
 @section('content')
     <style>
-        /* Rest of your existing styles (keep everything except delivery-section styles) */
+    /* Product Description Styles */
+.product-description {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.product-description p {
+    margin-bottom: 8px;
+}
+
+.product-description br {
+    display: block;
+    margin: 3px 0;
+}
+        /* Reset and Base */
         .product-detail-container {
             margin-top: 40px;
             overflow: visible;
+            position: relative;
         }
 
+        /* ===== FIXED LAYOUT - LEFT STICKY, RIGHT SCROLL ===== */
+        .product-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 40px;
+            width: 100%;
+            position: relative;
+        }
 
+        /* LEFT COLUMN - STICKY IMAGE */
+        .left-column {
+            width: 48%;
+            flex: 0 0 48%;
+            position: sticky !important;
+            top: 120px;
+            align-self: flex-start;
+            height: fit-content;
+            z-index: 10;
+        }
+
+        /* RIGHT COLUMN - SCROLLABLE WITH HIDDEN SCROLLBAR */
+        .right-column {
+            width: 52%;
+            flex: 0 0 52%;
+            position: relative;
+            z-index: 1;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .right-column::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+
+        .right-side-content {
+            width: 100%;
+            padding-left: 15px;
+            padding-right: 10px;
+        }
+
+        /* Image Gallery */
+        .product-gallery-wrapper {
+            display: flex;
+            gap: 20px;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .main-image-area {
+            flex: 1;
+            height: 600px;
+            background: #f8f8f8;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
         .vertical-thumbnails {
-            width: 120px;
-        }
-
-        .vertical-thumb {
-            width: 110px;
-            height: 110px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100px;
+            flex-shrink: 0;
+            max-height: 550px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
 
         .vertical-thumbnails::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .vertical-thumbnails::-webkit-scrollbar-thumb {
-            background: #dc3545;
-            border-radius: 10px;
+            display: none;
+            width: 0;
+            height: 0;
         }
 
         .vertical-thumb {
@@ -55,15 +140,6 @@
         .vertical-thumb:hover {
             transform: scale(1.05);
             border-color: #dc3545;
-        }
-
-
-
-        .main-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: .3s;
         }
 
         .nav-arrows {
@@ -96,14 +172,82 @@
             background: #dc3545;
         }
 
-
-        .navbar {
-            position: sticky;
-            top: 0;
-            z-index: 9999;
-            background: #fff;
+        /* ===== COLOR VARIANT STYLES ===== */
+        .color-section {
+            margin-bottom: 20px;
         }
 
+        .color-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .color-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #e0e0e0;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+            border-color: #999;
+        }
+
+        .color-btn.selected {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+            transform: scale(1.1);
+        }
+
+        .color-btn .color-name-tooltip {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #666;
+            white-space: nowrap;
+            display: none;
+        }
+
+        .color-btn:hover .color-name-tooltip {
+            display: block;
+        }
+
+        .color-btn .check-mark {
+            display: none;
+            color: white;
+            font-size: 14px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .color-btn.selected .check-mark {
+            display: block;
+        }
+
+        /* ===== RIGHT SIDE CONTENT STYLES ===== */
         .brand-name {
             font-size: 14px;
             color: #666;
@@ -114,12 +258,6 @@
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 5px;
-        }
-
-        .product-subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
         }
 
         .product-category {
@@ -176,6 +314,13 @@
             margin-top: 5px;
         }
 
+        .you-save-text {
+            font-size: 13px;
+            color: #28a745;
+            margin-top: 5px;
+        }
+
+        /* ===== SIZE SECTION ===== */
         .size-section {
             margin-bottom: 20px;
         }
@@ -222,6 +367,18 @@
             background: #dc3545;
             color: white;
             border-color: #dc3545;
+        }
+
+        .size-btn.out-of-stock-size {
+            opacity: 0.4;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .size-btn.out-of-stock-size:hover {
+            background: white;
+            color: inherit;
+            border-color: #ddd;
         }
 
         .size-warning {
@@ -272,6 +429,11 @@
 
         .in-stock {
             color: #28a745;
+            font-size: 14px;
+        }
+
+        .in-stock-low {
+            color: #dc3545;
             font-size: 14px;
         }
 
@@ -335,14 +497,7 @@
             background: #000000;
         }
 
-        .btn-add-cart:disabled,
-        .btn-buy-now:disabled,
-        .btn-wishlist:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
+        /* ===== DELIVERY BOX ===== */
         .delivery-box {
             background: #f8f9fa;
             padding: 15px;
@@ -355,6 +510,10 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 12px;
+        }
+
+        .delivery-item:last-child {
+            margin-bottom: 0;
         }
 
         .delivery-item i {
@@ -373,6 +532,16 @@
 
         .delivery-text small {
             color: #666;
+        }
+
+        .delivery-text .cod-available {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .delivery-text .cod-not-available {
+            color: #dc3545;
+            font-weight: 600;
         }
 
         .product-info-tabs {
@@ -432,22 +601,6 @@
 
         .info-tab-header.active .arrow {
             transform: rotate(180deg);
-        }
-
-        .specs-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .specs-list li {
-            padding: 6px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .specs-list li strong {
-            width: 110px;
-            display: inline-block;
         }
 
         .breadcrumb {
@@ -516,7 +669,7 @@
             background: #17a2b8;
         }
 
-        /* ===== CUSTOM LOGIN MODAL STYLES ===== */
+        /* ===== CUSTOM LOGIN MODAL ===== */
         .custom-modal-overlay {
             position: fixed;
             top: 0;
@@ -621,12 +774,6 @@
             display: inline-block;
         }
 
-        .custom-modal-box .btn-modal-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
-            color: white;
-        }
-
         .custom-modal-box .btn-modal-secondary {
             background: #e2e8f0;
             color: #64748b;
@@ -637,11 +784,6 @@
             font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s;
-        }
-
-        .custom-modal-box .btn-modal-secondary:hover {
-            background: #cbd5e1;
-            color: #1a1a2e;
         }
 
         .custom-modal-box .modal-close {
@@ -656,42 +798,7 @@
             transition: all 0.3s;
         }
 
-        .custom-modal-box .modal-close:hover {
-            color: #dc3545;
-            transform: rotate(90deg);
-        }
-
-        @media (max-width: 576px) {
-            .custom-modal-box {
-                padding: 30px 20px;
-            }
-
-            .custom-modal-box .modal-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 2rem;
-            }
-
-            .custom-modal-box .modal-title {
-                font-size: 1.2rem;
-            }
-
-            .custom-modal-box .modal-subtitle {
-                font-size: 0.85rem;
-            }
-
-            .custom-modal-box .modal-buttons {
-                flex-direction: column;
-            }
-
-            .custom-modal-box .btn-modal-primary,
-            .custom-modal-box .btn-modal-secondary {
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        /* ⭐ NEW: Review Section Styles */
+        /* ===== REVIEW SECTION ===== */
         .reviews-section {
             margin-top: 30px;
             padding: 25px;
@@ -708,10 +815,6 @@
             gap: 10px;
         }
 
-        .reviews-section .section-title i {
-            color: #dc3545;
-        }
-
         .review-card {
             background: white;
             border-radius: 12px;
@@ -719,7 +822,6 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             border-left: 4px solid #dc3545;
-            transition: transform 0.2s;
         }
 
         .review-card:hover {
@@ -740,11 +842,6 @@
             font-weight: 600;
             color: #1e293b;
             font-size: 15px;
-        }
-
-        .review-card .review-user i {
-            color: #dc3545;
-            margin-right: 5px;
         }
 
         .review-card .review-date {
@@ -786,17 +883,6 @@
             transition: transform 0.2s;
         }
 
-        .review-card .review-media .media-item:hover {
-            transform: scale(1.05);
-        }
-
-        .review-card .review-media .media-item img,
-        .review-card .review-media .media-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
         .review-card .review-verified {
             display: inline-block;
             background: #dcfce7;
@@ -829,22 +915,11 @@
             margin-left: 8px;
         }
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* ===== RELATED PRODUCTS SECTION - FIXED IMAGE GAP ===== */
+        /* ===== RELATED PRODUCTS ===== */
         .related-products-section {
             margin-top: 40px;
             padding: 20px 0;
+            clear: both;
         }
 
         .related-products-section .section-title {
@@ -857,17 +932,12 @@
             gap: 10px;
         }
 
-        .related-products-section .section-title i {
-            color: #dc3545;
-        }
-
         .related-product-card {
-            border: none;
-            border-radius: 15px;
+            border: 1px solid #eee;
+            border-radius: 12px;
             transition: transform 0.3s, box-shadow 0.3s;
             overflow: hidden;
             margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             height: 100%;
             position: relative;
             background: white;
@@ -875,100 +945,29 @@
         }
 
         .related-product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
         }
 
-        /* FIX: Image slider container - removed padding-top: 100% and using aspect-ratio instead */
-        .related-product-card .product-image-slider {
+        .related-product-card .product-image-container {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+            background: #f8f9fa;
             position: relative;
-            overflow: hidden;
-            background: #f5f5f5;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            /* This creates square aspect ratio without extra gap */
         }
 
-        .related-product-card .product-image-slider .carousel-inner {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .related-product-card .product-image-container img {
             width: 100%;
             height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+            background: #ffffff;
+            padding: 10px;
         }
 
-        .related-product-card .product-image-slider .carousel-item {
-            width: 100%;
-            height: 100%;
-        }
-
-        .related-product-card .product-image-slider .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            background: #f5f5f5;
-        }
-
-        .related-product-card .product-image-slider .carousel-control-prev,
-        .related-product-card .product-image-slider .carousel-control-next {
-            opacity: 0;
-            transition: opacity 0.3s;
-            width: 28px;
-            height: 28px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 50%;
-            z-index: 10;
-        }
-
-        .related-product-card:hover .product-image-slider .carousel-control-prev,
-        .related-product-card:hover .product-image-slider .carousel-control-next {
-            opacity: 1;
-        }
-
-        .related-product-card .product-image-slider .carousel-control-prev {
-            left: 6px;
-        }
-
-        .related-product-card .product-image-slider .carousel-control-next {
-            right: 6px;
-        }
-
-        .related-product-card .product-image-slider .carousel-control-prev-icon,
-        .related-product-card .product-image-slider .carousel-control-next-icon {
-            background-size: 60%;
-            width: 14px;
-            height: 14px;
-        }
-
-        .related-product-card .card-body {
-            text-align: left;
-            padding: 10px 12px;
-        }
-
-        .related-product-card .card-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #1e293b;
-            text-align: left;
-        }
-
-        .related-product-card .product-price-display {
-            font-size: 1rem;
-            font-weight: bold;
-            color: #dc3545;
-        }
-
-        .related-product-card .product-old-price-display {
-            text-decoration: line-through;
-            color: #999;
-            font-size: 0.8rem;
-            margin-right: 8px;
+        .related-product-card:hover .product-image-container img {
+            transform: scale(1.03);
         }
 
         .related-product-card .discount-badge {
@@ -977,11 +976,11 @@
             right: 10px;
             background: #dc3545;
             color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
+            padding: 4px 12px;
+            border-radius: 4px;
             font-size: 0.8rem;
-            font-weight: bold;
-            z-index: 5;
+            font-weight: 700;
+            z-index: 1;
         }
 
         .related-product-card .wishlist-btn {
@@ -997,14 +996,13 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 5;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
             transition: all 0.3s;
         }
 
         .related-product-card .wishlist-btn i {
-            font-size: 1.1rem;
-            transition: all 0.3s;
+            font-size: 1rem;
         }
 
         .related-product-card .wishlist-btn i.far {
@@ -1015,125 +1013,225 @@
             color: #dc3545;
         }
 
-        .related-product-card .wishlist-btn:hover {
-            transform: scale(1.1);
+        .related-product-card .card-body {
+            padding: 12px 15px 15px;
+            text-align: left;
         }
 
-        .related-product-card .product-rating {
+        .related-product-card .product-brand {
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .related-product-card .product-brand i {
+            font-size: 0.65rem;
+            margin-right: 4px;
+            color: #6c757d;
+        }
+
+        .related-product-card .product-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #1e293b;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 40px;
+        }
+
+        .related-product-card .product-price-container {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 6px;
-            margin-top: 4px;
-            justify-content: flex-start;
+            margin-top: 2px;
         }
 
-        .related-product-card .product-rating .stars {
-            display: flex;
-            gap: 2px;
-        }
-
-        .related-product-card .product-rating .stars i {
-            font-size: 0.85rem;
-        }
-
-        .related-product-card .product-rating .stars i.fa-star,
-        .related-product-card .product-rating .stars i.fa-star-half-alt {
-            color: #f59e0b !important;
-        }
-
-        .related-product-card .product-rating .stars i.far.fa-star {
-            color: #e0e0e0 !important;
-        }
-
-        .related-product-card .product-rating .rating-value {
-            font-size: 0.9rem;
-            font-weight: 600;
+        .related-product-card .product-price-container .final-price {
+            font-size: 1.1rem;
+            font-weight: 700;
             color: #1e293b;
         }
 
-        .related-product-card .product-stock-low {
-            font-size: 0.9rem;
-            color: #ef4444;
-            margin-top: 6px;
-            text-align: left;
-            font-weight: 600;
-            background: #fef2f2;
-            padding: 4px 10px;
-            border-radius: 6px;
-            border-left: 3px solid #ef4444;
-            display: inline-block;
-            width: 100%;
+        .related-product-card .product-price-container .original-price {
+            font-size: 0.85rem;
+            color: #999;
+            text-decoration: line-through;
         }
 
+        .related-product-card .product-price-container .discount-percent {
+            background: #dc3545;
+            color: white;
+            padding: 1px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
 
-
-        .right-side-content {
-            padding-left: 45px;
-            position: relative;
+        .related-product-card .product-stock-low {
+            font-size: 0.8rem;
+            color: #dc3545;
+            margin-top: 6px;
+            font-weight: 600;
         }
 
         .related-product-card .product-stock-low i {
-            font-size: 0.9rem;
-            margin-right: 6px;
-            color: #ef4444;
+            font-size: 0.8rem;
+            margin-right: 4px;
+            color: #dc3545;
         }
 
+        .related-product-card .product-stock-out {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 6px;
+            font-weight: 500;
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
 
+        .related-product-card .product-stock-out i {
+            font-size: 0.8rem;
+            margin-right: 4px;
+            color: #999;
+        }
 
-
-        .main-image-area {
-            flex: 1;
+        /* ===== SIZE GUIDE MODAL - SIDE POPUP ===== */
+        .sizeguide-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            min-height: 500px;
             height: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            background: #f8f8f8;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99999;
+            display: none;
+            justify-content: flex-end;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sizeguide-modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .sizeguide-modal-box {
+            background: white;
+            width: 500px;
+            max-width: 90%;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.3s ease;
             position: relative;
         }
 
-        .product-wrapper {
-            display: flex;
-            align-items: flex-start;
-            gap: 40px;
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
 
-        .left-column {
-            width: 48%;
+        .sizeguide-modal-box .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: all 0.3s;
         }
 
-        .right-column {
-            width: 52%;
+        .sizeguide-modal-box .modal-close-btn:hover {
+            color: #dc3545;
+            transform: rotate(90deg);
         }
 
-        .product-gallery-wrapper {
-            display: flex;
-            gap: 25px;
-            position: sticky;
-            top: 90px;
-            /* below navbar */
-            align-self: flex-start;
+        .sizeguide-modal-box h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eef2f6;
         }
 
-        .main-image-area {
+        .sizeguide-modal-box h3 i {
+            color: #dc3545;
+            margin-right: 10px;
+        }
+
+        .sizeguide-table {
             width: 100%;
-            height: 900px;
-            background: #f8f8f8;
-            border-radius: 18px;
-            overflow: hidden;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
 
-        .main-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .sizeguide-table th {
+            background: #dc3545;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
         }
 
-        .right-side-content {
-            width: 100%;
+        .sizeguide-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eef2f6;
+            font-size: 13px;
+            color: #333;
         }
 
-        @media (max-width: 768px) {
+        .sizeguide-table tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .sizeguide-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 991px) {
+            .product-wrapper {
+                flex-direction: column;
+            }
+
+            .left-column {
+                position: static !important;
+                width: 100%;
+                flex: 0 0 100%;
+                top: 0;
+            }
+
+            .right-column {
+                width: 100%;
+                flex: 0 0 100%;
+                max-height: none;
+                overflow-y: visible;
+            }
+
             .product-gallery-wrapper {
                 flex-direction: column-reverse;
             }
@@ -1142,10 +1240,34 @@
                 flex-direction: row;
                 width: 100%;
                 justify-content: center;
+                max-height: 120px;
+                overflow-x: auto;
+                overflow-y: hidden;
             }
 
             .main-image-area {
+                height: 450px;
+            }
+
+            .right-side-content {
+                padding-left: 0;
+                padding-top: 20px;
+            }
+
+            .related-product-card .product-image-container {
+                height: 200px;
+            }
+
+            .sizeguide-modal-box {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-image-area {
                 min-height: 350px;
+                height: 350px;
             }
 
             .action-buttons {
@@ -1158,34 +1280,261 @@
                 width: 100%;
             }
 
-            .review-card .review-header {
-                flex-direction: column;
-                align-items: flex-start;
+            .vertical-thumb {
+                width: 70px;
+                height: 70px;
             }
 
-            .related-product-card .product-image-slider .carousel-control-prev,
-            .related-product-card .product-image-slider .carousel-control-next {
-                opacity: 1;
-                width: 24px;
-                height: 24px;
+            .related-product-card .product-image-container {
+                height: 180px;
+            }
+
+            .related-product-card .product-name {
+                font-size: 0.75rem;
+                min-height: 30px;
+            }
+
+            .related-product-card .product-price-container .final-price {
+                font-size: 0.95rem;
+            }
+
+            .related-product-card .product-brand {
+                font-size: 0.65rem;
+            }
+
+            .sizeguide-modal-box {
+                padding: 20px;
+            }
+
+            .sizeguide-modal-box h3 {
+                font-size: 18px;
+            }
+
+            .sizeguide-table th,
+            .sizeguide-table td {
+                padding: 8px 10px;
+                font-size: 12px;
             }
         }
 
         @media (max-width: 576px) {
-
-            .related-product-card .product-image-slider .carousel-control-prev,
-            .related-product-card .product-image-slider .carousel-control-next {
-                width: 20px;
-                height: 20px;
+            .main-image-area {
+                height: 280px;
+                min-height: 280px;
             }
 
-            .related-product-card .product-image-slider .carousel-control-prev-icon,
-            .related-product-card .product-image-slider .carousel-control-next-icon {
-                width: 10px;
-                height: 10px;
+            .vertical-thumb {
+                width: 60px;
+                height: 60px;
+            }
+
+            .vertical-thumbnails {
+                gap: 8px;
+            }
+
+            .product-title {
+                font-size: 20px;
+            }
+
+            .current-price {
+                font-size: 24px;
+            }
+
+            .related-product-card .product-image-container {
+                height: 140px;
+            }
+
+            .related-product-card .product-name {
+                font-size: 0.7rem;
+                min-height: 25px;
+            }
+
+            .related-product-card .product-price-container .final-price {
+                font-size: 0.85rem;
+            }
+
+            .related-product-card .product-brand {
+                font-size: 0.6rem;
+            }
+
+            .sizeguide-modal-box {
+                padding: 15px;
+            }
+
+            .sizeguide-modal-box h3 {
+                font-size: 16px;
+            }
+
+            .sizeguide-table th,
+            .sizeguide-table td {
+                padding: 6px 8px;
+                font-size: 11px;
             }
         }
     </style>
+
+    @php
+        // ===== GET VARIANT DATA =====
+        $variants = \App\Models\ProductVariant::where('product_id', $product->id)->get();
+        $hasVariants = $variants->count() > 0;
+
+        // ===== GET UNIQUE COLORS FROM VARIANTS =====
+        $colors = $hasVariants ? $variants->pluck('color')->unique()->filter()->values() : collect();
+        $hasColors = $colors->count() > 0;
+
+        // ===== GET UNIQUE SIZES FROM VARIANTS =====
+        $sizes = $hasVariants ? $variants->pluck('size')->unique()->filter()->values() : collect();
+        $hasSizes = $sizes->count() > 0;
+
+        // ===== GET SIZE CHART - ONLY IF ASSIGNED =====
+        $sizeChart = null;
+        $hasSizeChart = false;
+        if ($product->size_chart_id) {
+            $sizeChart = \App\Models\SizeChart::find($product->size_chart_id);
+            $hasSizeChart = $sizeChart ? true : false;
+        }
+
+        // ===== DECODE SIZE CHART SIZES =====        $sizeChartSizes = [];
+        if ($hasSizeChart && $sizeChart && $sizeChart->sizes) {
+            if (is_string($sizeChart->sizes)) {
+                $sizeChartSizes = json_decode($sizeChart->sizes, true);
+                if (!is_array($sizeChartSizes)) {
+                    $sizeChartSizes = [];
+                }
+            } elseif (is_array($sizeChart->sizes)) {
+                $sizeChartSizes = $sizeChart->sizes;
+            }
+        }
+
+        // ===== GET FIRST VARIANT FOR DEFAULT DISPLAY =====
+        $firstVariant = $hasVariants ? $variants->first() : null;
+        $firstColor = $hasColors ? $colors->first() : null;
+
+        // ===== GET BRAND NAME =====
+        $brandName = $product->brand ? $product->brand->name : null;
+        $hasBrand = !empty($brandName);
+
+        // ===== DETERMINE PRICE DISPLAY =====
+        if ($hasVariants && $firstVariant) {
+            $displayPrice = floatval($firstVariant->final_price ?? ($firstVariant->price ?? 0));
+            $displayMrp = floatval($firstVariant->total_price ?? ($firstVariant->mrp ?? ($firstVariant->price ?? 0)));
+            $displayStock = $variants->sum('stock');
+            $displayGstPercentage = floatval($firstVariant->gst_percentage ?? 0);
+            $discountType = $firstVariant->discount_type ?? 'flat';
+            $discountValue = floatval($firstVariant->discount_value ?? 0);
+        } else {
+            $displayPrice = floatval($product->final_price ?? ($product->price ?? 0));
+            $displayMrp = floatval($product->total_price ?? ($product->mrp ?? ($product->price ?? 0)));
+            $displayStock = intval($product->stock ?? 0);
+            $displayGstPercentage = floatval($product->gst_percentage ?? 0);
+            $discountType = $product->discount_type ?? 'flat';
+            $discountValue = floatval($product->discount_value ?? 0);
+        }
+
+        // ===== CALCULATE DISCOUNT PERCENTAGE =====
+        $discountPercent = 0;
+        if ($displayMrp > 0 && $displayPrice > 0 && $displayPrice < $displayMrp) {
+            $discountPercent = round((($displayMrp - $displayPrice) / $displayMrp) * 100);
+        }
+
+        // ===== CALCULATE DISCOUNT AMOUNT =====
+        $discountAmount = $displayMrp - $displayPrice;
+        if ($discountAmount < 0) {
+            $discountAmount = 0;
+        }
+
+        // ===== GET DISPLAY DISCOUNT TEXT BASED ON TYPE =====
+        $discountDisplayText = '';
+        if ($discountValue > 0 && $discountPercent > 0) {
+            if ($discountType === 'flat') {
+                $discountDisplayText = '₹' . number_format($discountValue, 2) . ' off';
+            } else {
+                $discountDisplayText = $discountPercent . '% off';
+            }
+        } elseif ($discountPercent > 0) {
+            $discountDisplayText = $discountPercent . '% off';
+        }
+
+        // ===== GET DISCOUNT BADGE TEXT BASED ON TYPE =====
+        $discountBadgeText = '';
+        if ($discountValue > 0 && $discountPercent > 0) {
+            if ($discountType === 'flat') {
+                $discountBadgeText = '₹' . number_format($discountValue, 2) . ' OFF';
+            } else {
+                $discountBadgeText = $discountPercent . '% OFF';
+            }
+        } elseif ($discountPercent > 0) {
+            $discountBadgeText = $discountPercent . '% OFF';
+        }
+
+        // ===== GET PRODUCT IMAGES =====
+        $allImages = \App\Models\ProductImage::where('product_id', $product->id)->orderBy('display_order')->get();
+
+        if ($allImages->count() == 0 && $product->image) {
+            $allImages = collect([(object) ['image_path' => $product->image, 'is_main' => 1]]);
+        }
+
+        if ($allImages->count() == 0) {
+            $allImages = collect([
+                (object) [
+                    'image_path' => 'https://via.placeholder.com/500x500?text=No+Image',
+                    'is_main' => 1,
+                ],
+            ]);
+        }
+
+        // ===== BUILD VARIANT DATA ARRAY FOR JAVASCRIPT =====
+        $variantDataArray = [];
+        foreach ($variants as $v) {
+            $variantPrice = floatval($v->final_price ?? ($v->price ?? 0));
+            $variantMrp = floatval($v->total_price ?? ($v->mrp ?? ($v->price ?? 0)));
+            $variantDiscountPercent = 0;
+            if ($variantMrp > 0 && $variantPrice > 0 && $variantPrice < $variantMrp) {
+                $variantDiscountPercent = round((($variantMrp - $variantPrice) / $variantMrp) * 100);
+            }
+
+            $variantDataArray[] = [
+                'id' => $v->id,
+                'size' => $v->size,
+                'color' => $v->color,
+                'price' => $variantPrice,
+                'mrp' => $variantMrp,
+                'stock' => intval($v->stock ?? 0),
+                'discount_percent' => $variantDiscountPercent,
+                'discount_type' => $v->discount_type ?? 'flat',
+                'discount_value' => floatval($v->discount_value ?? 0),
+            ];
+        }
+
+        // ===== BUILD COLOR DATA WITH IMAGES =====
+        $colorDataArray = [];
+        foreach ($colors as $color) {
+            $colorVariants = $variants->where('color', $color);
+            $firstColorVariant = $colorVariants->first();
+
+            $colorImages = \App\Models\ProductImage::where('product_id', $product->id)
+                ->where('variant_id', $firstColorVariant->id)
+                ->orderBy('display_order')
+                ->get();
+
+            $colorImagePaths = [];
+            if ($colorImages->count() > 0) {
+                foreach ($colorImages as $img) {
+                    $colorImagePaths[] = asset('storage/' . $img->image_path);
+                }
+            } else {
+                foreach ($allImages as $img) {
+                    $colorImagePaths[] = asset('storage/' . $img->image_path);
+                }
+            }
+
+            $colorDataArray[] = [
+                'name' => $color,
+                'variants' => $colorVariants->pluck('id')->toArray(),
+                'images' => $colorImagePaths,
+            ];
+        }
+    @endphp
 
     <div class="container-fluid px-5 mt-4">
         <div class="product-detail-container">
@@ -1197,29 +1546,12 @@
                 </ol>
             </nav>
 
+            <!-- ===== PRODUCT WRAPPER ===== -->
             <div class="product-wrapper">
+                <!-- LEFT COLUMN - STICKY IMAGE -->
                 <div class="left-column">
                     <div class="product-gallery-wrapper">
                         <div class="vertical-thumbnails" id="verticalThumbnails">
-                            @php
-                                $allImages = \App\Models\ProductImage::where('product_id', $product->id)
-                                    ->orderBy('display_order')
-                                    ->get();
-
-                                if ($allImages->count() == 0 && $product->image) {
-                                    $allImages = collect([(object) ['image_path' => $product->image, 'is_main' => 1]]);
-                                }
-
-                                if ($allImages->count() == 0) {
-                                    $allImages = collect([
-                                        (object) [
-                                            'image_path' => 'https://via.placeholder.com/500x500?text=No+Image',
-                                            'is_main' => 1,
-                                        ],
-                                    ]);
-                                }
-                            @endphp
-
                             @foreach ($allImages as $index => $img)
                                 <div class="vertical-thumb {{ $index == 0 ? 'active' : '' }}"
                                     data-index="{{ $index }}" onclick="changeMainImage({{ $index }})">
@@ -1243,14 +1575,17 @@
                     </div>
                 </div>
 
-                <div class="left-column">
+                <!-- RIGHT COLUMN - SCROLLABLE CONTENT WITH HIDDEN SCROLLBAR -->
+                <div class="right-column">
                     <div class="right-side-content">
-                        <div class="brand-name">
-                            <i class="fas fa-building"></i> {{ $product->brand->name ?? 'BRAVE' }}
-                        </div>
+                        <!-- ===== BRAND NAME - ONLY SHOW IF EXISTS ===== -->
+                        @if ($hasBrand)
+                            <div class="brand-name">
+                                <i class="fas fa-building"></i> {{ $brandName }}
+                            </div>
+                        @endif
 
                         <h1 class="product-title">{{ $product->name }}</h1>
-                        <p class="product-subtitle">{{ $product->short_description ?? 'Graphic Printed T-Shirt' }}</p>
                         <p class="product-category">
                             <i class="fas fa-tag"></i>
                             {{ $product->category ? $product->category->name : 'Uncategorized' }}
@@ -1267,55 +1602,177 @@
                             <span class="rating-text">Based on 0 ratings</span>
                         </div>
 
+                        <!-- ===== PRICE SECTION WITH DISCOUNT ===== -->
                         <div class="price-section">
-                            @if ($product->discount_price && $product->discount_price < $product->price)
-                                <span class="current-price">₹{{ number_format($product->discount_price, 2) }}</span>
-                                <span class="old-price">₹{{ number_format($product->price, 2) }}</span>
-                                <span
-                                    class="discount-badge">{{ round((($product->price - $product->discount_price) / $product->price) * 100) }}%
-                                    OFF</span>
+                            @if ($discountPercent > 0)
+                                <span class="current-price" id="displayPrice">₹{{ number_format($displayPrice, 2) }}</span>
+                                <span class="old-price" id="displayMrp">₹{{ number_format($displayMrp, 2) }}</span>
+                                <span class="discount-badge" id="discountBadge">{{ $discountBadgeText }}</span>
+                                <div class="you-save-text">
+                                    <i class="fas fa-tag"></i> You save ₹{{ number_format($discountAmount, 2) }}
+                                </div>
                             @else
-                                <span class="current-price">₹{{ number_format($product->price, 2) }}</span>
+                                <span class="current-price" id="displayPrice">₹{{ number_format($displayPrice, 2) }}</span>
                             @endif
                             <div class="tax-text">Inclusive of all taxes</div>
+                            @if ($hasVariants)
+                                <div style="font-size:12px; color:#6c757d; margin-top:5px;">
+                                    <i class="fas fa-palette"></i> {{ $variants->count() }} variants available
+                                </div>
+                            @endif
+                            @if ($hasColors)
+                                <div style="font-size:12px; color:#6c757d; margin-top:3px;">
+                                    <i class="fas fa-paint-bucket"></i> {{ $colors->count() }} colors available
+                                </div>
+                            @endif
                         </div>
 
-                        <div class="size-section">
-                            <div class="size-header">
-                                <span class="size-label">Select Size</span>
-                                <a href="#" class="size-guide" onclick="showSizeGuide(event)">Size Guide</a>
+                        <!-- ===== COLOR SECTION - ONLY SHOW IF COLORS EXIST ===== -->
+                        @if ($hasColors)
+                            <div class="color-section">
+                                <div class="color-header">
+                                    <span class="color-label">Select Color</span>
+                                </div>
+                                <div class="color-options" id="colorOptions">
+                                    @foreach ($colors as $color)
+                                        @php
+                                            $isFirst = $loop->first;
+                                            $colorVariant = $variants->where('color', $color)->first();
+                                            $colorImages = \App\Models\ProductImage::where('product_id', $product->id)
+                                                ->where('variant_id', $colorVariant->id)
+                                                ->orderBy('display_order')
+                                                ->get();
+                                            $colorImage =
+                                                $colorImages->count() > 0
+                                                    ? asset('storage/' . $colorImages->first()->image_path)
+                                                    : asset('storage/' . ($allImages[0]->image_path ?? ''));
+                                        @endphp
+                                        <div class="color-btn {{ $isFirst ? 'selected' : '' }}"
+                                            data-color="{{ $color }}"
+                                            data-images="{{ json_encode($colorImages->count() > 0? $colorImages->pluck('image_path')->map(function ($p) {return asset('storage/' . $p);})->toArray(): $allImages->pluck('image_path')->map(function ($p) {return asset('storage/' . $p);})->toArray()) }}"
+                                            onclick="selectColor(this, '{{ $color }}')"
+                                            style="background: {{ $color }}; {{ in_array(strtolower($color), ['white', 'yellow', 'pink', 'lightblue', 'lightgreen', 'cream', 'beige']) ? 'border: 3px solid #ddd;' : '' }}">
+                                            <span class="check-mark"><i class="fas fa-check"></i></span>
+                                            <span class="color-name-tooltip">{{ ucfirst($color) }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
-                            <div class="size-options" id="sizeOptions">
-                                @php
-                                    $sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-                                @endphp
-                                @foreach ($sizes as $size)
-                                    <button type="button" class="size-btn"
-                                        data-size="{{ $size }}">{{ $size }}</button>
-                                @endforeach
+                        @endif
+
+                        <!-- ===== SIZE SECTION ===== -->
+                        @if ($hasSizes || $hasSizeChart)
+                            <div class="size-section">
+                                <div class="size-header">
+                                    <span class="size-label">Select Size</span>
+                                    <!-- ===== SIZE GUIDE - ONLY SHOW IF SIZE CHART IS ASSIGNED ===== -->
+                                    @if ($hasSizeChart)
+                                        <a href="#" class="size-guide" onclick="openSizeGuide(event)">Size Guide</a>
+                                    @endif
+                                </div>
+                                <div class="size-options" id="sizeOptions">
+                                    @if ($hasSizes)
+                                        @foreach ($sizes as $size)
+                                            @php
+                                                $sizeVariant = $variants->where('size', $size)->first();
+                                                $variantStock = $sizeVariant ? intval($sizeVariant->stock ?? 0) : 0;
+                                                $isOutOfStock = $variantStock <= 0;
+                                                $variantPrice = $sizeVariant
+                                                    ? floatval($sizeVariant->final_price ?? ($sizeVariant->price ?? 0))
+                                                    : 0;
+                                                $variantMrp = $sizeVariant
+                                                    ? floatval(
+                                                        $sizeVariant->total_price ??
+                                                            ($sizeVariant->mrp ?? ($sizeVariant->price ?? 0)),
+                                                    )
+                                                    : 0;
+                                                $variantDiscountPercent = 0;
+                                                if (
+                                                    $variantMrp > 0 &&
+                                                    $variantPrice > 0 &&
+                                                    $variantPrice < $variantMrp
+                                                ) {
+                                                    $variantDiscountPercent = round(
+                                                        (($variantMrp - $variantPrice) / $variantMrp) * 100,
+                                                    );
+                                                }
+                                                $variantDiscountType = $sizeVariant->discount_type ?? 'flat';
+                                                $variantDiscountValue = floatval($sizeVariant->discount_value ?? 0);
+
+                                                // ===== VARIANT DISCOUNT TEXT =====
+                                                $variantDiscountText = '';
+                                                if ($variantDiscountValue > 0 && $variantDiscountPercent > 0) {
+                                                    if ($variantDiscountType === 'flat') {
+                                                        $variantDiscountText =
+                                                            '₹' . number_format($variantDiscountValue, 2) . ' off';
+                                                    } else {
+                                                        $variantDiscountText = $variantDiscountPercent . '% off';
+                                                    }
+                                                } elseif ($variantDiscountPercent > 0) {
+                                                    $variantDiscountText = $variantDiscountPercent . '% off';
+                                                }
+                                            @endphp
+                                            <button type="button"
+                                                class="size-btn {{ $loop->first && !$hasColors ? 'selected' : '' }} {{ $isOutOfStock ? 'out-of-stock-size' : '' }}"
+                                                data-size="{{ $size }}"
+                                                data-variant-id="{{ $sizeVariant->id ?? '' }}"
+                                                data-price="{{ $variantPrice }}" data-mrp="{{ $variantMrp }}"
+                                                data-discount="{{ $variantDiscountPercent }}"
+                                                data-stock="{{ $variantStock }}" onclick="selectSize(this)"
+                                                {{ $isOutOfStock ? 'disabled' : '' }}>
+                                                {{ $size }}
+                                                @if ($variantDiscountPercent > 0)
+                                                    <span
+                                                        style="font-size:9px; display:block; color:#28a745;">-{{ $variantDiscountText }}</span>
+                                                @endif
+                                            </button>
+                                        @endforeach
+                                    @else
+                                        @php
+                                            $defaultSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+                                        @endphp
+                                        @foreach ($defaultSizes as $size)
+                                            <button type="button" class="size-btn" data-size="{{ $size }}"
+                                                onclick="selectDefaultSize(this)">
+                                                {{ $size }}
+                                            </button>
+                                        @endforeach
+                                    @endif
+                                </div>
+                                <div id="sizeWarning" class="size-warning">Please select a size first</div>
+                                <div id="sizeStockInfo"
+                                    style="font-size:12px; color:#6c757d; margin-top:8px; display:none;">
+                                    <i class="fas fa-box"></i> <span id="sizeStockCount">0</span> items in stock for this
+                                    size
+                                </div>
                             </div>
-                            <div id="sizeWarning" class="size-warning">Please select a size first</div>
-                        </div>
+                        @endif
 
                         <div class="quantity-section">
                             <label class="quantity-label">Quantity</label>
                             <div class="quantity-selector">
                                 <button class="quantity-btn" onclick="decrementQuantity()">-</button>
-                                <input type="number" id="quantity" class="quantity-input" value="1" min="1"
-                                    max="{{ $product->stock > 0 ? $product->stock : 10 }}">
+                                <input type="number" id="quantity" class="quantity-input" value="1"
+                                    min="1" max="{{ $displayStock > 0 ? $displayStock : 10 }}">
                                 <button class="quantity-btn" onclick="incrementQuantity()">+</button>
                             </div>
                         </div>
 
-                        <div class="stock-status">
-                            @if ($product->stock > 0)
-                                <span class="in-stock"><i class="fas fa-check-circle"></i> In Stock ({{ $product->stock }}
-                                    items available)</span>
-                            @else
-                                <span class="out-of-stock"><i class="fas fa-times-circle"></i> Out of Stock</span>
-                            @endif
-                        </div>
-
+                        <!-- ===== STOCK STATUS - ONLY SHOW LOW STOCK ALERT WHEN STOCK <= 5 ===== -->
+                        @if ($displayStock > 0 && $displayStock <= 5)
+                            <div class="stock-status">
+                                <span class="in-stock-low" id="stockStatus">
+                                    <i class="fas fa-exclamation-triangle"></i> Only {{ $displayStock }} left in stock!
+                                </span>
+                            </div>
+                        @elseif ($displayStock == 0)
+                            <div class="stock-status">
+                                <span class="out-of-stock" id="stockStatus">
+                                    <i class="fas fa-times-circle"></i> Out of Stock
+                                </span>
+                            </div>
+                        @endif
+                        <!-- ===== REMOVED: No stock message when stock > 5 ===== -->
 
                         <div class="action-buttons">
                             <button class="btn-wishlist" id="wishlistBtn" onclick="toggleWishlistDetail()">
@@ -1327,13 +1784,15 @@
 
                         </div>
 
-                        <!-- Delivery Information Box -->
+                        <!-- ===== DELIVERY BOX ===== -->
                         <div class="delivery-box">
                             <div class="delivery-item">
                                 <i class="fas fa-truck"></i>
                                 <div class="delivery-text">
                                     <strong>CASH ON DELIVERY</strong>
-                                    <small>Available</small>
+                                    <small class="{{ $product->cod_available ? 'cod-available' : 'cod-not-available' }}">
+                                        {{ $product->cod_available ? '✅ Available' : '❌ Not Available' }}
+                                    </small>
                                 </div>
                             </div>
                             <div class="delivery-item">
@@ -1347,225 +1806,283 @@
                                 <i class="fas fa-clock"></i>
                                 <div class="delivery-text">
                                     <strong>DELIVERY</strong>
-                                    <small>Free delivery on orders above ₹999</small>
+                                    <small>{{ $product->delivery_days ?? 3 }} days delivery</small>
                                 </div>
                             </div>
                         </div>
 
-
-                        <div class="product-info-tabs">
-                            <div class="info-tab">
-                                <div class="info-tab-header" onclick="toggleTab(this)">
-                                    <span><i class="fas fa-info-circle"></i> PRODUCT DETAILS</span>
-                                    <span class="arrow">▼</span>
-                                </div>
-                                <div class="info-tab-content">
-                                    <p>{{ $product->description ?? 'No description available' }}</p>
-                                    @if ($product->short_description)
-                                        <div class="alert alert-light mt-2 p-2">
-                                            <strong>Highlights:</strong>
-                                            <p class="mb-0">{{ $product->short_description }}</p>
-                                        </div>
-                                    @endif
-                                </div>
+                        <!-- ===== OFFER SECTION ===== -->
+                        @if (isset($product->offers) && $product->offers->count() > 0)
+                            <div
+                                style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px; padding: 12px 15px; margin-bottom: 20px;">
+                                <strong style="color: #856404;"><i class="fas fa-tags"></i> Special Offers</strong>
+                                <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #856404; font-size: 13px;">
+                                    @foreach ($product->offers as $offer)
+                                        <li>{{ $offer->title ?? ($offer->name ?? 'Offer') }} - {{ $offer->discount }}% off
+                                        </li>
+                                    @endforeach
+                                </ul>
                             </div>
+                        @endif
+<!-- ===== PRODUCT INFO TABS ===== -->
+<div class="product-info-tabs">
+    <div class="info-tab">
+        <div class="info-tab-header active" onclick="toggleTab(this)">
+            <span><i class="fas fa-info-circle"></i> PRODUCT DETAILS</span>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="info-tab-content show">
+            <!-- ===== DESCRIPTION WITH BULLET POINTS ===== -->
+            <div class="product-description">
+                @php
+                    $description = $product->description ?? '';
+                    if (!empty($description)) {
+                        // Convert newlines to <br> for basic display
+                        $formatted = nl2br(e($description));
+                        echo $formatted;
+                    } else {
+                        echo '<p>No description available</p>';
+                    }
+                @endphp
+            </div>
+            
+            @if ($product->short_description)
+                <div class="alert alert-light mt-2 p-2">
+                    <strong>Highlights:</strong>
+                    <p class="mb-0">{{ $product->short_description }}</p>
+                </div>
+            @endif
 
-                            <div class="info-tab">
-                                <div class="info-tab-header" onclick="toggleTab(this)">
-                                    <span><i class="fas fa-clipboard-list"></i> KNOW YOUR PRODUCT</span>
-                                    <span class="arrow">▼</span>
-                                </div>
-                                <div class="info-tab-content">
-                                    <ul class="specs-list">
-                                        <li><strong>SKU:</strong> {{ $product->sku ?? 'N/A' }}</li>
-                                        <li><strong>GST:</strong> {{ $product->gst_percentage ?? 18 }}%</li>
-                                        <li><strong>Weight:</strong> {{ $product->weight ?? 0 }}
-                                            {{ $product->weight_unit ?? 'kg' }}</li>
-                                        @if ($product->dimensions)
-                                            <li><strong>Dimensions:</strong> {{ $product->dimensions }}</li>
-                                        @endif
-                                        <li><strong>Material:</strong> High Quality Cotton</li>
-                                        <li><strong>Fit:</strong> Regular Fit</li>
-                                    </ul>
-                                </div>
-                            </div>
+        
+        </div>
+    </div>
 
-                            <div class="info-tab">
-                                <div class="info-tab-header" onclick="toggleTab(this)">
-                                    <span><i class="fas fa-undo-alt"></i> RETURN & EXCHANGE</span>
-                                    <span class="arrow">▼</span>
-                                </div>
-                                <div class="info-tab-content">
-                                    <p>You can return this product within {{ $product->return_days ?? 30 }} days of
-                                        delivery.</p>
-                                    <p><strong>Exchange Available:</strong> Yes</p>
-                                    <p>Exchange within {{ $product->return_days ?? 30 }} days of delivery.</p>
-                                    <p><strong>Warranty:</strong> {{ $product->warranty_months ?? 0 }} months manufacturer
-                                        warranty</p>
-                                    <p><strong>Conditions:</strong> Product must be unused and in original packaging.</p>
-                                    <hr>
-                                    <h6>How to Return?</h6>
-                                    <ol>
-                                        <li>Go to your orders section</li>
-                                        <li>Select the product you want to return</li>
-                                        <li>Choose return reason</li>
-                                        <li>Schedule a pickup</li>
-                                    </ol>
-                                </div>
-                            </div>
-                        </div>
+    <div class="info-tab">
+        <div class="info-tab-header" onclick="toggleTab(this)">
+            <span><i class="fas fa-undo-alt"></i> RETURN & EXCHANGE</span>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="info-tab-content">
+            <p>You can return this product within {{ $product->return_days ?? 30 }} days of delivery.</p>
+            <p><strong>Exchange Available:</strong> Yes</p>
+            <p>Exchange within {{ $product->return_days ?? 30 }} days of delivery.</p>
+            <p><strong>Warranty:</strong> {{ $product->warranty_months ?? 0 }} months manufacturer warranty</p>
+            <p><strong>Conditions:</strong> Product must be unused and in original packaging.</p>
+            <hr>
+            <h6>How to Return?</h6>
+            <ol>
+                <li>Go to your orders section</li>
+                <li>Select the product you want to return</li>
+                <li>Choose return reason</li>
+                <li>Schedule a pickup</li>
+            </ol>
+        </div>
+    </div>
+</div>
                     </div>
                 </div>
             </div>
-        </div>
+            <!-- ===== END PRODUCT WRAPPER ===== -->
 
-        <!-- ===== RELATED PRODUCTS SECTION - FIXED IMAGE GAP ===== -->
-        @if (isset($relatedProducts) && $relatedProducts->count() > 0)
-            <div class="related-products-section">
-                <h3 class="section-title">
-                    <i class="fas fa-sync-alt"></i> You May Also Like
-                </h3>
-                <div class="product-wrapper">
-                    @foreach ($relatedProducts as $related)
-                        @php
-                            // Get images for related product
-                            $relatedImages = [];
-                            if ($related->image) {
-                                $relatedImages[] = $related->image;
-                            }
-                            if (isset($related->gallery_images) && is_array($related->gallery_images)) {
-                                $relatedImages = array_merge($relatedImages, $related->gallery_images);
-                            }
-                            if (empty($relatedImages)) {
-                                $relatedImages = ['https://via.placeholder.com/300x300?text=No+Image'];
-                            }
-                            $relatedImageUrls = array_map(function ($img) {
-                                return strpos($img, 'http') === 0 ? $img : '/storage/' . $img;
-                            }, $relatedImages);
-                            $relatedCarouselId = 'relatedCarousel-' . $related->id;
-                            $hasMultipleRelatedImages = count($relatedImageUrls) > 1;
+            <!-- ===== RELATED PRODUCTS ===== -->
+            @if (isset($relatedProducts) && $relatedProducts->count() > 0)
+                <div class="related-products-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-sync-alt"></i> You May Also Like
+                    </h3>
+                    <div class="row">
+                        @foreach ($relatedProducts as $related)
+                            @php
+                                $relatedImages = \App\Models\ProductImage::where('product_id', $related->id)
+                                    ->orderBy('display_order')
+                                    ->get();
+                                $relatedImageUrls = [];
+                                if ($relatedImages->count() > 0) {
+                                    foreach ($relatedImages as $img) {
+                                        $relatedImageUrls[] = asset('storage/' . $img->image_path);
+                                    }
+                                } elseif ($related->image) {
+                                    $relatedImageUrls[] = asset('storage/' . $related->image);
+                                } else {
+                                    $relatedImageUrls[] = 'https://via.placeholder.com/300x300?text=No+Image';
+                                }
 
-                            // Rating - Yellow Filled Stars
-                            $relatedRating = floatval($related->rating ?? 0);
-                            $fullStars = floor($relatedRating);
-                            $halfStar = $relatedRating - $fullStars >= 0.5;
-                            $emptyStars = 5 - $fullStars - ($halfStar ? 1 : 0);
-                            $relatedStarsHtml = '';
-                            for ($i = 0; $i < $fullStars; $i++) {
-                                $relatedStarsHtml .= '<i class="fas fa-star"></i>';
-                            }
-                            if ($halfStar) {
-                                $relatedStarsHtml .= '<i class="fas fa-star-half-alt"></i>';
-                            }
-                            for ($i = 0; $i < $emptyStars; $i++) {
-                                $relatedStarsHtml .= '<i class="far fa-star"></i>';
-                            }
+                                $relatedVariants = \App\Models\ProductVariant::where('product_id', $related->id)->get();
+                                $hasRelatedVariants = $relatedVariants->count() > 0;
 
-                            // Stock Alert - Only when stock <= 5
-                            $relatedStock = intval($related->stock ?? 0);
-                            $relatedStockAlertHtml = '';
-                            if ($relatedStock <= 5 && $relatedStock > 0) {
-                                $relatedStockAlertHtml =
-                                    '
-                        <div class="product-stock-low">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Only ' .
-                                    $relatedStock .
-                                    ' left in stock!
-                        </div>
-                    ';
-                            }
+                                if ($hasRelatedVariants && $relatedVariants->first()) {
+                                    $firstVariant = $relatedVariants->first();
+                                    $relatedDisplayPrice = floatval(
+                                        $firstVariant->final_price ?? ($firstVariant->price ?? 0),
+                                    );
+                                    $relatedMrp = floatval(
+                                        $firstVariant->total_price ??
+                                            ($firstVariant->mrp ?? ($firstVariant->price ?? 0)),
+                                    );
+                                    $relatedStock = $relatedVariants->sum('stock');
+                                    $relatedDiscountType = $firstVariant->discount_type ?? 'flat';
+                                    $relatedDiscountValue = floatval($firstVariant->discount_value ?? 0);
+                                } else {
+                                    $relatedDisplayPrice = floatval($related->final_price ?? ($related->price ?? 0));
+                                    $relatedMrp = floatval(
+                                        $related->total_price ?? ($related->mrp ?? ($related->price ?? 0)),
+                                    );
+                                    $relatedStock = intval($related->stock ?? 0);
+                                    $relatedDiscountType = $related->discount_type ?? 'flat';
+                                    $relatedDiscountValue = floatval($related->discount_value ?? 0);
+                                }
 
-                            // Discount
-                            $relatedDiscountPercent = 0;
-                            if ($related->discount_price && $related->discount_price < $related->price) {
-                                $relatedDiscountPercent = round(
-                                    (($related->price - $related->discount_price) / $related->price) * 100,
-                                );
-                            }
-                        @endphp
-                        <div class="col-md-3 col-sm-6 mb-4">
-                            <div class="related-product-card"
-                                onclick="window.location.href='/product/{{ $related->id }}'">
-                                @if ($relatedDiscountPercent > 0)
-                                    <div class="discount-badge">-{{ $relatedDiscountPercent }}%</div>
-                                @endif
-                                <button class="wishlist-btn"
-                                    onclick="event.stopPropagation(); toggleRelatedWishlist({{ $related->id }}, '{{ addslashes($related->name) }}', {{ $related->discount_price ?? $related->price }}, '{{ $relatedImageUrls[0] ?? '' }}')">
-                                    <i class="far fa-heart" id="related-wishlist-icon-{{ $related->id }}"></i>
-                                </button>
+                                $relatedDiscountPercent = 0;
+                                if ($relatedMrp > 0 && $relatedDisplayPrice > 0 && $relatedDisplayPrice < $relatedMrp) {
+                                    $relatedDiscountPercent = round(
+                                        (($relatedMrp - $relatedDisplayPrice) / $relatedMrp) * 100,
+                                    );
+                                }
 
-                                <div id="{{ $relatedCarouselId }}" class="carousel slide product-image-slider"
-                                    data-bs-ride="false" data-bs-interval="false">
-                                    <div class="carousel-inner">
-                                        @foreach ($relatedImageUrls as $idx => $imgUrl)
-                                            <div class="carousel-item {{ $idx == 0 ? 'active' : '' }}">
-                                                <img src="{{ $imgUrl }}" alt="{{ $related->name }}">
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                    @if ($hasMultipleRelatedImages)
-                                        <button class="carousel-control-prev" type="button"
-                                            data-bs-target="#{{ $relatedCarouselId }}" data-bs-slide="prev"
-                                            onclick="event.stopPropagation()">
-                                            <span class="carousel-control-prev-icon"></span>
-                                        </button>
-                                        <button class="carousel-control-next" type="button"
-                                            data-bs-target="#{{ $relatedCarouselId }}" data-bs-slide="next"
-                                            onclick="event.stopPropagation()">
-                                            <span class="carousel-control-next-icon"></span>
-                                        </button>
+                                $relatedBrandName = $related->brand ? $related->brand->name : null;
+                                $hasRelatedBrand = !empty($relatedBrandName);
+
+                                // ===== RELATED DISCOUNT TEXT =====
+                                $relatedDiscountText = '';
+                                if ($relatedDiscountValue > 0 && $relatedDiscountPercent > 0) {
+                                    if ($relatedDiscountType === 'flat') {
+                                        $relatedDiscountText = '₹' . number_format($relatedDiscountValue, 2) . ' off';
+                                    } else {
+                                        $relatedDiscountText = $relatedDiscountPercent . '% off';
+                                    }
+                                } elseif ($relatedDiscountPercent > 0) {
+                                    $relatedDiscountText = $relatedDiscountPercent . '% off';
+                                }
+
+                                // Only show stock alert when stock <= 5
+                                $relatedStockAlert = '';
+                                if ($relatedStock <= 5 && $relatedStock > 0) {
+                                    $relatedStockAlert =
+                                        '<div class="product-stock-low"><i class="fas fa-exclamation-triangle"></i> Only ' .
+                                        $relatedStock .
+                                        ' left in stock!</div>';
+                                } elseif ($relatedStock === 0) {
+                                    $relatedStockAlert =
+                                        '<div class="product-stock-out"><i class="fas fa-times-circle"></i> Out of Stock</div>';
+                                }
+                            @endphp
+                            <div class="col-md-3 col-sm-6 mb-4">
+                                <div class="related-product-card"
+                                    onclick="window.location.href='/product/{{ $related->id }}'">
+                                    @if ($relatedDiscountPercent > 0)
+                                        <div class="discount-badge">{{ $relatedDiscountText }}</div>
                                     @endif
-                                </div>
+                                    <button class="wishlist-btn"
+                                        onclick="event.stopPropagation(); toggleRelatedWishlist({{ $related->id }}, '{{ addslashes($related->name) }}', {{ $relatedDisplayPrice }}, '{{ $relatedImageUrls[0] ?? '' }}')">
+                                        <i class="far fa-heart" id="related-wishlist-icon-{{ $related->id }}"></i>
+                                    </button>
 
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ Str::limit($related->name, 35) }}</h5>
-                                    <div>
-                                        @if ($related->discount_price)
-                                            <span
-                                                class="product-old-price-display">₹{{ number_format($related->price, 2) }}</span>
-                                            <span
-                                                class="product-price-display">₹{{ number_format($related->discount_price, 2) }}</span>
-                                        @else
-                                            <span
-                                                class="product-price-display">₹{{ number_format($related->price, 2) }}</span>
+                                    <div class="product-image-container">
+                                        <img src="{{ $relatedImageUrls[0] ?? 'https://via.placeholder.com/300x300?text=No+Image' }}"
+                                            alt="{{ $related->name }}"
+                                            onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+                                    </div>
+
+                                    <div class="card-body">
+                                        @if ($hasRelatedBrand)
+                                            <div class="product-brand"><i class="fas fa-tag"></i> {{ $relatedBrandName }}
+                                            </div>
                                         @endif
+                                        <div class="product-name">{{ $related->name }}</div>
+                                        <div class="product-price-container">
+                                            <span class="final-price">₹{{ number_format($relatedDisplayPrice, 2) }}</span>
+                                            @if ($relatedDiscountPercent > 0)
+                                                <span class="original-price">₹{{ number_format($relatedMrp, 2) }}</span>
+                                                <span class="discount-percent">{{ $relatedDiscountText }}</span>
+                                            @endif
+                                        </div>
+                                        {!! $relatedStockAlert !!}
                                     </div>
-
-                                    <!-- Rating Stars - Yellow Filled -->
-                                    <div class="product-rating">
-                                        <div class="stars">{!! $relatedStarsHtml !!}</div>
-                                        <span
-                                            class="rating-value">{{ $relatedRating > 0 ? number_format($relatedRating, 1) : '0.0' }}</span>
-                                    </div>
-
-                                    <!-- Low Stock Alert -->
-                                    {!! $relatedStockAlertHtml !!}
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        @endif
+            @endif
 
-        <!-- ⭐⭐⭐ NEW: REVIEWS SECTION ⭐⭐⭐ -->
-        <div class="reviews-section" id="reviewsSection">
-            <div class="section-title">
-                <i class="fas fa-star"></i> Customer Reviews
-                <span class="review-count-badge" id="reviewCountBadge">0</span>
-            </div>
-            <div id="reviewsContainer">
-                <div class="text-center" id="reviewsLoading">
-                    <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
-                    <p class="mt-2">Loading reviews...</p>
+            <!-- ===== REVIEWS SECTION ===== -->
+            <div class="reviews-section" id="reviewsSection">
+                <div class="section-title">
+                    <i class="fas fa-star"></i> Customer Reviews
+                    <span class="review-count-badge" id="reviewCountBadge">0</span>
                 </div>
-                <div id="reviewsList"></div>
+                <div id="reviewsContainer">
+                    <div class="text-center" id="reviewsLoading">
+                        <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                        <p class="mt-2">Loading reviews...</p>
+                    </div>
+                    <div id="reviewsList"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== CUSTOM LOGIN MODAL - GREEN BUTTON WITH CORRECT LINKS ===== -->
+    <!-- ===== SIZE GUIDE MODAL - SIDE POPUP ===== -->
+    <div class="sizeguide-modal-overlay" id="sizeGuideModalOverlay">
+        <div class="sizeguide-modal-box">
+            <button class="modal-close-btn" onclick="closeSizeGuide()">&times;</button>
+            <h3><i class="fas fa-tshirt"></i> Size Guide</h3>
+            <table class="sizeguide-table">
+                <thead>
+                    <tr>
+                        <th>Size</th>
+                        <th>Chest (inches)</th>
+                        <th>Length (inches)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!empty($sizeChartSizes) && is_array($sizeChartSizes))
+                        @foreach ($sizeChartSizes as $sizeData)
+                            <tr>
+                                <td>{{ $sizeData['size'] ?? ($sizeData->size ?? '-') }}</td>
+                                <td>{{ $sizeData['chest'] ?? ($sizeData->chest ?? '-') }}</td>
+                                <td>{{ $sizeData['length'] ?? ($sizeData->length ?? '-') }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td>XS</td>
+                            <td>34-36</td>
+                            <td>27</td>
+                        </tr>
+                        <tr>
+                            <td>S</td>
+                            <td>36-38</td>
+                            <td>28</td>
+                        </tr>
+                        <tr>
+                            <td>M</td>
+                            <td>38-40</td>
+                            <td>29</td>
+                        </tr>
+                        <tr>
+                            <td>L</td>
+                            <td>40-42</td>
+                            <td>30</td>
+                        </tr>
+                        <tr>
+                            <td>XL</td>
+                            <td>42-44</td>
+                            <td>31</td>
+                        </tr>
+                        <tr>
+                            <td>XXL</td>
+                            <td>44-46</td>
+                            <td>32</td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+    <!-- Login Modal -->
     <div class="custom-modal-overlay" id="loginModal">
         <div class="custom-modal-box">
             <button class="modal-close" onclick="closeLoginModal()">✕</button>
@@ -1595,57 +2112,13 @@
         </div>
     </div>
 
+    <!-- Image Modal -->
     <div id="imageModal" class="image-modal" onclick="closeModal()">
         <span class="close-modal">&times;</span>
         <img class="modal-image" id="modalImage">
     </div>
 
-    <div id="sizeGuideModal" class="image-modal" style="display:none;" onclick="closeSizeGuide()">
-        <div style="background:white; border-radius:15px; max-width:500px; width:90%; padding:20px;"
-            onclick="event.stopPropagation()">
-            <span style="float:right; cursor:pointer; font-size:24px;" onclick="closeSizeGuide()">&times;</span>
-            <h4>Size Guide</h4>
-            <table style="width:100%; border-collapse:collapse; margin-top:15px;">
-                <tr style="background:#f0f0f0;">
-                    <th style="padding:10px; border:1px solid #ddd;">Size</th>
-                    <th style="padding:10px; border:1px solid #ddd;">Chest (inches)</th>
-                    <th style="padding:10px; border:1px solid #ddd;">Length (inches)</th>
-                </tr>
-                <tr>
-                    <td style="padding:8px; border:1px solid #ddd;">XS</td>
-                    <td style="padding:8px; border:1px solid #ddd;">34-36</td>
-                    <td style="padding:8px; border:1px solid #ddd;">27</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px; border:1px solid #ddd;">S</td>
-                    <td style="padding:8px; border:1px solid #ddd;">36-38</td>
-                    <td style="padding:8px; border:1px solid #ddd;">28</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px; border:1px solid #ddd;">M</td>
-                    <td style="padding:8px; border:1px solid #ddd;">38-40</td>
-                    <td style="padding:8px; border:1px solid #ddd;">29</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px; border:1px solid #ddd;">L</td>
-                    <td style="padding:8px; border:1px solid #ddd;">40-42</td>
-                    <td style="padding:8px; border:1px solid #ddd;">30</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px; border:1px solid #ddd;">XL</td>
-                    <td style="padding:8px; border:1px solid #ddd;">42-44</td>
-                    <td style="padding:8px; border:1px solid #ddd;">31</td>
-                </tr>
-                <tr>
-                    <td style="padding:8px; border:1px solid #ddd;">XXL</td>
-                    <td style="padding:8px; border:1px solid #ddd;">44-46</td>
-                    <td style="padding:8px; border:1px solid #ddd;">32</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- ⭐ Lightbox Modal for Review Media -->
+    <!-- Review Media Lightbox -->
     <div class="modal fade" id="reviewMediaLightbox" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content" style="background: rgba(0,0,0,0.95);">
@@ -1663,6 +2136,257 @@
     </div>
 
     <script>
+        // ===== VARIABLE DECLARATIONS =====
+        let currentIndex = 0;
+        let totalImages = {{ $allImages->count() }};
+        const images = @json(
+            $allImages->map(function ($img) {
+                return asset('storage/' . $img->image_path);
+            }));
+
+        const productId = {{ $product->id }};
+        const productName = "{{ addslashes($product->name) }}";
+        const productImage = "{{ asset('storage/' . ($allImages[0]->image_path ?? $product->image)) }}";
+        let selectedSize = null;
+        let selectedColor = null;
+        let selectedVariantId = null;
+        let selectedPrice = {{ $displayPrice }};
+        let selectedMrp = {{ $displayMrp }};
+        let selectedStock = {{ $displayStock }};
+        let selectedDiscount = {{ $discountPercent }};
+        const hasVariants = {{ $hasVariants ? 'true' : 'false' }};
+        const hasColors = {{ $hasColors ? 'true' : 'false' }};
+        const hasSizes = {{ $hasSizes ? 'true' : 'false' }};
+
+        // ===== VARIANT DATA FROM PHP =====
+        const variantData = @json($variantDataArray);
+        const colorData = @json($colorDataArray);
+
+        // ===== SIZE GUIDE MODAL FUNCTIONS =====
+        function openSizeGuide(event) {
+            event.preventDefault();
+            document.getElementById('sizeGuideModalOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSizeGuide() {
+            document.getElementById('sizeGuideModalOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on overlay click
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('sizeGuideModalOverlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeSizeGuide();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeSizeGuide();
+                }
+            });
+        });
+
+        // ===== SELECT COLOR FUNCTION =====
+        function selectColor(element, color) {
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            selectedColor = color;
+
+            const imagesData = JSON.parse(element.dataset.images);
+            if (imagesData && imagesData.length > 0) {
+                document.getElementById('mainImage').src = imagesData[0];
+
+                const thumbnailsContainer = document.getElementById('verticalThumbnails');
+                thumbnailsContainer.innerHTML = '';
+                imagesData.forEach((imgUrl, index) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'vertical-thumb' + (index === 0 ? ' active' : '');
+                    thumb.dataset.index = index;
+                    thumb.onclick = function() {
+                        changeMainImage(index);
+                    };
+                    thumb.innerHTML = `<img src="${imgUrl}" alt="Thumbnail ${index + 1}">`;
+                    thumbnailsContainer.appendChild(thumb);
+                });
+
+                totalImages = imagesData.length;
+                currentIndex = 0;
+                images.length = 0;
+                imagesData.forEach(img => images.push(img));
+            }
+
+            updateSizesForColor(color);
+        }
+
+        // ===== UPDATE SIZES FOR SELECTED COLOR =====
+        function updateSizesForColor(color) {
+            const sizeOptions = document.getElementById('sizeOptions');
+            if (!sizeOptions) return;
+
+            const colorVariants = variantData.filter(v => v.color === color);
+
+            if (colorVariants.length > 0) {
+                sizeOptions.innerHTML = '';
+                colorVariants.forEach((variant, index) => {
+                    const isOutOfStock = variant.stock <= 0;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'size-btn' + (index === 0 ? ' selected' : '') + (isOutOfStock ?
+                        ' out-of-stock-size' : '');
+                    btn.dataset.size = variant.size;
+                    btn.dataset.variantId = variant.id;
+                    btn.dataset.price = variant.price;
+                    btn.dataset.mrp = variant.mrp;
+                    btn.dataset.discount = variant.discount_percent;
+                    btn.dataset.stock = variant.stock;
+                    btn.dataset.discountType = variant.discount_type;
+                    btn.dataset.discountValue = variant.discount_value;
+                    btn.onclick = function() {
+                        selectSize(this);
+                    };
+                    btn.disabled = isOutOfStock;
+
+                    let html = variant.size;
+                    if (variant.discount_percent > 0) {
+                        let discountText = '';
+                        if (variant.discount_type === 'flat') {
+                            discountText = '₹' + variant.discount_value.toFixed(2) + ' off';
+                        } else {
+                            discountText = variant.discount_percent + '% off';
+                        }
+                        html +=
+                            `<span style="font-size:9px; display:block; color:#28a745;">-${discountText}</span>`;
+                    }
+                    btn.innerHTML = html;
+                    sizeOptions.appendChild(btn);
+                });
+
+                const firstSizeBtn = sizeOptions.querySelector('.size-btn:not(.out-of-stock-size)');
+                if (firstSizeBtn) {
+                    selectSize(firstSizeBtn);
+                }
+            }
+        }
+
+        // ===== SELECT SIZE FUNCTION - UPDATED WITH STOCK =====
+        function selectSize(button) {
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+
+            const size = button.dataset.size;
+            const variantId = button.dataset.variantId;
+            const price = parseFloat(button.dataset.price);
+            const mrp = parseFloat(button.dataset.mrp);
+            const stock = parseInt(button.dataset.stock);
+            const discount = parseInt(button.dataset.discount);
+
+            selectedSize = size;
+            selectedVariantId = variantId;
+            selectedPrice = price;
+            selectedMrp = mrp;
+            selectedStock = stock; // ===== THIS IS THE INDIVIDUAL VARIANT STOCK =====
+            selectedDiscount = discount;
+
+            // ===== UPDATE QUANTITY MAX BASED ON SELECTED VARIANT STOCK =====
+            const quantityInput = document.getElementById('quantity');
+            if (quantityInput) {
+                quantityInput.max = stock > 0 ? stock : 1;
+                if (parseInt(quantityInput.value) > stock) {
+                    quantityInput.value = stock > 0 ? stock : 1;
+                }
+            }
+
+            updatePriceDisplay(price, mrp, discount, button);
+            updateStockDisplay(stock);
+            document.getElementById('quantity').max = stock > 0 ? stock : 1;
+
+            const stockInfo = document.getElementById('sizeStockInfo');
+            const stockCount = document.getElementById('sizeStockCount');
+            if (stockInfo) {
+                if (stock > 0) {
+                    stockInfo.style.display = 'block';
+                    stockCount.textContent = stock;
+                    stockCount.style.color = '#28a745';
+                } else {
+                    stockInfo.style.display = 'block';
+                    stockCount.textContent = '0';
+                    stockCount.style.color = '#dc3545';
+                }
+            }
+
+            document.getElementById('sizeWarning').style.display = 'none';
+        }
+
+        // ===== SELECT DEFAULT SIZE =====
+        function selectDefaultSize(button) {
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            button.classList.add('selected');
+            selectedSize = button.dataset.size;
+            selectedVariantId = null;
+            document.getElementById('sizeWarning').style.display = 'none';
+        }
+
+        // ===== UPDATE PRICE DISPLAY =====
+        function updatePriceDisplay(price, mrp, discount, button) {
+            const priceDisplay = document.getElementById('displayPrice');
+            const mrpDisplay = document.getElementById('displayMrp');
+            const discountBadge = document.getElementById('discountBadge');
+
+            priceDisplay.textContent = '₹' + price.toFixed(2);
+
+            if (discount > 0 && mrp > price) {
+                if (mrpDisplay) {
+                    mrpDisplay.style.display = 'inline';
+                    mrpDisplay.textContent = '₹' + mrp.toFixed(2);
+                }
+                if (discountBadge) {
+                    discountBadge.style.display = 'inline';
+                    if (button && button.dataset.discountType) {
+                        const discountType = button.dataset.discountType;
+                        const discountValue = parseFloat(button.dataset.discountValue) || 0;
+                        if (discountType === 'flat') {
+                            discountBadge.textContent = '₹' + discountValue.toFixed(2) + ' OFF';
+                        } else {
+                            discountBadge.textContent = discount + '% OFF';
+                        }
+                    } else {
+                        discountBadge.textContent = discount + '% OFF';
+                    }
+                }
+            } else {
+                if (mrpDisplay) mrpDisplay.style.display = 'none';
+                if (discountBadge) discountBadge.style.display = 'none';
+            }
+        }
+
+        // ===== UPDATE STOCK DISPLAY =====
+        function updateStockDisplay(stock) {
+            const stockStatus = document.getElementById('stockStatus');
+            if (stock > 0) {
+                if (stock <= 5) {
+                    stockStatus.className = 'in-stock-low';
+                    stockStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Only ' + stock + ' left in stock!';
+                    stockStatus.style.display = 'block';
+                } else {
+                    stockStatus.style.display = 'none';
+                }
+            } else {
+                stockStatus.className = 'out-of-stock';
+                stockStatus.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
+                stockStatus.style.display = 'block';
+            }
+        }
+
         // ===== CUSTOM LOGIN MODAL FUNCTIONS =====
         let pendingAction = null;
         let pendingData = null;
@@ -1681,13 +2405,27 @@
             pendingData = null;
         }
 
-        // Close modal on overlay click
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('loginModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeLoginModal();
                 }
             });
+
+            @if ($hasVariants && $firstVariant && !$hasColors)
+                const firstButton = document.querySelector('.size-btn[data-variant-id="{{ $firstVariant->id }}"]');
+                if (firstButton) {
+                    selectSize(firstButton);
+                }
+            @endif
+
+            @if ($hasColors)
+                const firstColor = document.querySelector('.color-btn.selected');
+                if (firstColor) {
+                    const color = firstColor.dataset.color;
+                    updateSizesForColor(color);
+                }
+            @endif
         });
 
         // ===== RELATED PRODUCTS WISHLIST =====
@@ -1726,149 +2464,7 @@
             updateWishlistCount();
         }
 
-        let currentIndex = 0;
-        let totalImages = {{ $allImages->count() }};
-        const images = @json(
-            $allImages->map(function ($img) {
-                return asset('storage/' . $img->image_path);
-            }));
-
-        const productId = {{ $product->id }};
-        const productName = "{{ addslashes($product->name) }}";
-        const productPrice = {{ $product->discount_price ?? $product->price }};
-        const productImage = "{{ asset('storage/' . ($allImages[0]->image_path ?? $product->image)) }}";
-        let selectedSize = null;
-
-        const wishlistBtn = document.getElementById('wishlistBtn');
-        const addToCartBtn = document.getElementById('addToCartBtn');
-
-        // ============ REVIEW FUNCTIONS ============
-        async function loadReviews() {
-            const container = document.getElementById('reviewsList');
-            const loading = document.getElementById('reviewsLoading');
-            const badge = document.getElementById('reviewCountBadge');
-
-            try {
-                const response = await fetch(`/api/product-reviews/${productId}`);
-                const data = await response.json();
-
-                loading.style.display = 'none';
-
-                if (data.success && data.reviews && data.reviews.length > 0) {
-                    badge.textContent = data.reviews.length;
-                    container.innerHTML = data.reviews.map(review => renderReviewCard(review)).join('');
-                } else {
-                    container.innerHTML = `
-                    <div class="no-reviews">
-                        <i class="fas fa-comment-slash"></i>
-                        <h5>No reviews yet</h5>
-                        <p class="text-muted">Be the first to review this product!</p>
-                    </div>
-                `;
-                    badge.textContent = '0';
-                }
-            } catch (error) {
-                console.error('Error loading reviews:', error);
-                loading.style.display = 'none';
-                container.innerHTML = `
-                <div class="no-reviews">
-                    <i class="fas fa-exclamation-circle text-danger"></i>
-                    <h5>Could not load reviews</h5>
-                    <p class="text-muted">Please try again later</p>
-                </div>
-            `;
-                badge.textContent = '0';
-            }
-        }
-
-        function renderReviewCard(review) {
-            // Generate stars
-            let starsHtml = '';
-            for (let i = 1; i <= 5; i++) {
-                if (i <= review.rating) {
-                    starsHtml += '<i class="fas fa-star"></i>';
-                } else {
-                    starsHtml += '<i class="fas fa-star star-empty"></i>';
-                }
-            }
-
-            // Media HTML
-            let mediaHtml = '';
-            if (review.images && review.images.length > 0) {
-                mediaHtml += '<div class="review-media">';
-                review.images.forEach(function(image) {
-                    mediaHtml += `
-                    <div class="media-item" onclick="openReviewMedia('${image}')">
-                        <img src="/storage/${image}" alt="Review Image">
-                    </div>
-                `;
-                });
-                mediaHtml += '</div>';
-            }
-
-            if (review.videos && review.videos.length > 0) {
-                mediaHtml += '<div class="review-media">';
-                review.videos.forEach(function(video) {
-                    mediaHtml += `
-                    <div class="media-item" onclick="openReviewMedia('${video}', 'video')">
-                        <video src="/storage/${video}"></video>
-                    </div>
-                `;
-                });
-                mediaHtml += '</div>';
-            }
-
-            // Format date
-            const date = new Date(review.created_at);
-            const formattedDate = date.toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            });
-
-            return `
-            <div class="review-card">
-                <div class="review-header">
-                    <span class="review-user"><i class="fas fa-user-circle"></i> ${review.user_name || 'Anonymous'}</span>
-                    <span class="review-date">${formattedDate}</span>
-                </div>
-                <div class="review-stars">${starsHtml}</div>
-                <div class="review-text">${escapeHtml(review.description)}</div>
-                ${mediaHtml}
-                <span class="review-verified"><i class="fas fa-check-circle"></i> Verified Purchase</span>
-            </div>
-        `;
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function openReviewMedia(src, type = 'image') {
-            const modal = new bootstrap.Modal(document.getElementById('reviewMediaLightbox'));
-            const content = document.getElementById('reviewLightboxContent');
-
-            if (type === 'video') {
-                content.innerHTML = `
-                <video controls style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">
-                    <source src="/storage/${src}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>
-            `;
-            } else {
-                content.innerHTML =
-                    `<img src="/storage/${src}" alt="Review Media" style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">`;
-            }
-
-            modal.show();
-        }
-
-        // ============ EXISTING FUNCTIONS ============
-
-        // Function to change main image
+        // ============ IMAGE FUNCTIONS ============
         function changeMainImage(index) {
             currentIndex = index;
             document.getElementById('mainImage').src = images[index];
@@ -1900,15 +2496,20 @@
             if (e.key === 'Escape') closeModal();
         });
 
-        function showSizeGuide(event) {
-            event.preventDefault();
-            document.getElementById('sizeGuideModal').style.display = 'flex';
+        // ============ MODAL FUNCTIONS ============
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.classList.add('show');
+            modalImg.src = src;
         }
 
-        function closeSizeGuide() {
-            document.getElementById('sizeGuideModal').style.display = 'none';
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
         }
 
+        // ============ TAB FUNCTIONS ============
         function toggleTab(header) {
             const content = header.nextElementSibling;
             const isActive = header.classList.contains('active');
@@ -1926,12 +2527,13 @@
             }
         }
 
+        // ============ WISHLIST ============
         function toggleWishlistDetail() {
             @if (!auth()->check())
                 showLoginModal('wishlist', {
                     id: productId,
                     name: productName,
-                    price: productPrice,
+                    price: selectedPrice,
                     image: productImage
                 });
                 return;
@@ -1952,7 +2554,7 @@
                 wishlist.push({
                     id: productId,
                     name: productName,
-                    price: productPrice,
+                    price: selectedPrice,
                     image: productImage,
                     added_at: new Date().toISOString()
                 });
@@ -1966,16 +2568,7 @@
             updateWishlistCount();
         }
 
-        document.querySelectorAll('.size-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedSize = this.getAttribute('data-size');
-                document.getElementById('sizeWarning').style.display = 'none';
-                saveSelectedSize();
-            });
-        });
-
+        // ============ QUANTITY ============
         function incrementQuantity() {
             let qty = document.getElementById('quantity');
             let max = parseInt(qty.getAttribute('max')) || 99;
@@ -1989,72 +2582,117 @@
             if (newVal >= 1) qty.value = newVal;
         }
 
+        // ============ ADD TO CART - UPDATED WITH STOCK CHECK =====
         function addToCartDetail() {
             @if (!auth()->check())
                 showLoginModal('cart', {
                     id: productId,
                     name: productName,
-                    price: productPrice,
+                    price: selectedPrice,
                     image: productImage
                 });
                 return;
             @endif
 
-            if (!selectedSize) {
-                document.getElementById('sizeWarning').style.display = 'block';
-                document.getElementById('sizeWarning').scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
+            @if ($hasSizes || $hasSizeChart)
+                if (!selectedSize) {
+                    document.getElementById('sizeWarning').style.display = 'block';
+                    document.getElementById('sizeWarning').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    return;
+                }
+            @endif
+
+            // ===== CHECK SELECTED VARIANT STOCK =====
+            if (selectedStock <= 0) {
+                alert('Selected size is out of stock!');
                 return;
             }
 
             let quantity = parseInt(document.getElementById('quantity').value);
+
+            // ===== VALIDATE QUANTITY AGAINST SELECTED VARIANT STOCK =====
+            if (quantity > selectedStock) {
+                alert('Only ' + selectedStock + ' items available in stock for selected size!');
+                document.getElementById('quantity').value = selectedStock;
+                return;
+            }
+
             let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-            let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize);
+            let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize && item
+                .color === selectedColor);
 
             if (existingItem) {
+                // ===== CHECK IF TOTAL QUANTITY EXCEEDS STOCK =====
+                if (existingItem.quantity + quantity > selectedStock) {
+                    alert('Only ' + selectedStock + ' items available in stock! You already have ' + existingItem.quantity +
+                        ' in cart.');
+                    return;
+                }
                 existingItem.quantity += quantity;
             } else {
                 currentCart.push({
                     id: productId,
                     name: productName,
-                    price: productPrice,
+                    price: selectedPrice,
+                    original_price: selectedMrp,
                     image: productImage,
                     quantity: quantity,
-                    size: selectedSize
+                    size: selectedSize,
+                    color: selectedColor,
+                    variant_id: selectedVariantId
                 });
             }
 
             localStorage.setItem('cart', JSON.stringify(currentCart));
-            showNotification(productName + ' (' + selectedSize + ') added to cart!', 'success');
+            const sizeText = selectedSize ? ' (' + selectedSize + ')' : '';
+            const colorText = selectedColor ? ' - ' + selectedColor : '';
+            showNotification(productName + sizeText + colorText + ' added to cart!', 'success');
             updateCartCount();
         }
 
+        // ============ BUY NOW - UPDATED WITH STOCK CHECK =====
         function buyNowDetail() {
             @if (!auth()->check())
                 showLoginModal('buynow', {
                     productId: productId,
                     productName: productName,
-                    productPrice: productPrice
+                    productPrice: selectedPrice
                 });
                 return;
             @endif
 
-            if (!selectedSize) {
-                document.getElementById('sizeWarning').style.display = 'block';
-                document.getElementById('sizeWarning').scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
+            @if ($hasSizes || $hasSizeChart)
+                if (!selectedSize) {
+                    document.getElementById('sizeWarning').style.display = 'block';
+                    document.getElementById('sizeWarning').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    return;
+                }
+            @endif
+
+            // ===== CHECK SELECTED VARIANT STOCK =====
+            if (selectedStock <= 0) {
+                alert('Selected size is out of stock!');
                 return;
             }
 
             let quantity = parseInt(document.getElementById('quantity').value);
 
+            // ===== VALIDATE QUANTITY AGAINST SELECTED VARIANT STOCK =====
+            if (quantity > selectedStock) {
+                alert('Only ' + selectedStock + ' items available in stock for selected size!');
+                document.getElementById('quantity').value = selectedStock;
+                return;
+            }
+
             let form = document.createElement('form');
             form.method = 'POST';
-            form.action = '{{ route('buy.now') }}';
+            form.action = '/buy-now';
 
             let csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
@@ -2074,16 +2712,35 @@
             quantityInput.value = quantity;
             form.appendChild(quantityInput);
 
-            let sizeInput = document.createElement('input');
-            sizeInput.type = 'hidden';
-            sizeInput.name = 'size';
-            sizeInput.value = selectedSize;
-            form.appendChild(sizeInput);
+            if (selectedSize) {
+                let sizeInput = document.createElement('input');
+                sizeInput.type = 'hidden';
+                sizeInput.name = 'size';
+                sizeInput.value = selectedSize;
+                form.appendChild(sizeInput);
+            }
+
+            if (selectedColor) {
+                let colorInput = document.createElement('input');
+                colorInput.type = 'hidden';
+                colorInput.name = 'color';
+                colorInput.value = selectedColor;
+                form.appendChild(colorInput);
+            }
+
+            if (selectedVariantId) {
+                let variantInput = document.createElement('input');
+                variantInput.type = 'hidden';
+                variantInput.name = 'variant_id';
+                variantInput.value = selectedVariantId;
+                form.appendChild(variantInput);
+            }
 
             document.body.appendChild(form);
             form.submit();
         }
 
+        // ============ NOTIFICATION ============
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
@@ -2093,6 +2750,7 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
+        // ============ CART & WISHLIST COUNTS ============
         function updateCartCount() {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             let count = cart.reduce((total, item) => total + item.quantity, 0);
@@ -2119,18 +2777,7 @@
             }
         }
 
-        function openModal(src) {
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
-            modal.classList.add('show');
-            modalImg.src = src;
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('imageModal');
-            modal.classList.remove('show');
-        }
-
+        // ============ WISHLIST STATUS ============
         function checkWishlistStatus() {
             let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
             const isInWishlist = wishlist.some(item => item.id === productId);
@@ -2148,6 +2795,7 @@
             }
         }
 
+        // ============ SAVE SELECTED SIZE ============
         function loadSavedSize() {
             let savedSizes = JSON.parse(localStorage.getItem('selectedSizes')) || {};
             if (savedSizes[productId]) {
@@ -2155,6 +2803,9 @@
                 document.querySelectorAll('.size-btn').forEach(btn => {
                     if (btn.getAttribute('data-size') === selectedSize) {
                         btn.classList.add('selected');
+                        if (btn.dataset.variantId) {
+                            selectSize(btn);
+                        }
                     }
                 });
             }
@@ -2168,6 +2819,128 @@
             }
         }
 
+        // ============ REVIEW FUNCTIONS ============
+        async function loadReviews() {
+            const container = document.getElementById('reviewsList');
+            const loading = document.getElementById('reviewsLoading');
+            const badge = document.getElementById('reviewCountBadge');
+
+            try {
+                const response = await fetch(`/api/product-reviews/${productId}`);
+                const data = await response.json();
+
+                loading.style.display = 'none';
+
+                if (data.success && data.reviews && data.reviews.length > 0) {
+                    badge.textContent = data.reviews.length;
+                    container.innerHTML = data.reviews.map(review => renderReviewCard(review)).join('');
+                } else {
+                    container.innerHTML = `
+                <div class="no-reviews">
+                    <i class="fas fa-comment-slash"></i>
+                    <h5>No reviews yet</h5>
+                    <p class="text-muted">Be the first to review this product!</p>
+                </div>
+            `;
+                    badge.textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+                loading.style.display = 'none';
+                container.innerHTML = `
+            <div class="no-reviews">
+                <i class="fas fa-exclamation-circle text-danger"></i>
+                <h5>Could not load reviews</h5>
+                <p class="text-muted">Please try again later</p>
+            </div>
+        `;
+                badge.textContent = '0';
+            }
+        }
+
+        function renderReviewCard(review) {
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= review.rating) {
+                    starsHtml += '<i class="fas fa-star"></i>';
+                } else {
+                    starsHtml += '<i class="fas fa-star star-empty"></i>';
+                }
+            }
+
+            let mediaHtml = '';
+            if (review.images && review.images.length > 0) {
+                mediaHtml += '<div class="review-media">';
+                review.images.forEach(function(image) {
+                    mediaHtml += `
+                <div class="media-item" onclick="openReviewMedia('${image}')">
+                    <img src="/storage/${image}" alt="Review Image">
+                </div>
+            `;
+                });
+                mediaHtml += '</div>';
+            }
+
+            if (review.videos && review.videos.length > 0) {
+                mediaHtml += '<div class="review-media">';
+                review.videos.forEach(function(video) {
+                    mediaHtml += `
+                <div class="media-item" onclick="openReviewMedia('${video}', 'video')">
+                    <video src="/storage/${video}"></video>
+                </div>
+            `;
+                });
+                mediaHtml += '</div>';
+            }
+
+            const date = new Date(review.created_at);
+            const formattedDate = date.toLocaleDateString('en-IN', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            return `
+        <div class="review-card">
+            <div class="review-header">
+                <span class="review-user"><i class="fas fa-user-circle"></i> ${review.user_name || 'Anonymous'}</span>
+                <span class="review-date">${formattedDate}</span>
+            </div>
+            <div class="review-stars">${starsHtml}</div>
+            <div class="review-text">${escapeHtml(review.description)}</div>
+            ${mediaHtml}
+            <span class="review-verified"><i class="fas fa-check-circle"></i> Verified Purchase</span>
+        </div>
+    `;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function openReviewMedia(src, type = 'image') {
+            const modal = new bootstrap.Modal(document.getElementById('reviewMediaLightbox'));
+            const content = document.getElementById('reviewLightboxContent');
+
+            if (type === 'video') {
+                content.innerHTML = `
+            <video controls style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">
+                <source src="/storage/${src}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+            } else {
+                content.innerHTML =
+                    `<img src="/storage/${src}" alt="Review Media" style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">`;
+            }
+
+            modal.show();
+        }
+
+        // ============ DOCUMENT READY ============
         document.addEventListener('DOMContentLoaded', function() {
             const firstTab = document.querySelector('.info-tab-header');
             if (firstTab) {
@@ -2189,8 +2962,14 @@
                 });
             }
 
-            // Load reviews
             loadReviews();
+
+            // ===== SET INITIAL QUANTITY MAX =====
+            const initialStock = {{ $displayStock }};
+            const quantityInput = document.getElementById('quantity');
+            if (quantityInput && initialStock > 0) {
+                quantityInput.max = initialStock;
+            }
         });
     </script>
 @endsection

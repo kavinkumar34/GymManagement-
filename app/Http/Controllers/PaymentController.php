@@ -39,28 +39,86 @@ class PaymentController extends Controller
     {
         $product = Product::findOrFail($request->product_id);
         $quantity = $request->quantity ?? 1;
+        $variantId = $request->variant_id ?? null;
+        $size = $request->size ?? null;
+        $color = $request->color ?? null;
         
-        $stock = $product->stock;
-        if ($quantity > $stock) {
-            return redirect()->back()->with('error', "Only {$stock} items available for {$product->name}");
+        // Get shipping charge from request
+        $shippingCharge = $request->input('shipping_charge', 0);
+        
+        // ===== CHECK IF THIS IS A VARIANT PRODUCT =====
+        if ($variantId) {
+            // ===== VARIANT PRODUCT - CHECK VARIANT STOCK =====
+            $variant = \App\Models\ProductVariant::find($variantId);
+            
+            if (!$variant) {
+                return redirect()->back()->with('error', 'Variant not found');
+            }
+            
+            if ($variant->stock < $quantity) {
+                return redirect()->back()->with('error', "Only {$variant->stock} items available for {$product->name} ({$size} - {$color})");
+            }
+            
+            // Get price from variant
+            $amount = $variant->final_price ?? $variant->price ?? 0;
+            $finalPrice = $variant->final_price ?? $variant->price ?? 0;
+            $totalAmount = number_format($amount * $quantity, 2, '.', '');
+            
+        } else {
+            // ===== NORMAL PRODUCT - CHECK PRODUCT STOCK =====
+            if ($product->stock < $quantity) {
+                return redirect()->back()->with('error', "Only {$product->stock} items available for {$product->name}");
+            }
+            
+            $amount = $product->final_price ?? $product->price ?? 0;
+            $finalPrice = $product->final_price ?? $product->price ?? 0;
+            $totalAmount = number_format($amount * $quantity, 2, '.', '');
         }
         
-        $amount = $product->discount_price ?? $product->price;
-        $totalAmount = number_format($amount * $quantity, 2, '.', '');
         $txnid = 'TXN' . time() . rand(1000, 9999);
         $productInfo = substr(preg_replace('/[^A-Za-z0-9 ]/', '', $product->name), 0, 100);
         
-        $order = $this->createOrder($txnid, $user->id, $totalAmount);
+        $order = $this->createOrder($txnid, $user->id, $totalAmount, $shippingCharge);
         
-        OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'quantity' => $quantity,
-            'price' => $amount
-        ]);
+        // Get product image
+        $productImage = $product->image ?? null;
         
-        $product->decrement('stock', $quantity);
+        // ===== CREATE ORDER ITEM WITH VARIANT DETAILS =====
+        if ($variantId && isset($variant)) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'variant_id' => $variantId,
+                'size' => $size,
+                'color' => $color,
+                'product_name' => $product->name . ' (' . $size . ' - ' . $color . ')',
+                'quantity' => $quantity,
+                'price' => $amount,
+                'final_price' => $finalPrice, // ← ADDED final_price
+                'product_image' => $productImage
+            ]);
+            
+            // ===== DEDUCT VARIANT STOCK =====
+            $variant->decrement('stock', $quantity);
+            
+        } else {
+            // Normal product
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $product->id,
+                'variant_id' => null,
+                'size' => null,
+                'color' => null,
+                'product_name' => $product->name,
+                'quantity' => $quantity,
+                'price' => $amount,
+                'final_price' => $finalPrice, // ← ADDED final_price
+                'product_image' => $productImage
+            ]);
+            
+            // ===== DEDUCT PRODUCT STOCK =====
+            $product->decrement('stock', $quantity);
+        }
         
         return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
     }
@@ -74,12 +132,15 @@ class PaymentController extends Controller
             foreach ($checkoutCart as $item) {
                 $product = Product::find($item['id']);
                 if ($product) {
-                    $amount = $product->discount_price ?? $product->price;
+                    $amount = $product->final_price ?? $product->price ?? 0;
                     $totalAmount += $amount * $item['quantity'];
                 }
             }
         }
         $totalAmount = (float) $totalAmount;
+        
+        // Get shipping charge from request
+        $shippingCharge = $request->input('shipping_charge', 0);
         
         $productItems = [];
         $productInfo = '';
@@ -88,15 +149,37 @@ class PaymentController extends Controller
             $product = Product::find($item['id']);
             if (!$product) continue;
             
-            if ($item['quantity'] > $product->stock) {
-                return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
+            $variantId = $item['variant_id'] ?? null;
+            $size = $item['size'] ?? null;
+            $color = $item['color'] ?? null;
+            
+            // ===== CHECK STOCK BASED ON VARIANT =====
+            if ($variantId) {
+                $variant = \App\Models\ProductVariant::find($variantId);
+                if (!$variant) {
+                    return redirect()->route('cart')->with('error', "Variant not found for {$product->name}");
+                }
+                if ($item['quantity'] > $variant->stock) {
+                    return redirect()->route('cart')->with('error', "Only {$variant->stock} items available for {$product->name} ({$size} - {$color})");
+                }
+                $amount = $variant->final_price ?? $variant->price ?? 0;
+                $finalPrice = $variant->final_price ?? $variant->price ?? 0;
+            } else {
+                if ($item['quantity'] > $product->stock) {
+                    return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
+                }
+                $amount = $product->final_price ?? $product->price ?? 0;
+                $finalPrice = $product->final_price ?? $product->price ?? 0;
             }
             
-            $amount = $product->discount_price ?? $product->price;
             $productItems[] = [
                 'product' => $product,
+                'variant_id' => $variantId,
+                'size' => $size,
+                'color' => $color,
                 'quantity' => $item['quantity'],
-                'price' => $amount
+                'price' => $amount,
+                'final_price' => $finalPrice // ← ADDED final_price
             ];
             $productInfo .= $product->name . ' x' . $item['quantity'] . ', ';
         }
@@ -104,17 +187,48 @@ class PaymentController extends Controller
         $productInfo = substr(rtrim($productInfo, ', '), 0, 100);
         $txnid = 'TXN' . time() . rand(1000, 9999);
         
-        $order = $this->createOrder($txnid, $user->id, $totalAmount);
+        $order = $this->createOrder($txnid, $user->id, $totalAmount, $shippingCharge);
         
         foreach ($productItems as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product']->id,
-                'product_name' => $item['product']->name,
-                'quantity' => $item['quantity'],
-                'price' => $item['price']
-            ]);
-            $item['product']->decrement('stock', $item['quantity']);
+            $productImage = $item['product']->image ?? null;
+            
+            // ===== CREATE ORDER ITEM WITH VARIANT DETAILS =====
+            if ($item['variant_id']) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'variant_id' => $item['variant_id'],
+                    'size' => $item['size'],
+                    'color' => $item['color'],
+                    'product_name' => $item['product']->name . ' (' . $item['size'] . ' - ' . $item['color'] . ')',
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'final_price' => $item['final_price'], // ← ADDED final_price
+                    'product_image' => $productImage
+                ]);
+                
+                // ===== DEDUCT VARIANT STOCK =====
+                $variant = \App\Models\ProductVariant::find($item['variant_id']);
+                if ($variant) {
+                    $variant->decrement('stock', $item['quantity']);
+                }
+            } else {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'variant_id' => null,
+                    'size' => null,
+                    'color' => null,
+                    'product_name' => $item['product']->name,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'final_price' => $item['final_price'], // ← ADDED final_price
+                    'product_image' => $productImage
+                ]);
+                
+                // ===== DEDUCT PRODUCT STOCK =====
+                $item['product']->decrement('stock', $item['quantity']);
+            }
         }
         
         // ===== RECORD COUPON USAGE =====
@@ -130,12 +244,13 @@ class PaymentController extends Controller
         return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
     }
     
-    private function createOrder($txnid, $userId, $totalAmount)
+    private function createOrder($txnid, $userId, $totalAmount, $shippingCharge = 0)
     {
         return Order::create([
             'order_number' => $txnid,
             'user_id' => $userId,
             'total_amount' => $totalAmount,
+            'shipping_charge' => $shippingCharge,
             'payment_status' => 'PENDING',
             'order_status' => 'Pending',
             'payment_method' => 'PayU',
@@ -216,10 +331,20 @@ class PaymentController extends Controller
             
             return redirect()->route('order.success', ['id' => $order->id, 'clear_cart' => 1])->with('success', 'Payment successful!');
         } else {
+            // ===== RESTORE STOCK ON PAYMENT FAILURE (BOTH PRODUCT AND VARIANT) =====
             foreach ($order->items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->increment('stock', $item->quantity);
+                if ($item->variant_id) {
+                    // ===== RESTORE VARIANT STOCK =====
+                    $variant = \App\Models\ProductVariant::find($item->variant_id);
+                    if ($variant) {
+                        $variant->increment('stock', $item->quantity);
+                    }
+                } else {
+                    // ===== RESTORE PRODUCT STOCK =====
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock', $item->quantity);
+                    }
                 }
             }
             
@@ -246,10 +371,20 @@ class PaymentController extends Controller
                 Auth::loginUsingId($order->user_id);
             }
             
+            // ===== RESTORE STOCK ON PAYMENT FAILURE (BOTH PRODUCT AND VARIANT) =====
             foreach ($order->items as $item) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->increment('stock', $item->quantity);
+                if ($item->variant_id) {
+                    // ===== RESTORE VARIANT STOCK =====
+                    $variant = \App\Models\ProductVariant::find($item->variant_id);
+                    if ($variant) {
+                        $variant->increment('stock', $item->quantity);
+                    }
+                } else {
+                    // ===== RESTORE PRODUCT STOCK =====
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock', $item->quantity);
+                    }
                 }
             }
             
@@ -338,12 +473,15 @@ class PaymentController extends Controller
             foreach ($cart as $item) {
                 $product = Product::find($item['id']);
                 if ($product) {
-                    $amount = $product->discount_price ?? $product->price;
+                    $amount = $product->final_price ?? $product->price ?? 0;
                     $totalAmount += $amount * $item['quantity'];
                 }
             }
         }
         $totalAmount = (float) $totalAmount;
+        
+        // Get shipping charge from request
+        $shippingCharge = $request->input('shipping_charge', 0);
         
         $productItems = [];
         
@@ -351,49 +489,109 @@ class PaymentController extends Controller
             $product = Product::find($item['id']);
             if (!$product) continue;
             
-            if ($item['quantity'] > $product->stock) {
-                return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
+            $variantId = $item['variant_id'] ?? null;
+            $size = $item['size'] ?? null;
+            $color = $item['color'] ?? null;
+            
+            // ===== CHECK STOCK BASED ON VARIANT =====
+            if ($variantId) {
+                $variant = \App\Models\ProductVariant::find($variantId);
+                if (!$variant) {
+                    return redirect()->route('cart')->with('error', "Variant not found for {$product->name}");
+                }
+                if ($item['quantity'] > $variant->stock) {
+                    return redirect()->route('cart')->with('error', "Only {$variant->stock} items available for {$product->name} ({$size} - {$color})");
+                }
+                $amount = $variant->final_price ?? $variant->price ?? 0;
+                $finalPrice = $variant->final_price ?? $variant->price ?? 0;
+            } else {
+                if ($item['quantity'] > $product->stock) {
+                    return redirect()->route('cart')->with('error', "Only {$product->stock} items available for {$product->name}");
+                }
+                $amount = $product->final_price ?? $product->price ?? 0;
+                $finalPrice = $product->final_price ?? $product->price ?? 0;
             }
             
-            $amount = $product->discount_price ?? $product->price;
             $productItems[] = [
                 'product' => $product,
+                'variant_id' => $variantId,
+                'size' => $size,
+                'color' => $color,
                 'quantity' => $item['quantity'],
-                'price' => $amount
+                'price' => $amount,
+                'final_price' => $finalPrice // ← ADDED final_price
             ];
         }
         
         $txnid = 'COD' . time() . rand(1000, 9999);
         
+        // Get address from request
+        $address = $request->input('address');
+        if (is_string($address)) {
+            $address = json_decode($address, true);
+        }
+        
         $order = Order::create([
             'order_number' => $txnid,
             'user_id' => $user->id,
             'total_amount' => $totalAmount,
+            'shipping_charge' => $shippingCharge,
             'payment_status' => 'PENDING',
             'order_status' => 'Pending',
             'payment_method' => 'COD',
             'transaction_id' => $txnid,
             'order_date' => now(),
             'payment_details' => json_encode([
-                'shipping_address' => $request->address,
+                'shipping_address' => $address,
                 'payment_method' => 'COD',
                 'total_amount' => $totalAmount,
                 'subtotal' => $request->input('subtotal'),
-                'shipping_charge' => $request->input('shipping_charge'),
+                'shipping_charge' => $shippingCharge,
                 'coupon_discount' => $request->input('coupon_discount'),
                 'coupon_code' => $request->input('coupon_code')
             ])
         ]);
         
         foreach ($productItems as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product']->id,
-                'product_name' => $item['product']->name,
-                'quantity' => $item['quantity'],
-                'price' => $item['price']
-            ]);
-            $item['product']->decrement('stock', $item['quantity']);
+            $productImage = $item['product']->image ?? null;
+            
+            // ===== CREATE ORDER ITEM WITH VARIANT DETAILS =====
+            if ($item['variant_id']) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'variant_id' => $item['variant_id'],
+                    'size' => $item['size'],
+                    'color' => $item['color'],
+                    'product_name' => $item['product']->name . ' (' . $item['size'] . ' - ' . $item['color'] . ')',
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'final_price' => $item['final_price'], // ← ADDED final_price
+                    'product_image' => $productImage
+                ]);
+                
+                // ===== DEDUCT VARIANT STOCK =====
+                $variant = \App\Models\ProductVariant::find($item['variant_id']);
+                if ($variant) {
+                    $variant->decrement('stock', $item['quantity']);
+                }
+            } else {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'variant_id' => null,
+                    'size' => null,
+                    'color' => null,
+                    'product_name' => $item['product']->name,
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'final_price' => $item['final_price'], // ← ADDED final_price
+                    'product_image' => $productImage
+                ]);
+                
+                // ===== DEDUCT PRODUCT STOCK =====
+                $item['product']->decrement('stock', $item['quantity']);
+            }
         }
         
         // ===== RECORD COUPON USAGE FOR COD =====
@@ -530,6 +728,9 @@ class PaymentController extends Controller
                 ];
             }
             
+            // Get shipping charge from order
+            $shippingCharge = $order->shipping_charge ?? 0;
+            
             $items = [];
             foreach ($order->items as $item) {
                 $items[] = [
@@ -538,6 +739,7 @@ class PaymentController extends Controller
                     'product_name' => $item->product_name,
                     'quantity' => $item->quantity,
                     'price' => $item->price,
+                    'final_price' => $item->final_price ?? $item->price, // ← ADDED final_price
                     'product_image' => $item->product_image ?? ($item->product ? $item->product->image : null)
                 ];
             }
@@ -548,6 +750,7 @@ class PaymentController extends Controller
                     'id' => $order->id,
                     'order_number' => $order->order_number,
                     'total_amount' => $order->total_amount,
+                    'shipping_charge' => $shippingCharge,
                     'payment_status' => $order->payment_status,
                     'order_status' => $order->order_status,
                     'payment_method' => $order->payment_method,

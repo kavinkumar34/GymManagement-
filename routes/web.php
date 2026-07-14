@@ -130,6 +130,7 @@ Route::get('/api/offers/category/{category_id}', [PublicOfferController::class, 
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/products/{id}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // Member Management
@@ -212,6 +213,8 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/sizecharts/{id}/edit', [SizeChartController::class, 'edit'])->name('sizecharts.edit');
     Route::put('/sizecharts/{id}', [SizeChartController::class, 'update'])->name('sizecharts.update');
     Route::delete('/sizecharts/{id}', [SizeChartController::class, 'destroy'])->name('sizecharts.destroy');
+    // Size Charts - AJAX Details Route for View Modal
+Route::get('/size-charts/{id}/details', [SizeChartController::class, 'getDetails'])->name('sizecharts.details');
     
     // Products
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -227,7 +230,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/get-categories/{topId}', [CategoryController::class, 'getByTopCategory'])->name('get.categories');
     Route::get('/get-subcategories/{categoryId}', [SubCategoryController::class, 'getByCategory'])->name('get.subcategories');
     Route::get('/get-producttypes/{subCategoryId}', [ProductTypeController::class, 'getBySubCategory'])->name('get.producttypes');
-    Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
+Route::get('/get-producttypes-by-category/{categoryId}', [ProductTypeController::class, 'getByCategory'])->name('get.producttypes.by.category');    Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
     Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
     
     // GST ROUTE

@@ -17,6 +17,10 @@ class OrderConfirmationMail extends Mailable
     public $user;
     public $items;
     public $shippingAddress;
+    public $subtotal;
+    public $shippingCharge;
+    public $couponDiscount;
+    public $couponCode;
 
     public function __construct(Order $order, $user, $items, $shippingAddress = null)
     {
@@ -24,6 +28,31 @@ class OrderConfirmationMail extends Mailable
         $this->user = $user;
         $this->items = $items;
         $this->shippingAddress = $shippingAddress;
+        
+        // Calculate subtotal using final_price if available
+        $this->subtotal = 0;
+        foreach ($items as $item) {
+            $price = $item->final_price ?? $item->price ?? 0;
+            $this->subtotal += $price * $item->quantity;
+        }
+        
+        // Get shipping charge from order
+        $this->shippingCharge = $order->shipping_charge ?? 0;
+        
+        // Get coupon details from payment_details
+        $this->couponDiscount = 0;
+        $this->couponCode = null;
+        if ($order->payment_details) {
+            try {
+                $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
+                if (isset($paymentDetails['coupon_discount'])) {
+                    $this->couponDiscount = floatval($paymentDetails['coupon_discount']);
+                }
+                if (isset($paymentDetails['coupon_code'])) {
+                    $this->couponCode = $paymentDetails['coupon_code'];
+                }
+            } catch (\Exception $e) {}
+        }
     }
 
     public function envelope(): Envelope

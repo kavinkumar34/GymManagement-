@@ -9,20 +9,22 @@ class ProductType extends Model
     protected $table = 'product_types';
     
     protected $fillable = [
-        'name', 'slug', 'sub_category_id', 'image', 'is_active'
+        'name',
+        'category_id',
+        'image',
+        'is_active'
+        // Remove 'slug' from here
     ];
-    
+
     protected $casts = [
         'is_active' => 'boolean'
     ];
-    
-    public function subCategory()
+
+    // Remove any boot() method that creates slug
+    // Remove any slug-related methods
+
+    public function category()
     {
-        return $this->belongsTo(SubCategory::class, 'sub_category_id');
-    }
-    
-    public function products()
-    {
-        return $this->hasMany(Product::class, 'product_type_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
 }

@@ -76,11 +76,34 @@
             text-decoration: none;
         }
 
+        .product-variant-details {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
         .product-price {
             font-size: 1rem;
             font-weight: 700;
             color: #0f172a;
             margin-top: 0.25rem;
+        }
+
+        .product-price .original-price {
+            font-size: 0.85rem;
+            color: #999;
+            text-decoration: line-through;
+            font-weight: 400;
+            margin-right: 8px;
+        }
+
+        .product-price .discount-tag {
+            font-size: 0.7rem;
+            background: #dc3545;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
         }
 
         .quantity-control {
@@ -334,6 +357,12 @@
             background: #eff6ff;
         }
 
+        .payment-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .payment-icon {
             width: 36px;
             height: 36px;
@@ -372,6 +401,15 @@
             border-color: #3b82f6;
             background: #3b82f6;
             box-shadow: inset 0 0 0 4px white;
+        }
+
+        .payment-option .cod-not-available-badge {
+            background: #fee2e2;
+            color: #dc3545;
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
         }
 
         .address-list {
@@ -940,6 +978,22 @@
             align-items: center;
             gap: 0.3rem;
         }
+
+        .cod-not-available-badge {
+            background: #fee2e2;
+            color: #dc3545;
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .cod-unavailable-text {
+            color: #dc3545;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
     </style>
 
     <div class="cart-wrapper">
@@ -958,6 +1012,7 @@
         // Global variables
         let productStock = {};
         let productImages = {};
+        let productData = {};
         let currentPage = 'cart';
         let selectedAddress = null;
         let selectedPayment = null;
@@ -975,6 +1030,7 @@
         let editAddressData = null;
         let couponCode = null;
         let couponDiscount = 0;
+        let codAvailable = true;
 
         // ============ LOAD DELIVERABLE STATES FROM ADMIN ============
         async function loadDeliverableStates() {
@@ -1128,6 +1184,19 @@
             localStorage.setItem('user_addresses', JSON.stringify(savedAddresses));
         }
 
+        // ============ CHECK COD AVAILABILITY ============
+    function checkCodAvailability() {
+    for (const item of cartData) {
+        const product = productData[item.id];
+
+        if (product && Number(product.cod_available) === 0) {
+            return false;
+        }
+    }
+
+    return true;
+}   
+
         // ============ PRODUCT DATA FUNCTIONS ============
         async function loadProductsData() {
             try {
@@ -1147,13 +1216,61 @@
                 if (productsArray.length > 0) {
                     productsArray.forEach(product => {
                         if (product.id) {
-                            productStock[product.id] = parseInt(product.stock) || 0;
-                            if (product.image) {
-                                productImages[product.id] = '/storage/' + product.image;
+                            // Store full product data
+                            productData[product.id] = product;
+                            console.log("Product ID:", product.id);
+                            console.log(product);
+                            console.log("COD:", product.cod_available);
+                            // Get stock from variants or product
+                            let stock = 0;
+                            if (product.variants && product.variants.length > 0) {
+                                // Sum stock from all variants
+                                product.variants.forEach(v => {
+                                    stock += parseInt(v.stock) || 0;
+                                });
+                            } else {
+                                stock = parseInt(product.stock) || 0;
+                            }
+                            productStock[product.id] = stock;
+
+                            // Get first image - for variant products, get first variant image
+                            let imageUrl = null;
+                            if (product.product_images && product.product_images.length > 0) {
+                                // Sort by is_main (main first)
+                                const sortedImages = [...product.product_images].sort((a, b) => {
+                                    if (a.is_main !== b.is_main) return b.is_main - a.is_main;
+                                    return (a.display_order || 0) - (b.display_order || 0);
+                                });
+                                // For variant products, get image with variant_id
+                                if (product.variants && product.variants.length > 0) {
+                                    const firstVariant = product.variants[0];
+                                    const variantImage = sortedImages.find(img => img.variant_id == firstVariant
+                                        .id);
+                                    if (variantImage) {
+                                        imageUrl = '/storage/' + variantImage.image_path;
+                                    } else if (sortedImages.length > 0) {
+                                        imageUrl = '/storage/' + sortedImages[0].image_path;
+                                    }
+                                } else {
+                                    // Normal product
+                                    if (sortedImages.length > 0) {
+                                        imageUrl = '/storage/' + sortedImages[0].image_path;
+                                    }
+                                }
+                            }
+                            // Fallback to product.image
+                            if (!imageUrl && product.image) {
+                                imageUrl = '/storage/' + product.image;
+                            }
+                            if (imageUrl) {
+                                productImages[product.id] = imageUrl;
                             }
                         }
                     });
                 }
+
+                // Check COD availability for cart items
+                codAvailable = checkCodAvailability();
 
                 cart.forEach(item => {
                     if (productStock[item.id] === undefined || productStock[item.id] === null) {
@@ -1173,6 +1290,28 @@
             }
         }
 
+        // ============ GET VARIANT STOCK ============
+        function getVariantStock(productId, size, color) {
+            const product = productData[productId];
+            if (!product || !product.variants) return 0;
+
+            const variant = product.variants.find(v =>
+                v.size === size && v.color === color
+            );
+
+            return variant ? parseInt(variant.stock) || 0 : 0;
+        }
+
+        // ============ GET VARIANT BY SIZE AND COLOR ============
+        function getVariantBySizeColor(productId, size, color) {
+            const product = productData[productId];
+            if (!product || !product.variants) return null;
+
+            return product.variants.find(v =>
+                v.size === size && v.color === color
+            ) || null;
+        }
+
         // ============ HELPER FUNCTIONS ============
         function getSubtotal() {
             let subtotal = 0;
@@ -1188,7 +1327,13 @@
 
         function checkStockIssues() {
             for (let item of cartData) {
-                let stock = productStock[item.id] || 0;
+                let stock = 0;
+                // For variant products, check specific variant stock
+                if (item.size && item.color) {
+                    stock = getVariantStock(item.id, item.size, item.color);
+                } else {
+                    stock = productStock[item.id] || 0;
+                }
                 if (item.quantity > stock || stock <= 0) {
                     return true;
                 }
@@ -1428,9 +1573,7 @@
             renderPage();
         }
 
-        // ============ COUPON FUNCTIONS - WITH DROPDOWN ============
-
-        // Load available coupons into dropdown - Only Coupon Code
+        // ============ COUPON FUNCTIONS ============
         async function loadAvailableCoupons() {
             try {
                 const response = await fetch('/api/available-coupons', {
@@ -1448,7 +1591,6 @@
                 if (data.success && data.coupons && data.coupons.length > 0) {
                     let options = '<option value="">-- Select a coupon --</option>';
                     data.coupons.forEach(coupon => {
-                        // Only show coupon code in dropdown
                         options += `<option value="${coupon.code}">${coupon.code}</option>`;
                     });
                     select.innerHTML = options;
@@ -1464,7 +1606,6 @@
             }
         }
 
-        // Apply coupon from dropdown
         async function applyCouponFromDropdown() {
             const select = document.getElementById('couponSelect');
             if (!select) {
@@ -1540,7 +1681,15 @@
             if (index >= cart.length) return;
 
             let item = cart[index];
-            let stock = productStock[item.id] || 0;
+            let stock = 0;
+
+            // For variant products, check specific variant stock
+            if (item.size && item.color) {
+                stock = getVariantStock(item.id, item.size, item.color);
+            } else {
+                stock = productStock[item.id] || 0;
+            }
+
             let newQty = item.quantity + change;
 
             if (newQty < 1) {
@@ -1550,7 +1699,7 @@
                     return;
                 }
             } else if (newQty > stock && stock > 0) {
-                alert(`Sorry, only ${stock} items available!`);
+                alert(`Sorry, only ${stock} items available for this size and color!`);
                 return;
             } else {
                 item.quantity = newQty;
@@ -1594,6 +1743,12 @@
         async function placeOrder() {
             if (checkStockIssues()) {
                 alert('Some items are out of stock or quantity exceeds available stock!');
+                return;
+            }
+
+            // ===== CHECK COD AVAILABILITY BEFORE PLACING ORDER =====
+            if (selectedPayment === 'cod' && !codAvailable) {
+                alert('Cash on Delivery is not available for this order. Please select Online Payment.');
                 return;
             }
 
@@ -1684,28 +1839,24 @@
                     csrfInput.value = csrfToken;
                     form.appendChild(csrfInput);
 
-                    // ===== SEND GRAND TOTAL - IMPORTANT =====
                     const totalInput = document.createElement('input');
                     totalInput.type = 'hidden';
                     totalInput.name = 'total_amount';
                     totalInput.value = totalWithShipping;
                     form.appendChild(totalInput);
 
-                    // Send subtotal
                     const subtotalInput = document.createElement('input');
                     subtotalInput.type = 'hidden';
                     subtotalInput.name = 'subtotal';
                     subtotalInput.value = subtotal;
                     form.appendChild(subtotalInput);
 
-                    // Send shipping charge
                     const shippingInput = document.createElement('input');
                     shippingInput.type = 'hidden';
                     shippingInput.name = 'shipping_charge';
                     shippingInput.value = shippingCharge;
                     form.appendChild(shippingInput);
 
-                    // Send coupon details
                     if (couponCode) {
                         const couponInput = document.createElement('input');
                         couponInput.type = 'hidden';
@@ -1720,35 +1871,30 @@
                         form.appendChild(couponDiscountInput);
                     }
 
-                    // Send full order data
                     const orderDataInput = document.createElement('input');
                     orderDataInput.type = 'hidden';
                     orderDataInput.name = 'order_data';
                     orderDataInput.value = JSON.stringify(orderData);
                     form.appendChild(orderDataInput);
 
-                    // Send address
                     const addressInput = document.createElement('input');
                     addressInput.type = 'hidden';
                     addressInput.name = 'address';
                     addressInput.value = JSON.stringify(selectedAddress);
                     form.appendChild(addressInput);
 
-                    // Send state
                     const stateInput = document.createElement('input');
                     stateInput.type = 'hidden';
                     stateInput.name = 'state_id';
                     stateInput.value = selectedState ? selectedState.id : '';
                     form.appendChild(stateInput);
 
-                    // Send payment method
                     const paymentInput = document.createElement('input');
                     paymentInput.type = 'hidden';
                     paymentInput.name = 'payment_method';
                     paymentInput.value = selectedPayment;
                     form.appendChild(paymentInput);
 
-                    // For COD, add additional flags
                     if (selectedPayment === 'cod') {
                         const codInput = document.createElement('input');
                         codInput.type = 'hidden';
@@ -1763,7 +1909,6 @@
                         form.appendChild(shippingStateInput);
                     }
 
-                    // Add cart items
                     const cartInput = document.createElement('input');
                     cartInput.type = 'hidden';
                     cartInput.name = 'cart';
@@ -1798,15 +1943,15 @@
 
             if (cartData.length === 0) {
                 container.innerHTML = `
-            <div class="empty-cart-card">
-                <div class="empty-cart-icon"><i class="fas fa-shopping-bag"></i></div>
-                <h3>Your cart is empty</h3>
-                <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
-                <a href="{{ url('/') }}" class="btn-primary-custom" style="display: inline-flex; width: auto; padding: 0.75rem 2rem; text-decoration: none;">
-                    <i class="fas fa-store"></i> Start Shopping
-                </a>
-            </div>
-        `;
+                    <div class="empty-cart-card">
+                        <div class="empty-cart-icon"><i class="fas fa-shopping-bag"></i></div>
+                        <h3>Your cart is empty</h3>
+                        <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+                        <a href="{{ url('/') }}" class="btn-primary-custom" style="display: inline-flex; width: auto; padding: 0.75rem 2rem; text-decoration: none;">
+                            <i class="fas fa-store"></i> Start Shopping
+                        </a>
+                    </div>
+                `;
                 updateNavbarCartCount();
                 return;
             }
@@ -1825,87 +1970,195 @@
 
             for (let i = 0; i < cartData.length; i++) {
                 let item = cartData[i];
-                let stock = productStock[item.id] || 0;
-                let qty = item.quantity;
-                let price = parseFloat(item.price);
-                let itemTotal = price * qty;
 
+                // Get stock for this specific variant
+                let stock = 0;
+                let variantDetails = '';
+                let price = parseFloat(item.price) || 0;
+                let originalPrice = parseFloat(item.original_price) || price;
+                let discountType = item.discount_type || 'flat';
+                let discountValue = parseFloat(item.discount_value) || 0;
+
+                // Get product data
+                let product = productData[item.id];
+
+                // For variant products, find the specific variant
+                if (item.size && item.color) {
+                    const variant = getVariantBySizeColor(item.id, item.size, item.color);
+                    if (variant) {
+                        stock = parseInt(variant.stock) || 0;
+                        originalPrice = parseFloat(variant.total_price) || parseFloat(variant.mrp) || price;
+                        price = parseFloat(variant.final_price) || parseFloat(variant.price) || price;
+                        discountType = variant.discount_type || 'flat';
+                        discountValue = parseFloat(variant.discount_value) || 0;
+                        variantDetails = `Size: ${item.size} | Color: ${item.color}`;
+                    } else {
+                        // If variant not found, use product data
+                        stock = productStock[item.id] || 0;
+                        if (product) {
+                            originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
+                            price = parseFloat(product.final_price) || parseFloat(product.price) || price;
+                        }
+                        variantDetails = `Size: ${item.size} | Color: ${item.color}`;
+                    }
+                } else if (item.size) {
+                    // Only size specified
+                    const variant = product?.variants?.find(v => v.size === item.size);
+                    if (variant) {
+                        stock = parseInt(variant.stock) || 0;
+                        originalPrice = parseFloat(variant.total_price) || parseFloat(variant.mrp) || price;
+                        price = parseFloat(variant.final_price) || parseFloat(variant.price) || price;
+                        discountType = variant.discount_type || 'flat';
+                        discountValue = parseFloat(variant.discount_value) || 0;
+                    } else {
+                        stock = productStock[item.id] || 0;
+                        if (product) {
+                            originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
+                            price = parseFloat(product.final_price) || parseFloat(product.price) || price;
+                        }
+                    }
+                    variantDetails = `Size: ${item.size}`;
+                } else if (item.color) {
+                    // Only color specified
+                    const variant = product?.variants?.find(v => v.color === item.color);
+                    if (variant) {
+                        stock = parseInt(variant.stock) || 0;
+                        originalPrice = parseFloat(variant.total_price) || parseFloat(variant.mrp) || price;
+                        price = parseFloat(variant.final_price) || parseFloat(variant.price) || price;
+                        discountType = variant.discount_type || 'flat';
+                        discountValue = parseFloat(variant.discount_value) || 0;
+                    } else {
+                        stock = productStock[item.id] || 0;
+                        if (product) {
+                            originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
+                            price = parseFloat(product.final_price) || parseFloat(product.price) || price;
+                        }
+                    }
+                    variantDetails = `Color: ${item.color}`;
+                } else {
+                    // Normal product (no variant)
+                    stock = productStock[item.id] || 0;
+                    if (product) {
+                        originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
+                        price = parseFloat(product.final_price) || parseFloat(product.price) || price;
+                        discountType = product.discount_type || 'flat';
+                        discountValue = parseFloat(product.discount_value) || 0;
+                    }
+                }
+
+                // If item has original_price stored in cart, use it
+                if (item.original_price) {
+                    originalPrice = parseFloat(item.original_price);
+                }
+
+                let qty = item.quantity;
+                let itemTotal = price * qty;
                 subtotal += itemTotal;
                 totalItems += qty;
+
+                // Calculate discount display
+                let discountPercent = 0;
+                let discountDisplay = '';
+                let hasDiscount = false;
+                if (originalPrice > 0 && price < originalPrice) {
+                    hasDiscount = true;
+                    discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
+                    if (discountType === 'flat') {
+                        discountDisplay = '₹' + discountValue.toFixed(2) + ' off';
+                    } else {
+                        discountDisplay = discountPercent + '% off';
+                    }
+                }
 
                 let stockText = stock > 0 ? (stock <= 5 ? `Only ${stock} left` : 'In Stock') : 'Out of Stock';
                 let stockClass = stock > 0 ? (stock <= 5 ? 'stock-low' : 'stock-available') : 'stock-out';
                 let imageUrl = productImages[item.id] || '';
 
+                let priceHtml = '';
+                if (hasDiscount) {
+                    priceHtml = `
+                        <div class="product-price">
+                            <span class="original-price">₹${originalPrice.toFixed(2)}</span>
+                            ₹${price.toFixed(2)}
+                            <span class="discount-tag">${discountDisplay}</span>
+                        </div>
+                    `;
+                } else {
+                    priceHtml = `
+                        <div class="product-price">₹${price.toFixed(2)}</div>
+                    `;
+                }
+
                 cartItemsHtml += `
-            <div class="cart-item">
-                <div class="cart-item-image">
-                    ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}">` : `<div class="image-placeholder">🏋️</div>`}
-                </div>
-                <div>
-                    <div class="product-title">${escapeHtml(item.name)}</div>
-                    <div class="product-price">₹${price.toLocaleString()}</div>
-                    <div class="quantity-control">
-                        <button class="qty-btn" onclick="updateQty(${i}, -1)">-</button>
-                        <span>${qty}</span>
-                        <button class="qty-btn" onclick="updateQty(${i}, 1)" ${qty >= stock ? 'disabled' : ''}>+</button>
+                    <div class="cart-item">
+                        <div class="cart-item-image">
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}">` : `<div class="image-placeholder">🏋️</div>`}
+                        </div>
+                        <div>
+                            <div class="product-title">${escapeHtml(item.name)}</div>
+                            ${variantDetails ? `<div class="product-variant-details">${escapeHtml(variantDetails)}</div>` : ''}
+                            ${priceHtml}
+                            <div class="quantity-control">
+                                <button class="qty-btn" onclick="updateQty(${i}, -1)">-</button>
+                                <span>${qty}</span>
+                                <button class="qty-btn" onclick="updateQty(${i}, 1)" ${qty >= stock ? 'disabled' : ''}>+</button>
+                            </div>
+                            <span class="stock-badge ${stockClass}">${stockText}</span>
+                        </div>
+                        <div>
+                            <div class="item-total">₹${itemTotal.toFixed(2)}</div>
+                            <button class="remove-item" onclick="removeItem(${i})"><i class="fas fa-trash-alt"></i> Remove</button>
+                        </div>
                     </div>
-                    <span class="stock-badge ${stockClass}">${stockText}</span>
-                </div>
-                <div>
-                    <div class="item-total">₹${itemTotal.toLocaleString()}</div>
-                    <button class="remove-item" onclick="removeItem(${i})"><i class="fas fa-trash-alt"></i> Remove</button>
-                </div>
-            </div>
-        `;
+                `;
             }
 
             let hasStockIssue = checkStockIssues();
 
             let html = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h2 style="font-size: 1.8rem; font-weight: 700; color: #1e293b;">
-                <i class="fas fa-shopping-cart" style="color: #3b82f6;"></i> Shopping Cart (${cartData.length} item${cartData.length > 1 ? 's' : ''})
-            </h2>
-        </div>
-        <div class="cart-grid">
-            <div class="cart-items-card">
-                <div style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; padding: 0.5rem 0; border-bottom: 2px solid #eef2f6; font-weight: 600; font-size: 0.85rem; color: #64748b;">
-                    <div>PRODUCT</div>
-                    <div></div>
-                    <div style="text-align: right;">TOTAL</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.8rem; font-weight: 700; color: #1e293b;">
+                        <i class="fas fa-shopping-cart" style="color: #3b82f6;"></i> Shopping Cart (${cartData.length} item${cartData.length > 1 ? 's' : ''})
+                    </h2>
                 </div>
-                ${cartItemsHtml}
-                <div class="cart-actions">
-                    <button class="btn-update" onclick="updateCart()"><i class="fas fa-sync-alt"></i> Update Cart</button>
-                    <button class="btn-clear" onclick="clearCart()"><i class="fas fa-trash"></i> Clear cart</button>
+                <div class="cart-grid">
+                    <div class="cart-items-card">
+                        <div style="display: grid; grid-template-columns: 100px 1fr auto; gap: 1rem; padding: 0.5rem 0; border-bottom: 2px solid #eef2f6; font-weight: 600; font-size: 0.85rem; color: #64748b;">
+                            <div>PRODUCT</div>
+                            <div></div>
+                            <div style="text-align: right;">TOTAL</div>
+                        </div>
+                        ${cartItemsHtml}
+                        <div class="cart-actions">
+                            <button class="btn-update" onclick="updateCart()"><i class="fas fa-sync-alt"></i> Update Cart</button>
+                            <button class="btn-clear" onclick="clearCart()"><i class="fas fa-trash"></i> Clear cart</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="summary-card">
+                            <div class="summary-header">Order Summary</div>
+                            <div class="summary-row">
+                                <span>Subtotal (${totalItems} items)</span>
+                                <span>₹${subtotal.toFixed(2)}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Shipping</span>
+                                <span class="text-success">Select state at checkout</span>
+                            </div>
+                            <div class="summary-total">
+                                <span>Total</span>
+                                <span>₹${subtotal.toFixed(2)}</span>
+                            </div>
+                            <button class="btn-primary-custom" onclick="goToCheckout()" ${hasStockIssue ? 'disabled' : ''}>
+                                Proceed to Checkout <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <a href="{{ url('/') }}" class="btn-secondary-custom">
+                                <i class="fas fa-arrow-left"></i> Continue Shopping
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <div class="summary-card">
-                    <div class="summary-header">Order Summary</div>
-                    <div class="summary-row">
-                        <span>Subtotal (${totalItems} items)</span>
-                        <span>₹${subtotal.toLocaleString()}</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Shipping</span>
-                        <span class="text-success">Select state at checkout</span>
-                    </div>
-                    <div class="summary-total">
-                        <span>Total</span>
-                        <span>₹${subtotal.toLocaleString()}</span>
-                    </div>
-                    <button class="btn-primary-custom" onclick="goToCheckout()" ${hasStockIssue ? 'disabled' : ''}>
-                        Proceed to Checkout <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <a href="{{ url('/') }}" class="btn-secondary-custom">
-                        <i class="fas fa-arrow-left"></i> Continue Shopping
-                    </a>
-                </div>
-            </div>
-        </div>
-    `;
+            `;
 
             document.getElementById('cartContainer').innerHTML = html;
             updateNavbarCartCount();
@@ -1916,15 +2169,22 @@
             let totalItems = getTotalItems();
             let totalWithShipping = getTotalWithShipping();
 
+            // Check COD availability - ONLY if ALL products have cod_available = 1
+            codAvailable = checkCodAvailability();
+
+            // Debug: Log COD availability
+            console.log('COD Available:', codAvailable);
+            console.log('Cart Items:', cartData);
+
             let stateOptions = '';
             if (deliverableStates && deliverableStates.length > 0) {
                 stateOptions = deliverableStates.map(state => {
                     const selected = selectedState && selectedState.id === state.id ? 'selected' : '';
                     return `
-                <option value="${state.id}" ${selected}>
-                    ${state.state} (₹${parseFloat(state.shipping_charge || 0).toFixed(2)})
-                </option>
-            `;
+                        <option value="${state.id}" ${selected}>
+                            ${state.state} (₹${parseFloat(state.shipping_charge || 0).toFixed(2)})
+                        </option>
+                    `;
                 }).join('');
             } else {
                 stateOptions = '<option value="">-- No states available --</option>';
@@ -1938,31 +2198,32 @@
             savedAddresses.forEach((addr, idx) => {
                 let isSelected = selectedAddress && selectedAddress.id === addr.id;
                 addressesHtml += `
-            <div class="address-item ${isSelected ? 'selected' : ''}" onclick="selectAddress(${idx})">
-                <div class="address-radio-wrapper">
-                    <span class="radio-select"></span>
-                    <div class="address-content">
-                        <div class="address-name">
-                            ${escapeHtml(addr.name)}
-                        </div>
-                        <div class="address-details">
-                            ${escapeHtml(addr.address)}<br>
-                            ${escapeHtml(addr.city)}, ${escapeHtml(addr.state)} - ${addr.pincode}
-                        </div>
-                        <div class="address-phone"><i class="fas fa-phone"></i> ${addr.phone}</div>
-                        <div class="address-actions">
-                            <button class="btn-address-edit" onclick="event.stopPropagation(); editAddress(${idx})"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn-address-delete" onclick="event.stopPropagation(); deleteAddress(${idx})"><i class="fas fa-trash-alt"></i> Delete</button>
+                    <div class="address-item ${isSelected ? 'selected' : ''}" onclick="selectAddress(${idx})">
+                        <div class="address-radio-wrapper">
+                            <span class="radio-select"></span>
+                            <div class="address-content">
+                                <div class="address-name">
+                                    ${escapeHtml(addr.name)}
+                                </div>
+                                <div class="address-details">
+                                    ${escapeHtml(addr.address)}<br>
+                                    ${escapeHtml(addr.city)}, ${escapeHtml(addr.state)} - ${addr.pincode}
+                                </div>
+                                <div class="address-phone"><i class="fas fa-phone"></i> ${addr.phone}</div>
+                                <div class="address-actions">
+                                    <button class="btn-address-edit" onclick="event.stopPropagation(); editAddress(${idx})"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="btn-address-delete" onclick="event.stopPropagation(); deleteAddress(${idx})"><i class="fas fa-trash-alt"></i> Delete</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
             });
 
             let orderItemsHtml = '';
             for (let item of cartData) {
-                let price = parseFloat(item.price);
+                let price = parseFloat(item.price) || 0;
+                let originalPrice = parseFloat(item.original_price) || price;
                 let imageUrl = productImages[item.id] || '';
                 let color = item.color || '';
                 let size = item.size || '';
@@ -1972,190 +2233,212 @@
                         `<div class="item-details">${color ? 'Color: ' + color : ''}${color && size ? ' | ' : ''}${size ? 'Size: ' + size : ''}</div>`;
                 }
                 orderItemsHtml += `
-            <div class="order-item">
-                <div class="item-img">
-                    ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🏋️</div>'}
-                </div>
-                <div class="item-info">
-                    <div class="item-name">${escapeHtml(item.name)}</div>
-                    ${detailsHtml}
-                    <div class="item-details">Qty: ${item.quantity}</div>
-                </div>
-                <div class="item-price">₹${(price * item.quantity).toLocaleString()}</div>
-            </div>
-        `;
+                    <div class="order-item">
+                        <div class="item-img">
+                            ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}">` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🏋️</div>'}
+                        </div>
+                        <div class="item-info">
+                            <div class="item-name">${escapeHtml(item.name)}</div>
+                            ${detailsHtml}
+                            <div class="item-details">Qty: ${item.quantity}</div>
+                        </div>
+                        <div class="item-price">₹${(price * item.quantity).toFixed(2)}</div>
+                    </div>
+                `;
             }
 
-            let codAvailable = true;
             let editAddress = editAddressData || {};
 
-            // ===== COUPON SECTION HTML - WITH DROPDOWN (Only Coupon Code) =====
+            // ===== COUPON SECTION HTML =====
             let couponHtml = '';
             if (couponCode) {
                 const discountAmount = typeof couponDiscount === 'number' ? couponDiscount : parseFloat(couponDiscount) ||
                     0;
                 couponHtml = `
-            <div class="coupon-applied">
-                <i class="fas fa-check-circle" style="color: #22c55e;"></i>
-                Coupon <strong>${couponCode}</strong> applied! 
-                Discount: ₹${discountAmount.toFixed(2)}
-                <span class="remove-coupon" onclick="removeCoupon()">✕ Remove</span>
-            </div>
-        `;
+                    <div class="coupon-applied">
+                        <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                        Coupon <strong>${couponCode}</strong> applied! 
+                        Discount: ₹${discountAmount.toFixed(2)}
+                        <span class="remove-coupon" onclick="removeCoupon()">✕ Remove</span>
+                    </div>
+                `;
             } else {
                 couponHtml = `
-            <div class="coupon-section">
-                <i class="fas fa-ticket-alt coupon-icon"></i>
-                <select id="couponSelect" class="form-select">
-                    <option value="">-- Select a coupon --</option>
-                </select>
-                <button id="applyCouponBtn" onclick="applyCouponFromDropdown()" class="btn-apply-coupon">Apply</button>
-            </div>
-        `;
+                    <div class="coupon-section">
+                        <i class="fas fa-ticket-alt coupon-icon"></i>
+                        <select id="couponSelect" class="form-select">
+                            <option value="">-- Select a coupon --</option>
+                        </select>
+                        <button id="applyCouponBtn" onclick="applyCouponFromDropdown()" class="btn-apply-coupon">Apply</button>
+                    </div>
+                `;
             }
 
+            // ===== PAYMENT METHODS - COD ONLY IF AVAILABLE =====
+            let paymentMethodsHtml = `
+                <div class="payment-methods">
+                    <div class="payment-option ${selectedPayment === 'online' ? 'selected' : ''}" onclick="selectPayment('online')">
+                        <div class="payment-icon"><i class="fas fa-credit-card"></i></div>
+                        <div class="payment-info">
+                            <div class="payment-name">Online Payment</div>
+                            <div class="payment-desc">UPI, Card, NetBanking, Wallet</div>
+                        </div>
+                        <span class="radio-select"></span>
+                    </div>
+            `;
+
+            // ===== COD OPTION - ONLY SHOW IF codAvailable = true =====
+            if (codAvailable === true) {
+                paymentMethodsHtml += `
+                    <div class="payment-option ${selectedPayment === 'cod' ? 'selected' : ''}" onclick="selectPayment('cod')">
+                        <div class="payment-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="payment-info">
+                            <div class="payment-name">Cash on Delivery</div>
+                            <div class="payment-desc">Pay when your order arrives</div>
+                        </div>
+                        <span class="radio-select"></span>
+                    </div>
+                `;
+            } else {
+                paymentMethodsHtml += `
+                    <div class="payment-option disabled" style="opacity:0.6; cursor:not-allowed;">
+                        <div class="payment-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="payment-info">
+                            <div class="payment-name">Cash on Delivery</div>
+                            <div class="payment-desc" style="color:#dc3545;">Not available for this product</div>
+                        </div>
+                        <span class="cod-not-available-badge">Not Available</span>
+                    </div>
+                `;
+            }
+
+            paymentMethodsHtml += `</div>`;
+
             let html = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h2 style="font-size: 1.8rem; font-weight: 700; color: #1e293b;">
-                <i class="fas fa-check-circle" style="color: #10b981;"></i> Checkout
-            </h2>
-            <button class="btn-secondary-custom" onclick="goToCart()" style="width: auto; padding: 0.5rem 1.5rem; display: inline-block;">
-                <i class="fas fa-arrow-left"></i> Back to Cart
-            </button>
-        </div>
-        <div class="cart-grid">
-            <!-- LEFT SIDE -->
-            <div>
-                <!-- Contact Information -->
-                <div class="checkout-contact-section">
-                    <div class="section-title">Contact Information</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>FULL NAME <span class="required">*</span></label>
-                            <input type="text" id="checkoutName" value="${escapeHtml(loggedInUser?.name || '')}" placeholder="Enter your name">
-                        </div>
-                        <div class="form-group">
-                            <label>PHONE NUMBER <span class="required">*</span></label>
-                            <input type="text" id="checkoutPhone" value="${escapeHtml(loggedInUser?.phone || '')}" placeholder="Enter 10-digit phone number">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>EMAIL <span class="required">*</span></label>
-                        <input type="email" id="checkoutEmail" value="${escapeHtml(userEmail)}" readonly>
-                    </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.8rem; font-weight: 700; color: #1e293b;">
+                        <i class="fas fa-check-circle" style="color: #10b981;"></i> Checkout
+                    </h2>
+                    <button class="btn-secondary-custom" onclick="goToCart()" style="width: auto; padding: 0.5rem 1.5rem; display: inline-block;">
+                        <i class="fas fa-arrow-left"></i> Back to Cart
+                    </button>
                 </div>
-                
-                <!-- Delivery Address -->
-                <div class="delivery-address-section">
-                    <div class="section-title">Delivery Address</div>
-                    
-                    <div class="address-list">
-                        ${addressesHtml}
-                    </div>
-                    
-                    <span class="add-address-toggle" onclick="showAddAddressForm()">+ Add New Address</span>
-                    
-                    <div id="addAddressForm" class="add-address-form ${showAddressForm ? 'show' : ''}">
-                        <div class="form-group">
-                            <label>FLAT / HOUSE NO., BUILDING, STREET <span class="required">*</span></label>
-                            <input type="text" id="newBuilding" placeholder="Enter your address" value="${escapeHtml(editAddress.address || '')}">
-                        </div>
-                        <div class="form-group">
-                            <label>CITY / DISTRICT <span class="required">*</span></label>
-                            <input type="text" id="newCity" placeholder="City" value="${escapeHtml(editAddress.city || '')}">
-                        </div>
-                        <div class="form-group">
-                            <label>STATE <span class="required">*</span></label>
-                            <select id="newState" onchange="updateShippingFromForm()">
-                                <option value="">-- Select State --</option>
-                                ${stateOptions}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>PINCODE <span class="required">*</span></label>
-                            <input type="text" id="newPincode" placeholder="Enter 6-digit pin code" maxlength="10" value="${escapeHtml(editAddress.pincode || '')}">
+                <div class="cart-grid">
+                    <!-- LEFT SIDE -->
+                    <div>
+                        <!-- Contact Information -->
+                        <div class="checkout-contact-section">
+                            <div class="section-title">Contact Information</div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>FULL NAME <span class="required">*</span></label>
+                                    <input type="text" id="checkoutName" value="${escapeHtml(loggedInUser?.name || '')}" placeholder="Enter your name">
+                                </div>
+                                <div class="form-group">
+                                    <label>PHONE NUMBER <span class="required">*</span></label>
+                                    <input type="text" id="checkoutPhone" value="${escapeHtml(loggedInUser?.phone || '')}" placeholder="Enter 10-digit phone number">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>EMAIL <span class="required">*</span></label>
+                                <input type="email" id="checkoutEmail" value="${escapeHtml(userEmail)}" readonly>
+                            </div>
                         </div>
                         
-                        <div class="shipping-charge-display">
-                            <span>Shipping Charge</span>
-                            <span class="charge-amount">₹${shippingCharge.toFixed(2)}</span>
+                        <!-- Delivery Address -->
+                        <div class="delivery-address-section">
+                            <div class="section-title">Delivery Address</div>
+                            
+                            <div class="address-list">
+                                ${addressesHtml}
+                            </div>
+                            
+                            <span class="add-address-toggle" onclick="showAddAddressForm()">+ Add New Address</span>
+                            
+                            <div id="addAddressForm" class="add-address-form ${showAddressForm ? 'show' : ''}">
+                                <div class="form-group">
+                                    <label>FLAT / HOUSE NO., BUILDING, STREET <span class="required">*</span></label>
+                                    <input type="text" id="newBuilding" placeholder="Enter your address" value="${escapeHtml(editAddress.address || '')}">
+                                </div>
+                                <div class="form-group">
+                                    <label>CITY / DISTRICT <span class="required">*</span></label>
+                                    <input type="text" id="newCity" placeholder="City" value="${escapeHtml(editAddress.city || '')}">
+                                </div>
+                                <div class="form-group">
+                                    <label>STATE <span class="required">*</span></label>
+                                    <select id="newState" onchange="updateShippingFromForm()">
+                                        <option value="">-- Select State --</option>
+                                        ${stateOptions}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>PINCODE <span class="required">*</span></label>
+                                    <input type="text" id="newPincode" placeholder="Enter 6-digit pin code" maxlength="10" value="${escapeHtml(editAddress.pincode || '')}">
+                                </div>
+                                
+                                <div class="shipping-charge-display">
+                                    <span>Shipping Charge</span>
+                                    <span class="charge-amount">₹${shippingCharge.toFixed(2)}</span>
+                                </div>
+                                
+                                <button class="btn-add-address" onclick="saveNewAddress()">${isEditingAddress ? 'Update Address' : 'Add Address'}</button>
+                                <button class="btn-secondary-custom" onclick="hideAddAddressForm()" style="margin-top: 0.5rem;">Cancel</button>
+                            </div>
                         </div>
-                        
-                        <button class="btn-add-address" onclick="saveNewAddress()">${isEditingAddress ? 'Update Address' : 'Add Address'}</button>
-                        <button class="btn-secondary-custom" onclick="hideAddAddressForm()" style="margin-top: 0.5rem;">Cancel</button>
                     </div>
-                </div>
-            </div>
-            
-            <!-- RIGHT SIDE -->
-            <div class="order-summary-section">
-                <!-- Coupon / Promo Code Section -->
-                <div class="coupon-section-wrapper">
-                    <div class="section-title">
-                        <i class="fas fa-ticket-alt" style="color: #8b5cf6;"></i> Coupon / Promo Code
-                    </div>
-                    ${couponHtml}
-                </div>
-                <div class="summary-card">
-                    <div class="order-header">
-                        <h4>Your Order (${totalItems} item${totalItems > 1 ? 's' : ''})</h4>
-                    </div>
-                    ${orderItemsHtml}
-                    <hr style="margin: 1rem 0;">
                     
-                    <div class="summary-row">
-                        <span>Subtotal (Tax included)</span>
-                        <span>₹${subtotal.toLocaleString()}</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Shipping</span>
-                        <span>${selectedState ? selectedState.state + ' ₹' + shippingCharge.toFixed(2) : '₹0.00'}</span>
-                    </div>
-                    ${(couponCode && couponDiscount > 0) ? `
+                    <!-- RIGHT SIDE -->
+                    <div class="order-summary-section">
+                        <!-- Coupon / Promo Code Section -->
+                        <div class="coupon-section-wrapper">
+                            <div class="section-title">
+                                <i class="fas fa-ticket-alt" style="color: #8b5cf6;"></i> Coupon / Promo Code
+                            </div>
+                            ${couponHtml}
+                        </div>
+                        <div class="summary-card">
+                            <div class="order-header">
+                                <h4>Your Order (${totalItems} item${totalItems > 1 ? 's' : ''})</h4>
+                            </div>
+                            ${orderItemsHtml}
+                            <hr style="margin: 1rem 0;">
+                            
+                            <div class="summary-row">
+                                <span>Subtotal (Tax included)</span>
+                                <span>₹${subtotal.toFixed(2)}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Shipping</span>
+                                <span>${selectedState ? selectedState.state + ' ₹' + shippingCharge.toFixed(2) : '₹0.00'}</span>
+                            </div>
+                            ${(couponCode && couponDiscount > 0) ? `
                                             <div class="summary-row" style="color: #15803d;">
                                                 <span>Coupon Discount (${couponCode})</span>
                                                 <span>- ₹${parseFloat(couponDiscount || 0).toFixed(2)}</span>
                                             </div>
                                         ` : ''}
-                    
-                    <!-- Payment Method -->
-                    <div style="margin-top: 1rem; border-top: 1px solid #eef2f6; padding-top: 1rem;">
-                        <div class="payment-methods">
-                            <div class="payment-option ${selectedPayment === 'online' ? 'selected' : ''}" onclick="selectPayment('online')">
-                                <div class="payment-icon"><i class="fas fa-credit-card"></i></div>
-                                <div class="payment-info">
-                                    <div class="payment-name">Online Payment</div>
-                                    <div class="payment-desc">UPI, Card, NetBanking, Wallet</div>
-                                </div>
-                                <span class="radio-select"></span>
+                            
+                            <!-- Payment Method -->
+                            <div style="margin-top: 1rem; border-top: 1px solid #eef2f6; padding-top: 1rem;">
+                                ${paymentMethodsHtml}
                             </div>
-                            <div class="payment-option ${selectedPayment === 'cod' ? 'selected' : ''}" onclick="selectPayment('cod')">
-                                <div class="payment-icon"><i class="fas fa-money-bill-wave"></i></div>
-                                <div class="payment-info">
-                                    <div class="payment-name">Cash on Delivery</div>
-                                    <div class="payment-desc">Pay when your order arrives</div>
-                                </div>
-                                <span class="radio-select"></span>
+                            
+                            <div class="summary-total">
+                                <span>Grand Total</span>
+                                <span>₹${parseFloat(totalWithShipping || 0).toFixed(2)}</span>
+                            </div>
+                            <button class="btn-primary-custom place-order-btn" onclick="placeOrder()" ${!selectedAddress || !selectedPayment || !selectedState ? 'disabled' : ''}>
+                                <i class="fas fa-check-circle"></i> Place Order
+                            </button>
+                            <div class="secure-checkout-footer">
+                                <span><i class="fas fa-lock"></i> Secure Checkout</span>
+                                <span><i class="fas fa-undo"></i> 3 Day Return Policy</span>
+                                ${codAvailable ? '<span><i class="fas fa-truck"></i> COD Available</span>' : '<span style="color:#dc3545;"><i class="fas fa-times-circle"></i> COD Not Available</span>'}
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="summary-total">
-                        <span>Grand Total</span>
-                        <span>₹${parseFloat(totalWithShipping || 0).toLocaleString()}</span>
-                    </div>
-                    <button class="btn-primary-custom place-order-btn" onclick="placeOrder()" ${!selectedAddress || !selectedPayment || !selectedState ? 'disabled' : ''}>
-                        <i class="fas fa-check-circle"></i> Place Order
-                    </button>
-                    <div class="secure-checkout-footer">
-                        <span><i class="fas fa-lock"></i> Secure Checkout</span>
-                        <span><i class="fas fa-undo"></i> 3 Day Return Policy</span>
-                        <span><i class="fas fa-truck"></i> COD Available in Tamil Nadu Only</span>
-                    </div>
                 </div>
-            </div>
-        </div>
-    `;
+            `;
 
             document.getElementById('cartContainer').innerHTML = html;
 

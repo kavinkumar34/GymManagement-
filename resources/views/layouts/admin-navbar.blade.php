@@ -31,7 +31,8 @@
     $newPendingOrders = 0;
     try {
         if (Schema::hasTable('orders')) {
-            $lastViewedAt = session('payments_last_viewed_at', now()->subDays(30));
+            $lastViewedAt = cache()->get('orders_last_viewed', now()->subDays(30));
+
             $newPendingOrders = Order::where('payment_status', 'PENDING')
                 ->where('created_at', '>', $lastViewedAt)
                 ->count();
@@ -342,123 +343,192 @@
 <script>
     // ============ DROPDOWN CLICK TOGGLE - IMPROVED ============
     document.addEventListener('DOMContentLoaded', function() {
-        // Get all dropdown toggle links
-        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
 
-        dropdownToggles.forEach(function(toggle) {
+        // ===========================
+        // DROPDOWN TOGGLE
+        // ===========================
+        const dropdowns = document.querySelectorAll('.has-dropdown');
+
+        dropdowns.forEach(function(dropdown) {
+
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            const menu = dropdown.querySelector('.dropdown-menu-custom');
+            const arrow = dropdown.querySelector('.dropdown-arrow');
+
             toggle.addEventListener('click', function(e) {
+
                 e.preventDefault();
                 e.stopPropagation();
 
-                const parent = this.closest('.has-dropdown');
-                const dropdownMenu = parent.querySelector('.dropdown-menu-custom');
+                // Close other dropdowns
+                dropdowns.forEach(function(item) {
 
-                if (dropdownMenu) {
-                    // If this dropdown is already open, close it
-                    if (parent.classList.contains('active')) {
-                        parent.classList.remove('active');
-                        dropdownMenu.style.display = 'none';
-                        const arrow = this.querySelector('.dropdown-arrow');
-                        if (arrow) {
-                            arrow.style.transform = 'rotate(0deg)';
-                        }
-                        return;
-                    }
+                    if (item !== dropdown) {
 
-                    // Close all other dropdowns
-                    document.querySelectorAll('.has-dropdown.active').forEach(function(item) {
                         item.classList.remove('active');
-                        const menu = item.querySelector('.dropdown-menu-custom');
-                        if (menu) {
-                            menu.style.display = 'none';
-                        }
-                        const arrow = item.querySelector('.dropdown-arrow');
-                        if (arrow) {
-                            arrow.style.transform = 'rotate(0deg)';
-                        }
-                    });
 
-                    // Open this dropdown
-                    parent.classList.add('active');
-                    dropdownMenu.style.display = 'block';
-                    const arrow = this.querySelector('.dropdown-arrow');
-                    if (arrow) {
-                        arrow.style.transform = 'rotate(180deg)';
+                        const m = item.querySelector('.dropdown-menu-custom');
+                        const a = item.querySelector('.dropdown-arrow');
+
+                        if (m) m.style.display = 'none';
+                        if (a) a.style.transform = 'rotate(0deg)';
                     }
+
+                });
+
+                // Toggle current dropdown
+                if (dropdown.classList.contains('active')) {
+
+                    dropdown.classList.remove('active');
+
+                    menu.style.display = 'none';
+
+                    if (arrow)
+                        arrow.style.transform = 'rotate(0deg)';
+
+                } else {
+
+                    dropdown.classList.add('active');
+
+                    menu.style.display = 'block';
+
+                    if (arrow)
+                        arrow.style.transform = 'rotate(180deg)';
+
+                }
+
+            });
+
+        });
+
+
+        // ==========================================
+        // KEEP CURRENT DROPDOWN OPEN AFTER PAGE LOAD
+        // ==========================================
+        const currentUrl = window.location.href;
+
+        document.querySelectorAll('.dropdown-item-custom').forEach(function(item) {
+
+            if (item.href === currentUrl ||
+                currentUrl.startsWith(item.href)) {
+
+                item.classList.add('active');
+
+                const parent = item.closest('.has-dropdown');
+
+                if (parent) {
+
+                    parent.classList.add('active');
+
+                    const menu = parent.querySelector('.dropdown-menu-custom');
+                    const arrow = parent.querySelector('.dropdown-arrow');
+
+                    if (menu)
+                        menu.style.display = 'block';
+
+                    if (arrow)
+                        arrow.style.transform = 'rotate(180deg)';
+
+                }
+
+            }
+
+        });
+
+
+        // ===========================
+        // CLICK OUTSIDE
+        // ===========================
+        document.addEventListener('click', function(e) {
+
+            if (!e.target.closest('.admin-sidebar')) {
+
+                dropdowns.forEach(function(dropdown) {
+
+                    dropdown.classList.remove('active');
+
+                    const menu = dropdown.querySelector('.dropdown-menu-custom');
+                    const arrow = dropdown.querySelector('.dropdown-arrow');
+
+                    if (menu)
+                        menu.style.display = 'none';
+
+                    if (arrow)
+                        arrow.style.transform = 'rotate(0deg)';
+
+                });
+
+            }
+
+        });
+
+
+        // ===========================
+        // MARK PAYMENTS VIEWED
+        // ===========================
+        window.markPaymentsViewed = function() {
+
+            const badge = document.getElementById("pendingBadge");
+
+            if (badge) {
+
+                badge.style.display = "none";
+
+                badge.innerHTML = "";
+
+            }
+
+            fetch('{{ route('admin.payments.mark-viewed') }}', {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                    "Content-Type": "application/json"
                 }
             });
-        });
 
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.has-dropdown')) {
-                document.querySelectorAll('.has-dropdown.active').forEach(function(item) {
-                    item.classList.remove('active');
-                    const menu = item.querySelector('.dropdown-menu-custom');
-                    if (menu) {
-                        menu.style.display = 'none';
-                    }
-                    const arrow = item.querySelector('.dropdown-arrow');
-                    if (arrow) {
-                        arrow.style.transform = 'rotate(0deg)';
-                    }
-                });
-            }
-        });
-
-        // ===== Function to mark payments as viewed =====
-        function markPaymentsViewed() {
-            fetch('{{ route('admin.payments.mark-viewed') }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    }
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const badge = document.getElementById('pendingBadge');
-                        if (badge) {
-                            badge.style.display = 'none';
-                        }
-                    }
-                });
         }
 
-        // Make markPaymentsViewed globally accessible
-        window.markPaymentsViewed = markPaymentsViewed;
 
-        // ===== Check for new orders periodically =====
+        // ===========================
+        // CHECK NEW ORDERS
+        // ===========================
         function checkNewOrders() {
+
             fetch('{{ route('admin.payments.check-new') }}')
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
-                    const badge = document.getElementById('pendingBadge');
+
+                    let badge = document.getElementById("pendingBadge");
+
                     if (data.new_count > 0) {
-                        if (badge) {
-                            badge.textContent = data.new_count;
-                            badge.style.display = 'inline-block';
-                        } else {
-                            const navLink = document.getElementById('paymentsNavLink');
-                            if (navLink) {
-                                const newBadge = document.createElement('span');
-                                newBadge.className = 'badge bg-danger ms-2';
-                                newBadge.id = 'pendingBadge';
-                                newBadge.textContent = data.new_count;
-                                navLink.appendChild(newBadge);
-                            }
+
+                        if (!badge) {
+
+                            badge = document.createElement("span");
+
+                            badge.id = "pendingBadge";
+
+                            badge.className = "badge bg-danger ms-2";
+
+                            document.getElementById("paymentsNavLink").appendChild(badge);
+
                         }
-                    } else {
-                        if (badge) {
-                            badge.style.display = 'none';
-                        }
+
+                        badge.innerHTML = data.new_count;
+
+                        badge.style.display = "inline-block";
+
                     }
+
                 });
+
         }
 
-        // Check for new orders every 30 seconds
-        setInterval(checkNewOrders, 30000);
         checkNewOrders();
+
+        checkNewOrders();
+
+        setInterval(checkNewOrders, 2000);
     });
 </script>
 
@@ -909,5 +979,62 @@
             left: 55px;
             width: 180px;
         }
+    }
+
+    .dropdown-item-custom.active {
+        background: rgba(74, 158, 255, 0.18);
+        border-left: 3px solid #4a9eff;
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .dropdown-item-custom.active i {
+        color: #4a9eff;
+    }
+
+    #pendingBadge {
+        animation: badgeBlink 1s infinite;
+    }
+
+    @keyframes badgeBlink {
+
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: .3;
+            transform: scale(1.25);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+    }
+
+    .blinkBadge {
+
+        animation: blink 1s infinite;
+
+    }
+
+    @keyframes blink {
+
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .3;
+            transform: scale(1.25);
+        }
+
+        100% {
+            opacity: 1;
+        }
+
     }
 </style>

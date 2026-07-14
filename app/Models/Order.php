@@ -9,9 +9,17 @@ class Order extends Model
     protected $table = 'orders';
     
     protected $fillable = [
-        'order_number', 'user_id', 'total_amount', 'payment_status', 
-        'order_status', 'payment_method', 'transaction_id', 'payment_id',
-        'payment_details', 'order_date'
+        'order_number', 
+        'user_id', 
+        'total_amount', 
+        'shipping_charge', // ← ADDED THIS FIELD
+        'payment_status', 
+        'order_status', 
+        'payment_method', 
+        'transaction_id', 
+        'payment_id',
+        'payment_details', 
+        'order_date'
     ];
     
     public function user()

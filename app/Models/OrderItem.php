@@ -9,7 +9,17 @@ class OrderItem extends Model
     protected $table = 'order_items';
     
     protected $fillable = [
-        'order_id', 'product_id', 'product_name', 'quantity', 'price'
+        'order_id', 
+        'product_id', 
+        'variant_id',
+        'product_name', 
+        'quantity', 
+        'price',
+        'final_price', // ← ADD THIS
+        'total',
+        'size',
+        'color',
+        'product_image'
     ];
     
     public function order()
@@ -17,9 +27,13 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
     
-    // Add this relationship
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+    
+    public function variant()
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
     }
 }

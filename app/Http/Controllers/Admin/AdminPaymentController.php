@@ -10,56 +10,67 @@ use Illuminate\Support\Facades\DB;
 
 class AdminPaymentController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = Order::with('user');
-        
-        if ($request->search) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('order_number', 'like', "%{$search}%")
-                  ->orWhere('transaction_id', 'like', "%{$search}%")
-                  ->orWhere('payment_id', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($q2) use ($search) {
-                      $q2->where('name', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%")
-                         ->orWhere('phone', 'like', "%{$search}%");
-                  });
-            });
-        }
-        
-        if ($request->payment_status && $request->payment_status != '') {
-            $query->where('payment_status', $request->payment_status);
-        }
-        
-        if ($request->order_status && $request->order_status != '') {
-            $query->where('order_status', $request->order_status);
-        }
-        
-        $sortBy = $request->sort_by ?? 'id';
-        $sortOrder = $request->sort_order ?? 'desc';
-        
-        if ($sortBy == 'customer') {
-            $query->leftJoin('users', 'orders.user_id', '=', 'users.id')
-                  ->select('orders.*')
-                  ->orderBy('users.name', $sortOrder);
-        } elseif ($sortBy == 'total_amount') {
-            $query->orderBy('total_amount', $sortOrder);
-        } elseif ($sortBy == 'order_number') {
-            $query->orderBy('order_number', $sortOrder);
-        } elseif ($sortBy == 'created_at') {
-            $query->orderBy('created_at', $sortOrder);
-        } else {
-            $query->orderBy('id', $sortOrder);
-        }
-        
-        $perPage = $request->per_page ?? 10;
-        $orders = $query->paginate($perPage);
-        
-        session(['payments_last_viewed_at' => now()]);
-        
-        return view('admin.payments.index', compact('orders'));
+  public function index(Request $request)
+{
+    $query = Order::with('user');
+
+    if ($request->search) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('order_number', 'like', "%{$search}%")
+                ->orWhere('transaction_id', 'like', "%{$search}%")
+                ->orWhere('payment_id', 'like', "%{$search}%")
+                ->orWhereHas('user', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+        });
     }
+
+    if ($request->payment_status != '') {
+        $query->where('payment_status', $request->payment_status);
+    }
+
+    if ($request->order_status != '') {
+        $query->where('order_status', $request->order_status);
+    }
+
+    $sortBy = $request->sort_by ?? 'id';
+    $sortOrder = $request->sort_order ?? 'desc';
+
+    switch ($sortBy) {
+
+        case 'customer':
+            $query->leftJoin('users', 'orders.user_id', '=', 'users.id')
+                ->select('orders.*')
+                ->orderBy('users.name', $sortOrder);
+            break;
+
+        case 'total_amount':
+            $query->orderBy('total_amount', $sortOrder);
+            break;
+
+        case 'order_number':
+            $query->orderBy('order_number', $sortOrder);
+            break;
+
+        case 'created_at':
+            $query->orderBy('created_at', $sortOrder);
+            break;
+
+        default:
+            $query->orderBy('id', 'desc');
+    }
+
+    $orders = $query->paginate($request->per_page ?? 10);
+
+    // Hide badge after opening Orders page
+    cache()->forever('orders_last_viewed', now());
+
+    return view('admin.payments.index', compact('orders'));
+}
     
     public function show($id)
     {
@@ -98,22 +109,30 @@ class AdminPaymentController extends Controller
         return redirect()->route('admin.payments')->with('success', 'Order deleted successfully!');
     }
     
-    public function markViewed(Request $request)
-    {
-        session(['payments_last_viewed_at' => now()]);
-        return response()->json(['success' => true]);
-    }
+  public function markViewed(Request $request)
+{
+    cache()->forever('orders_last_viewed', now());
+
+    return response()->json([
+        'success' => true
+    ]);
+}
     
-    public function getNewOrdersCount(Request $request)
-    {
-        $lastViewedAt = session('payments_last_viewed_at', now()->subDays(30));
-        
-        $newCount = Order::where('payment_status', 'PENDING')
-            ->where('created_at', '>', $lastViewedAt)
-            ->count();
-        
-        return response()->json(['new_count' => $newCount]);
-    }
+  public function getNewOrdersCount(Request $request)
+{
+    $lastViewed = cache()->get(
+        'orders_last_viewed',
+        now()->subDays(30)
+    );
+
+    $count = Order::where('payment_status', 'PENDING')
+        ->where('created_at', '>', $lastViewed)
+        ->count();
+
+    return response()->json([
+        'new_count' => $count
+    ]);
+}
     
 public function getOrderDetails($id)
 {
