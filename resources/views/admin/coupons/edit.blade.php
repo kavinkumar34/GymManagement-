@@ -122,7 +122,7 @@
             </div>
 
             <div class="mt-3">
-                <button type="submit" class="btn btn-danger">
+                <button type="submit" class="btn btn-success">
                     <i class="fas fa-save me-1"></i> Update Coupon
                 </button>
                 <a href="{{ route('admin.coupons.index') }}" class="btn btn-secondary">Cancel</a>

@@ -5,7 +5,7 @@
 @section('content')
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4><i class="fas fa-ticket-alt me-2"></i> Coupons</h4>
-        <a href="{{ route('admin.coupons.create') }}" class="btn btn-danger">
+        <a href="{{ route('admin.coupons.create') }}" class="btn btn-success">
             <i class="fas fa-plus me-1"></i> Add New Coupon
         </a>
     </div>

@@ -6,6 +6,9 @@
     nav.navbar, .navbar, footer, .footer, .whatsapp-float, .whatsapp-tooltip {
         display: none !important;
     }
+      .navbar-spacer {
+        display: none !important;
+    }
     
     /* Keep admin sidebar - adjust container */
     body {
@@ -26,6 +29,7 @@
         min-height: 100vh;
         padding: 30px !important;
         background: #f0f4f8;
+        
     }
     
     .card {
@@ -184,7 +188,7 @@
     }
 </style>
 
-<div class="container-fluid">
+<div class="container-fluid" style="margin-top:40px;">
     <div class="card">
         <div class="card-header">
             <h4><i class="fas fa-plus-circle"></i> Add Deliverable State</h4>
@@ -224,7 +228,7 @@
                 </div>
                 
                 <div class="btn-group-custom">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-success">
                         <i class="fas fa-save"></i> Save State
                     </button>
                     <a href="{{ route('admin.pincodes.index') }}" class="btn btn-secondary">

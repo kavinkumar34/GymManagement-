@@ -190,7 +190,27 @@ class PaymentController extends Controller
         $order = $this->createOrder($txnid, $user->id, $totalAmount, $shippingCharge);
         
         foreach ($productItems as $item) {
-            $productImage = $item['product']->image ?? null;
+            $productImage = \App\Models\ProductImage::where('product_id', $item['product']->id)
+    ->where(function($q) use ($item){
+
+        if(!empty($item['variant_id'])){
+            $q->where('variant_id',$item['variant_id']);
+        }else{
+            $q->whereNull('variant_id');
+        }
+
+    })
+    ->orderByDesc('is_main')
+    ->orderBy('display_order')
+    ->value('image_path');
+
+if(!$productImage){
+
+    $productImage = \App\Models\ProductImage::where('product_id',$item['product']->id)
+        ->orderByDesc('is_main')
+        ->orderBy('display_order')
+        ->value('image_path');
+}
             
             // ===== CREATE ORDER ITEM WITH VARIANT DETAILS =====
             if ($item['variant_id']) {
@@ -553,7 +573,27 @@ class PaymentController extends Controller
         ]);
         
         foreach ($productItems as $item) {
-            $productImage = $item['product']->image ?? null;
+            $productImage = \App\Models\ProductImage::where('product_id', $item['product']->id)
+    ->where(function($q) use ($item){
+
+        if(!empty($item['variant_id'])){
+            $q->where('variant_id',$item['variant_id']);
+        }else{
+            $q->whereNull('variant_id');
+        }
+
+    })
+    ->orderByDesc('is_main')
+    ->orderBy('display_order')
+    ->value('image_path');
+
+if(!$productImage){
+
+    $productImage = \App\Models\ProductImage::where('product_id',$item['product']->id)
+        ->orderByDesc('is_main')
+        ->orderBy('display_order')
+        ->value('image_path');
+}
             
             // ===== CREATE ORDER ITEM WITH VARIANT DETAILS =====
             if ($item['variant_id']) {
@@ -731,18 +771,48 @@ class PaymentController extends Controller
             // Get shipping charge from order
             $shippingCharge = $order->shipping_charge ?? 0;
             
-            $items = [];
-            foreach ($order->items as $item) {
-                $items[] = [
-                    'id' => $item->id,
-                    'product_id' => $item->product_id,
-                    'product_name' => $item->product_name,
-                    'quantity' => $item->quantity,
-                    'price' => $item->price,
-                    'final_price' => $item->final_price ?? $item->price, // ← ADDED final_price
-                    'product_image' => $item->product_image ?? ($item->product ? $item->product->image : null)
-                ];
+      $items = [];
+
+foreach ($order->items as $item) {
+
+    $productImage = \App\Models\ProductImage::where('product_id', $item->product_id)
+        ->where(function ($q) use ($item) {
+
+            if ($item->variant_id) {
+                $q->where('variant_id', $item->variant_id);
+            } else {
+                $q->whereNull('variant_id');
             }
+
+        })
+        ->orderByDesc('is_main')
+        ->orderBy('display_order')
+        ->value('image_path');
+
+    if (!$productImage) {
+
+        $productImage = \App\Models\ProductImage::where('product_id', $item->product_id)
+            ->orderByDesc('is_main')
+            ->orderBy('display_order')
+            ->value('image_path');
+    }
+
+    $items[] = [
+
+        'id' => $item->id,
+        'product_id' => $item->product_id,
+        'product_name' => $item->product_name,
+        'quantity' => $item->quantity,
+        'price' => $item->price,
+        'final_price' => $item->final_price ?? $item->price,
+
+        'size' => $item->size,
+        'color' => $item->color,
+
+        'product_image' => $productImage
+
+    ];
+}
             
             return response()->json([
                 'success' => true,

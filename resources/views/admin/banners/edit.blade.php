@@ -44,7 +44,7 @@
                     </div>
                     
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-success">
                             <i class="fas fa-save me-1"></i> Update Banner
                         </button>
                         <a href="{{ route('admin.banners.index') }}" class="btn btn-secondary">

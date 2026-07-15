@@ -1017,10 +1017,14 @@ $navCategories = \App\Models\Category::where('is_active',1)
     <div class="navbar-container">
         <div class="navbar-top">
             <!-- Brand on LEFT side -->
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <i class="fas fa-dumbbell"></i>
-                <strong>Gym Management</strong>
-            </a>
+        <a class="navbar-brand" href="{{ url('/') }}">
+    @php
+        $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
+        $companyName = \App\Models\Setting::get('company_name', 'Gym Management');
+    @endphp
+    <i class="{{ $companyLogo }}"></i>
+    <strong>{{ $companyName }}</strong>
+</a>
             
             <!-- Icons on RIGHT side -->
             <div class="nav-icons">

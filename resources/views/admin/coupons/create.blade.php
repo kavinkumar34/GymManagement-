@@ -23,7 +23,7 @@
                                 <input type="text" name="code" id="couponCode"
                                     class="form-control @error('code') is-invalid @enderror" value="{{ old('code') }}"
                                     placeholder="e.g., SAVE10" required>
-                                <button type="button" class="btn btn-primary" onclick="generateCouponCode()">
+                                <button type="button" class="btn btn-success" onclick="generateCouponCode()">
                                     <i class="fas fa-sync-alt me-1"></i> Generate
                                 </button>
                             </div>
@@ -158,7 +158,7 @@
                 </div>
 
                 <div class="mt-3">
-                    <button type="submit" class="btn btn-danger">
+                    <button type="submit" class="btn btn-success">
                         <i class="fas fa-save me-1"></i> Create Coupon
                     </button>
                     <a href="{{ route('admin.coupons.index') }}" class="btn btn-secondary">Cancel</a>

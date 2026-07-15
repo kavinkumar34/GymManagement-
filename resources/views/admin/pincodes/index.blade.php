@@ -10,6 +10,9 @@
     nav.navbar, .navbar {
         display: none !important;
     }
+        .navbar-spacer {
+        display: none !important;
+    }
     
     /* Hide WhatsApp float button and tooltip */
     .whatsapp-float, .whatsapp-tooltip {

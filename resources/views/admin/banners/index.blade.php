@@ -1,12 +1,20 @@
 @extends('layouts.admin-layout')
 
 @section('content')
+<style>
+.cor{
+        background: linear-gradient(180deg, #0d1b2a 0%, #1b3a5c 50%, #0d1b2a 100%);
+                color: #ffffff;
+
+
+}
+</style>
 <div class="admin-main-content">
     <div class="container-fluid">
         <div class="card">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h4><i class="fas fa-image"></i> Banner Management</h4>
-                <a href="{{ route('admin.banners.create') }}" class="btn btn-light">
+            <div class="card-header cor text-white d-flex justify-content-between align-items-center">
+                <h4> Banner Management</h4>
+                <a href="{{ route('admin.banners.create') }}" class="btn btn-success">
                     <i class="fas fa-plus"></i> Add Banner
                 </a>
             </div>

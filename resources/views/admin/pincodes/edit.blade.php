@@ -10,6 +10,9 @@
     nav.navbar, .navbar, footer, .footer, .whatsapp-float, .whatsapp-tooltip {
         display: none !important;
     }
+      .navbar-spacer {
+        display: none !important;
+    }
     
     /* Keep admin sidebar - adjust container */
     body {
@@ -278,7 +281,7 @@
     <span id="alertMessage">Alert Message</span>
 </div>
 
-<div class="container-fluid">
+<div class="container-fluid" style="margin-top:30px;">
     <div class="card">
         <div class="card-header">
             <h4><i class="fas fa-edit"></i> Edit Deliverable State</h4>
@@ -323,7 +326,7 @@
                 </div>
                 
                 <div class="btn-group-custom">
-                    <button type="submit" class="btn btn-primary" id="updateBtn">
+                    <button type="submit" class="btn btn-success" id="updateBtn">
                         <i class="fas fa-save"></i> Update State
                     </button>
                     <a href="{{ route('admin.pincodes.index') }}" class="btn btn-secondary">
