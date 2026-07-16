@@ -816,3 +816,9 @@ Route::get('/debug-coupon/{code}', function($code) {
         'message' => 'Coupon not found'
     ]);
 });
+
+
+
+// ============ MEMBER/TRAINER LOGIN WITH ROLE SELECTION ============
+Route::get('/member-trainer-login', [App\Http\Controllers\Auth\MemberTrainerLoginController::class, 'showLoginForm'])->name('member.trainer.login');
+Route::post('/member-trainer-login', [App\Http\Controllers\Auth\MemberTrainerLoginController::class, 'login'])->name('member.trainer.login.submit');

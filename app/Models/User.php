@@ -18,6 +18,7 @@ class User extends Authenticatable
         'otp',
         'otp_expires_at',
         'is_verified',
+        'role', // 👈 ADD THIS - For Member/Trainer/Admin role
     ];
 
     protected $hidden = [
@@ -54,5 +55,45 @@ class User extends Authenticatable
             return true;
         }
         return false;
+    }
+
+    /**
+     * Check if user is a member
+     */
+    public function isMember()
+    {
+        return $this->role === 'member';
+    }
+
+    /**
+     * Check if user is a trainer
+     */
+    public function isTrainer()
+    {
+        return $this->role === 'trainer';
+    }
+
+    /**
+     * Check if user is an admin
+     */
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Get member record for this user
+     */
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'email', 'email');
+    }
+
+    /**
+     * Get trainer record for this user
+     */
+    public function trainer()
+    {
+        return $this->hasOne(Trainer::class, 'email', 'email');
     }
 }
