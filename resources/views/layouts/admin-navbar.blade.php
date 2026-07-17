@@ -304,6 +304,12 @@
                         <i class="fas fa-user-plus"></i> Add Member
                     </a>
                 </li>
+
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.member.index') }}">
+                        <i class="fas fa-list"></i> Member List
+                    </a>
+                </li>
             </ul>
         </li>
 
@@ -319,8 +325,36 @@
                         <i class="fas fa-user-plus"></i> Add Trainer
                     </a>
                 </li>
+
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.trainer.index') }}">
+                        <i class="fas fa-list"></i> Trainer List
+                    </a>
+                </li>
             </ul>
         </li>
+        <!-- Membership Dropdown -->
+<li class="nav-item has-dropdown">
+    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+        <i class="fas fa-id-card"></i>
+        <span>Membership</span>
+        <span class="dropdown-arrow">▼</span>
+    </a>
+
+    <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.membership.create') }}">
+                <i class="fas fa-plus-circle"></i> Add Membership
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.membership.index') }}">
+                <i class="fas fa-list"></i> Membership List
+            </a>
+        </li>
+    </ul>
+</li>
     </ul>
 
     <!-- Sidebar Footer -->

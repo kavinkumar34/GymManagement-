@@ -1,5 +1,4 @@
-@extends('layouts.dashboard-layout')
-
+@extends('layouts.trainer-layout')
 @section('content')
 <div class="row">
     <div class="col-12">

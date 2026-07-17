@@ -6,7 +6,7 @@
             <div class="col-md-6">
                 <div class="card shadow-lg border-0">
                     <div class="card-header bg-primary text-white text-center py-3">
-                        <h4 class="mb-0"><i class="fas fa-user-check me-2"></i> Member / Trainer Login</h4>
+                        <h4 class="mb-0"><i class="fas fa-user-check me-2"></i>Only Registered Member / Trainer Login</h4>
                     </div>
                     <div class="card-body p-4">
                         @if (session('error'))

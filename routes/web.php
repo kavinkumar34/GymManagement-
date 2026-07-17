@@ -53,6 +53,10 @@ use App\Models\SubCategory;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
+// ============ Gym Memebership Controller============
+use App\Http\Controllers\Admin\MembershipController;
+
+
 // ============ HOME PAGE ============
 Route::get('/', function () {
     return view('home');
@@ -819,6 +823,35 @@ Route::get('/debug-coupon/{code}', function($code) {
 
 
 
-// ============ MEMBER/TRAINER LOGIN WITH ROLE SELECTION ============
+// ============ MEMBER/TRAINER LOGIN WITH ROLE SELECTION FOR GYM MANAGEMENET ============
+
 Route::get('/member-trainer-login', [App\Http\Controllers\Auth\MemberTrainerLoginController::class, 'showLoginForm'])->name('member.trainer.login');
 Route::post('/member-trainer-login', [App\Http\Controllers\Auth\MemberTrainerLoginController::class, 'login'])->name('member.trainer.login.submit');
+
+Route::get('/admin/members-list', [MemberController::class, 'index'])
+    ->name('admin.member.index');
+
+Route::get('/admin/trainers-list', [TrainerController::class, 'index'])
+    ->name('admin.trainer.index');
+
+
+    Route::get('/admin/membership/create', [MembershipController::class, 'create'])
+    ->name('admin.membership.create');
+
+Route::post('/admin/membership/store', [MembershipController::class, 'store'])
+    ->name('admin.membership.store');
+
+Route::get('/admin/membership', [MembershipController::class, 'index'])
+    ->name('admin.membership.index');
+    Route::get('/admin/membership/{id}/edit', [MembershipController::class, 'edit'])
+    ->name('admin.membership.edit');
+
+Route::put('/admin/membership/{id}', [MembershipController::class, 'update'])
+    ->name('admin.membership.update');
+
+Route::delete('/admin/membership/{id}', [MembershipController::class, 'destroy'])
+    ->name('admin.membership.destroy');
+
+    // Member - Membership
+Route::get('/member/membership', [App\Http\Controllers\Member\MemberController::class, 'membership'])->name('member.membership');
+Route::post('/member/buy-membership', [App\Http\Controllers\Member\MemberController::class, 'buyMembership'])->name('member.buy.membership');
