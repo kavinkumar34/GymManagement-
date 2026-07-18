@@ -318,6 +318,11 @@
         <span class="badge">Active</span>
     </a>
                 </li>
+                 <li>
+    <a href="{{ route('member.packages') }}">
+        <i class="fas fa-shopping-bag"></i> Packages
+    </a>
+</li>
                 <li>
                     <a href="#">
                         <i class="fas fa-dumbbell"></i> Workout
@@ -353,11 +358,7 @@
                         <i class="fas fa-credit-card"></i> Payments
                     </a>
                 </li>
-                <li>
-                    <a href="#">
-                        <i class="fas fa-shopping-bag"></i> Orders
-                    </a>
-                </li>
+          
                 <li>
                     <a href="#">
                         <i class="fas fa-comment-dots"></i> Chat

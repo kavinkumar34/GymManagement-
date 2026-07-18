@@ -55,6 +55,9 @@ use Illuminate\Http\Request;
 
 // ============ Gym Memebership Controller============
 use App\Http\Controllers\Admin\MembershipController;
+use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Member\MemberPackageController;
+
 
 
 // ============ HOME PAGE ============
@@ -855,3 +858,17 @@ Route::delete('/admin/membership/{id}', [MembershipController::class, 'destroy']
     // Member - Membership
 Route::get('/member/membership', [App\Http\Controllers\Member\MemberController::class, 'membership'])->name('member.membership');
 Route::post('/member/buy-membership', [App\Http\Controllers\Member\MemberController::class, 'buyMembership'])->name('member.buy.membership');
+
+// Admin - Package Routes
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
+    Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
+    Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
+    Route::get('/packages/{id}/edit', [PackageController::class, 'edit'])->name('package.edit');
+    Route::put('/packages/{id}', [PackageController::class, 'update'])->name('package.update');
+    Route::delete('/packages/{id}', [PackageController::class, 'destroy'])->name('package.destroy');
+});
+
+// Member - Packages
+Route::get('/member/packages', [MemberPackageController::class, 'index'])->name('member.packages');
+Route::post('/member/buy-package', [MemberPackageController::class, 'buy'])->name('member.buy.package');

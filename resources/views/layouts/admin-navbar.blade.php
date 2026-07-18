@@ -333,6 +333,8 @@
                 </li>
             </ul>
         </li>
+
+
         <!-- Membership Dropdown -->
 <li class="nav-item has-dropdown">
     <a class="nav-link dropdown-toggle" href="javascript:void(0)">
@@ -351,6 +353,32 @@
         <li>
             <a class="dropdown-item-custom" href="{{ route('admin.membership.index') }}">
                 <i class="fas fa-list"></i> Membership List
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+
+<!--Package GropDown -->
+
+<li class="nav-item has-dropdown">
+    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+        <i class="fas fa-id-card"></i>
+        <span>Package</span>
+        <span class="dropdown-arrow">▼</span>
+    </a>
+
+    <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.package.create') }}">
+                <i class="fas fa-plus-circle"></i> Add Package
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.package.index') }}">
+                <i class="fas fa-list"></i> Package List
             </a>
         </li>
     </ul>
