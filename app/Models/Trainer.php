@@ -19,4 +19,9 @@ class Trainer extends Model
     {
         return $this->hasMany(Member::class, 'trainer_id');
     }
+        // Get assigned members count
+    public function getMemberCountAttribute()
+    {
+        return $this->members()->count();
+    }
 }

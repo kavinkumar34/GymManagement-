@@ -29,4 +29,9 @@ class Member extends Model
     {
         return $this->belongsTo(Trainer::class, 'trainer_id');
     }
+      // Get trainer name
+    public function getTrainerNameAttribute()
+    {
+        return $this->trainer ? $this->trainer->name : 'Not Assigned';
+    }
 }

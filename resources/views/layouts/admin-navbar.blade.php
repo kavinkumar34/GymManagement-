@@ -291,6 +291,11 @@
         <li class="nav-divider">
             <span class="divider-text">Gym One</span>
         </li>
+           <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.gym.dashboard') }}">
+                 <i class="fas fa-dumbbell"></i> <span>Dashboard</span>
+            </a>
+        </li>
 
         <!-- Members Dropdown -->
         <li class="nav-item has-dropdown">
@@ -379,6 +384,28 @@
         <li>
             <a class="dropdown-item-custom" href="{{ route('admin.package.index') }}">
                 <i class="fas fa-list"></i> Package List
+            </a>
+        </li>
+    </ul>
+</li>
+<!-- ============================================ -->
+<!-- ASSIGN TRAINER - NEW MENU                    -->
+<!-- ============================================ -->
+<li class="nav-item has-dropdown">
+    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+        <i class="fas fa-user-tag"></i>
+        <span>Assign Trainer</span>
+        <span class="dropdown-arrow">▼</span>
+    </a>
+    <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.assign.trainer.index') }}">
+                <i class="fas fa-users"></i> Assign Trainer to Member
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.assign.trainer.list') }}">
+                <i class="fas fa-list"></i> Assigned Members List
             </a>
         </li>
     </ul>

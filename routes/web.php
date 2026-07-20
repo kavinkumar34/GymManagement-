@@ -57,6 +57,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\MembershipController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Member\MemberPackageController;
+use App\Http\Controllers\Admin\DashboardController;
 
 
 
@@ -872,3 +873,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
 // Member - Packages
 Route::get('/member/packages', [MemberPackageController::class, 'index'])->name('member.packages');
 Route::post('/member/buy-package', [MemberPackageController::class, 'buy'])->name('member.buy.package');
+
+Route::get('/admin/gym-dashboard', [DashboardController::class, 'index'])
+    ->name('admin.gym.dashboard');
+
+// ADMIN - ASSIGN TRAINER ROUTES
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Main Assign Trainer Pages
+    Route::get('/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'index'])->name('assign.trainer.index');
+    Route::get('/assign-trainer/list', [App\Http\Controllers\Admin\AssignTrainerController::class, 'assignedList'])->name('assign.trainer.list');
+    
+    // 👇 Bulk Assign Route
+    Route::post('/assign-trainer/bulk', [App\Http\Controllers\Admin\AssignTrainerController::class, 'bulkAssign'])->name('assign.trainer.bulk');
+    
+    // Assign/Remove Trainer - Individual Member Actions
+    Route::get('/member/{id}/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'assignForm'])->name('member.assign.trainer');
+    Route::post('/member/{id}/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'storeAssign'])->name('member.assign.trainer.store');
+    Route::get('/member/{id}/remove-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'removeTrainer'])->name('member.remove.trainer');
+});
