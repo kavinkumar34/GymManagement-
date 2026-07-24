@@ -38,6 +38,7 @@
                         <thead class="table-dark">
                             <tr>
                                 <th width="60">#</th>
+                                <th width="100">Image</th>
                                 <th>Package Name</th>
                                 <th>Price</th>
                                 <th>Duration</th>
@@ -51,6 +52,17 @@
                             @forelse($packages as $key => $package)
                                 <tr>
                                     <td>{{ $packages->firstItem() + $key }}</td>
+                                    <td>
+    @if($package->image)
+        <img src="{{ asset('storage/' . $package->image) }}"
+             width="70"
+             height="70"
+             class="rounded border"
+             style="object-fit: cover;">
+    @else
+        <span class="text-muted">No Image</span>
+    @endif
+</td>
 
                                     <td>
                                         <strong>{{ $package->package_name }}</strong>
@@ -116,7 +128,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7">
+                                    <td colspan="8">
                                         <div class="text-center p-4">
                                             <h5 class="text-muted">No Packages Found</h5>
                                             <a href="{{ route('admin.package.create') }}" class="btn btn-primary mt-2">

@@ -34,8 +34,10 @@
                     </div>
                 @endif
 
-                <form action="{{ route('admin.package.store') }}" method="POST">
-                    @csrf
+<form action="{{ route('admin.package.store') }}"
+      method="POST"
+      enctype="multipart/form-data">
+                          @csrf
 
                     <div class="row">
 
@@ -55,6 +57,30 @@
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
+                        <!-- Package Image -->
+<div class="col-md-6 mb-3">
+    <label for="image" class="form-label fw-bold">
+        Package Image
+    </label>
+
+    <input type="file"
+        name="image"
+        id="image"
+        class="form-control @error('image') is-invalid @enderror"
+        accept="image/*">
+
+    @error('image')
+        <span class="invalid-feedback">{{ $message }}</span>
+    @enderror
+
+    <!-- Image Preview -->
+    <div class="mt-2">
+        <img id="imagePreview"
+            src=""
+            alt="Preview"
+            style="display:none; width:120px; height:120px; object-fit:cover; border:1px solid #ddd; border-radius:8px;">
+    </div>
+</div>
 
                         <!-- Price -->
                         <div class="col-md-3 mb-3">
@@ -200,5 +226,22 @@
 
     </div>
 </div>
+<script>
+document.getElementById('image').addEventListener('change', function (e) {
+
+    const preview = document.getElementById('imagePreview');
+
+    if (e.target.files.length > 0) {
+
+        preview.src = URL.createObjectURL(e.target.files[0]);
+        preview.style.display = 'block';
+
+    } else {
+
+        preview.style.display = 'none';
+    }
+
+});
+</script>
 
 @endsection

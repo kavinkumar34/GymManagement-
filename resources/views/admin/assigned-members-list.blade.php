@@ -115,12 +115,15 @@
 <!-- ============================================ -->
 <!-- VIEW MEMBERS MODAL                          -->
 <!-- ============================================ -->
+<!-- ============================================ -->
+<!-- VIEW MEMBERS MODAL                          -->
+<!-- ============================================ -->
 @foreach($groupedMembers as $trainerId => $memberList)
     @php
         $trainer = $memberList->first()->trainer;
     @endphp
     <div class="modal fade" id="viewMembersModal{{ $trainerId }}" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">
@@ -138,6 +141,8 @@
                                     <th>Member Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
+                                    <th>Goal Type</th>
+                                    <th>Plan Type</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -147,6 +152,28 @@
                                         <td><strong>{{ $member->name }}</strong></td>
                                         <td>{{ $member->email }}</td>
                                         <td>{{ $member->phone }}</td>
+                                        <td>
+                                            <span class="badge" style="background: #fce7f3; color: #db2777; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem;">
+                                                <i class="fas fa-bullseye me-1"></i> {{ $member->goal_type ?? 'Fitness' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if($member->plan_type == 'membership')
+                                                <span class="badge" style="background: #dcfce7; color: #15803d; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem;">
+                                                    <i class="fas fa-id-card me-1"></i> Membership
+                                                </span>
+                                            @elseif($member->plan_type == 'package')
+                                                <span class="badge" style="background: #fef3c7; color: #92400e; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem;">
+                                                    <i class="fas fa-box me-1"></i> Package
+                                                </span>
+                                            @else
+                                                <span class="badge bg-secondary">N/A</span>
+                                            @endif
+                                            <br>
+                                            <small style="color: #64748b; font-size: 0.7rem;">
+                                                {{ $member->membership_plan ?? 'Basic' }}
+                                            </small>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

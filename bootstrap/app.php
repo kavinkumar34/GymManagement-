@@ -20,6 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
     $middleware->validateCsrfTokens(except: [
         '/payment/success',
         '/payment/failure',
+           // Gym Membership PayU Callback Routes
+    '/member/membership-payment-success',
+    '/member/membership-payment-failure',
+
+    // Optional (recommended)
+    'member/membership-payment-success',
+    'member/membership-payment-failure',
     ]);
 })
     ->withExceptions(function (Exceptions $exceptions) {

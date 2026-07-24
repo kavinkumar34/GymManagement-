@@ -7,13 +7,20 @@
                 <h4><i class="fas fa-chalkboard-user"></i> Trainer Dashboard</h4>
             </div>
             <div class="card-body">
+                
+            @php
+    $trainer = App\Models\Trainer::find(session('gym_user_id'));
+    $members = $trainer ? $trainer->members : collect();
+    $memberCount = $members->count();
+@endphp
+                
                 <!-- Stats Cards -->
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <div class="card bg-primary text-white">
                             <div class="card-body">
                                 <h5>Assigned Members</h5>
-                                <h2>25</h2>
+                                <h2>{{ $memberCount }}</h2>
                             </div>
                         </div>
                     </div>
@@ -70,46 +77,55 @@
                     </table>
                 </div>
                 
-                <!-- Assigned Members List -->
+                <!-- Assigned Members List - Dynamic -->
                 <div class="mt-4">
                     <h5>Assigned Members List</h5>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Membership</th>
-                                <th>Progress</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>John Doe</td>
-                                <td>Premium</td>
-                                <td>75%</td>
-                                <td><button class="btn btn-sm btn-primary">View</button></td>
-                            </tr>
-                            <tr>
-                                <td>Jane Smith</td>
-                                <td>Basic</td>
-                                <td>60%</td>
-                                <td><button class="btn btn-sm btn-primary">View</button></td>
-                            </tr>
-                            <tr>
-                                <td>Mike Johnson</td>
-                                <td>Standard</td>
-                                <td>90%</td>
-                                <td><button class="btn btn-sm btn-primary">View</button></td>
-                            </tr>
-                            <tr>
-                                <td>Sarah Williams</td>
-                                <td>Premium</td>
-                                <td>45%</td>
-                                <td><button class="btn btn-sm btn-primary">View</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    
+                    @if($memberCount > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Membership</th>
+                                        <th>Goal</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($members as $key => $member)
+                                        <tr>
+                                            <td>{{ $key + 1 }}</td>
+                                            <td><strong>{{ $member->name }}</strong></td>
+                                            <td>{{ $member->email }}</td>
+                                            <td>{{ $member->phone }}</td>
+                                            <td>
+                                                <span class="badge bg-primary">
+                                                    {{ $member->membership_plan ?? 'N/A' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $member->goal_type ?? 'N/A' }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye"></i> View
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="alert alert-warning">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No members assigned to you yet.
+                        </div>
+                    @endif
                 </div>
+                
             </div>
         </div>
     </div>

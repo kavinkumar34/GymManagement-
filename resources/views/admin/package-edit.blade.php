@@ -34,8 +34,10 @@
                     </div>
                 @endif
 
-                <form action="{{ route('admin.package.update', $package->id) }}" method="POST">
-                    @csrf
+<form action="{{ route('admin.package.update', $package->id) }}"
+      method="POST"
+      enctype="multipart/form-data">
+                          @csrf
                     @method('PUT')
 
                     <div class="row">
@@ -55,6 +57,48 @@
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
+                        <!-- Package Image -->
+<div class="col-md-6 mb-3">
+
+    <label class="form-label fw-bold">
+        Package Image
+    </label>
+
+    <input type="file"
+           name="image"
+           id="image"
+           class="form-control"
+           accept="image/*">
+
+    @error('image')
+        <span class="text-danger">{{ $message }}</span>
+    @enderror
+
+    <div class="mt-2">
+
+        @if($package->image)
+
+            <img id="imagePreview"
+                 src="{{ asset('storage/'.$package->image) }}"
+                 width="120"
+                 height="120"
+                 class="border rounded"
+                 style="object-fit:cover;">
+
+        @else
+
+            <img id="imagePreview"
+                 src=""
+                 width="120"
+                 height="120"
+                 class="border rounded"
+                 style="display:none;object-fit:cover;">
+
+        @endif
+
+    </div>
+
+</div>
 
                         <!-- Price -->
                         <div class="col-md-3 mb-3">
@@ -196,5 +240,19 @@
 
     </div>
 </div>
+<script>
+document.getElementById('image').addEventListener('change', function(e){
+
+    let preview=document.getElementById('imagePreview');
+
+    if(e.target.files.length){
+
+        preview.src=URL.createObjectURL(e.target.files[0]);
+        preview.style.display='block';
+
+    }
+
+});
+</script>
 
 @endsection

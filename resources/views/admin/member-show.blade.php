@@ -41,44 +41,86 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col-md-6">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th width="30%">Height</th>
-                                <td>{{ $member->height ?? 'Not specified' }} cm</td>
-                            </tr>
-                            <tr>
-                                <th>Weight</th>
-                                <td>{{ $member->weight ?? 'Not specified' }} kg</td>
-                            </tr>
-                            <tr>
-                                <th>BMI</th>
-                                <td>{{ $member->bmi ?? 'Not calculated' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Membership Plan</th>
-                                <td><span class="badge bg-primary">{{ $member->membership_plan ?? 'Basic' }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>Membership Duration</th>
-                                <td>{{ $member->membership_duration ?? '1 Month' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Join Date</th>
-                                <td>{{ $member->join_date }}</td>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <td>
-                                    @if($member->status == 'Active')
-                                        <span class="badge bg-success">Active</span>
-                                    @else
-                                        <span class="badge bg-danger">Inactive</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                 <div class="col-md-6">
+
+    @if($member->photo)
+    <div class="text-center mb-3">
+        <img src="{{ asset('storage/'.$member->photo) }}"
+             width="140"
+             height="140"
+             class="rounded-circle border shadow-sm"
+             style="object-fit:cover;">
+    </div>
+    @endif
+
+    <table class="table table-bordered">
+
+        <tr>
+            <th width="30%">Height</th>
+            <td>{{ $member->height ?? 'Not specified' }} cm</td>
+        </tr>
+
+        <tr>
+            <th>Weight</th>
+            <td>{{ $member->weight ?? 'Not specified' }} kg</td>
+        </tr>
+
+        <tr>
+            <th>BMI</th>
+            <td>{{ $member->bmi ?? 'Not calculated' }}</td>
+        </tr>
+
+        <tr>
+            <th>Plan Type</th>
+            <td>
+                @if($member->plan_type=='membership')
+                    <span class="badge bg-primary">Membership</span>
+                @elseif($member->plan_type=='package')
+                    <span class="badge bg-success">Package</span>
+                @else
+                    <span class="badge bg-secondary">Not Selected</span>
+                @endif
+            </td>
+        </tr>
+
+        <tr>
+            <th>Membership / Package</th>
+            <td>
+                <span class="badge bg-info">
+                    {{ $member->membership_plan ?? 'Not Selected' }}
+                </span>
+            </td>
+        </tr>
+
+        <tr>
+            <th>Duration</th>
+            <td>{{ $member->membership_duration ?? '-' }}</td>
+        </tr>
+
+        <tr>
+            <th>Final Price</th>
+            <td>₹ {{ number_format($member->final_price ?? 0,2) }}</td>
+        </tr>
+
+        <tr>
+            <th>Join Date</th>
+            <td>{{ $member->join_date }}</td>
+        </tr>
+
+        <tr>
+            <th>Status</th>
+            <td>
+                @if($member->status=='Active')
+                    <span class="badge bg-success">Active</span>
+                @else
+                    <span class="badge bg-danger">Inactive</span>
+                @endif
+            </td>
+        </tr>
+
+    </table>
+
+</div>
                 </div>
 
                 <div class="row mt-3">
@@ -110,6 +152,15 @@
                                 <th>Goal Type</th>
                                 <td>{{ $member->goal_type ?? 'Fitness' }}</td>
                             </tr>
+                            <tr>
+    <th>Created At</th>
+    <td>{{ $member->created_at ? $member->created_at->format('d-m-Y h:i A') : '-' }}</td>
+</tr>
+
+<tr>
+    <th>Updated At</th>
+    <td>{{ $member->updated_at ? $member->updated_at->format('d-m-Y h:i A') : '-' }}</td>
+</tr>
                         </table>
                     </div>
                 </div>

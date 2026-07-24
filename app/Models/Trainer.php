@@ -24,4 +24,13 @@ class Trainer extends Model
     {
         return $this->members()->count();
     }
+    public function memberAttendances()
+{
+    return $this->hasMany(MemberAttendance::class, 'trainer_id');
+}
+
+public function trainerAttendances()
+{
+    return $this->hasMany(TrainerAttendance::class, 'trainer_id');
+}
 }

@@ -10,8 +10,9 @@ class Member extends Model
     
     protected $fillable = [
         'member_id', 'name', 'gender', 'dob', 'age', 'phone', 'email', 'address',
-        'height', 'weight', 'bmi', 'emergency_contact', 'join_date', 'membership_plan',
-        'membership_duration', 'trainer_id', 'medical_issues', 'goal_type', 'photo', 'status'
+        'height', 'weight', 'bmi', 'emergency_contact', 'join_date',    'plan_type',          // <-- Add this
+ 'membership_plan',
+        'membership_duration', 'final_price', 'trainer_id', 'medical_issues', 'goal_type', 'photo', 'status'
     ];
     
     // Calculate BMI automatically
@@ -29,9 +30,14 @@ class Member extends Model
     {
         return $this->belongsTo(Trainer::class, 'trainer_id');
     }
-      // Get trainer name
+    
+    // Get trainer name
     public function getTrainerNameAttribute()
     {
         return $this->trainer ? $this->trainer->name : 'Not Assigned';
     }
+    public function attendances()
+{
+    return $this->hasMany(MemberAttendance::class, 'member_id');
+}
 }

@@ -58,6 +58,17 @@ use App\Http\Controllers\Admin\MembershipController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Member\MemberPackageController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Trainer\DietController;
+use App\Http\Controllers\Member\DietController as MemberDietController;
+use App\Http\Controllers\Admin\MemberAttendanceController;
+use App\Http\Controllers\Admin\TrainerAttendanceController as AdminTrainerAttendanceController;
+use App\Http\Controllers\Trainer\MemberAttendanceController as TrainerMemberAttendanceController;
+use App\Http\Controllers\Trainer\TrainerAttendanceController as TrainerTrainerAttendanceController;
+use App\Http\Controllers\Member\AttendanceController;
+use App\Http\Controllers\Member\ProgressController;
+use App\Http\Controllers\Member\AppointmentController as MemberAppointmentController;
+use App\Http\Controllers\Trainer\AppointmentController as TrainerAppointmentController;
+
 
 
 
@@ -316,13 +327,12 @@ Route::get('coupons/{id}/view', [CouponController::class, 'view'])->name('admin.
 // ============ REVIEW SUBMIT ROUTE (PUBLIC - FOR USERS) ============
 Route::post('/submit-product-review', [ProductReviewController::class, 'store'])->name('submit.review')->middleware('auth');
 
-// ============ TRAINER ROUTES ============
-Route::middleware(['auth'])->prefix('trainer')->name('trainer.')->group(function () {
+Route::prefix('trainer')->name('trainer.')->group(function () {
     Route::get('/dashboard', [TrainerDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/members', [App\Http\Controllers\Trainer\TrainerMemberController::class, 'index'])->name('members');
 });
 
-// ============ MEMBER ROUTES ============
-Route::middleware(['auth'])->prefix('member')->name('member.')->group(function () {
+Route::prefix('member')->name('member.')->group(function () {
     Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
 });
 
@@ -857,9 +867,28 @@ Route::delete('/admin/membership/{id}', [MembershipController::class, 'destroy']
     ->name('admin.membership.destroy');
 
     // Member - Membership
-Route::get('/member/membership', [App\Http\Controllers\Member\MemberController::class, 'membership'])->name('member.membership');
-Route::post('/member/buy-membership', [App\Http\Controllers\Member\MemberController::class, 'buyMembership'])->name('member.buy.membership');
+// Member - Membership with auth middleware
+// ============ MEMBER ROUTES ============
+Route::prefix('member')->name('member.')->group(function () {
+    Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/membership', [App\Http\Controllers\Member\MemberController::class, 'membership'])->name('membership');
+    Route::post('/buy-membership', [App\Http\Controllers\Member\MemberController::class, 'buyMembership'])->name('buy.membership');
+    
+    // ✅ Payment Routes - CSRF Excluded
+Route::post('/membership-payment-success', [App\Http\Controllers\Member\MemberController::class, 'paymentSuccess'])
+    ->name('payment.success')
+    ->withoutMiddleware([
+        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class
+    ]);
 
+Route::post('/membership-payment-failure', [App\Http\Controllers\Member\MemberController::class, 'paymentFailure'])
+    ->name('payment.failure')
+    ->withoutMiddleware([
+        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class
+    ]);
+    
+    Route::get('/payment/success-page/{id}', [App\Http\Controllers\Member\MemberController::class, 'paymentSuccessPage'])->name('payment.success.page');
+});
 // Admin - Package Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
@@ -871,6 +900,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 // Member - Packages
+// Member - Packages (NO auth middleware)
 Route::get('/member/packages', [MemberPackageController::class, 'index'])->name('member.packages');
 Route::post('/member/buy-package', [MemberPackageController::class, 'buy'])->name('member.buy.package');
 
@@ -890,4 +920,145 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/member/{id}/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'assignForm'])->name('member.assign.trainer');
     Route::post('/member/{id}/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'storeAssign'])->name('member.assign.trainer.store');
     Route::get('/member/{id}/remove-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'removeTrainer'])->name('member.remove.trainer');
+});
+Route::get('/members', [App\Http\Controllers\Trainer\TrainerMemberController::class, 'index'])
+    ->name('trainer.members');
+
+    // Admin - AJAX Routes for Membership/Package Details
+Route::get('/get-membership-details/{planName}', [MemberController::class, 'getMembershipDetails'])->name('get.membership.details');
+Route::get('/get-package-details/{packageName}', [MemberController::class, 'getPackageDetails'])->name('get.package.details');
+
+//hand payment 
+Route::get('/admin/hand-payment', [App\Http\Controllers\Admin\MemberController::class, 'handPayment'])->name('admin.hand.payment');
+
+// memeber online  payment
+Route::get('/admin/payment-orders', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('admin.payment.orders');
+
+// Trainer Workout Routes
+Route::prefix('trainer')->name('trainer.')->group(function () {
+    Route::resource('workout', App\Http\Controllers\Trainer\WorkoutController::class);
+});
+
+// Member Workout Routes
+Route::prefix('member')->name('member.')->group(function () {
+    Route::get('workouts', [App\Http\Controllers\Member\WorkoutController::class, 'index'])->name('workout.index');
+    Route::get('workouts/{id}', [App\Http\Controllers\Member\WorkoutController::class, 'show'])->name('workout.show');
+});
+
+Route::prefix('trainer')
+    ->name('trainer.')
+    ->group(function () {
+
+        Route::resource('diet', DietController::class);
+
+});
+
+Route::prefix('member')
+    ->name('member.')
+    ->group(function () {
+
+        Route::get('/diet', [MemberDietController::class, 'index'])
+            ->name('diet.index');
+
+        Route::get('/diet/{id}', [MemberDietController::class, 'show'])
+            ->name('diet.show');
+
+});
+
+// ================= ADMIN ATTENDANCE =================
+
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/member-attendance', [MemberAttendanceController::class, 'index'])
+        ->name('member-attendance.index');
+
+Route::get('/trainer-attendance', [AdminTrainerAttendanceController::class, 'index'])
+    ->name('trainer-attendance.index');
+
+});
+
+
+Route::prefix('trainer')->name('trainer.')->group(function () {
+
+    Route::resource('trainer-attendance', TrainerTrainerAttendanceController::class);
+
+    Route::resource('member-attendance', TrainerMemberAttendanceController::class);
+
+});
+
+Route::prefix('member')->name('member.')->group(function () {
+
+    Route::get('/attendance', [AttendanceController::class, 'index'])
+        ->name('attendance.index');
+
+});
+
+
+// ================= Progress 23072026 =================
+Route::prefix('trainer')->name('trainer.')->group(function () {
+
+    // Existing trainer routes...
+
+    Route::get('/progress', [App\Http\Controllers\Trainer\ProgressController::class, 'index'])
+        ->name('progress.index');
+
+    Route::get('/progress/create', [App\Http\Controllers\Trainer\ProgressController::class, 'create'])
+        ->name('progress.create');
+
+    Route::post('/progress/store', [App\Http\Controllers\Trainer\ProgressController::class, 'store'])
+        ->name('progress.store');
+
+    Route::get('/progress/{id}/edit', [App\Http\Controllers\Trainer\ProgressController::class, 'edit'])
+        ->name('progress.edit');
+
+    Route::post('/progress/{id}/update', [App\Http\Controllers\Trainer\ProgressController::class, 'update'])
+        ->name('progress.update');
+
+    Route::delete('/progress/{id}', [App\Http\Controllers\Trainer\ProgressController::class, 'destroy'])
+        ->name('progress.destroy');
+            Route::get('/progress/chart/{memberId}', [App\Http\Controllers\Trainer\ProgressController::class, 'chart'])
+        ->name('progress.chart');
+
+});
+
+Route::get('/progress', [App\Http\Controllers\Member\ProgressController::class, 'index'])
+    ->name('progress.index');
+
+    Route::get('/member/progress', [App\Http\Controllers\Member\ProgressController::class, 'index'])
+    ->name('member.progress.index');
+
+
+
+
+Route::prefix('member')->name('member.')->group(function () {
+
+    Route::get('/appointments', [MemberAppointmentController::class, 'index'])
+        ->name('appointment.index');
+
+    Route::get('/appointments/create', [MemberAppointmentController::class, 'create'])
+        ->name('appointment.create');
+
+    Route::post('/appointments/store', [MemberAppointmentController::class, 'store'])
+        ->name('appointment.store');
+
+});
+
+Route::prefix('trainer')->name('trainer.')->group(function () {
+
+    Route::get('/appointments', [TrainerAppointmentController::class, 'index'])
+        ->name('appointment.index');
+
+    Route::post('/appointments/{id}/approve', [TrainerAppointmentController::class, 'approve'])
+        ->name('appointment.approve');
+
+    Route::post('/appointments/{id}/reject', [TrainerAppointmentController::class, 'reject'])
+        ->name('appointment.reject');
+
+});
+
+Route::prefix('member')->name('member.')->group(function () {
+
+    Route::get('/payments', [App\Http\Controllers\Member\PaymentController::class, 'index'])
+        ->name('payments.index');
+
 });

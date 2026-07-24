@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
 {
@@ -26,16 +27,24 @@ class PackageController extends Controller
     {
         $request->validate([
             'package_name' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
             'duration_type' => 'required|in:Days,Months,Years',
             'included_features' => 'nullable|string',
-            'status' => 'required|in:Active,Inactive'
+            'status' => 'required|in:Active,Inactive',
         ]);
+
+        $image = null;
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image')->store('packages', 'public');
+        }
 
         Package::create([
             'package_name' => $request->package_name,
+            'image' => $image,
             'description' => $request->description,
             'price' => $request->price,
             'duration' => $request->duration,
@@ -62,16 +71,29 @@ class PackageController extends Controller
 
         $request->validate([
             'package_name' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:1',
             'duration_type' => 'required|in:Days,Months,Years',
             'included_features' => 'nullable|string',
-            'status' => 'required|in:Active,Inactive'
+            'status' => 'required|in:Active,Inactive',
         ]);
+
+        $image = $package->image;
+
+        if ($request->hasFile('image')) {
+
+            if ($package->image && Storage::disk('public')->exists($package->image)) {
+                Storage::disk('public')->delete($package->image);
+            }
+
+            $image = $request->file('image')->store('packages', 'public');
+        }
 
         $package->update([
             'package_name' => $request->package_name,
+            'image' => $image,
             'description' => $request->description,
             'price' => $request->price,
             'duration' => $request->duration,
@@ -88,6 +110,11 @@ class PackageController extends Controller
     public function destroy($id)
     {
         $package = Package::findOrFail($id);
+
+        if ($package->image && Storage::disk('public')->exists($package->image)) {
+            Storage::disk('public')->delete($package->image);
+        }
+
         $package->delete();
 
         return redirect()->route('admin.package.index')

@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Member;
 use App\Models\Trainer;
-use App\Models\User;
 
 class MemberTrainerLoginController extends Controller
 {
@@ -67,48 +65,42 @@ class MemberTrainerLoginController extends Controller
             return back()->with('error', 'Invalid email or phone number. Please check and try again.')->withInput();
         }
 
-        // Check if user exists in users table, if not create one
-        $user = User::where('email', $userEmail)->first();
-        
-        if (!$user) {
-            // Create user in users table with phone as password hash
-            $user = User::create([
-                'name' => $userName,
-                'email' => $userEmail,
-                'phone' => $userPhone,
-                'password' => bcrypt($userPhone), // Phone number as password
-                'role' => $role,
-                'is_verified' => 1,
-            ]);
-        } else {
-            // Update user phone if different
-            if ($user->phone != $userPhone) {
-                $user->phone = $userPhone;
-                $user->name = $userName;
-                $user->save();
-            }
-        }
-
-        // Login the user
-        Auth::login($user);
+        // Regenerate session
         $request->session()->regenerate();
 
-        // Redirect based on role
-        if ($role === 'trainer') {
-            return redirect()->route('trainer.dashboard')->with('success', 'Welcome back, ' . $userName . '!');
-        } elseif ($role === 'member') {
-            return redirect()->route('member.dashboard')->with('success', 'Welcome back, ' . $userName . '!');
+        // Store Gym Management user in session
+        session([
+            'gym_user_id'    => $userData->id,
+            'gym_user_name'  => $userData->name,
+            'gym_user_email' => $userData->email,
+            'gym_user_role'  => $role,
+        ]);
+
+        if ($role == 'member') {
+            return redirect()->route('member.dashboard')
+                ->with('success', 'Welcome ' . $userData->name);
         }
 
-        Auth::logout();
-        return back()->with('error', 'Invalid role.');
+        if ($role == 'trainer') {
+            return redirect()->route('trainer.dashboard')
+                ->with('success', 'Welcome ' . $userData->name);
+        }
+
+        return back()->with('error', 'Invalid Role');
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        $request->session()->forget([
+            'gym_user_id',
+            'gym_user_name',
+            'gym_user_email',
+            'gym_user_role'
+        ]);
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+
+        return redirect()->route('member.trainer.login');
     }
 }

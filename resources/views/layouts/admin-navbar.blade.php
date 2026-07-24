@@ -291,9 +291,9 @@
         <li class="nav-divider">
             <span class="divider-text">Gym One</span>
         </li>
-           <li class="nav-item">
+        <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.gym.dashboard') }}">
-                 <i class="fas fa-dumbbell"></i> <span>Dashboard</span>
+                <i class="fas fa-dumbbell"></i> <span>Dashboard</span>
             </a>
         </li>
 
@@ -341,75 +341,127 @@
 
 
         <!-- Membership Dropdown -->
-<li class="nav-item has-dropdown">
-    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-        <i class="fas fa-id-card"></i>
-        <span>Membership</span>
-        <span class="dropdown-arrow">▼</span>
-    </a>
-
-    <ul class="dropdown-menu-custom">
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.membership.create') }}">
-                <i class="fas fa-plus-circle"></i> Add Membership
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-id-card"></i>
+                <span>Membership</span>
+                <span class="dropdown-arrow">▼</span>
             </a>
+
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.membership.create') }}">
+                        <i class="fas fa-plus-circle"></i> Add Membership
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.membership.index') }}">
+                        <i class="fas fa-list"></i> Membership List
+                    </a>
+                </li>
+            </ul>
         </li>
 
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.membership.index') }}">
-                <i class="fas fa-list"></i> Membership List
+
+
+        <!--Package GropDown -->
+
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-id-card"></i>
+                <span>Package</span>
+                <span class="dropdown-arrow">▼</span>
             </a>
+
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.package.create') }}">
+                        <i class="fas fa-plus-circle"></i> Add Package
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.package.index') }}">
+                        <i class="fas fa-list"></i> Package List
+                    </a>
+                </li>
+            </ul>
         </li>
-    </ul>
-</li>
-
-
-
-<!--Package GropDown -->
-
-<li class="nav-item has-dropdown">
-    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-        <i class="fas fa-id-card"></i>
-        <span>Package</span>
-        <span class="dropdown-arrow">▼</span>
-    </a>
-
-    <ul class="dropdown-menu-custom">
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.package.create') }}">
-                <i class="fas fa-plus-circle"></i> Add Package
+        <!-- ============================================ -->
+        <!-- ASSIGN TRAINER - NEW MENU                    -->
+        <!-- ============================================ -->
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-user-tag"></i>
+                <span>Assign Trainer</span>
+                <span class="dropdown-arrow">▼</span>
             </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.assign.trainer.index') }}">
+                        <i class="fas fa-users"></i> Assign Trainer to Member
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.assign.trainer.list') }}">
+                        <i class="fas fa-list"></i> Assigned Members List
+                    </a>
+                </li>
+            </ul>
         </li>
 
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.package.index') }}">
-                <i class="fas fa-list"></i> Package List
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-user-tag"></i>
+                <span>Payments</span>
+                <span class="dropdown-arrow">▼</span>
             </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.hand.payment') }}">
+                        <i class="fas fa-hand-holding-usd"></i> Hand Payment
+                    </a>
+                </li>
+                {{-- 
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.payment.orders') }}">
+                        <i class="fas fa-list"></i>Membership Payment
+                    </a>
+                </li>
+                --}}
+            </ul>
         </li>
-    </ul>
-</li>
-<!-- ============================================ -->
-<!-- ASSIGN TRAINER - NEW MENU                    -->
-<!-- ============================================ -->
-<li class="nav-item has-dropdown">
-    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-        <i class="fas fa-user-tag"></i>
-        <span>Assign Trainer</span>
-        <span class="dropdown-arrow">▼</span>
-    </a>
-    <ul class="dropdown-menu-custom">
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.assign.trainer.index') }}">
-                <i class="fas fa-users"></i> Assign Trainer to Member
+
+
+
+
+            <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-user-tag"></i>
+                <span>Attendance</span>
+                <span class="dropdown-arrow">▼</span>
             </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.member-attendance.index') }}">
+ Member Attendance
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.trainer-attendance.index') }}">
+                                                              
+
+Trainer Attendance
+                    </a>
+                </li>
+            </ul>
         </li>
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.assign.trainer.list') }}">
-                <i class="fas fa-list"></i> Assigned Members List
-            </a>
-        </li>
-    </ul>
-</li>
+
+
+
+
+
     </ul>
 
     <!-- Sidebar Footer -->

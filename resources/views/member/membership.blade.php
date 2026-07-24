@@ -1,3 +1,9 @@
+@php
+    $userId = session('gym_user_id');
+    $userName = session('gym_user_name');
+    $userEmail = session('gym_user_email');
+@endphp
+
 @extends('layouts.member-layout')
 
 @section('content')
@@ -5,7 +11,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header" style="background: linear-gradient(135deg, #1a1a2e 0%, #2d3a4b 50%, #1a1a2e 100%); color: white;">
                     <h4 class="mb-0"><i class="fas fa-id-card me-2"></i> Membership Plans</h4>
                 </div>
                 <div class="card-body">
@@ -98,10 +104,7 @@
                                             <form action="{{ route('member.buy.membership') }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="membership_id" value="{{ $membership->id }}">
-                                                <button type="submit" class="btn btn-primary w-100">
-                                                    <i class="fas fa-shopping-cart me-2"></i>
-                                                    Buy Now - ₹ {{ number_format($membership->final_price, 2) }}
-                                                </button>
+                                              
                                             </form>
                                         @else
                                             <button class="btn btn-secondary w-100" disabled>
