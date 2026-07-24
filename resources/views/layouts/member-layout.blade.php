@@ -46,15 +46,54 @@
             color: #ffffff;
         }
 
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Hamburger Toggle Button - Mobile Only */
+        .sidebar-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            color: #ffd54f;
+        }
+
         .sidebar-brand {
             padding: 0 1px 1px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
 
         .sidebar-brand h3 {
             font-weight: 700;
-            margin: 0;
+            margin-bottom: 24px;
             color: #ffffff !important;
         }
 
@@ -68,6 +107,25 @@
             opacity: 0.7;
             margin-top: 5px;
             color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        /* Close button inside sidebar (mobile) */
+        .sidebar-close-btn {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-close-btn:hover {
+            opacity: 1;
         }
 
         .sidebar-menu {
@@ -164,6 +222,7 @@
             background: #f0f2f5;
             min-height: 100vh;
             width: calc(100% - 280px);
+            transition: margin-left 0.3s ease;
         }
 
         /* ============================================ */
@@ -179,6 +238,12 @@
             position: sticky;
             top: 0;
             z-index: 999;
+        }
+
+        .top-navbar .left-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .top-navbar .page-title h4 {
@@ -378,15 +443,63 @@
         }
 
         /* ============================================ */
-        /* RESPONSIVE                                   */
+        /* RESPONSIVE - MOBILE & TABLET                 */
         /* ============================================ */
-        @media (max-width: 768px) {
+
+        /* Tablet - Medium Screens */
+        @media (max-width: 1024px) {
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding: 10px 0;
+                width: 240px;
+            }
+
+            .main-content {
+                margin-left: 240px;
+                width: calc(100% - 240px);
+            }
+        }
+
+        /* Mobile - Small Screens */
+        @media (max-width: 768px) {
+
+            /* Hide sidebar by default on mobile */
+            .sidebar {
+                width: 300px;
+                left: -320px;
                 display: block !important;
+                position: fixed;
+                top: 0;
+                height: 100vh;
+                min-height: 100vh;
+                z-index: 1001;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 30px rgba(0, 0, 0, 0.2);
+                padding-top: 0;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            /* Show hamburger toggle on mobile */
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar-close-btn {
+                display: block;
+            }
+
+            .sidebar-brand {
+                padding: 15px 20px;
+                justify-content: space-between;
+            }
+
+            .sidebar-brand h3 {
+                font-size: 1.2rem;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
             }
 
             .main-content {
@@ -395,10 +508,32 @@
             }
 
             .top-navbar {
-                flex-direction: column;
+                padding: 12px 15px;
                 gap: 10px;
-                text-align: center;
-                padding: 15px;
+                flex-wrap: wrap;
+            }
+
+            .top-navbar .left-section {
+                gap: 10px;
+            }
+
+            .top-navbar .page-title h4 {
+                font-size: 1rem;
+            }
+
+            .top-navbar .page-title small {
+                font-size: 0.65rem;
+                display: none;
+            }
+
+            .top-navbar .user-info .user-name {
+                font-size: 0.85rem;
+            }
+
+            .top-navbar .user-info .avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
             }
 
             .page-content {
@@ -413,8 +548,48 @@
                 max-width: 100% !important;
                 margin: 0 !important;
             }
+
+            .sidebar-menu li {
+                padding: 8px 15px;
+                margin: 2px 10px;
+            }
+
+            .sidebar-menu li a {
+                font-size: 0.85rem;
+            }
+
+            .sidebar-menu .menu-label {
+                padding: 8px 20px;
+                font-size: 0.6rem;
+            }
         }
 
+        /* Extra Small Devices */
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 280px;
+                left: -290px;
+            }
+
+            .top-navbar .page-title small {
+                display: none;
+            }
+
+            .top-navbar .user-info .user-name {
+                font-size: 0.8rem;
+            }
+
+            .top-navbar .user-info .badge-role {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+            }
+
+            .page-content {
+                padding: 10px;
+            }
+        }
+
+        /* Scrollbar styling */
         .sidebar::-webkit-scrollbar {
             width: 5px;
         }
@@ -445,15 +620,21 @@
     <div class="dashboard-wrapper">
 
         <!-- ============================================ -->
+        <!-- SIDEBAR OVERLAY (Mobile)                     -->
+        <!-- ============================================ -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- ============================================ -->
         <!-- MEMBER SIDEBAR                               -->
         <!-- ============================================ -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <h3><i class="fas fa-dumbbell"></i> Member</h3>
-                <p>Dashboard</p>
+                <button class="sidebar-close-btn" onclick="closeSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <ul class="sidebar-menu">
-                <li class="menu-label">Main Menu</li>
                 <li class="{{ request()->routeIs('member.dashboard') ? 'active' : '' }}">
                     <a href="{{ route('member.dashboard') }}">
                         <i class="fas fa-home"></i> Dashboard
@@ -462,7 +643,6 @@
                 <li class="{{ request()->routeIs('member.membership') ? 'active' : '' }}">
                     <a href="{{ route('member.membership') }}">
                         <i class="fas fa-id-card"></i> Membership
-                        <span class="badge">Active</span>
                     </a>
                 </li>
                 <li class="{{ request()->routeIs('member.packages') ? 'active' : '' }}">
@@ -525,16 +705,21 @@
             @endphp
 
             <div class="top-navbar">
-                <div class="page-title">
-                    <h4>
-                        <i class="fas fa-user me-2"></i> Member
-                        <small><i class="fas fa-calendar-alt ms-3 me-1"></i> {{ date('l, d M Y') }}</small>
-                    </h4>
+                <div class="left-section">
+                    <!-- Hamburger Toggle Button -->
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h4>
+                            <i class="fas fa-user me-2"></i> Member
+                            <small><i class="fas fa-calendar-alt ms-3 me-1"></i> {{ date('l, d M Y') }}</small>
+                        </h4>
+                    </div>
                 </div>
                 <div class="user-info" onclick="openProfileModal()">
                     <div class="text-end">
                         <span class="user-name">{{ $memberData->name ?? session('gym_user_name', 'Guest') }}</span>
-
                     </div>
                     <div class="avatar">
                         {{ $memberData ? substr($memberData->name, 0, 1) : 'G' }}
@@ -700,6 +885,54 @@
     </form>
 
     <script>
+        // ============================================ //
+        // SIDEBAR TOGGLE FUNCTIONS                     //
+        // ============================================ //
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+
+            // Prevent body scroll when sidebar is open
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close sidebar when clicking on a menu item (mobile)
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuItems = document.querySelectorAll('.sidebar-menu li a');
+            menuItems.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        // Don't close if it's the logout link (it has its own handler)
+                        if (!this.closest('.logout-item')) {
+                            closeSidebar();
+                        }
+                    }
+                });
+            });
+
+            // Close sidebar on resize to desktop
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // ============================================ //
+        // PROFILE MODAL                                //
+        // ============================================ //
         function openProfileModal() {
             const modal = new bootstrap.Modal(document.getElementById('profileModal'), {
                 backdrop: true,
