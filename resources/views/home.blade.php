@@ -11,7 +11,7 @@
             padding: 0 !important;
         }
 
-        /* ===== FULL WIDTH BANNER - NO GAPS ===== */
+        /* ===== FULL WIDTH BANNER - SMOOTH ===== */
         .banner-full-width {
             width: 100%;
             margin: 0;
@@ -19,6 +19,8 @@
             position: relative;
             left: 0;
             right: 0;
+            overflow: hidden;
+            background: #f0f0f0;
         }
 
         .banner-full-width .carousel {
@@ -32,32 +34,63 @@
             width: 100%;
             margin: 0;
             padding: 0;
+            position: relative;
         }
 
+        /* ===== FIXED: BANNER ITEM WITH FIXED HEIGHT ===== */
         .banner-full-width .carousel-item {
             width: 100%;
-            height: 550px;
+            height: 500px;
             margin: 0;
             padding: 0;
+            position: relative;
+            overflow: hidden;
+            background: #f0f0f0;
+            transition: none;
         }
 
         .banner-full-width .carousel-item img {
             width: 100%;
-            height: 550px;
+            height: 100%;
             object-fit: cover;
             display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: transform 0.3s ease;
         }
 
+        /* ===== BANNER PLACEHOLDER ===== */
+        .banner-placeholder {
+            width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .banner-placeholder i {
+            font-size: 2.5rem;
+            margin-right: 12px;
+        }
+
+        /* ===== CAROUSEL CONTROLS ===== */
         .banner-full-width .carousel-control-prev,
         .banner-full-width .carousel-control-next {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 50%;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
+            z-index: 10;
         }
 
         .banner-full-width:hover .carousel-control-prev,
@@ -80,7 +113,30 @@
             background-size: 100% 100%;
         }
 
-        /* ===== PRODUCT CARD - VD LOOKS STYLE ===== */
+        /* ===== CAROUSEL INDICATORS ===== */
+        .banner-full-width .carousel-indicators {
+            bottom: 15px;
+            z-index: 11;
+        }
+
+        .banner-full-width .carousel-indicators button {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: transparent;
+            opacity: 0.6;
+            transition: all 0.3s;
+            margin: 0 4px;
+        }
+
+        .banner-full-width .carousel-indicators button.active {
+            background: white;
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* ===== PRODUCT CARD ===== */
         .product-card {
             border: 1px solid #eee;
             border-radius: 12px;
@@ -172,7 +228,7 @@
             text-align: left;
         }
 
-        /* ===== PRODUCT BRAND - NEW ===== */
+        /* ===== PRODUCT BRAND ===== */
         .product-brand {
             font-size: 0.75rem;
             color: #6c757d;
@@ -201,7 +257,7 @@
             text-align: left;
         }
 
-        /* Price container - VD LOOKS style */
+        /* Price container */
         .product-price-container {
             display: flex;
             align-items: center;
@@ -262,9 +318,57 @@
             color: #999;
         }
 
-        /* REMOVED RATING - NO STARS */
-        .product-rating {
-            display: none !important;
+        /* ===== COLOR OPTIONS - ONLY COLORS WITH COUNT ===== */
+        .color-options-container {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            align-items: center;
+        }
+
+        .color-options-container .color-label {
+            font-size: 0.65rem;
+            color: #666;
+            font-weight: 500;
+            margin-right: 2px;
+        }
+
+        .color-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #e0e0e0;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .color-dot:hover {
+            transform: scale(1.15);
+            border-color: #dc3545;
+        }
+
+        .color-dot.more-colors {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .color-dot.more-colors:hover {
+            border-color: #dc3545;
+            background: #dc3545;
+            color: white;
         }
 
         /* ===== CATEGORY CARD ===== */
@@ -420,31 +524,22 @@
             border-radius: 15px;
         }
 
-        /* Placeholder image style */
-        .placeholder-image {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f0f0f0;
-            color: #999;
-            font-size: 14px;
-            flex-direction: column;
-        }
-
-        .placeholder-image i {
-            font-size: 48px;
-            color: #ddd;
-            margin-bottom: 8px;
-        }
-
+        /* ============================================================ */
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
+        /* ============================================================ */
 
-            .banner-full-width .carousel-item,
-            .banner-full-width .carousel-item img {
-                height: 250px;
+        @media (max-width: 768px) {
+            .banner-full-width .carousel-item {
+                height: 320px;
+            }
+
+            .banner-placeholder {
+                height: 320px;
+                font-size: 1rem;
+            }
+
+            .banner-placeholder i {
+                font-size: 2rem;
             }
 
             .category-image-wrapper {
@@ -454,13 +549,68 @@
             .product-image-container {
                 height: 200px;
             }
+
+            .product-card .product-name {
+                font-size: 0.8rem;
+                min-height: 35px;
+            }
+
+            .product-price-container .final-price {
+                font-size: 1rem;
+            }
+
+            .product-brand {
+                font-size: 0.7rem;
+            }
+
+            .category-info h5 {
+                font-size: 1.1rem;
+            }
+
+            .color-dot {
+                width: 16px;
+                height: 16px;
+            }
+
+            .color-dot.more-colors {
+                width: 16px;
+                height: 16px;
+                font-size: 6px;
+            }
         }
 
         @media (max-width: 576px) {
+            .banner-full-width .carousel-item {
+                height: 220px;
+            }
 
-            .banner-full-width .carousel-item,
-            .banner-full-width .carousel-item img {
-                height: 180px;
+            .banner-placeholder {
+                height: 220px;
+                font-size: 0.85rem;
+            }
+
+            .banner-placeholder i {
+                font-size: 1.5rem;
+            }
+
+            .banner-full-width .carousel-control-prev,
+            .banner-full-width .carousel-control-next {
+                width: 32px;
+                height: 32px;
+            }
+
+            .banner-full-width .carousel-control-prev {
+                left: 8px;
+            }
+
+            .banner-full-width .carousel-control-next {
+                right: 8px;
+            }
+
+            .banner-full-width .carousel-control-prev-icon,
+            .banner-full-width .carousel-control-next-icon {
+                width: 14px;
+                height: 14px;
             }
 
             .category-image-wrapper {
@@ -468,11 +618,12 @@
             }
 
             .category-info {
-                padding: 15px;
+                padding: 12px 15px;
             }
 
             .category-info h5 {
                 font-size: 0.9rem;
+                margin-bottom: 4px;
             }
 
             .category-info p {
@@ -480,33 +631,190 @@
             }
 
             .product-image-container {
-                height: 160px;
+                height: 150px;
+            }
+
+            .product-card .card-body {
+                padding: 8px 10px 12px;
             }
 
             .product-card .product-name {
-                font-size: 0.75rem;
-                min-height: 30px;
-            }
-
-            .product-price-container .final-price {
-                font-size: 0.95rem;
+                font-size: 0.7rem;
+                min-height: 28px;
+                -webkit-line-clamp: 2;
             }
 
             .product-brand {
+                font-size: 0.6rem;
+                margin-bottom: 1px;
+            }
+
+            .product-brand i {
+                font-size: 0.55rem;
+            }
+
+            .product-price-container .final-price {
+                font-size: 0.85rem;
+            }
+
+            .product-price-container .original-price {
+                font-size: 0.7rem;
+            }
+
+            .product-price-container .discount-percent {
+                font-size: 0.6rem;
+                padding: 1px 6px;
+            }
+
+            .product-price-container {
+                gap: 4px;
+            }
+
+            .discount-badge {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+                top: 6px;
+                right: 6px;
+            }
+
+            .wishlist-btn {
+                width: 28px;
+                height: 28px;
+                top: 6px;
+                left: 6px;
+            }
+
+            .wishlist-btn i {
+                font-size: 0.8rem;
+            }
+
+            .product-stock-low {
+                font-size: 0.65rem;
+                margin-top: 4px;
+            }
+
+            .product-stock-out {
+                font-size: 0.65rem;
+                margin-top: 4px;
+                padding: 3px 8px;
+            }
+
+            .color-options-container {
+                margin-top: 4px;
+                gap: 4px;
+            }
+
+            .color-options-container .color-label {
+                font-size: 0.55rem;
+            }
+
+            .color-dot {
+                width: 14px;
+                height: 14px;
+                border-width: 1.5px;
+            }
+
+            .color-dot.more-colors {
+                width: 14px;
+                height: 14px;
+                font-size: 5px;
+                border-width: 1.5px;
+            }
+
+            .col-sm-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .category-row .col-sm-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .container {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+
+            h2 {
+                font-size: 1.1rem !important;
+            }
+
+            .d-flex .btn-link {
+                font-size: 0.75rem !important;
+            }
+
+            .banner-full-width .carousel-indicators button {
+                width: 8px;
+                height: 8px;
+                margin: 0 3px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .banner-full-width .carousel-item {
+                height: 180px;
+            }
+
+            .banner-placeholder {
+                height: 180px;
+                font-size: 0.75rem;
+            }
+
+            .banner-placeholder i {
+                font-size: 1.2rem;
+            }
+
+            .product-image-container {
+                height: 120px;
+            }
+
+            .product-card .product-name {
+                font-size: 0.65rem;
+                min-height: 24px;
+            }
+
+            .product-price-container .final-price {
+                font-size: 0.75rem;
+            }
+
+            .product-brand {
+                font-size: 0.55rem;
+            }
+
+            .color-dot {
+                width: 12px;
+                height: 12px;
+            }
+
+            .color-dot.more-colors {
+                width: 12px;
+                height: 12px;
+                font-size: 4px;
+            }
+
+            .category-image-wrapper {
+                height: 140px;
+            }
+
+            .category-info h5 {
+                font-size: 0.75rem;
+            }
+
+            .category-info p {
                 font-size: 0.65rem;
             }
         }
     </style>
 
-    <!-- ===== FULL WIDTH BANNER - NO GAPS ===== -->
+    <!-- ===== FULL WIDTH BANNER - SMOOTH ===== -->
     <div class="banner-full-width">
         <div id="bannerSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-inner" id="bannerContainer">
                 <div class="carousel-item active">
-                    <div
-                        style="height:550px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;width:100%;">
-                        <i class="fas fa-spinner fa-spin fa-2x"></i>
-                        <span class="ms-2">Loading banners...</span>
+                    <div class="banner-placeholder">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading banners...</span>
                     </div>
                 </div>
             </div>
@@ -529,7 +837,7 @@
     <div class="container mt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 style="color: #000000;">🔥 Best Selling Products</h2>
-            <a href="/shop" style="color: #dc3545 !important;">View All →</a>
+            <a href="/shop" style="color: #dc3545 !important; font-size: 0.9rem;text-decoration:none;">View All →</a>
         </div>
 
         <div id="productsLoader" class="loader" style="display: none;">
@@ -541,7 +849,11 @@
     </div>
 
     <script>
-        // ===== BANNER LOADING =====
+        // ================================================================
+        // ===== BANNER LOADING - SMOOTH =====
+        // ================================================================
+        let bannerLoaded = false;
+
         async function loadBanners() {
             try {
                 const response = await fetch('/api/banners');
@@ -549,33 +861,73 @@
                 const bannerContainer = document.getElementById('bannerContainer');
                 if (!bannerContainer) return;
 
-                if (banners.length === 0) {
-                    bannerContainer.innerHTML =
-                        '<div class="carousel-item active"><div style="height:450px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;width:100%;"><i class="fas fa-image fa-2x"></i> <span class="ms-2">No Banners Available</span></div></div>';
+                if (!banners || banners.length === 0) {
+                    bannerContainer.innerHTML = `
+                        <div class="carousel-item active">
+                            <div class="banner-placeholder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="fas fa-image"></i>
+                                <span>No Banners Available</span>
+                            </div>
+                        </div>
+                    `;
                     return;
                 }
 
                 let bannerHtml = '';
                 banners.forEach((banner, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    const imageUrl = banner.image_url || '';
+
                     bannerHtml += `
-                    <div class="carousel-item ${index === 0 ? 'active' : ''}" style="width:100%;">
-                        ${banner.link ? `<a href="${banner.link}" target="_blank" style="display:block;width:100%;">` : ''}
-                            <img src="${banner.image_url}" alt="Banner" style="width:100%; height:550px; object-fit:cover;">
-                        ${banner.link ? `</a>` : ''}
-                    </div>
-                `;
+                        <div class="carousel-item ${isActive}">
+                            ${banner.link ? `<a href="${banner.link}" target="_blank" style="display:block;width:100%;height:100%;">` : ''}
+                                <img src="${imageUrl}" alt="Banner" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+                            ${banner.link ? `</a>` : ''}
+                        </div>
+                    `;
                 });
+
                 bannerContainer.innerHTML = bannerHtml;
+
+                // ===== RE-INITIALIZE CAROUSEL SMOOTHLY =====
+                const carouselElement = document.getElementById('bannerSlider');
+                if (carouselElement) {
+                    // Destroy existing instance if any
+                    const existingInstance = bootstrap.Carousel.getInstance(carouselElement);
+                    if (existingInstance) {
+                        existingInstance.dispose();
+                    }
+                    // Create new carousel instance with smooth settings
+                    new bootstrap.Carousel(carouselElement, {
+                        interval: 5000,
+                        pause: 'hover',
+                        wrap: true,
+                        touch: true,
+                        ride: 'carousel'
+                    });
+                }
+
+                bannerLoaded = true;
+
             } catch (error) {
                 console.error('Error loading banners:', error);
+                const bannerContainer = document.getElementById('bannerContainer');
+                if (bannerContainer) {
+                    bannerContainer.innerHTML = `
+                        <div class="carousel-item active">
+                            <div class="banner-placeholder" style="background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span>Failed to load banners</span>
+                            </div>
+                        </div>
+                    `;
+                }
             }
         }
 
-        if (document.getElementById('bannerContainer')) {
-            loadBanners();
-        }
-
+        // ================================================================
         // ===== WISHLIST FUNCTIONS =====
+        // ================================================================
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -647,81 +999,6 @@
             updateWishlistCount();
         }
 
-        function addToCart(id, name, price, imageUrl, event) {
-            if (event) event.stopPropagation();
-
-            @if (!auth()->check())
-                if (confirm('Please login to add products to cart. Go to login page?')) {
-                    window.location.href = "{{ route('login') }}";
-                }
-                return;
-            @endif
-
-            let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-            let existingItem = currentCart.find(item => item.id === id);
-
-            let finalImageUrl = imageUrl || '';
-            if (finalImageUrl && !finalImageUrl.startsWith('http') && !finalImageUrl.startsWith('/storage/')) {
-                finalImageUrl = '/storage/' + finalImageUrl;
-            }
-
-            if (existingItem) {
-                existingItem.quantity++;
-                if (!existingItem.image) {
-                    existingItem.image = finalImageUrl;
-                }
-            } else {
-                currentCart.push({
-                    id: id,
-                    name: name,
-                    price: price,
-                    image: finalImageUrl,
-                    quantity: 1
-                });
-            }
-
-            localStorage.setItem('cart', JSON.stringify(currentCart));
-            cart = currentCart;
-            updateCartCount();
-            showNotification(name + ' added to cart!', 'success');
-        }
-
-        function buyNow(productId, productName, productPrice, event) {
-            if (event) event.stopPropagation();
-
-            @if (!auth()->check())
-                if (confirm('Please login to purchase. Go to login page?')) {
-                    window.location.href = "{{ route('login') }}";
-                }
-                return;
-            @endif
-
-            let form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '{{ route('buy.now') }}';
-
-            let csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_token';
-            csrfInput.value = '{{ csrf_token() }}';
-            form.appendChild(csrfInput);
-
-            let productInput = document.createElement('input');
-            productInput.type = 'hidden';
-            productInput.name = 'product_id';
-            productInput.value = productId;
-            form.appendChild(productInput);
-
-            let quantityInput = document.createElement('input');
-            quantityInput.type = 'hidden';
-            quantityInput.name = 'quantity';
-            quantityInput.value = 1;
-            form.appendChild(quantityInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        }
-
         function goToProductDetail(productId, event) {
             if (event.target.closest('.wishlist-btn') ||
                 event.target.closest('.btn-add-cart') ||
@@ -750,7 +1027,9 @@
             window.location.href = `/shop?category=${categoryId}&name=${encodeURIComponent(categoryName)}`;
         }
 
+        // ================================================================
         // ===== LOAD CATEGORIES =====
+        // ================================================================
         async function loadCategories() {
             try {
                 const response = await fetch('/api/categories');
@@ -768,7 +1047,7 @@
                     <div class="category-card" onclick="goToCategoryProducts(${cat.id}, '${cat.name.replace(/'/g, "\\'")}')">
                         <div class="category-image-wrapper">
                             ${cat.image ? 
-                                `<img src="/storage/${cat.image}" alt="${cat.name}">` : 
+                                `<img src="/storage/${cat.image}" alt="${cat.name}" loading="lazy">` : 
                                 `<div class="category-icon-wrapper"><i class="fas fa-tag"></i></div>`
                             }
                         </div>
@@ -785,42 +1064,27 @@
             }
         }
 
-        // ===== FIXED: GET PRODUCT IMAGES (Supports Variants) =====
+        // ================================================================
+        // ===== GET PRODUCT IMAGES =====
+        // ================================================================
         function getProductImages(product) {
             let images = [];
 
-            // DEBUG: Log the product data
-            console.log('🔍 Product:', product.id, product.name);
-            console.log('  - Variants:', product.variants ? product.variants.length : 0);
-            console.log('  - Images:', product.product_images ? product.product_images.length : 0);
-
-            // 1. CHECK VARIANT IMAGES FIRST
             if (product.variants && product.variants.length > 0) {
-                // Get the first variant
                 const firstVariant = product.variants[0];
-                console.log('  - First Variant ID:', firstVariant.id);
-
-                // Check if product_images has variant_id matching
                 if (product.product_images && product.product_images.length > 0) {
-                    // Filter images for this variant
                     const variantImages = product.product_images.filter(img => img.variant_id == firstVariant.id);
-                    console.log('  - Variant Images Found:', variantImages.length);
-
                     if (variantImages.length > 0) {
-                        // Sort by is_main (main image first)
                         const sortedImages = [...variantImages].sort((a, b) => {
                             if (a.is_main !== b.is_main) return b.is_main - a.is_main;
                             return (a.display_order || 0) - (b.display_order || 0);
                         });
                         images = sortedImages.map(img => '/storage/' + img.image_path);
-                        console.log('  - Using variant images:', images);
                     }
                 }
             }
 
-            // 2. If no variant images, check product_images without variant_id (normal product)
             if (images.length === 0 && product.product_images && product.product_images.length > 0) {
-                // Filter images that don't have variant_id or variant_id is null
                 const normalImages = product.product_images.filter(img => !img.variant_id || img.variant_id === null || img
                     .variant_id === 0);
                 if (normalImages.length > 0) {
@@ -829,54 +1093,30 @@
                         return (a.display_order || 0) - (b.display_order || 0);
                     });
                     images = sortedImages.map(img => '/storage/' + img.image_path);
-                    console.log('  - Using normal product images:', images);
-                } else {
-                    // If all images have variant_id, try to get any image
-                    const anyImages = [...product.product_images].sort((a, b) => {
-                        if (a.is_main !== b.is_main) return b.is_main - a.is_main;
-                        return (a.display_order || 0) - (b.display_order || 0);
-                    });
-                    if (anyImages.length > 0) {
-                        images = anyImages.map(img => '/storage/' + img.image_path);
-                        console.log('  - Using any product image:', images);
-                    }
                 }
             }
 
-            // 3. Check all_images from API
             if (images.length === 0 && product.all_images && product.all_images.length > 0) {
                 images = product.all_images.map(img => {
                     if (img.startsWith('http')) return img;
                     return '/storage/' + img;
                 });
-                console.log('  - Using all_images:', images);
             }
 
-            // 4. Check product.image field
             if (images.length === 0 && product.image) {
                 if (product.image.startsWith('http')) {
                     images.push(product.image);
                 } else {
                     images.push('/storage/' + product.image);
                 }
-                console.log('  - Using product.image:', images);
             }
 
-            // 5. Check image_url
-            if (images.length === 0 && product.image_url) {
-                images.push(product.image_url);
-                console.log('  - Using image_url:', images);
-            }
-
-            // 6. Fallback - Show a colored placeholder with product name
             if (images.length === 0) {
-                // Use inline SVG placeholder instead of external URL
                 const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8A5C', '#A29BFE'];
                 const colorIndex = (product.id || 1) % colors.length;
                 const bgColor = colors[colorIndex];
                 const text = product.name ? product.name.substring(0, 2).toUpperCase() : '?';
 
-                // Create a data URL for the placeholder
                 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
                     <rect width="300" height="300" fill="${bgColor}" opacity="0.3"/>
                     <rect x="50" y="50" width="200" height="200" fill="${bgColor}" rx="10"/>
@@ -885,159 +1125,155 @@
                 </svg>`;
 
                 const encoded = btoa(svg);
-                const dataUrl = `data:image/svg+xml;base64,${encoded}`;
-                images.push(dataUrl);
-                console.log('  - Using SVG placeholder with color:', bgColor);
+                images.push(`data:image/svg+xml;base64,${encoded}`);
             }
 
             return images;
         }
 
-        // ===== GET VARIANT DATA =====
-    // ===== GET VARIANT DATA =====
-function getVariantData(product) {
-    // If product has variants, use the first variant's data
-    if (product.variants && product.variants.length > 0) {
-        const firstVariant = product.variants[0];
+        // ================================================================
+        // ===== GET VARIANT DATA WITH COLORS ONLY =====
+        // ================================================================
+        function getVariantData(product) {
+            if (product.variants && product.variants.length > 0) {
+                const firstVariant = product.variants[0];
 
-        // Get variant images
-        let variantImages = [];
-        if (product.product_images && product.product_images.length > 0) {
-            // Filter images for this variant
-            const variantImageObjs = product.product_images.filter(img => img.variant_id == firstVariant.id);
-            if (variantImageObjs.length > 0) {
-                const sortedImages = [...variantImageObjs].sort((a, b) => {
-                    if (a.is_main !== b.is_main) return b.is_main - a.is_main;
-                    return (a.display_order || 0) - (b.display_order || 0);
+                let variantImages = [];
+                if (product.product_images && product.product_images.length > 0) {
+                    const variantImageObjs = product.product_images.filter(img => img.variant_id == firstVariant.id);
+                    if (variantImageObjs.length > 0) {
+                        const sortedImages = [...variantImageObjs].sort((a, b) => {
+                            if (a.is_main !== b.is_main) return b.is_main - a.is_main;
+                            return (a.display_order || 0) - (b.display_order || 0);
+                        });
+                        variantImages = sortedImages.map(img => '/storage/' + img.image_path);
+                    }
+                }
+
+                if (variantImages.length === 0 && product.image) {
+                    variantImages.push('/storage/' + product.image);
+                }
+
+                if (variantImages.length === 0) {
+                    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8A5C', '#A29BFE'];
+                    const colorIndex = (product.id || 1) % colors.length;
+                    const bgColor = colors[colorIndex];
+                    const text = product.name ? product.name.substring(0, 2).toUpperCase() : '?';
+                    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+                        <rect width="300" height="300" fill="${bgColor}" opacity="0.3"/>
+                        <rect x="50" y="50" width="200" height="200" fill="${bgColor}" rx="10"/>
+                        <text x="150" y="175" font-family="Arial" font-size="80" fill="${bgColor}" text-anchor="middle" dominant-baseline="central">${text}</text>
+                        <text x="150" y="250" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${product.name || 'Product'}</text>
+                    </svg>`;
+                    const encoded = btoa(svg);
+                    variantImages.push(`data:image/svg+xml;base64,${encoded}`);
+                }
+
+                let totalStock = 0;
+                product.variants.forEach(v => {
+                    totalStock += parseInt(v.stock) || 0;
                 });
-                variantImages = sortedImages.map(img => '/storage/' + img.image_path);
+
+                // ===== EXTRACT COLORS FROM VARIANT ATTRIBUTES =====
+                let colors = [];
+                if (product.variants && product.variants.length > 0) {
+                    const colorSet = new Set();
+                    product.variants.forEach(variant => {
+                        if (variant.attributes && variant.attributes.length > 0) {
+                            variant.attributes.forEach(attr => {
+                                if (attr.attribute && attr.attribute.name &&
+                                    attr.attribute.name.toLowerCase() === 'color') {
+                                    if (attr.value && attr.value.trim() !== '') {
+                                        colorSet.add(attr.value);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    colors = Array.from(colorSet);
+                }
+
+                const originalPrice = parseFloat(firstVariant.total_price) || parseFloat(firstVariant.mrp) || parseFloat(
+                    firstVariant.price) || 0;
+                const displayPrice = parseFloat(firstVariant.final_price) || parseFloat(firstVariant.price) || 0;
+
+                return {
+                    hasVariant: true,
+                    image: variantImages[0],
+                    allImages: variantImages,
+                    price: displayPrice,
+                    originalPrice: originalPrice,
+                    discountType: firstVariant.discount_type || 'flat',
+                    discountValue: parseFloat(firstVariant.discount_value) || 0,
+                    stock: parseInt(firstVariant.stock) || 0,
+                    totalStock: totalStock,
+                    variantId: firstVariant.id,
+                    colors: colors,
+                    variantCount: product.variants.length
+                };
             }
+
+            const originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || parseFloat(product.price) ||
+                0;
+            const displayPrice = parseFloat(product.final_price) || parseFloat(product.price) || 0;
+
+            return {
+                hasVariant: false,
+                image: null,
+                allImages: [],
+                price: displayPrice,
+                originalPrice: originalPrice,
+                discountType: product.discount_type || 'flat',
+                discountValue: parseFloat(product.discount_value) || 0,
+                stock: parseInt(product.stock) || 0,
+                totalStock: parseInt(product.stock) || 0,
+                variantId: null,
+                colors: [],
+                variantCount: 0
+            };
         }
 
-        // If no variant images, check product_images without variant_id
-        if (variantImages.length === 0 && product.product_images && product.product_images.length > 0) {
-            const normalImages = product.product_images.filter(img => !img.variant_id || img.variant_id === null ||
-                img.variant_id === 0);
-            if (normalImages.length > 0) {
-                const sortedImages = [...normalImages].sort((a, b) => {
-                    if (a.is_main !== b.is_main) return b.is_main - a.is_main;
-                    return (a.display_order || 0) - (b.display_order || 0);
-                });
-                variantImages = sortedImages.map(img => '/storage/' + img.image_path);
+        // ================================================================
+        // ===== CALCULATE DISCOUNT =====
+        // ================================================================
+        function calculateDiscount(priceData) {
+            const originalPrice = priceData.originalPrice || 0;
+            const displayPrice = priceData.price || 0;
+            const discountType = priceData.discountType || 'flat';
+            const discountValue = priceData.discountValue || 0;
+
+            let discountDisplay = '';
+            let hasDiscount = false;
+
+            if (discountValue > 0 && originalPrice > 0) {
+                hasDiscount = true;
+                const discountAmount = originalPrice - displayPrice;
+                const discountPercent = Math.round((discountAmount / originalPrice) * 100);
+
+                if (discountType === 'flat') {
+                    discountDisplay = `₹${discountValue.toFixed(2)} off`;
+                } else if (discountType === 'percentage') {
+                    discountDisplay = `${discountValue}% off`;
+                } else {
+                    discountDisplay = `₹${discountValue.toFixed(2)} off`;
+                }
+            } else if (originalPrice > 0 && displayPrice > 0 && displayPrice < originalPrice) {
+                hasDiscount = true;
+                const discountPercent = Math.round(((originalPrice - displayPrice) / originalPrice) * 100);
+                discountDisplay = `${discountPercent}% off`;
             }
+
+            return {
+                originalPrice: originalPrice,
+                displayPrice: displayPrice,
+                discountDisplay: discountDisplay,
+                hasDiscount: hasDiscount && discountDisplay !== ''
+            };
         }
 
-        // Fallback to product.image
-        if (variantImages.length === 0 && product.image) {
-            variantImages.push('/storage/' + product.image);
-        }
-
-        if (variantImages.length === 0) {
-            // Use placeholder
-            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8A5C', '#A29BFE'];
-            const colorIndex = (product.id || 1) % colors.length;
-            const bgColor = colors[colorIndex];
-            const text = product.name ? product.name.substring(0, 2).toUpperCase() : '?';
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
-                <rect width="300" height="300" fill="${bgColor}" opacity="0.3"/>
-                <rect x="50" y="50" width="200" height="200" fill="${bgColor}" rx="10"/>
-                <text x="150" y="175" font-family="Arial" font-size="80" fill="${bgColor}" text-anchor="middle" dominant-baseline="central">${text}</text>
-                <text x="150" y="250" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${product.name || 'Product'}</text>
-            </svg>`;
-            const encoded = btoa(svg);
-            variantImages.push(`data:image/svg+xml;base64,${encoded}`);
-        }
-
-        // Calculate total stock from all variants
-        let totalStock = 0;
-        product.variants.forEach(v => {
-            totalStock += parseInt(v.stock) || 0;
-        });
-
-        // ===== FIX: Use total_price as original price, final_price as discounted price =====
-        const originalPrice = parseFloat(firstVariant.total_price) || parseFloat(firstVariant.mrp) || parseFloat(firstVariant.price) || 0;
-        const displayPrice = parseFloat(firstVariant.final_price) || parseFloat(firstVariant.price) || 0;
-
-        return {
-            hasVariant: true,
-            image: variantImages[0],
-            allImages: variantImages,
-            price: displayPrice,
-            originalPrice: originalPrice,
-            discountType: firstVariant.discount_type || 'flat',
-            discountValue: parseFloat(firstVariant.discount_value) || 0,
-            discountAmount: parseFloat(firstVariant.discount_amount) || 0,
-            stock: parseInt(firstVariant.stock) || 0,
-            totalStock: totalStock,
-            gstPercentage: parseFloat(firstVariant.gst_percentage) || 0,
-            gstAmount: parseFloat(firstVariant.gst_amount) || 0,
-            variantId: firstVariant.id
-        };
-    }
-
-    // Normal product (no variants)
-    // ===== FIX: Use total_price as original price, final_price as discounted price =====
-    const originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || parseFloat(product.price) || 0;
-    const displayPrice = parseFloat(product.final_price) || parseFloat(product.price) || 0;
-
-    return {
-        hasVariant: false,
-        image: null,
-        allImages: [],
-        price: displayPrice,
-        originalPrice: originalPrice,
-        discountType: product.discount_type || 'flat',
-        discountValue: parseFloat(product.discount_value) || 0,
-        discountAmount: parseFloat(product.discount_amount) || 0,
-        stock: parseInt(product.stock) || 0,
-        totalStock: parseInt(product.stock) || 0,
-        gstPercentage: parseFloat(product.gst_percentage) || 0,
-        gstAmount: parseFloat(product.gst_amount) || 0,
-        variantId: null
-    };
-}
-
-    // ===== CALCULATE DISCOUNT =====
-function calculateDiscount(priceData) {
-    const originalPrice = priceData.originalPrice || 0;
-    const displayPrice = priceData.price || 0;
-    const discountType = priceData.discountType || 'flat';
-    const discountValue = priceData.discountValue || 0;
-
-    let discountDisplay = '';
-    let hasDiscount = false;
-    let finalPrice = displayPrice;
-
-    // If discount_value > 0, show the discount based on type
-    if (discountValue > 0 && originalPrice > 0) {
-        hasDiscount = true;
-        const discountAmount = originalPrice - displayPrice;
-        const discountPercent = Math.round((discountAmount / originalPrice) * 100);
-        
-        if (discountType === 'flat') {
-            discountDisplay = `₹${discountValue.toFixed(2)} off`;
-        } else if (discountType === 'percentage') {
-            discountDisplay = `${discountValue}% off`;
-        } else {
-            discountDisplay = `₹${discountValue.toFixed(2)} off`;
-        }
-    }
-    // If no discount_value but final price is less than original
-    else if (originalPrice > 0 && displayPrice > 0 && displayPrice < originalPrice) {
-        hasDiscount = true;
-        const discountPercent = Math.round(((originalPrice - displayPrice) / originalPrice) * 100);
-        discountDisplay = `${discountPercent}% off`;
-    }
-
-    return {
-        originalPrice: originalPrice,
-        displayPrice: finalPrice,
-        discountDisplay: discountDisplay,
-        hasDiscount: hasDiscount && discountDisplay !== ''
-    };
-}
-
+        // ================================================================
         // ===== LOAD PRODUCTS =====
+        // ================================================================
         async function loadProducts() {
             const loader = document.getElementById('productsLoader');
             const container = document.getElementById('productsContainer');
@@ -1048,8 +1284,6 @@ function calculateDiscount(priceData) {
                 const products = await response.json();
 
                 if (loader) loader.style.display = 'none';
-
-                console.log('📦 Total Products:', products.length);
 
                 const allProducts = products.sort((a, b) => {
                     return (b.id || 0) - (a.id || 0);
@@ -1062,10 +1296,8 @@ function calculateDiscount(priceData) {
                 }
 
                 container.innerHTML = allProducts.map(product => {
-                    // Get variant data (for variant products)
                     const variantData = getVariantData(product);
 
-                    // Get product images - USE VARIANT IMAGES IF AVAILABLE
                     let imageUrls = [];
                     if (variantData.hasVariant && variantData.allImages.length > 0) {
                         imageUrls = variantData.allImages;
@@ -1076,7 +1308,6 @@ function calculateDiscount(priceData) {
                     const firstImage = imageUrls.length > 0 ? imageUrls[0] :
                         'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNmMGYwZjAiLz48dGV4dCB4PSIxNTAiIHk9IjE1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjUwIiBmaWxsPSIjY2NjIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
 
-                    // Use variant stock if available
                     const totalStock = variantData.totalStock || parseInt(product.stock) || 0;
 
                     const priceData = {
@@ -1086,7 +1317,6 @@ function calculateDiscount(priceData) {
                         discountValue: variantData.discountValue
                     };
 
-                    // Calculate discount
                     const discount = calculateDiscount(priceData);
                     const displayPrice = discount.displayPrice;
                     const originalPrice = discount.originalPrice;
@@ -1097,7 +1327,6 @@ function calculateDiscount(priceData) {
                     const heartClass = isInWishlist ? 'fas fa-heart' : 'far fa-heart';
                     const escapeName = product.name.replace(/'/g, "\\'");
 
-                    // ===== GET BRAND NAME =====
                     let brandName = '';
                     if (product.brand) {
                         brandName = product.brand.name || '';
@@ -1122,7 +1351,6 @@ function calculateDiscount(priceData) {
                     `;
                     }
 
-                    // Price HTML - VD LOOKS style
                     let priceHtml = '';
                     if (hasDiscount && originalPrice > 0 && displayPrice > 0) {
                         priceHtml = `
@@ -1140,12 +1368,25 @@ function calculateDiscount(priceData) {
                     `;
                     }
 
-                    // Variant indicator
-                    const variantBadge = variantData.hasVariant ?
-                        `<span style="position:absolute;bottom:10px;right:10px;background:#0d6efd;color:white;padding:2px 8px;border-radius:4px;font-size:10px;z-index:1;">${product.variants.length} Variants</span>` :
-                        '';
+                    // ===== COLOR OPTIONS - ONLY COLORS WITH COUNT =====
+                    let colorHtml = '';
+                    const totalColors = variantData.colors.length;
 
-                    // ===== BRAND HTML =====
+                    if (totalColors > 0) {
+                        const displayColors = variantData.colors.slice(0, 4);
+                        const remaining = totalColors - 4;
+
+                        colorHtml = `
+                        <div class="color-options-container">
+                            <span class="color-label">${totalColors} Color${totalColors > 1 ? 's' : ''}:</span>
+                            ${displayColors.map(color => `
+                                            <span class="color-dot" style="background: ${color.toLowerCase()};" title="${color}"></span>
+                                        `).join('')}
+                            ${remaining > 0 ? `<span class="color-dot more-colors">+${remaining}</span>` : ''}
+                        </div>
+                    `;
+                    }
+
                     let brandHtml = '';
                     if (brandName) {
                         brandHtml = `
@@ -1160,7 +1401,6 @@ function calculateDiscount(priceData) {
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card card" onclick="goToProductDetail(${product.id}, event)">
                             ${hasDiscount && displayPrice > 0 ? `<div class="discount-badge">${discountDisplay}</div>` : ''}
-                            ${variantBadge}
                             <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${firstImage}')">
                                 <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
                             </button>
@@ -1175,6 +1415,7 @@ function calculateDiscount(priceData) {
                                 ${brandHtml}
                                 <div class="product-name">${product.name}</div>
                                 ${priceHtml}
+                                ${colorHtml}
                                 ${stockHtml}
                             </div>
                         </div>
@@ -1192,50 +1433,27 @@ function calculateDiscount(priceData) {
             }
         }
 
-        // ===== LOAD BEST SELLERS =====
-        async function loadBestSellers() {
-            try {
-                const response = await fetch('/api/best-sellers');
-                const products = await response.json();
-                const container = document.getElementById('bestSellersList');
-                if (!container) return;
-
-                if (products.length === 0) {
-                    container.innerHTML = '<p class="text-center">No best sellers yet</p>';
-                    return;
-                }
-
-                container.innerHTML = `
-                <div class="row">
-                    ${products.slice(0, 6).map((product, index) => `
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <span class="badge bg-warning me-3 p-2" style="background-color: #dc3545 !important;">#${index + 1}</span>
-                                        <div>
-                                            <h6 class="mb-0">${product.name}</h6>
-                                            <small>Sold: ${product.sold_count || 100}+ units</small>
-                                        </div>
-                                        ${index === 0 ? '<span class="ms-auto text-warning" style="color: #dc3545 !important;">🔥 Hot</span>' : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
-                </div>
-            `;
-            } catch (error) {
-                console.error('Error loading best sellers:', error);
-            }
-        }
-
+        // ================================================================
         // ===== INITIALIZE =====
+        // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
-            loadBanners();
             wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
             cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            // Load banners first, then categories and products
+            loadBanners();
             loadCategories();
             loadProducts();
-            loadBestSellers();
+
             updateCartCount();
             updateWishlistCount();
+        });
+
+        // ===== RELOAD BANNERS ON PAGE VISIBILITY CHANGE =====
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && !bannerLoaded) {
+                loadBanners();
+            }
         });
     </script>
 @endsection

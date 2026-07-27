@@ -69,6 +69,34 @@ use App\Http\Controllers\Member\ProgressController;
 use App\Http\Controllers\Member\AppointmentController as MemberAppointmentController;
 use App\Http\Controllers\Trainer\AppointmentController as TrainerAppointmentController;
 
+// ============ SEARCH PRODUCTS API ============
+Route::get('/search-products', function (Illuminate\Http\Request $request) {
+    $query = $request->get('q');
+    
+    if (empty($query) || strlen($query) < 2) {
+        return response()->json([]);
+    }
+    
+    $products = Product::where('status', 'Active')
+        ->where(function($q) use ($query) {
+            $q->where('name', 'LIKE', "%{$query}%")
+              ->orWhere('description', 'LIKE', "%{$query}%");
+        })
+        ->limit(10)
+        ->get(['id', 'name', 'final_price as price', 'mrp', 'category_id', 'sub_category_id']);
+    
+    // Get category names and images
+    $products->each(function ($product) {
+        $product->category_name = \App\Models\Category::where('id', $product->category_id)->value('name') ?? '';
+        $product->sub_category_name = \App\Models\SubCategory::where('id', $product->sub_category_id)->value('name') ?? '';
+        
+        $image = \App\Models\ProductImage::where('product_id', $product->id)->first();
+        $product->image_url = $image ? asset('storage/' . $image->image_path) : null;
+    });
+    
+    return response()->json($products);
+})->name('search.products');
+
 
 
 
@@ -345,6 +373,8 @@ Route::get('/api/products/category/{id}', [ProductApiController::class, 'getProd
 Route::get('/api/products/subcategory/{id}', [ProductApiController::class, 'getProductsBySubCategory']);
 Route::get('/api/products/stocks', [ProductApiController::class, 'getProductStocks']);
 Route::get('/api/banners', [BannerApiController::class, 'getBanners']);
+
+
 
 // ============ SINGLE PRODUCT STOCK API ============
 Route::get('/api/product-stock/{id}', [ProductApiController::class, 'getProductStock']);
