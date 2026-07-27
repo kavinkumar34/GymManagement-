@@ -2,461 +2,452 @@
 
 @section('content')
 
-    <div class="container">
-
-        <div class="card">
-
-            <div class="card-header d-flex justify-content-between align-items-center">
-
-                <h4>Edit Workout Plan</h4>
-
-                <a href="{{ route('trainer.workout.index') }}" class="btn btn-secondary">
-                    Back
-                </a>
-
-            </div>
-
-            <div class="card-body">
-
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-
-                        <ul class="mb-0">
-
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-
-                        </ul>
-
-                    </div>
-                @endif
-
-                <form action="{{ route('trainer.workout.update', $workout->id) }}" method="POST">
-
-                    @csrf
-                    @method('PUT')
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-
-                            <div class="form-group mb-3">
-
-                                <label>
-                                    Member
-                                    <span class="text-danger">*</span>
-                                </label>
-
-                                <select name="member_id" class="form-control" required>
-
-                                    <option value="">
-                                        Select Member
-                                    </option>
-
-                                    @foreach ($members as $member)
-                                        <option value="{{ $member->id }}"
-                                            {{ $workout->member_id == $member->id ? 'selected' : '' }}>
-
-                                            {{ $member->name }}
-                                            ({{ $member->email }})
-                                        </option>
-                                    @endforeach
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="form-group mb-3">
-
-                                <label>
-                                    Workout Title
-                                </label>
-
-                                <input type="text" name="title" class="form-control"
-                                    value="{{ old('title', $workout->title) }}" required>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-
-                            <div class="form-group mb-3">
-
-                                <label>
-                                    Start Date
-                                </label>
-
-                                <input type="date" name="start_date" class="form-control"
-                                    value="{{ $workout->start_date }}" required>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="form-group mb-3">
-
-                                <label>
-                                    End Date
-                                </label>
-
-                                <input type="date" name="end_date" class="form-control" value="{{ $workout->end_date }}">
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="form-group mb-4">
-
-                        <label>Description</label>
-
-                        <textarea name="description" rows="3" class="form-control">{{ old('description', $workout->description) }}</textarea>
-
-                    </div>
-
-                    <hr>
-
-                    <h5 class="mb-3">
-                        Exercises
-                    </h5>
-
-                    <div id="exercises-container">
-
-                        @foreach ($workout->exercises as $index => $exercise)
-                            <div class="exercise-row card p-3 mb-3">
-
-                                <div class="row">
-
-                                    <div class="col-md-3">
-
-                                        <div class="form-group">
-
-                                            <label>Day</label>
-
-                                            <select name="exercises[{{ $index }}][day]" class="form-control">
-
-                                                @foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day)
-                                                    <option value="{{ $day }}"
-                                                        {{ $exercise->day == $day ? 'selected' : '' }}>
-
-                                                        {{ $day }}
-
-                                                    </option>
-                                                @endforeach
-
-                                            </select>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-3">
-
-                                        <div class="form-group">
-
-                                            <label>Exercise Name</label>
-
-                                            <input type="text" class="form-control"
-                                                name="exercises[{{ $index }}][exercise_name]"
-                                                value="{{ $exercise->exercise_name }}">
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-2">
-
-                                        <div class="form-group">
-
-                                            <label>Sets</label>
-
-                                            <input type="number" class="form-control"
-                                                name="exercises[{{ $index }}][sets]" value="{{ $exercise->sets }}">
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-2">
-
-                                        <div class="form-group">
-
-                                            <label>Reps</label>
-
-                                            <input type="text" class="form-control"
-                                                name="exercises[{{ $index }}][reps]" value="{{ $exercise->reps }}">
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-2">
-
-                                        <div class="form-group">
-
-                                            <label>Weight</label>
-
-                                            <input type="text" class="form-control"
-                                                name="exercises[{{ $index }}][weight]"
-                                                value="{{ $exercise->weight }}">
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                                <div class="row mt-3">
-
-                                    <div class="col-md-4">
-
-                                        <div class="form-group">
-
-                                            <label>Rest Time</label>
-
-                                            <input type="text" class="form-control"
-                                                name="exercises[{{ $index }}][rest_time]"
-                                                value="{{ $exercise->rest_time }}">
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-4">
-
-                                        <div class="form-group">
-
-                                            <label>Exercise Image URL</label>
-
-                                            <input type="text" class="form-control"
-                                                name="exercises[{{ $index }}][exercise_image]"
-                                                value="{{ $exercise->exercise_image }}">
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-4">
-
-                                        <div class="form-group">
-
-                                            <label>Exercise Video URL</label>
-
-                                            <input type="text" class="form-control"
-                                                name="exercises[{{ $index }}][exercise_video]"
-                                                value="{{ $exercise->exercise_video }}">
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <div class="mt-3">
-
-                                    <label>Trainer Notes</label>
-
-                                    <textarea class="form-control" rows="3" name="exercises[{{ $index }}][trainer_notes]">{{ $exercise->trainer_notes }}</textarea>
-
-                                </div>
-
-                                <button type="button" class="btn btn-danger btn-sm mt-3"
-                                    onclick="this.closest('.exercise-row').remove()">
-
-                                    <i class="fas fa-trash"></i>
-                                    Remove Exercise
-
-                                </button>
-
-                            </div>
-                        @endforeach
-
-                    </div>
-
-                    <button type="button" class="btn btn-info mt-3" onclick="addExercise()">
-
-                        <i class="fas fa-plus"></i>
-
-                        Add Exercise
-
-                    </button>
-
-                    <div class="mt-4">
-
-                        <button type="submit" class="btn btn-success">
-
-                            <i class="fas fa-save"></i>
-
-                            Update Workout
-
-                        </button>
-
-                        <a href="{{ route('trainer.workout.index') }}" class="btn btn-secondary">
-
-                            Cancel
-
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <!-- Card Header - Green Theme -->
+                <div class="card-header" style="background: linear-gradient(135deg, #0d2818 0%, #1a472a 100%); color: white;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h4 class="mb-0">
+                            <i class="fas fa-edit me-2"></i> Edit Workout Plan
+                        </h4>
+                        <a href="{{ route('trainer.workout.index') }}" class="btn"
+                            style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 8px 20px;">
+                            <i class="fas fa-arrow-left me-2"></i> Back
                         </a>
-
                     </div>
+                </div>
 
-                </form>
+                <div class="card-body">
+                    @if ($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                            style="border-left: 4px solid #dc3545;">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
 
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                            style="border-left: 4px solid #dc3545;">
+                            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('trainer.workout.update', $workout->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-user me-1" style="color: #1a472a;"></i> Member <span
+                                            class="text-danger">*</span>
+                                    </label>
+                                    <select name="member_id" class="form-control"
+                                        style="border-color: #1a472a; border-radius: 8px;" required>
+                                        @foreach ($members as $member)
+                                            <option value="{{ $member->id }}"
+                                                {{ $workout->member_id == $member->id ? 'selected' : '' }}>
+                                                {{ $member->name }} ({{ $member->email }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-heading me-1" style="color: #1a472a;"></i> Workout Title <span
+                                            class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" name="title"
+                                        style="border-color: #1a472a; border-radius: 8px;"
+                                        value="{{ old('title', $workout->title) }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calendar-alt me-1" style="color: #1a472a;"></i> Start Date
+                                    </label>
+                                    <input type="date" class="form-control" name="start_date"
+                                        style="border-color: #1a472a; border-radius: 8px;"
+                                        value="{{ old('start_date', $workout->start_date) }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-calendar-alt me-1" style="color: #1a472a;"></i> End Date
+                                    </label>
+                                    <input type="date" class="form-control" name="end_date"
+                                        style="border-color: #1a472a; border-radius: 8px;"
+                                        value="{{ old('end_date', $workout->end_date) }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-align-left me-1" style="color: #1a472a;"></i> Description
+                            </label>
+                            <textarea class="form-control" rows="3" name="description" style="border-color: #1a472a; border-radius: 8px;"
+                                placeholder="Enter workout description...">{{ old('description', $workout->description) }}</textarea>
+                        </div>
+
+                        <hr style="border-color: #1a472a;">
+
+                        @php
+                            $groupedExercises = $workout->exercises->groupBy('day');
+                            $dayIndex = 0;
+                        @endphp
+
+                        <div id="workout-days">
+                            @foreach ($groupedExercises as $day => $exerciseList)
+                                <div class="workout-day card border mb-4" style="border-color: #1a472a !important;">
+                                    <div class="card-header" style="background: #f8fafc; border-bottom-color: #1a472a;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <strong style="color: #0d2818;"><i class="fas fa-calendar-day me-2"></i>Workout
+                                                Day</strong>
+                                            <button type="button" class="btn btn-danger btn-sm remove-day"
+                                                {{ $loop->first ? 'style=display:none' : '' }}>
+                                                <i class="fas fa-trash"></i> Remove Day
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="row mb-4">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold" style="color: #1a472a;">Select Day</label>
+                                                <select class="form-control" name="days[{{ $dayIndex }}][day]"
+                                                    style="border-color: #1a472a; border-radius: 8px;">
+                                                    @foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $weekDay)
+                                                        <option value="{{ $weekDay }}"
+                                                            {{ $day == $weekDay ? 'selected' : '' }}>
+                                                            {{ $weekDay }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="exercise-container">
+                                            @foreach ($exerciseList as $exerciseIndex => $exercise)
+                                                <div class="exercise-card card border mb-3 p-3"
+                                                    style="border-color: #e5e7eb;">
+                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                        <h6 class="mb-0" style="color: #1a472a;">
+                                                            <i class="fas fa-dumbbell me-2"></i> Exercise
+                                                            {{ $exerciseIndex + 1 }}
+                                                        </h6>
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm remove-exercise">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-4 mb-2">
+                                                            <label class="form-label" style="font-size: 0.85rem;">Exercise
+                                                                Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control"
+                                                                style="border-color: #1a472a; border-radius: 8px;"
+                                                                name="days[{{ $dayIndex }}][exercises][{{ $exerciseIndex }}][exercise_name]"
+                                                                value="{{ $exercise->exercise_name }}" required>
+                                                        </div>
+                                                        <div class="col-md-2 mb-2">
+                                                            <label class="form-label"
+                                                                style="font-size: 0.85rem;">Sets</label>
+                                                            <input type="number" class="form-control"
+                                                                style="border-color: #1a472a; border-radius: 8px;"
+                                                                name="days[{{ $dayIndex }}][exercises][{{ $exerciseIndex }}][sets]"
+                                                                value="{{ $exercise->sets }}">
+                                                        </div>
+                                                        <div class="col-md-2 mb-2">
+                                                            <label class="form-label"
+                                                                style="font-size: 0.85rem;">Reps</label>
+                                                            <input type="text" class="form-control"
+                                                                style="border-color: #1a472a; border-radius: 8px;"
+                                                                name="days[{{ $dayIndex }}][exercises][{{ $exerciseIndex }}][reps]"
+                                                                value="{{ $exercise->reps }}">
+                                                        </div>
+                                                        <div class="col-md-2 mb-2">
+                                                            <label class="form-label"
+                                                                style="font-size: 0.85rem;">Weight</label>
+                                                            <input type="text" class="form-control"
+                                                                style="border-color: #1a472a; border-radius: 8px;"
+                                                                name="days[{{ $dayIndex }}][exercises][{{ $exerciseIndex }}][weight]"
+                                                                value="{{ $exercise->weight }}">
+                                                        </div>
+                                                        <div class="col-md-2 mb-2">
+                                                            <label class="form-label" style="font-size: 0.85rem;">Rest
+                                                                Time</label>
+                                                            <input type="text" class="form-control"
+                                                                style="border-color: #1a472a; border-radius: 8px;"
+                                                                name="days[{{ $dayIndex }}][exercises][{{ $exerciseIndex }}][rest_time]"
+                                                                value="{{ $exercise->rest_time }}">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label" style="font-size: 0.85rem;">Exercise
+                                                                Video URL</label>
+                                                            <input type="text" class="form-control"
+                                                                style="border-color: #1a472a; border-radius: 8px;"
+                                                                name="days[{{ $dayIndex }}][exercises][{{ $exerciseIndex }}][exercise_video]"
+                                                                value="{{ $exercise->exercise_video }}">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label" style="font-size: 0.85rem;">Trainer
+                                                                Notes</label>
+                                                            <input type="text" class="form-control"
+                                                                style="border-color: #1a472a; border-radius: 8px;"
+                                                                name="days[{{ $dayIndex }}][exercises][{{ $exerciseIndex }}][trainer_notes]"
+                                                                value="{{ $exercise->trainer_notes }}">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mt-3 text-end">
+                                                        <button type="button"
+                                                            class="btn btn-success btn-sm add-exercise">
+                                                            <i class="fas fa-plus me-1"></i> Add Exercise
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                                @php $dayIndex++; @endphp
+                            @endforeach
+                        </div>
+
+                        <div class="text-end mb-4">
+                            <button type="button" id="addWorkoutDay" class="btn"
+                                style="background: #0d2818; color: white; border-radius: 8px;">
+                                <i class="fas fa-plus-circle me-1"></i> Add Workout Day
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn"
+                                style="background: #0d2818; color: white; border-radius: 8px; padding: 10px 30px;">
+                                <i class="fas fa-save me-2"></i> Update Workout Plan
+                            </button>
+                            <a href="{{ route('trainer.workout.index') }}" class="btn btn-secondary"
+                                style="border-radius: 8px; padding: 10px 30px;">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-
         </div>
-
     </div>
 
     <script>
-        let exerciseIndex = {{ $workout->exercises->count() }};
+        let dayIndex = {{ $groupedExercises->count() }};
 
-        function addExercise() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add Exercise
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.add-exercise')) {
+                    let workoutCard = e.target.closest('.workout-day');
+                    let exerciseContainer = workoutCard.querySelector('.exercise-container');
+                    let exerciseIndex = exerciseContainer.querySelectorAll('.exercise-card').length;
+                    let currentDay = workoutCard.querySelector('select').name.match(/\d+/)[0];
 
-            let container = document.getElementById('exercises-container');
+                    let html = `
+                <div class="exercise-card card border mb-3 p-3" style="border-color: #e5e7eb;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0" style="color: #1a472a;">
+                            <i class="fas fa-dumbbell me-2"></i> Exercise
+                        </h6>
+                        <button type="button" class="btn btn-danger btn-sm remove-exercise">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
 
-            let row = document.createElement('div');
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label" style="font-size: 0.85rem;">Exercise Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" style="border-color: #1a472a; border-radius: 8px;"
+                                name="days[${currentDay}][exercises][${exerciseIndex}][exercise_name]" placeholder="Enter exercise name" required>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label" style="font-size: 0.85rem;">Sets</label>
+                            <input type="number" class="form-control" value="3" style="border-color: #1a472a; border-radius: 8px;"
+                                name="days[${currentDay}][exercises][${exerciseIndex}][sets]">
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label" style="font-size: 0.85rem;">Reps</label>
+                            <input type="text" class="form-control" placeholder="12-15" style="border-color: #1a472a; border-radius: 8px;"
+                                name="days[${currentDay}][exercises][${exerciseIndex}][reps]">
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label" style="font-size: 0.85rem;">Weight</label>
+                            <input type="text" class="form-control" placeholder="Optional" style="border-color: #1a472a; border-radius: 8px;"
+                                name="days[${currentDay}][exercises][${exerciseIndex}][weight]">
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label" style="font-size: 0.85rem;">Rest Time</label>
+                            <input type="text" class="form-control" value="60 sec" style="border-color: #1a472a; border-radius: 8px;"
+                                name="days[${currentDay}][exercises][${exerciseIndex}][rest_time]">
+                        </div>
+                    </div>
 
-            row.className = 'exercise-row card p-3 mb-3';
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label class="form-label" style="font-size: 0.85rem;">Exercise Video URL</label>
+                            <input type="text" class="form-control" placeholder="Video URL" style="border-color: #1a472a; border-radius: 8px;"
+                                name="days[${currentDay}][exercises][${exerciseIndex}][exercise_video]">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" style="font-size: 0.85rem;">Trainer Notes</label>
+                            <input type="text" class="form-control" placeholder="Trainer Notes" style="border-color: #1a472a; border-radius: 8px;"
+                                name="days[${currentDay}][exercises][${exerciseIndex}][trainer_notes]">
+                        </div>
+                    </div>
 
-            row.innerHTML = `
+                    <div class="mt-3 text-end">
+                        <button type="button" class="btn btn-success btn-sm add-exercise">
+                            <i class="fas fa-plus me-1"></i> Add Exercise
+                        </button>
+                    </div>
+                </div>`;
 
-<div class="row">
+                    exerciseContainer.insertAdjacentHTML('beforeend', html);
+                }
+            });
 
-<div class="col-md-3">
+            // Remove Exercise
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-exercise')) {
+                    let card = e.target.closest('.exercise-card');
+                    let container = card.parentNode;
 
-<label>Day</label>
+                    if (container.querySelectorAll('.exercise-card').length > 1) {
+                        card.remove();
+                    } else {
+                        alert('At least one exercise is required.');
+                    }
+                }
+            });
 
-<select name="exercises[\${exerciseIndex}][day]" class="form-control">
+            // Add Workout Day
+            document.getElementById('addWorkoutDay').addEventListener('click', function() {
+                let container = document.getElementById('workout-days');
+                let template = container.querySelector('.workout-day');
+                let clone = template.cloneNode(true);
 
-<option>Monday</option>
-<option>Tuesday</option>
-<option>Wednesday</option>
-<option>Thursday</option>
-<option>Friday</option>
-<option>Saturday</option>
-<option>Sunday</option>
+                clone.querySelectorAll('input, textarea, select').forEach(function(el) {
+                    if (el.tagName == "INPUT") {
+                        el.value = "";
+                        if (el.name && el.name.includes('[sets]')) {
+                            el.value = "3";
+                        }
+                        if (el.name && el.name.includes('[rest_time]')) {
+                            el.value = "60 sec";
+                        }
+                    }
+                    if (el.tagName == "TEXTAREA") {
+                        el.value = "";
+                    }
+                    if (el.tagName == "SELECT") {
+                        el.selectedIndex = 0;
+                    }
 
-</select>
+                    if (el.name) {
+                        el.name = el.name.replace(/days\[\d+\]/g, `days[${dayIndex}]`);
+                        el.name = el.name.replace(/exercises\[\d+\]/g, 'exercises[0]');
+                    }
+                });
 
-</div>
+                let removeBtn = clone.querySelector('.remove-day');
+                if (removeBtn) {
+                    removeBtn.style.display = 'inline-block';
+                }
 
-<div class="col-md-3">
+                let exerciseContainer = clone.querySelector('.exercise-container');
+                let exerciseCards = exerciseContainer.querySelectorAll('.exercise-card');
+                if (exerciseCards.length > 1) {
+                    for (let i = exerciseCards.length - 1; i > 0; i--) {
+                        exerciseCards[i].remove();
+                    }
+                }
 
-<label>Exercise Name</label>
+                container.appendChild(clone);
+                dayIndex++;
+            });
 
-<input type="text"
-class="form-control"
-name="exercises[\${exerciseIndex}][exercise_name]">
-
-</div>
-
-<div class="col-md-2">
-
-<label>Sets</label>
-
-<input type="number"
-class="form-control"
-name="exercises[\${exerciseIndex}][sets]"
-value="3">
-
-</div>
-
-<div class="col-md-2">
-
-<label>Reps</label>
-
-<input type="text"
-class="form-control"
-name="exercises[\${exerciseIndex}][reps]">
-
-</div>
-
-<div class="col-md-2">
-
-<label>Weight</label>
-
-<input type="text"
-class="form-control"
-name="exercises[\${exerciseIndex}][weight]">
-
-</div>
-
-</div>
-
-<div class="row mt-3">
-
-<div class="col-md-4">
-
-<label>Rest Time</label>
-
-<input type="text"
-class="form-control"
-name="exercises[\${exerciseIndex}][rest_time]"
-value="60 sec">
-
-</div>
-
-<div class="col-md-4">
-
-<label>Exercise Image URL</label>
-
-<input type="text"
-class="form-control"
-name="exercises[\${exerciseIndex}][exercise_image]">
-
-</div>
-
-<div class="col-md-4">
-
-<label>Exercise Video URL</label>
-
-<input type="text"
-class="form-control"
-name="exercises[\${exerciseIndex}][exercise_video]">
-
-</div>
-
-</div>
-
-<div class="mt-3">
-
-<label>Trainer Notes</label>
-
-<textarea
-class="form-control"
-rows="3"
-name="exercises[\${exerciseIndex}][trainer_notes]"></textarea>
-
-</div>
-
-<button
-type="button"
-class="btn btn-danger btn-sm mt-3"
-onclick="this.closest('.exercise-row').remove()">
-
-Remove Exercise
-
-</button>
-
-`;
-
-            container.appendChild(row);
-
-            exerciseIndex++;
-
-        }
+            // Remove Workout Day
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-day')) {
+                    let allDays = document.querySelectorAll('.workout-day');
+                    if (allDays.length == 1) {
+                        alert('At least one Workout Day is required.');
+                        return;
+                    }
+                    e.target.closest('.workout-day').remove();
+                }
+            });
+        });
     </script>
+
+    <style>
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d2818 !important;
+            box-shadow: 0 0 0 0.2rem rgba(13, 40, 24, 0.15) !important;
+        }
+
+        .form-check-input:checked {
+            background-color: #0d2818;
+            border-color: #0d2818;
+        }
+
+        @media (max-width: 768px) {
+            .card-header .d-flex {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start !important;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+
+            .form-control,
+            .form-select {
+                font-size: 0.85rem;
+            }
+
+            .card-header h4 {
+                font-size: 1.1rem;
+            }
+
+            .exercise-card .row .col-md-4,
+            .exercise-card .row .col-md-2 {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
 
 @endsection

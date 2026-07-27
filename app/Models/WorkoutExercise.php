@@ -16,7 +16,7 @@ class WorkoutExercise extends Model
         'reps',
         'weight',
         'rest_time',
-        'exercise_image',
+        // 'exercise_image', // REMOVED - Column deleted from database
         'exercise_video',
         'trainer_notes',
         'display_order'

@@ -1,203 +1,313 @@
 @extends('layouts.trainer-layout')
 
 @section('content')
-
-<div class="container">
-
-    <div class="card">
-
-        <div class="card-header d-flex justify-content-between align-items-center">
-
-            <h4>
-                <i class="fas fa-utensils"></i>
-                Diet Plans
-            </h4>
-
-            <a href="{{ route('trainer.diet.create') }}"
-                class="btn btn-primary">
-
-                <i class="fas fa-plus"></i>
-
-                Add Diet Plan
-
-            </a>
-
-        </div>
-
-        <div class="card-body">
-
-            @if(session('success'))
-
-                <div class="alert alert-success">
-
-                    {{ session('success') }}
-
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <!-- Card Header - Green Theme -->
+                <div class="card-header" style="background: linear-gradient(135deg, #0d2818 0%, #1a472a 100%); color: white;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h4 class="mb-0">
+                            <i class="fas fa-utensils me-2"></i> Diet Plans
+                        </h4>
+                        <div>
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-list me-1"></i> Total: {{ $dietPlans->count() }}
+                            </span>
+                            <a href="{{ route('trainer.diet.create') }}" class="btn btn-sm"
+                                style="background: #ffd54f; color: #0d2818; border-radius: 8px;">
+                                <i class="fas fa-plus me-1"></i> Add Diet Plan
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
-            @endif
-
-            <div class="table-responsive">
-
-                <table class="table table-bordered table-striped">
-
-                    <thead class="table-dark">
-
-                        <tr>
-
-                            <th width="5%">#</th>
-
-                            <th>Member</th>
-
-                            <th>Diet Title</th>
-
-                            <th>Goal</th>
-
-                            <th>Start Date</th>
-
-                            <th>End Date</th>
-
-                            <th>Status</th>
-
-                            <th width="180">Action</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @forelse($dietPlans as $key => $diet)
-
-                        <tr>
-
-                            <td>{{ $key + 1 }}</td>
-
-                            <td>
-
-                                <strong>{{ $diet->member->name ?? '-' }}</strong>
-
-                                <br>
-
-                                <small>{{ $diet->member->email ?? '' }}</small>
-
-                            </td>
-
-                            <td>
-
-                                {{ $diet->title }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $diet->goal }}
-
-                            </td>
-
-                            <td>
-
-                                {{ \Carbon\Carbon::parse($diet->start_date)->format('d-m-Y') }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $diet->end_date ? \Carbon\Carbon::parse($diet->end_date)->format('d-m-Y') : '-' }}
-
-                            </td>
-
-                            <td>
-
-                                @if($diet->status=='Active')
-
-                                    <span class="badge bg-success">
-
-                                        Active
-
-                                    </span>
-
-                                @elseif($diet->status=='Completed')
-
-                                    <span class="badge bg-primary">
-
-                                        Completed
-
-                                    </span>
-
-                                @else
-
-                                    <span class="badge bg-danger">
-
-                                        Cancelled
-
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                            <td>
-                                                            <a href="{{ route('trainer.diet.show', $diet->id) }}"
-                                    class="btn btn-info btn-sm">
-
-                                    <i class="fas fa-eye"></i>
-
-                                </a>
-
-                                <a href="{{ route('trainer.diet.edit', $diet->id) }}"
-                                    class="btn btn-warning btn-sm">
-
-                                    <i class="fas fa-edit"></i>
-
-                                </a>
-
-                                <form
-                                    action="{{ route('trainer.diet.destroy', $diet->id) }}"
-                                    method="POST"
-                                    class="d-inline">
-
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button
-                                        type="submit"
-                                        class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Are you sure you want to delete this diet plan?')">
-
-                                        <i class="fas fa-trash"></i>
-
-                                    </button>
-
-                                </form>
-
-                            </td>
-
-                        </tr>
-
-                        @empty
-
-                        <tr>
-
-                            <td colspan="8" class="text-center">
-
-                                No Diet Plans Found.
-
-                            </td>
-
-                        </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
-
+                <div class="card-body">
+
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                            style="border-left: 4px solid #0d2818;">
+                            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                            style="border-left: 4px solid #dc3545;">
+                            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    @endif
+
+                    <!-- Filter Section -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-5 col-lg-4">
+                            <div class="input-group">
+                                <span class="input-group-text" style="background: #0d2818; color: white; border: none;">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="searchDiet"
+                                    placeholder="Search diet or member...">
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <select class="form-select" id="filterStatus">
+                                <option value="all">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-lg-5">
+                            <button class="btn w-100" style="background: #0d2818; color: white; border-radius: 8px;"
+                                onclick="resetFilters()">
+                                <i class="fas fa-undo me-1"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle" id="dietTable">
+                            <thead style="background: #0d2818; color: white;">
+                                <tr>
+                                    <th width="50">#</th>
+                                    <th>Member</th>
+                                    <th>Title</th>
+                                    <th>Goal</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Meals</th>
+                                    <th>Status</th>
+                                    <th width="180">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($dietPlans as $index => $diet)
+                                    <tr data-status="{{ $diet->status }}"
+                                        data-search="{{ strtolower($diet->title . ' ' . ($diet->member->name ?? '')) }}">
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            <strong>{{ $diet->member->name ?? 'N/A' }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ $diet->member->member_id ?? '' }}</small>
+                                        </td>
+                                        <td>{{ $diet->title }}</td>
+                                        <td>
+                                            <span class="badge" style="background: #8b5cf6; color: white;">
+                                                {{ $diet->goal ?? 'Fitness' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" style="background: #1a472a; color: white;">
+                                                <i class="far fa-calendar-alt me-1"></i>
+                                                {{ date('d M Y', strtotime($diet->start_date)) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if ($diet->end_date)
+                                                <span class="badge" style="background: #1a472a; color: white;">
+                                                    <i class="far fa-calendar-alt me-1"></i>
+                                                    {{ date('d M Y', strtotime($diet->end_date)) }}
+                                                </span>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <span class="badge" style="background: #3b82f6; color: white;">
+                                                <i class="fas fa-utensils me-1"></i>
+                                                {{ $diet->meals->count() }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if ($diet->status == 'Active')
+                                                <span class="badge"
+                                                    style="background: #10b981; color: white; padding: 5px 15px;">
+                                                    <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Active
+                                                </span>
+                                            @elseif($diet->status == 'Completed')
+                                                <span class="badge"
+                                                    style="background: #3b82f6; color: white; padding: 5px 15px;">
+                                                    <i class="fas fa-check-circle me-1"></i> Completed
+                                                </span>
+                                            @else
+                                                <span class="badge"
+                                                    style="background: #ef4444; color: white; padding: 5px 15px;">
+                                                    <i class="fas fa-times-circle me-1"></i> Cancelled
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <a href="{{ route('trainer.diet.show', $diet->id) }}"
+                                                    class="btn action-btn"
+                                                    style="background: #8b5cf6; color: white; border-radius: 6px; border: none; padding: 3px 10px; font-size: 0.7rem; height: 28px; min-width: 45px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+                                                    <i class="fas fa-eye me-1"></i> View
+                                                </a>
+                                                <a href="{{ route('trainer.diet.edit', $diet->id) }}"
+                                                    class="btn action-btn"
+                                                    style="background: #f59e0b; color: white; border-radius: 6px; border: none; padding: 3px 10px; font-size: 0.7rem; height: 28px; min-width: 45px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+                                                    <i class="fas fa-edit me-1"></i> Edit
+                                                </a>
+                                                <form action="{{ route('trainer.diet.destroy', $diet->id) }}"
+                                                    method="POST" style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn action-btn"
+                                                        style="background: #ef4444; color: white; border-radius: 6px; border: none; padding: 3px 10px; font-size: 0.7rem; height: 28px; min-width: 45px; display: inline-flex; align-items: center; justify-content: center;"
+                                                        onclick="return confirm('Delete this diet plan?')">
+                                                        <i class="fas fa-trash me-1"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4">
+                                            <i class="fas fa-utensils fa-3x text-muted mb-3 d-block"></i>
+                                            <h5 class="text-muted">No Diet Plans Found</h5>
+                                            <p class="text-muted">Create a new diet plan for your members.</p>
+                                            <a href="{{ route('trainer.diet.create') }}" class="btn"
+                                                style="background: #0d2818; color: white; border-radius: 8px; padding: 8px 25px;">
+                                                <i class="fas fa-plus me-2"></i> Add Diet Plan
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
             </div>
-
         </div>
-
     </div>
 
-</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchDiet');
+            const filterStatus = document.getElementById('filterStatus');
+            const table = document.querySelector('table tbody');
+            if (!table) return;
+            const rows = table.getElementsByTagName('tr');
 
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                const statusFilter = filterStatus.value;
+
+                for (let row of rows) {
+                    if (row.cells.length === 0 || row.cells[0]?.colSpan > 1) continue;
+
+                    const searchData = row.getAttribute('data-search') || '';
+                    const status = row.getAttribute('data-status') || '';
+
+                    const matchesSearch = searchTerm === '' || searchData.includes(searchTerm);
+                    const matchesStatus = statusFilter === 'all' || status === statusFilter;
+
+                    row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+                }
+            }
+
+            searchInput?.addEventListener('input', filterTable);
+            filterStatus?.addEventListener('change', filterTable);
+        });
+
+        function resetFilters() {
+            document.getElementById('searchDiet').value = '';
+            document.getElementById('filterStatus').value = 'all';
+            document.getElementById('searchDiet')?.dispatchEvent(new Event('input'));
+            document.getElementById('filterStatus')?.dispatchEvent(new Event('change'));
+        }
+    </script>
+
+    <style>
+        .table-hover tbody tr:hover {
+            background: rgba(13, 40, 24, 0.03);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #1a472a !important;
+            box-shadow: 0 0 0 0.2rem rgba(26, 71, 42, 0.15) !important;
+        }
+
+        .action-btn {
+            padding: 3px 10px !important;
+            font-size: 0.7rem !important;
+            border-radius: 6px !important;
+            height: 28px !important;
+            min-height: 28px !important;
+            max-height: 28px !important;
+            min-width: 45px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+        }
+
+        .action-btn i {
+            font-size: 0.65rem !important;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .card-header .d-flex {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start !important;
+            }
+
+            .btn.w-100 {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+
+            .d-flex.gap-1 {
+                flex-wrap: wrap !important;
+            }
+
+            .action-btn {
+                height: 26px !important;
+                min-height: 26px !important;
+                max-height: 26px !important;
+                min-width: 40px !important;
+                padding: 2px 8px !important;
+                font-size: 0.65rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+
+            .badge {
+                font-size: 0.65rem;
+            }
+
+            .action-btn {
+                height: 24px !important;
+                min-height: 24px !important;
+                max-height: 24px !important;
+                min-width: 35px !important;
+                padding: 1px 6px !important;
+                font-size: 0.6rem !important;
+            }
+
+            .action-btn i {
+                font-size: 0.55rem !important;
+            }
+        }
+    </style>
 @endsection

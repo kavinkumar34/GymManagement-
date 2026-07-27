@@ -30,6 +30,13 @@
                         @if ($workouts->count())
                             <div class="row g-4">
                                 @foreach ($workouts as $workout)
+                                    @php
+                                        $start = \Carbon\Carbon::parse($workout->start_date);
+                                        $end = \Carbon\Carbon::parse($workout->end_date);
+                                        $durationDays = $start->diffInDays($end);
+                                        $totalExercises = $workout->exercises->count();
+                                        $uniqueDays = $workout->exercises->groupBy('day')->count();
+                                    @endphp
                                     <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12">
                                         <div class="workout-card">
                                             <!-- Workout Header -->
@@ -77,23 +84,29 @@
                                                             <i class="fas fa-clock me-1"></i> Duration
                                                         </span>
                                                         <span class="info-value">
-                                                            @php
-                                                                $start = \Carbon\Carbon::parse($workout->start_date);
-                                                                $end = \Carbon\Carbon::parse($workout->end_date);
-                                                                $days = $start->diffInDays($end);
-                                                            @endphp
-                                                            {{ $days }} Day(s)
+                                                            {{ $uniqueDays }} Day(s)
                                                         </span>
                                                     </div>
                                                 </div>
 
-                                                
-
-                                                <!-- Exercise Count -->
-                                                <div class="exercise-count">
-                                                    <i class="fas fa-list-ul me-1"></i>
-                                                    {{ $workout->exercises->count() }} Exercise(s)
+                                                <!-- Workout Stats -->
+                                                <div class="workout-stats">
+                                                    <div class="stat-badge">
+                                                        <i class="fas fa-calendar-week me-1"></i>
+                                                        {{ $uniqueDays }} Day(s)
+                                                    </div>
+                                                    <div class="stat-badge">
+                                                        <i class="fas fa-list-ul me-1"></i>
+                                                        {{ $totalExercises }} Exercise(s)
+                                                    </div>
                                                 </div>
+
+                                                @if ($workout->description)
+                                                    <p class="workout-description-small">
+                                                        <i class="fas fa-align-left me-1"></i>
+                                                        {{ Str::limit($workout->description, 60) }}
+                                                    </p>
+                                                @endif
                                             </div>
 
                                             <!-- Workout Footer -->
@@ -109,7 +122,7 @@
                                 @endforeach
                             </div>
 
-                            <!-- Pagination - Removed hasPages check -->
+                            <!-- Pagination -->
                             @if (method_exists($workouts, 'links'))
                                 <div class="pagination-wrapper">
                                     {{ $workouts->links() }}
@@ -255,7 +268,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px 20px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .info-item {
@@ -283,53 +296,42 @@
         }
 
         /* ============================================ */
-        /* PROGRESS BAR                                 */
+        /* WORKOUT STATS                                */
         /* ============================================ */
-        .workout-progress {
-            margin-bottom: 10px;
-        }
-
-        .progress-label {
+        .workout-stats {
             display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-bottom: 4px;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
-        .progress-label span:last-child {
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 14px;
+            background: #f8fafc;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #0d1b3e;
+            border: 1px solid rgba(13, 27, 62, 0.06);
         }
 
-        .progress-bar-custom {
-            width: 100%;
-            height: 6px;
-            background: #e8edf5;
-            border-radius: 10px;
-            overflow: hidden;
+        .stat-badge i {
+            color: #1a2a6c;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #0d1b3e 0%, #1a2a6c 100%);
-            border-radius: 10px;
-            transition: width 0.8s ease;
-        }
-
-        /* ============================================ */
-        /* EXERCISE COUNT                               */
-        /* ============================================ */
-        .exercise-count {
+        .workout-description-small {
             font-size: 0.8rem;
             color: #64748b;
-            padding: 6px 12px;
+            margin: 0;
+            padding: 8px 12px;
             background: #f8fafc;
-            border-radius: 8px;
-            display: inline-block;
+            border-radius: 6px;
+            border-left: 3px solid #1a2a6c;
         }
 
-        .exercise-count i {
+        .workout-description-small i {
             color: #1a2a6c;
         }
 
@@ -513,6 +515,11 @@
             .workout-count {
                 font-size: 0.75rem;
                 padding: 2px 10px;
+            }
+
+            .workout-stats {
+                flex-direction: column;
+                gap: 5px;
             }
         }
 

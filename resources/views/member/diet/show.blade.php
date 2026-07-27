@@ -12,7 +12,7 @@
             </div>
 
             <div class="diet-detail-main">
-                <!-- Card Header - Matching Navbar Theme -->
+                <!-- Card Header -->
                 <div class="diet-detail-header">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                         <h4 class="mb-0">
@@ -67,8 +67,8 @@
                             <div class="info-card">
                                 <span class="info-icon"><i class="fas fa-utensils"></i></span>
                                 <div>
-                                    <span class="info-label">Total Meals</span>
-                                    <span class="info-value">{{ $diet->meals->count() }} Meal(s)</span>
+                                    <span class="info-label">Total Items</span>
+                                    <span class="info-value">{{ $diet->meals->count() }} Item(s)</span>
                                 </div>
                             </div>
                         </div>
@@ -90,6 +90,37 @@
                         </h5>
 
                         @if($diet->meals->count())
+                            @php
+                                // Group meals by Day
+                                $groupedByDay = [];
+                                foreach($diet->meals as $meal) {
+                                    $groupedByDay[$meal->day][] = $meal;
+                                }
+                                
+                                // Helper function to extract numeric value
+                                function extractNumber($value) {
+                                    if (is_null($value) || $value === '') {
+                                        return 0;
+                                    }
+                                    $numeric = preg_replace('/[^0-9.]/', '', $value);
+                                    return is_numeric($numeric) ? (float)$numeric : 0;
+                                }
+                                
+                                // Calculate totals
+                                $totalCalories = $diet->meals->sum(function($meal) {
+                                    return extractNumber($meal->calories);
+                                });
+                                $totalProtein = $diet->meals->sum(function($meal) {
+                                    return extractNumber($meal->protein);
+                                });
+                                $totalCarbs = $diet->meals->sum(function($meal) {
+                                    return extractNumber($meal->carbs);
+                                });
+                                $totalFats = $diet->meals->sum(function($meal) {
+                                    return extractNumber($meal->fats);
+                                });
+                            @endphp
+
                             <div class="table-responsive">
                                 <table class="meal-table">
                                     <thead>
@@ -106,69 +137,50 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($diet->meals as $meal)
-                                            <tr>
-                                                <td>
-                                                    <span class="meal-day">{{ $meal->day }}</span>
-                                                </td>
-                                                <td>
-                                                    <span class="meal-time">{{ $meal->meal_time }}</span>
-                                                </td>
-                                                <td>
-                                                    <span class="food-name">{{ $meal->food_name }}</span>
-                                                </td>
-                                                <td>{{ $meal->quantity ?? '-' }}</td>
-                                                <td>
-                                                    <span class="calorie-badge">{{ $meal->calories ?? 0 }}</span>
-                                                </td>
-                                                <td>
-                                                    <span class="nutrition-value protein">{{ $meal->protein ?? 0 }}</span>
-                                                </td>
-                                                <td>
-                                                    <span class="nutrition-value carbs">{{ $meal->carbs ?? 0 }}</span>
-                                                </td>
-                                                <td>
-                                                    <span class="nutrition-value fats">{{ $meal->fats ?? 0 }}</span>
-                                                </td>
-                                                <td>
-                                                    @if($meal->notes)
-                                                        <span class="meal-notes">{{ $meal->notes }}</span>
-                                                    @else
-                                                        <span class="text-muted">-</span>
+                                        @foreach($groupedByDay as $day => $meals)
+                                            @php $dayCount = count($meals); @endphp
+                                            @foreach($meals as $index => $meal)
+                                                <tr>
+                                                    @if($index === 0)
+                                                        <td class="day-merged" rowspan="{{ $dayCount }}">
+                                                            <span class="meal-day">{{ $day }}</span>
+                                                            <span class="day-count">{{ $dayCount }}</span>
+                                                        </td>
                                                     @endif
-                                                </td>
-                                            </tr>
+                                                    <td>
+                                                        <span class="meal-time">{{ $meal->meal_time }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="food-name">{{ $meal->food_name }}</span>
+                                                    </td>
+                                                    <td>{{ $meal->quantity ?? '-' }}</td>
+                                                    <td>
+                                                        <span class="calorie-badge">{{ $meal->calories ?? 0 }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="nutrition-value protein">{{ $meal->protein ?? 0 }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="nutrition-value carbs">{{ $meal->carbs ?? 0 }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="nutrition-value fats">{{ $meal->fats ?? 0 }}</span>
+                                                    </td>
+                                                    <td>
+                                                        @if($meal->notes)
+                                                            <span class="meal-notes">{{ $meal->notes }}</span>
+                                                        @else
+                                                            <span class="text-muted">-</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
 
-                            <!-- Meal Summary - FIXED with numeric extraction -->
-                            @php
-                                // Helper function to extract numeric value from string
-                                function extractNumber($value) {
-                                    if (is_null($value) || $value === '') {
-                                        return 0;
-                                    }
-                                    // Remove all non-numeric characters except decimal point
-                                    $numeric = preg_replace('/[^0-9.]/', '', $value);
-                                    return is_numeric($numeric) ? (float)$numeric : 0;
-                                }
-
-                                $totalCalories = $diet->meals->sum(function($meal) {
-                                    return extractNumber($meal->calories);
-                                });
-                                $totalProtein = $diet->meals->sum(function($meal) {
-                                    return extractNumber($meal->protein);
-                                });
-                                $totalCarbs = $diet->meals->sum(function($meal) {
-                                    return extractNumber($meal->carbs);
-                                });
-                                $totalFats = $diet->meals->sum(function($meal) {
-                                    return extractNumber($meal->fats);
-                                });
-                            @endphp
-
+                            <!-- Meal Summary -->
                             <div class="meal-summary">
                                 <div class="summary-item">
                                     <span class="summary-label">Total Meals:</span>
@@ -230,7 +242,7 @@
 }
 
 /* ============================================ */
-/* MAIN CARD - Matching Navbar Theme            */
+/* MAIN CARD                                    */
 /* ============================================ */
 .diet-detail-main {
     background: #ffffff;
@@ -432,11 +444,40 @@
     color: #334155;
 }
 
-.meal-day {
-    font-weight: 600;
-    color: #0d1b3e;
+/* ============================================ */
+/* DAY MERGED COLUMN                            */
+/* ============================================ */
+.day-merged {
+    background: linear-gradient(135deg, #eef2f7 0%, #f8fafc 100%);
+    border-right: 2px solid rgba(13, 27, 62, 0.1);
+    text-align: center;
+    vertical-align: middle !important;
+    min-width: 100px;
 }
 
+.meal-day {
+    display: block;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0d1b3e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.day-count {
+    display: inline-block;
+    background: #0d1b3e;
+    color: #ffffff;
+    padding: 1px 10px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* ============================================ */
+/* TABLE CELL STYLES                            */
+/* ============================================ */
 .meal-time {
     font-weight: 500;
     color: #1a2a6c;
@@ -575,6 +616,14 @@
         padding: 8px 10px;
     }
     
+    .day-merged {
+        min-width: 60px;
+    }
+    
+    .meal-day {
+        font-size: 0.8rem;
+    }
+    
     .btn-back {
         padding: 6px 16px;
         font-size: 0.85rem;
@@ -604,6 +653,19 @@
     
     .meal-table thead th i {
         display: none;
+    }
+    
+    .day-merged {
+        min-width: 50px;
+    }
+    
+    .meal-day {
+        font-size: 0.7rem;
+    }
+    
+    .day-count {
+        font-size: 0.55rem;
+        padding: 1px 6px;
     }
     
     .summary-value {

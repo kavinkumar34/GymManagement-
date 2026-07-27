@@ -46,50 +46,37 @@ class DietController extends Controller
             'meals' => 'required|array',
             'meals.*.day' => 'required',
             'meals.*.meal_time' => 'required',
-            'meals.*.food_name' => 'required',
+            'meals.*.food_items' => 'required|array',
+            'meals.*.food_items.*.food_name' => 'required',
         ]);
 
         foreach ($request->member_ids as $memberId) {
-
             $diet = DietPlan::create([
                 'trainer_id' => session('gym_user_id'),
                 'member_id' => $memberId,
-
                 'title' => $request->title,
                 'goal' => $request->goal,
                 'description' => $request->description,
-
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
-
                 'status' => 'Active',
             ]);
 
-            foreach ($request->meals as $meal) {
-
-                DietMeal::create([
-
-                    'diet_plan_id' => $diet->id,
-
-                    'day' => $meal['day'],
-
-                    'meal_time' => $meal['meal_time'],
-
-                    'food_name' => $meal['food_name'],
-
-                    'quantity' => $meal['quantity'] ?? null,
-
-                    'calories' => $meal['calories'] ?? null,
-
-                    'protein' => $meal['protein'] ?? null,
-
-                    'carbs' => $meal['carbs'] ?? null,
-
-                    'fats' => $meal['fats'] ?? null,
-
-                    'notes' => $meal['notes'] ?? null,
-
-                ]);
+            foreach ($request->meals as $mealData) {
+                foreach ($mealData['food_items'] as $foodItem) {
+                    DietMeal::create([
+                        'diet_plan_id' => $diet->id,
+                        'day' => $mealData['day'],
+                        'meal_time' => $mealData['meal_time'],
+                        'food_name' => $foodItem['food_name'],
+                        'quantity' => $foodItem['quantity'] ?? null,
+                        'calories' => $foodItem['calories'] ?? null,
+                        'protein' => $foodItem['protein'] ?? null,
+                        'carbs' => $foodItem['carbs'] ?? null,
+                        'fats' => $foodItem['fats'] ?? null,
+                        'notes' => $foodItem['notes'] ?? null,
+                    ]);
+                }
             }
         }
 
@@ -97,13 +84,28 @@ class DietController extends Controller
             ->route('trainer.diet.index')
             ->with('success', 'Diet Plan Assigned Successfully.');
     }
-        public function show($id)
+
+    public function show($id)
     {
         $diet = DietPlan::where('trainer_id', session('gym_user_id'))
             ->with(['member', 'meals'])
             ->findOrFail($id);
 
-        return view('trainer.diet.show', compact('diet'));
+        // Group meals by day and meal_time
+        $groupedMeals = [];
+        foreach ($diet->meals as $meal) {
+            $key = $meal->day . '|' . $meal->meal_time;
+            if (!isset($groupedMeals[$key])) {
+                $groupedMeals[$key] = [
+                    'day' => $meal->day,
+                    'meal_time' => $meal->meal_time,
+                    'items' => []
+                ];
+            }
+            $groupedMeals[$key]['items'][] = $meal;
+        }
+
+        return view('trainer.diet.show', compact('diet', 'groupedMeals'));
     }
 
     public function edit($id)
@@ -112,12 +114,26 @@ class DietController extends Controller
             ->with('meals')
             ->findOrFail($id);
 
+        // Group meals by day and meal_time for editing
+        $groupedMeals = [];
+        foreach ($diet->meals as $meal) {
+            $key = $meal->day . '|' . $meal->meal_time;
+            if (!isset($groupedMeals[$key])) {
+                $groupedMeals[$key] = [
+                    'day' => $meal->day,
+                    'meal_time' => $meal->meal_time,
+                    'items' => []
+                ];
+            }
+            $groupedMeals[$key]['items'][] = $meal;
+        }
+
         $members = Member::where('trainer_id', session('gym_user_id'))
             ->where('status', 'Active')
             ->orderBy('name')
             ->get();
 
-        return view('trainer.diet.edit', compact('diet', 'members'));
+        return view('trainer.diet.edit', compact('diet', 'members', 'groupedMeals'));
     }
 
     public function update(Request $request, $id)
@@ -135,55 +151,41 @@ class DietController extends Controller
             'meals' => 'required|array',
             'meals.*.day' => 'required',
             'meals.*.meal_time' => 'required',
-            'meals.*.food_name' => 'required',
+            'meals.*.food_items' => 'required|array',
+            'meals.*.food_items.*.food_name' => 'required',
         ]);
 
         $diet = DietPlan::where('trainer_id', session('gym_user_id'))
             ->findOrFail($id);
 
         $diet->update([
-
             'member_id' => $request->member_id,
-
             'title' => $request->title,
-
             'goal' => $request->goal,
-
             'description' => $request->description,
-
             'start_date' => $request->start_date,
-
             'end_date' => $request->end_date,
-
         ]);
 
+        // Delete old meals
         DietMeal::where('diet_plan_id', $diet->id)->delete();
 
-        foreach ($request->meals as $meal) {
-
-            DietMeal::create([
-
-                'diet_plan_id' => $diet->id,
-
-                'day' => $meal['day'],
-
-                'meal_time' => $meal['meal_time'],
-
-                'food_name' => $meal['food_name'],
-
-                'quantity' => $meal['quantity'] ?? null,
-
-                'calories' => $meal['calories'] ?? null,
-
-                'protein' => $meal['protein'] ?? null,
-
-                'carbs' => $meal['carbs'] ?? null,
-
-                'fats' => $meal['fats'] ?? null,
-
-                'notes' => $meal['notes'] ?? null,
-
-            ]);
+        // Add new meals
+        foreach ($request->meals as $mealData) {
+            foreach ($mealData['food_items'] as $foodItem) {
+                DietMeal::create([
+                    'diet_plan_id' => $diet->id,
+                    'day' => $mealData['day'],
+                    'meal_time' => $mealData['meal_time'],
+                    'food_name' => $foodItem['food_name'],
+                    'quantity' => $foodItem['quantity'] ?? null,
+                    'calories' => $foodItem['calories'] ?? null,
+                    'protein' => $foodItem['protein'] ?? null,
+                    'carbs' => $foodItem['carbs'] ?? null,
+                    'fats' => $foodItem['fats'] ?? null,
+                    'notes' => $foodItem['notes'] ?? null,
+                ]);
+            }
         }
 
         return redirect()

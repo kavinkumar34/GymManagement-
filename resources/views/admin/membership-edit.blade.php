@@ -1,296 +1,726 @@
 @extends('layouts.admin-layout')
 
 @section('content')
+    <style>
+        /* ============================================ */
+        /* COLOR VARIABLES - MATCHING NAVBAR          */
+        /* ============================================ */
+        :root {
+            --primary: #4a9eff;
+            --primary-dark: #2b7be0;
+            --primary-light: #8ab4f8;
+            --success: #4caf50;
+            --warning: #ffa726;
+            --danger: #ef5350;
+            --dark: #1a1a2e;
+            --gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            --radius: 10px;
+            --radius-lg: 16px;
+        }
 
-<div class="admin-main-content">
-    <div class="container-fluid">
+        .admin-main-content {
+            padding: 20px 25px;
+            background: #f0f4f8;
+            min-height: 100vh;
+        }
 
-        <div class="card shadow">
+        /* ============================================ */
+        /* CARD STYLES                                 */
+        /* ============================================ */
+        .edit-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
 
-            <div class="card-header d-flex justify-content-between align-items-center text-white"
-                style="background: linear-gradient(180deg,#0d1b2a 0%,#1b3a5c 50%,#0d1b2a 100%);">
+        .edit-card .card-header {
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b3a5c 100%);
+            color: #ffffff;
+            border-bottom: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
-                <h4 class="mb-0">
-                    <i class="fas fa-edit"></i>
-                    Edit Membership
-                </h4>
+        .edit-card .card-header h4 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-                <a href="{{ route('admin.membership.index') }}"
-                    class="btn btn-light">
+        .edit-card .card-header h4 i {
+            color: #4a9eff;
+        }
 
-                    <i class="fas fa-arrow-left"></i>
-                    Back to List
+        .edit-card .card-header small {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: 400;
+        }
 
+        .edit-card .card-body {
+            padding: 20px 24px;
+        }
+
+        /* ============================================ */
+        /* SECTION HEADERS                             */
+        /* ============================================ */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            padding: 6px 14px;
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            border-left: 3px solid var(--primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        /* ============================================ */
+        /* FORM STYLES                                 */
+        /* ============================================ */
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .form-label .text-danger {
+            color: var(--danger) !important;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 7px 12px;
+            font-size: 13px;
+            transition: all 0.3s;
+            background: #ffffff;
+            height: 38px;
+            color: var(--dark);
+            width: 100%;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+            outline: none;
+        }
+
+        .form-control[readonly] {
+            background: #f8f9fa;
+            cursor: not-allowed;
+            color: var(--gray);
+        }
+
+        textarea.form-control {
+            height: auto;
+            min-height: 50px;
+            resize: vertical;
+        }
+
+        /* ============================================ */
+        /* DROPDOWN - SAME AS INPUTS                   */
+        /* ============================================ */
+        select.form-control,
+        select.form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            cursor: pointer;
+            color: #1a1a2e !important;
+            background-color: #ffffff !important;
+        }
+
+        select.form-control option,
+        select.form-select option {
+            padding: 8px 12px;
+            color: #1a1a2e !important;
+            background: #ffffff !important;
+        }
+
+        select.form-control option:hover,
+        select.form-control option:focus,
+        select.form-select option:hover,
+        select.form-select option:focus {
+            background: #e8f4fd !important;
+            color: #1a1a2e !important;
+        }
+
+        select.form-control option:checked,
+        select.form-select option:checked {
+            background: #d4e8fc !important;
+            color: #1a1a2e !important;
+        }
+
+        select.form-control:focus,
+        select.form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+            color: #1a1a2e !important;
+        }
+
+        /* ============================================ */
+        /* FILE INPUT WITH FILE NAME                  */
+        /* ============================================ */
+        .file-input-wrapper {
+            position: relative;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .file-input-wrapper .file-input-container {
+            position: relative;
+            flex: 1;
+            height: 38px;
+            min-width: 150px;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .file-input-wrapper .file-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: #ffffff;
+            font-size: 13px;
+            color: var(--gray);
+            height: 38px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .file-input-wrapper .file-label i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .file-input-wrapper .file-label:hover {
+            border-color: var(--primary);
+            background: #f8f9fa;
+        }
+
+        .file-input-wrapper .file-name {
+            font-size: 13px;
+            color: var(--dark);
+            padding: 0 8px;
+            flex: 1;
+            min-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .file-input-wrapper .file-name .no-file {
+            color: var(--gray);
+            font-style: italic;
+        }
+
+        .file-input-wrapper .file-name .selected-file {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        /* ============================================ */
+        /* CURRENT IMAGE                               */
+        /* ============================================ */
+        .current-image {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .current-image img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+        }
+
+        .current-image .image-label {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* ============================================ */
+        /* COMPACT ROW                                */
+        /* ============================================ */
+        .compact-row {
+            margin-bottom: 0;
+        }
+
+        .compact-row .mb-3 {
+            margin-bottom: 10px !important;
+        }
+
+        /* ============================================ */
+        /* BUTTON STYLES                               */
+        /* ============================================ */
+        .btn-success {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 9px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-success:hover {
+            background: #388e3c;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.35);
+        }
+
+        .btn-secondary {
+            background: #f0f4f8;
+            color: var(--gray);
+            border: 1px solid var(--border-color);
+            padding: 9px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            color: var(--dark);
+        }
+
+        .form-actions {
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* ============================================ */
+        /* ERROR ALERT                                 */
+        /* ============================================ */
+        .alert-danger {
+            background: #fce4ec;
+            color: #c62828;
+            border-left: 4px solid #ef5350;
+            border-radius: var(--radius);
+            padding: 12px 18px;
+            margin-bottom: 16px;
+            border: none;
+        }
+
+        .alert-danger ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        /* ============================================ */
+        /* RESPONSIVE                                  */
+        /* ============================================ */
+        @media (max-width: 768px) {
+            .admin-main-content {
+                padding: 12px 15px;
+            }
+
+            .edit-card .card-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .edit-card .card-header h4 {
+                font-size: 16px;
+            }
+
+            .edit-card .card-body {
+                padding: 14px 16px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .file-input-wrapper {
+                flex-wrap: wrap;
+                height: auto;
+            }
+
+            .file-input-wrapper .file-input-container {
+                flex: 1;
+                min-width: 150px;
+            }
+
+            .file-input-wrapper .file-name {
+                font-size: 12px;
+                min-width: 50px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .edit-card .card-header h4 {
+                font-size: 14px;
+            }
+
+            .edit-card .card-body {
+                padding: 10px 12px;
+            }
+
+            .form-label {
+                font-size: 11px;
+            }
+
+            .form-control,
+            .form-select {
+                font-size: 12px;
+                padding: 5px 10px;
+                height: 34px;
+            }
+
+            .section-title {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+
+            .btn-success,
+            .btn-secondary {
+                padding: 7px 16px;
+                font-size: 12px;
+            }
+
+            .file-input-wrapper .file-label {
+                font-size: 12px;
+                padding: 5px 10px;
+                height: 34px;
+            }
+
+            .file-input-wrapper .file-name {
+                font-size: 11px;
+            }
+
+            .current-image img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+
+    <div class="admin-main-content">
+        <div class="edit-card">
+            <!-- Card Header -->
+            <div class="card-header">
+                <div>
+                    <h4><i class="fas fa-edit"></i> Edit Membership</h4>
+                    <small>Update membership plan</small>
+                </div>
+                <a href="{{ route('admin.membership.index') }}" class="btn btn-secondary"
+                    style="background:#f0f4f8; color:var(--gray); border:1px solid var(--border-color); padding:6px 16px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:500; font-size:12px; transition:all 0.3s;">
+                    <i class="fas fa-arrow-left"></i> Back
                 </a>
-
             </div>
 
+            <!-- Card Body -->
             <div class="card-body">
-
-                @if($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach($errors->all() as $error)
+                @if ($errors->any())
+                    <div class="alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
                 @endif
 
-                <form action="{{ route('admin.membership.update', $membership->id) }}"
-                    method="POST"
+                <form action="{{ route('admin.membership.update', $membership->id) }}" method="POST"
                     enctype="multipart/form-data">
-
                     @csrf
                     @method('PUT')
 
-                    <div class="row">
+                    <!-- ========================================== -->
+                    <!-- PLAN INFORMATION                           -->
+                    <!-- ========================================== -->
+                    <div class="section-title">
+                        <i class="fas fa-info-circle"></i> Plan Information
+                    </div>
 
+                    <div class="row compact-row">
                         <!-- Plan Name -->
                         <div class="col-md-6 mb-3">
-                            <label for="plan_name" class="form-label fw-bold">
-                                Plan Name <span class="text-danger">*</span>
-                            </label>
-                            <input type="text"
-                                name="plan_name"
-                                id="plan_name"
-                                class="form-control"
-                                value="{{ old('plan_name', $membership->plan_name) }}"
-                                required>
+                            <label class="form-label">Plan Name <span class="text-danger">*</span></label>
+                            <input type="text" name="plan_name" class="form-control"
+                                value="{{ old('plan_name', $membership->plan_name) }}" required>
                         </div>
 
                         <!-- Image -->
                         <div class="col-md-6 mb-3">
-                            <label for="image" class="form-label fw-bold">
-                                Image
-                            </label>
-                            <input type="file"
-                                name="image"
-                                id="image"
-                                class="form-control"
-                                accept="image/*">
-
-                            @if($membership->image)
-                                <div class="mt-2">
-                                    <img src="{{ asset('storage/'.$membership->image) }}"
-                                        width="80"
-                                        height="80"
-                                        style="object-fit:cover;border-radius:8px;border:1px solid #ddd;">
-                                    <small class="d-block text-muted mt-1">
-                                        Current Image
-                                    </small>
+                            <label class="form-label">Image</label>
+                            @if ($membership->image)
+                                <div class="current-image">
+                                    <img src="{{ asset('storage/' . $membership->image) }}"
+                                        alt="{{ $membership->plan_name }}">
+                                    <span class="image-label"><i class="fas fa-check-circle text-success"></i> Current
+                                        Image</span>
                                 </div>
                             @endif
+                            <div class="file-input-wrapper">
+                                <div class="file-input-container">
+                                    <div class="file-label">
+                                        <i class="fas fa-image"></i>
+                                        <span>Change image</span>
+                                    </div>
+                                    <input type="file" name="image" id="image" accept="image/*"
+                                        onchange="updateFileName()">
+                                </div>
+                                <span class="file-name" id="fileNameDisplay">
+                                    <span class="no-file">No file chosen</span>
+                                </span>
+                            </div>
+                            <small class="text-muted" style="font-size:11px;">Leave empty to keep current image</small>
                         </div>
+                    </div>
 
+                    <!-- ========================================== -->
+                    <!-- PRICING & DURATION                         -->
+                    <!-- ========================================== -->
+                    <div class="section-title mt-2">
+                        <i class="fas fa-clock"></i> Pricing & Duration
+                    </div>
+
+                    <div class="row compact-row">
                         <!-- Duration -->
                         <div class="col-md-4 mb-3">
-                            <label for="duration" class="form-label fw-bold">
-                                Duration <span class="text-danger">*</span>
-                            </label>
-                            <input type="number"
-                                name="duration"
-                                id="duration"
-                                class="form-control"
-                                value="{{ old('duration', $membership->duration) }}"
-                                min="1"
-                                required>
+                            <label class="form-label">Duration <span class="text-danger">*</span></label>
+                            <input type="number" name="duration" class="form-control"
+                                value="{{ old('duration', $membership->duration) }}" min="1" required>
                         </div>
 
                         <!-- Duration Type -->
                         <div class="col-md-4 mb-3">
-                            <label for="duration_type" class="form-label fw-bold">
-                                Duration Type <span class="text-danger">*</span>
-                            </label>
-                            <select name="duration_type"
-                                id="duration_type"
-                                class="form-select"
-                                required>
-
+                            <label class="form-label">Duration Type <span class="text-danger">*</span></label>
+                            <select name="duration_type" class="form-control" required>
                                 <option value="Days"
-                                    {{ old('duration_type', $membership->duration_type) == 'Days' ? 'selected' : '' }}>
-                                    Days
+                                    {{ old('duration_type', $membership->duration_type) == 'Days' ? 'selected' : '' }}>Days
                                 </option>
-
                                 <option value="Months"
                                     {{ old('duration_type', $membership->duration_type) == 'Months' ? 'selected' : '' }}>
-                                    Months
-                                </option>
-
+                                    Months</option>
                                 <option value="Years"
                                     {{ old('duration_type', $membership->duration_type) == 'Years' ? 'selected' : '' }}>
-                                    Years
-                                </option>
-
+                                    Years</option>
                             </select>
                         </div>
 
                         <!-- Price -->
                         <div class="col-md-4 mb-3">
-                            <label for="price" class="form-label fw-bold">
-                                Price (₹) <span class="text-danger">*</span>
-                            </label>
-                            <input type="number"
-                                name="price"
-                                id="price"
-                                class="form-control"
-                                value="{{ old('price', $membership->price) }}"
-                                step="0.01"
-                                min="0"
-                                required>
+                            <label class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" id="price" name="price" class="form-control"
+                                value="{{ old('price', $membership->price) }}" required>
                         </div>
+                    </div>
 
+                    <div class="row compact-row">
                         <!-- Discount Type -->
                         <div class="col-md-4 mb-3">
-                            <label for="discount_type" class="form-label fw-bold">
-                                Discount Type
-                            </label>
-                            <select name="discount_type"
-                                id="discount_type"
-                                class="form-select">
-
+                            <label class="form-label">Discount Type</label>
+                            <select name="discount_type" id="discount_type" class="form-control">
                                 <option value="Flat"
-                                    {{ old('discount_type', $membership->discount_type) == 'Flat' ? 'selected' : '' }}>
-                                    Flat (₹)
-                                </option>
-
+                                    {{ old('discount_type', $membership->discount_type) == 'Flat' ? 'selected' : '' }}>Flat
+                                    (₹)</option>
                                 <option value="Percentage"
                                     {{ old('discount_type', $membership->discount_type) == 'Percentage' ? 'selected' : '' }}>
-                                    Percentage (%)
-                                </option>
-
+                                    Percentage (%)</option>
                             </select>
                         </div>
 
                         <!-- Discount -->
                         <div class="col-md-4 mb-3">
-                            <label for="discount" class="form-label fw-bold">
-                                Discount Value
-                            </label>
-                            <input type="number"
-                                name="discount"
-                                id="discount"
-                                class="form-control"
-                                value="{{ old('discount', $membership->discount) }}"
-                                step="0.01"
-                                min="0">
-                            <small class="text-muted">
-                                Enter 0 for no discount
-                            </small>
+                            <label class="form-label">Discount</label>
+                            <input type="number" step="0.01" id="discount" name="discount" class="form-control"
+                                value="{{ old('discount', $membership->discount) }}" min="0">
+                            <small class="text-muted" style="font-size:10px;">Enter 0 for no discount</small>
                         </div>
 
-                        <!-- Final Price (Auto Calculated - Read Only) -->
+                        <!-- Final Price -->
                         <div class="col-md-4 mb-3">
-                            <label for="final_price" class="form-label fw-bold">
-                                Final Price (₹)
-                            </label>
-                            <input type="text"
-                                id="final_price"
-                                class="form-control bg-light"
-                                value="₹ {{ number_format($membership->final_price, 2) }}"
-                                readonly>
-                            <small class="text-muted">
-                                Auto-calculated after discount
-                            </small>
+                            <label class="form-label">Final Price</label>
+                            <input type="text" id="final_price" class="form-control bg-light"
+                                value="₹ {{ number_format($membership->final_price, 2) }}" readonly>
+                            <input type="hidden" name="final_price" id="final_price_hidden"
+                                value="{{ $membership->final_price }}">
+                            <small class="text-muted" style="font-size:10px;">Auto-calculated after discount</small>
                         </div>
-
-                        <!-- Status -->
-                        <div class="col-md-6 mb-3">
-                            <label for="status" class="form-label fw-bold">
-                                Status <span class="text-danger">*</span>
-                            </label>
-                            <select name="status"
-                                id="status"
-                                class="form-select"
-                                required>
-
-                                <option value="Active"
-                                    {{ old('status', $membership->status) == 'Active' ? 'selected' : '' }}>
-                                    Active
-                                </option>
-
-                                <option value="Inactive"
-                                    {{ old('status', $membership->status) == 'Inactive' ? 'selected' : '' }}>
-                                    Inactive
-                                </option>
-
-                            </select>
-                        </div>
-
-                        <!-- Description -->
-                        <div class="col-md-12 mb-3">
-                            <label for="description" class="form-label fw-bold">
-                                Description
-                            </label>
-                            <textarea name="description"
-                                id="description"
-                                class="form-control"
-                                rows="4">{{ old('description', $membership->description) }}</textarea>
-                        </div>
-
                     </div>
 
-                    <!-- Submit Buttons -->
-                    <div class="mt-3">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-save"></i>
-                            Update Membership
-                        </button>
+                    <!-- ========================================== -->
+                    <!-- DESCRIPTION & STATUS                      -->
+                    <!-- ========================================== -->
+                    <div class="section-title mt-2">
+                        <i class="fas fa-cog"></i> Additional Details
+                    </div>
 
-                        <a href="{{ route('admin.membership.index') }}"
-                            class="btn btn-secondary">
-                            <i class="fas fa-times"></i>
-                            Cancel
+                    <div class="row compact-row">
+                        <!-- Description -->
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" rows="3" class="form-control">{{ old('description', $membership->description) }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="row compact-row">
+                        <!-- Status -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Status <span class="text-danger">*</span></label>
+                            <select name="status" class="form-control" required>
+                                <option value="Active"
+                                    {{ old('status', $membership->status) == 'Active' ? 'selected' : '' }}>Active</option>
+                                <option value="Inactive"
+                                    {{ old('status', $membership->status) == 'Inactive' ? 'selected' : '' }}>Inactive
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- FORM ACTIONS                              -->
+                    <!-- ========================================== -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Update Membership
+                        </button>
+                        <a href="{{ route('admin.membership.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
                         </a>
                     </div>
 
                 </form>
-
             </div>
-
         </div>
-
     </div>
-</div>
 
-<script>
-    // Auto-calculate final price
-    document.addEventListener('DOMContentLoaded', function() {
+    <script>
+        // ============================================
+        // FILE NAME UPDATE
+        // ============================================
+        function updateFileName() {
+            var input = document.getElementById('image');
+            var display = document.getElementById('fileNameDisplay');
 
-        const priceInput = document.getElementById('price');
-        const discountInput = document.getElementById('discount');
-        const discountTypeSelect = document.getElementById('discount_type');
-        const finalPriceInput = document.getElementById('final_price');
-
-        function calculateFinalPrice() {
-            const price = parseFloat(priceInput.value) || 0;
-            const discount = parseFloat(discountInput.value) || 0;
-            const discountType = discountTypeSelect.value;
-
-            let finalPrice = price;
-
-            if (discountType === 'Flat') {
-                finalPrice = price - discount;
-            } else if (discountType === 'Percentage') {
-                finalPrice = price - ((price * discount) / 100);
+            if (input.files && input.files.length > 0) {
+                var fileName = input.files[0].name;
+                if (fileName.length > 30) {
+                    fileName = fileName.substring(0, 27) + '...';
+                }
+                display.innerHTML =
+                    '<span class="selected-file"><i class="fas fa-check-circle" style="color:#4caf50;"></i> ' + fileName +
+                    '</span>';
+            } else {
+                display.innerHTML = '<span class="no-file">No file chosen</span>';
             }
-
-            if (finalPrice < 0) {
-                finalPrice = 0;
-            }
-
-            finalPriceInput.value = '₹ ' + finalPrice.toFixed(2);
         }
 
-        // Add event listeners
-        priceInput.addEventListener('input', calculateFinalPrice);
-        discountInput.addEventListener('input', calculateFinalPrice);
-        discountTypeSelect.addEventListener('change', calculateFinalPrice);
+        // ============================================
+        // AUTO CALCULATE FINAL PRICE
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const priceInput = document.getElementById('price');
+            const discountInput = document.getElementById('discount');
+            const discountTypeSelect = document.getElementById('discount_type');
+            const finalPriceInput = document.getElementById('final_price');
+            const finalPriceHidden = document.getElementById('final_price_hidden');
 
-        // Initial calculation
-        calculateFinalPrice();
+            function calculateFinalPrice() {
+                const price = parseFloat(priceInput.value) || 0;
+                const discount = parseFloat(discountInput.value) || 0;
+                const discountType = discountTypeSelect.value;
 
-    });
-</script>
+                let finalPrice = price;
+
+                if (discountType === 'Flat') {
+                    finalPrice = price - discount;
+                } else if (discountType === 'Percentage') {
+                    finalPrice = price - ((price * discount) / 100);
+                }
+
+                if (finalPrice < 0) {
+                    finalPrice = 0;
+                }
+
+                finalPriceInput.value = '₹ ' + finalPrice.toFixed(2);
+                finalPriceHidden.value = finalPrice.toFixed(2);
+            }
+
+            priceInput.addEventListener('input', calculateFinalPrice);
+            discountInput.addEventListener('input', calculateFinalPrice);
+            discountTypeSelect.addEventListener('change', calculateFinalPrice);
+
+            calculateFinalPrice();
+        });
+    </script>
 
 @endsection

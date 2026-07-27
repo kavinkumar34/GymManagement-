@@ -1,111 +1,627 @@
 @extends('layouts.admin-layout')
 
 @section('content')
-<div class="admin-main-content">
-    <div class="container-fluid">
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h4><i class="fas fa-chalkboard-user"></i> Trainer Details</h4>
+    <style>
+        /* ============================================ */
+        /* COLOR VARIABLES - MATCHING NAVBAR          */
+        /* ============================================ */
+        :root {
+            --primary: #4a9eff;
+            --primary-dark: #2b7be0;
+            --primary-light: #8ab4f8;
+            --success: #4caf50;
+            --warning: #ffa726;
+            --danger: #ef5350;
+            --dark: #1a1a2e;
+            --gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+            --radius: 10px;
+            --radius-lg: 16px;
+        }
+
+        .admin-main-content {
+            padding: 20px 25px;
+            background: #f0f4f8;
+            min-height: 100vh;
+        }
+
+        /* ============================================ */
+        /* CARD STYLES                                 */
+        /* ============================================ */
+        .show-card {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .show-card .card-header {
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b3a5c 100%);
+            color: #ffffff;
+            border-bottom: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .show-card .card-header h4 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .show-card .card-header h4 i {
+            color: #4a9eff;
+        }
+
+        .show-card .card-header small {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .show-card .card-body {
+            padding: 20px 24px;
+        }
+
+        /* ============================================ */
+        /* PROFILE SECTION                             */
+        /* ============================================ */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 20px;
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .profile-section .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .profile-section .profile-info {
+            flex: 1;
+        }
+
+        .profile-section .profile-info h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 0 0 2px 0;
+        }
+
+        .profile-section .profile-info .profile-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .profile-section .profile-info .profile-meta span i {
+            margin-right: 4px;
+            color: var(--primary);
+        }
+
+        .profile-section .profile-status {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .profile-section .profile-status .status-badge {
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .profile-section .profile-status .status-badge.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .profile-section .profile-status .status-badge.inactive {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .profile-section .profile-status .status-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .profile-section .profile-status .status-badge.active .dot {
+            background: #4caf50;
+            animation: pulse-dot 2s infinite;
+        }
+
+        .profile-section .profile-status .status-badge.inactive .dot {
+            background: #ef5350;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        /* ============================================ */
+        /* DETAILS TABLE STYLES                        */
+        /* ============================================ */
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .details-table tr {
+            transition: all 0.3s;
+        }
+
+        .details-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .details-table th {
+            padding: 10px 16px;
+            font-weight: 600;
+            color: var(--dark);
+            background: var(--light-gray);
+            border: 1px solid var(--border-color);
+            width: 35%;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .details-table td {
+            padding: 10px 16px;
+            color: var(--dark);
+            border: 1px solid var(--border-color);
+        }
+
+        .details-table td .badge-custom {
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .details-table td .badge-custom.primary {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .details-table td .badge-custom.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .details-table td .badge-custom.warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .details-table td .badge-custom.secondary {
+            background: #f5f5f5;
+            color: #9e9e9e;
+        }
+
+        .details-table td .badge-custom.info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        /* ============================================ */
+        /* SECTION HEADERS                             */
+        /* ============================================ */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            padding: 8px 14px;
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            border-left: 3px solid var(--primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        /* ============================================ */
+        /* BUTTON STYLES                               */
+        /* ============================================ */
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 9px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.35);
+        }
+
+        .btn-warning {
+            background: #ffa726;
+            color: #fff;
+            border: none;
+            padding: 9px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 167, 38, 0.35);
+        }
+
+        .btn-secondary {
+            background: #f0f4f8;
+            color: var(--gray);
+            border: 1px solid var(--border-color);
+            padding: 9px 24px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            color: var(--dark);
+        }
+
+        .form-actions {
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* ============================================ */
+        /* RESPONSIVE                                  */
+        /* ============================================ */
+        @media (max-width: 768px) {
+            .admin-main-content {
+                padding: 12px 15px;
+            }
+
+            .show-card .card-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .show-card .card-header h4 {
+                font-size: 16px;
+            }
+
+            .show-card .card-body {
+                padding: 14px 16px;
+            }
+
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+                padding: 14px 16px;
+            }
+
+            .profile-section .profile-status {
+                text-align: center;
+                width: 100%;
+            }
+
+            .profile-section .profile-info .profile-meta {
+                justify-content: center;
+            }
+
+            .profile-section .profile-avatar {
+                width: 60px;
+                height: 60px;
+            }
+
+            .profile-section .profile-info h3 {
+                font-size: 17px;
+            }
+
+            .details-table {
+                font-size: 12px;
+            }
+
+            .details-table th,
+            .details-table td {
+                padding: 8px 12px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .show-card .card-header h4 {
+                font-size: 14px;
+            }
+
+            .show-card .card-body {
+                padding: 10px 12px;
+            }
+
+            .profile-section .profile-avatar {
+                width: 50px;
+                height: 50px;
+            }
+
+            .profile-section .profile-info h3 {
+                font-size: 15px;
+            }
+
+            .profile-section .profile-info .profile-meta {
+                font-size: 12px;
+                gap: 8px 14px;
+            }
+
+            .details-table {
+                font-size: 11px;
+            }
+
+            .details-table th,
+            .details-table td {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+
+            .details-table th {
+                font-size: 10px;
+            }
+
+            .section-title {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .btn-primary,
+            .btn-warning,
+            .btn-secondary {
+                padding: 7px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+
+    <div class="admin-main-content">
+        <div class="show-card">
+            <!-- Card Header -->
+            <div class="card-header">
+                <div>
+                    <h4><i class="fas fa-chalkboard-user"></i> Trainer Details</h4>
+                    <small>View complete trainer information</small>
+                </div>
+                <span
+                    style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
+                    <i class="fas fa-id-card"></i> {{ $trainer->trainer_id }}
+                </span>
             </div>
+
+            <!-- Card Body -->
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th width="30%">Trainer ID</th>
-                                <td>{{ $trainer->trainer_id }}</td>
-                            </tr>
-                            <tr>
-                                <th>Name</th>
-                                <td>{{ $trainer->name }}</td>
-                            </tr>
-                            <tr>
-                                <th>Email</th>
-                                <td>{{ $trainer->email }}</td>
-                            </tr>
-                            <tr>
-                                <th>Phone</th>
-                                <td>{{ $trainer->phone }}</td>
-                            </tr>
-                            <tr>
-                                <th>Gender</th>
-                                <td>{{ $trainer->gender ?? 'Not specified' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Date of Birth</th>
-                                <td>{{ $trainer->dob ?? 'Not specified' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Age</th>
-                                <td>{{ $trainer->age ?? 'Not specified' }}</td>
-                            </tr>
-                        </table>
+                <!-- ========================================== -->
+                <!-- PROFILE SECTION                            -->
+                <!-- ========================================== -->
+                <div class="profile-section">
+                    @if ($trainer->photo)
+                        <img src="{{ asset('storage/' . $trainer->photo) }}" class="profile-avatar" alt="{{ $trainer->name }}">
+                    @else
+                        <img src="{{ asset('images/no-image.png') }}" class="profile-avatar" alt="No Image">
+                    @endif
+
+                    <div class="profile-info">
+                        <h3>{{ $trainer->name }}</h3>
+                        <div class="profile-meta">
+                            <span><i class="fas fa-envelope"></i> {{ $trainer->email }}</span>
+                            <span><i class="fas fa-phone"></i> {{ $trainer->phone }}</span>
+                            <span><i class="fas fa-venus-mars"></i> {{ $trainer->gender ?? 'Not specified' }}</span>
+                            <span><i class="fas fa-calendar-alt"></i> Joined:
+                                {{ date('d-m-Y', strtotime($trainer->join_date)) }}</span>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th width="30%">Experience</th>
-                                <td>{{ $trainer->experience ?? '0' }} years</td>
-                            </tr>
-                            <tr>
-                                <th>Specialization</th>
-                                <td><span class="badge bg-success">{{ $trainer->specialization }}</span></td>
-                            </tr>
-                            <tr>
-                                <th>Salary</th>
-                                <td>₹{{ number_format($trainer->salary ?? 0, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <th>Join Date</th>
-                                <td>{{ $trainer->join_date }}</td>
-                            </tr>
-                            <tr>
-                                <th>Shift Timing</th>
-                                <td>{{ $trainer->shift_timing }}</td>
-                            </tr>
-                            <tr>
-                                <th>Assigned Members</th>
-                                <td><span class="badge bg-primary">{{ $trainer->assigned_members ?? 0 }} Members</span></td>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <td>
-                                    @if($trainer->status == 'Active')
-                                        <span class="badge bg-success">Active</span>
-                                    @else
-                                        <span class="badge bg-danger">Inactive</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
+
+                    <div class="profile-status">
+                        @if ($trainer->status == 'Active')
+                            <span class="status-badge active">
+                                <span class="dot"></span> Active
+                            </span>
+                        @else
+                            <span class="status-badge inactive">
+                                <span class="dot"></span> Inactive
+                            </span>
+                        @endif
                     </div>
                 </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-12">
-                        <table class="table table-bordered">
-                            <tr>
-                                <th width="30%">Address</th>
-                                <td>{{ $trainer->address ?? 'Not specified' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Certifications</th>
-                                <td>{{ $trainer->certification ?? 'Not specified' }}</td>
-                            </tr>
-                        </table>
-                    </div>
+                <!-- ========================================== -->
+                <!-- PERSONAL INFORMATION                       -->
+                <!-- ========================================== -->
+                <div class="section-title">
+                    <i class="fas fa-user"></i> Personal Information
                 </div>
 
-                <div class="mt-4">
-                    <a href="{{ route('admin.trainers') }}" class="btn btn-secondary">
+                <table class="details-table">
+                    <tr>
+                        <th>Trainer ID</th>
+                        <td><span class="badge-custom primary">{{ $trainer->trainer_id }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Full Name</th>
+                        <td>{{ $trainer->name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email Address</th>
+                        <td>{{ $trainer->email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Phone Number</th>
+                        <td>{{ $trainer->phone }}</td>
+                    </tr>
+                    <tr>
+                        <th>Gender</th>
+                        <td>{{ $trainer->gender ?? 'Not specified' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date of Birth</th>
+                        <td>{{ $trainer->dob ? date('d-m-Y', strtotime($trainer->dob)) : 'Not specified' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Address</th>
+                        <td>{{ $trainer->address ?? 'Not specified' }}</td>
+                    </tr>
+                </table>
+
+                <!-- ========================================== -->
+                <!-- PROFESSIONAL INFORMATION                    -->
+                <!-- ========================================== -->
+                <div class="section-title mt-3">
+                    <i class="fas fa-briefcase"></i> Professional Information
+                </div>
+
+                <table class="details-table">
+                    <tr>
+                        <th>Experience</th>
+                        <td>{{ $trainer->experience ?? '0' }} years</td>
+                    </tr>
+                    <tr>
+                        <th>Specialization</th>
+                        <td><span class="badge-custom success"><i class="fas fa-tag"></i>
+                                {{ $trainer->specialization }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Salary</th>
+                        <td><strong>₹ {{ number_format($trainer->salary ?? 0, 2) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <th>Join Date</th>
+                        <td>{{ date('d-m-Y', strtotime($trainer->join_date)) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Shift Timing</th>
+                        <td><span class="badge-custom info">{{ $trainer->shift_timing }}</span></td>
+                    </tr>
+                    <tr>
+                        <th>Assigned Members</th>
+                        <td><span class="badge-custom primary"><i class="fas fa-users"></i>
+                                {{ $trainer->assigned_members ?? 0 }} Members</span></td>
+                    </tr>
+                    <tr>
+                        <th>Certifications</th>
+                        <td>{{ $trainer->certification ?? 'Not specified' }}</td>
+                    </tr>
+                </table>
+
+                <!-- ========================================== -->
+                <!-- SYSTEM INFORMATION                         -->
+                <!-- ========================================== -->
+                <div class="section-title mt-3">
+                    <i class="fas fa-clock"></i> System Information
+                </div>
+
+                <table class="details-table">
+                    <tr>
+                        <th>Created At</th>
+                        <td>{{ $trainer->created_at ? $trainer->created_at->format('d-m-Y h:i A') : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Updated At</th>
+                        <td>{{ $trainer->updated_at ? $trainer->updated_at->format('d-m-Y h:i A') : '-' }}</td>
+                    </tr>
+                </table>
+
+                <!-- ========================================== -->
+                <!-- FORM ACTIONS                              -->
+                <!-- ========================================== -->
+                <div class="form-actions">
+                    <a href="{{ route('admin.trainers') }}" class="btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to List
                     </a>
-                    <a href="{{ route('admin.trainer.edit', $trainer->id) }}" class="btn btn-warning">
+                    <a href="{{ route('admin.trainer.edit', $trainer->id) }}" class="btn-warning">
                         <i class="fas fa-edit"></i> Edit Trainer
                     </a>
                 </div>
+
             </div>
         </div>
     </div>
-</div>
 @endsection

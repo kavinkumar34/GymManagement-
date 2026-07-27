@@ -1,281 +1,219 @@
 @extends('layouts.trainer-layout')
 
 @section('content')
-
-<div class="container-fluid">
-
-    <div class="card">
-
-        <div class="card-header bg-warning text-dark">
-            <h4>Edit Member Progress</h4>
-        </div>
-
-        <div class="card-body">
-
-            <form action="{{ route('trainer.progress.update',$progress->id) }}"
-                  method="POST"
-                  enctype="multipart/form-data">
-
-                @csrf
-
-                <div class="row">
-
-                    <!-- Member -->
-                    <div class="col-md-6 mb-3">
-                        <label>Member</label>
-
-                        <select name="member_id" class="form-control" required>
-
-                            @foreach($members as $member)
-
-                                <option value="{{ $member->id }}"
-                                    {{ $progress->member_id == $member->id ? 'selected' : '' }}>
-                                    {{ $member->name }}
-                                </option>
-
-                            @endforeach
-
-                        </select>
-
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <!-- Card Header -->
+                <div class="card-header" style="background: linear-gradient(135deg, #0d2818 0%, #1a472a 100%); color: white;">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <h4 class="mb-0">
+                            <i class="fas fa-edit me-2"></i> Edit Member Progress
+                        </h4>
+                        <a href="{{ route('trainer.progress.index') }}" class="btn"
+                            style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 8px 20px;">
+                            <i class="fas fa-arrow-left me-2"></i> Back
+                        </a>
                     </div>
-
-                    <!-- Progress Date -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Progress Date</label>
-
-                        <input type="date"
-                               name="progress_date"
-                               class="form-control"
-                               value="{{ $progress->progress_date }}"
-                               required>
-
-                    </div>
-
-                    <!-- Weight -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Weight (Kg)</label>
-
-                        <input type="number"
-                               step="0.01"
-                               id="weight"
-                               name="weight"
-                               value="{{ $progress->weight }}"
-                               class="form-control"
-                               required>
-
-                    </div>
-
-                    <!-- Height -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Height (cm)</label>
-
-                        <input type="number"
-                               step="0.01"
-                               id="height"
-                               name="height"
-                               value="{{ $progress->height }}"
-                               class="form-control"
-                               required>
-
-                    </div>
-
-                    <!-- BMI -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>BMI</label>
-
-                        <input type="text"
-                               id="bmi"
-                               value="{{ $progress->bmi }}"
-                               class="form-control"
-                               readonly>
-
-                    </div>
-
-                    <!-- Body Fat -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Body Fat (%)</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="body_fat"
-                               value="{{ $progress->body_fat }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Chest -->
-                    <div class="col-md-4 mb-3">
-
-                        <label>Chest</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="chest"
-                               value="{{ $progress->chest }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Waist -->
-                    <div class="col-md-4 mb-3">
-
-                        <label>Waist</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="waist"
-                               value="{{ $progress->waist }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Hips -->
-                    <div class="col-md-4 mb-3">
-
-                        <label>Hips</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="hips"
-                               value="{{ $progress->hips }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Left Arm -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Left Arm</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="left_arm"
-                               value="{{ $progress->left_arm }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Right Arm -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Right Arm</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="right_arm"
-                               value="{{ $progress->right_arm }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Left Thigh -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Left Thigh</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="left_thigh"
-                               value="{{ $progress->left_thigh }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Right Thigh -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Right Thigh</label>
-
-                        <input type="number"
-                               step="0.01"
-                               name="right_thigh"
-                               value="{{ $progress->right_thigh }}"
-                               class="form-control">
-
-                    </div>
-
-                    <!-- Before Photo -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>Before Photo</label>
-
-                        <input type="file"
-                               name="before_photo"
-                               class="form-control">
-
-                        @if($progress->before_photo)
-                            <img src="{{ asset('storage/'.$progress->before_photo) }}"
-                                 width="120"
-                                 class="mt-2 border">
-                        @endif
-
-                    </div>
-
-                    <!-- After Photo -->
-                    <div class="col-md-6 mb-3">
-
-                        <label>After Photo</label>
-
-                        <input type="file"
-                               name="after_photo"
-                               class="form-control">
-
-                        @if($progress->after_photo)
-                            <img src="{{ asset('storage/'.$progress->after_photo) }}"
-                                 width="120"
-                                 class="mt-2 border">
-                        @endif
-
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="col-md-12 mb-3">
-
-                        <label>Notes</label>
-
-                        <textarea name="notes"
-                                  rows="4"
-                                  class="form-control">{{ $progress->notes }}</textarea>
-
-                    </div>
-
                 </div>
 
-                <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> Update Progress
-                </button>
+                <div class="card-body">
+                    <form action="{{ route('trainer.progress.update', $progress->id) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf @method('PUT')
 
-                <a href="{{ route('trainer.progress.index') }}"
-                   class="btn btn-secondary">
-                    Back
-                </a>
+                        <div class="row">
+                            <!-- Member -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Member <span class="text-danger">*</span></label>
+                                <select name="member_id" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" required>
+                                    @foreach ($members as $member)
+                                        <option value="{{ $member->id }}"
+                                            {{ $progress->member_id == $member->id ? 'selected' : '' }}>
+                                            {{ $member->name }} ({{ $member->member_id }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-            </form>
+                            <!-- Date -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Progress Date</label>
+                                <input type="date" name="progress_date" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;"
+                                    value="{{ $progress->progress_date }}" required>
+                            </div>
 
+                            <!-- Weight -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Weight (Kg)</label>
+                                <input type="number" step="0.01" id="weight" name="weight" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" value="{{ $progress->weight }}"
+                                    required>
+                            </div>
+
+                            <!-- Height -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Height (cm)</label>
+                                <input type="number" step="0.01" id="height" name="height" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" value="{{ $progress->height }}"
+                                    required>
+                            </div>
+
+                            <!-- BMI -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">BMI</label>
+                                <input type="text" id="bmi" class="form-control"
+                                    style="background: #f8fafc; border-color: #1a472a; border-radius: 8px;"
+                                    value="{{ $progress->bmi }}" readonly>
+                            </div>
+
+                            <!-- Body Fat -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Body Fat (%)</label>
+                                <input type="number" step="0.01" name="body_fat" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" value="{{ $progress->body_fat }}">
+                            </div>
+
+                            <div class="col-md-6 mb-3"></div>
+
+                            <!-- Body Measurements -->
+                            <div class="col-12 mb-3">
+                                <h6 class="fw-bold"
+                                    style="color: #0d2818; border-bottom: 2px solid #1a472a; padding-bottom: 8px;">
+                                    <i class="fas fa-ruler me-2"></i> Body Measurements
+                                </h6>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Chest</label>
+                                <input type="number" step="0.01" name="chest" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" value="{{ $progress->chest }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Waist</label>
+                                <input type="number" step="0.01" name="waist" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" value="{{ $progress->waist }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Hips</label>
+                                <input type="number" step="0.01" name="hips" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" value="{{ $progress->hips }}">
+                            </div>
+                            <div class="col-md-3 mb-3"></div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Left Arm</label>
+                                <input type="number" step="0.01" name="left_arm" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;" value="{{ $progress->left_arm }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Right Arm</label>
+                                <input type="number" step="0.01" name="right_arm" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;"
+                                    value="{{ $progress->right_arm }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Left Thigh</label>
+                                <input type="number" step="0.01" name="left_thigh" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;"
+                                    value="{{ $progress->left_thigh }}">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Right Thigh</label>
+                                <input type="number" step="0.01" name="right_thigh" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;"
+                                    value="{{ $progress->right_thigh }}">
+                            </div>
+
+                            <!-- Photos -->
+                            <div class="col-12 mb-3">
+                                <h6 class="fw-bold"
+                                    style="color: #0d2818; border-bottom: 2px solid #1a472a; padding-bottom: 8px;">
+                                    <i class="fas fa-images me-2"></i> Progress Photos
+                                </h6>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Before Photo</label>
+                                <input type="file" name="before_photo" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;">
+                                @if ($progress->before_photo)
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/' . $progress->before_photo) }}" width="80"
+                                            class="rounded border">
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">After Photo</label>
+                                <input type="file" name="after_photo" class="form-control"
+                                    style="border-color: #1a472a; border-radius: 8px;">
+                                @if ($progress->after_photo)
+                                    <div class="mt-2">
+                                        <img src="{{ asset('storage/' . $progress->after_photo) }}" width="80"
+                                            class="rounded border">
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="col-12 mb-3">
+                                <label class="form-label fw-bold">Notes</label>
+                                <textarea name="notes" class="form-control" rows="3" style="border-color: #1a472a; border-radius: 8px;"
+                                    placeholder="Enter notes...">{{ $progress->notes }}</textarea>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="col-12">
+                                <button type="submit" class="btn"
+                                    style="background: #0d2818; color: white; border-radius: 8px; padding: 10px 30px;">
+                                    <i class="fas fa-save me-2"></i> Update Progress
+                                </button>
+                                <a href="{{ route('trainer.progress.index') }}" class="btn btn-secondary"
+                                    style="border-radius: 8px; padding: 10px 30px;">
+                                    <i class="fas fa-times me-2"></i> Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
     </div>
 
-</div>
+    <script>
+        function calculateBMI() {
+            let w = parseFloat(document.getElementById('weight').value);
+            let h = parseFloat(document.getElementById('height').value);
+            if (w && h && h > 0) {
+                document.getElementById('bmi').value = (w / ((h / 100) * (h / 100))).toFixed(2);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('weight').addEventListener('keyup', calculateBMI);
+            document.getElementById('height').addEventListener('keyup', calculateBMI);
+        });
+    </script>
 
-<script>
-function calculateBMI() {
-    let weight = parseFloat(document.getElementById('weight').value);
-    let height = parseFloat(document.getElementById('height').value);
+    <style>
+        .form-control:focus {
+            border-color: #0d2818 !important;
+            box-shadow: 0 0 0 0.2rem rgba(13, 40, 24, 0.15) !important;
+        }
 
-    if(weight && height){
-        let bmi = weight / ((height/100) * (height/100));
-        document.getElementById('bmi').value = bmi.toFixed(2);
-    }
-}
+        @media (max-width: 768px) {
+            .card-header .d-flex {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start !important;
+            }
 
-document.getElementById('weight').addEventListener('keyup', calculateBMI);
-document.getElementById('height').addEventListener('keyup', calculateBMI);
-</script>
-
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 @endsection
