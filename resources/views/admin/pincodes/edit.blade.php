@@ -1,331 +1,311 @@
-@extends('layouts.app')
+@extends('layouts.admin-layout')
 
 @section('content')
-<!-- SweetAlert2 CSS & JS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <style>
-    /* Hide navbar, footer, and WhatsApp icon */
-    nav.navbar, .navbar, footer, .footer, .whatsapp-float, .whatsapp-tooltip {
-        display: none !important;
+    /* ============================================ */
+    /* COLOR VARIABLES - MATCHING NAVBAR          */
+    /* ============================================ */
+    :root {
+        --primary: #4a9eff;
+        --primary-dark: #2b7be0;
+        --primary-light: #8ab4f8;
+        --success: #4caf50;
+        --warning: #ffa726;
+        --danger: #ef5350;
+        --dark: #1a1a2e;
+        --gray: #6c757d;
+        --light-gray: #f8f9fa;
+        --border-color: #e9ecef;
+        --shadow: 0 2px 20px rgba(0,0,0,0.05);
+        --radius: 10px;
+        --radius-lg: 16px;
     }
-      .navbar-spacer {
-        display: none !important;
-    }
-    
-    /* Keep admin sidebar - adjust container */
-    body {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #f0f4f8 !important;
-    }
-    
-    main.py-4 {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    
-    .container {
-        margin-left: 270px !important;
-        max-width: calc(100% - 270px) !important;
-        width: calc(100% - 270px) !important;
-        min-height: 100vh;
-        padding: 30px !important;
+
+    .admin-main-content {
+        padding: 20px 25px;
         background: #f0f4f8;
+        min-height: 100vh;
     }
-    
-    .card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+
+    .edit-card {
+        background: #ffffff;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(0,0,0,0.04);
         overflow: hidden;
         max-width: 700px;
         margin: 0 auto;
     }
-    
-    .card-header {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-        padding: 18px 24px;
-        border: none;
+
+    .edit-card .card-header {
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #0d1b2a 0%, #1b3a5c 100%);
+        color: #ffffff;
+        border-bottom: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
     }
-    
-    .card-header h4 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: white;
+
+    .edit-card .card-header h4 {
         margin: 0;
+        font-weight: 600;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
-    
-    .card-header h4 i {
-        margin-right: 8px;
+
+    .edit-card .card-header h4 i {
+        color: #4a9eff;
     }
-    
-    .card-body {
-        padding: 30px;
-        background: #ffffff;
+
+    .edit-card .card-header small {
+        font-size: 12px;
+        opacity: 0.8;
+        font-weight: 400;
     }
-    
+
+    .edit-card .card-body {
+        padding: 20px 24px;
+    }
+
+    .section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark);
+        padding: 6px 14px;
+        background: var(--light-gray);
+        border-radius: var(--radius);
+        border-left: 3px solid var(--primary);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-title i {
+        color: var(--primary);
+        font-size: 14px;
+    }
+
     .form-label {
-        font-weight: 600;
-        color: #1a1a2e;
-        margin-bottom: 6px;
-        font-size: 0.9rem;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 4px;
     }
-    
+
+    .form-label .text-danger {
+        color: var(--danger) !important;
+    }
+
     .form-control {
-        border-radius: 10px;
-        border: 2px solid #e5e7eb;
-        padding: 10px 14px;
-        font-size: 0.95rem;
-        background: #fafafa;
-    }
-    
-    .form-control:focus {
-        border-color: #f59e0b;
-        box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
-        outline: none;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+        padding: 7px 12px;
+        font-size: 13px;
+        transition: all 0.3s;
         background: #ffffff;
+        height: 38px;
+        color: var(--dark);
+        width: 100%;
     }
-    
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+        outline: none;
+    }
+
+    .form-check {
+        padding-left: 28px;
+    }
+
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        cursor: pointer;
+        accent-color: var(--primary);
+    }
+
     .form-check-input:checked {
-        background-color: #f59e0b;
-        border-color: #f59e0b;
+        background-color: var(--primary);
+        border-color: var(--primary);
     }
-    
-    .btn {
-        padding: 10px 24px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 0.9rem;
+
+    .form-check-label {
+        font-size: 13px;
+        color: var(--dark);
+        cursor: pointer;
+    }
+
+    .form-check-label i {
+        margin-right: 4px;
+    }
+
+    .compact-row {
+        margin-bottom: 0;
+    }
+
+    .compact-row .mb-3 {
+        margin-bottom: 10px !important;
+    }
+
+    .btn-success {
+        background: #4caf50;
+        color: #fff;
         border: none;
+        padding: 9px 24px;
+        border-radius: var(--radius);
+        font-weight: 500;
+        font-size: 13px;
+        transition: all 0.3s;
         display: inline-flex;
         align-items: center;
         gap: 8px;
     }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        color: white;
+
+    .btn-success:hover {
+        background: #388e3c;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(76, 175, 80, 0.35);
     }
-    
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-        color: white;
-    }
-    
+
     .btn-secondary {
-        background: #f1f3f5;
-        color: #374151;
+        background: #f0f4f8;
+        color: var(--gray);
+        border: 1px solid var(--border-color);
+        padding: 9px 24px;
+        border-radius: var(--radius);
+        font-weight: 500;
+        font-size: 13px;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
     }
-    
+
     .btn-secondary:hover {
-        background: #e5e7eb;
+        background: #e9ecef;
+        color: var(--dark);
     }
-    
-    .btn-group-custom {
+
+    .form-actions {
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
         display: flex;
-        gap: 12px;
+        gap: 10px;
         flex-wrap: wrap;
         margin-top: 10px;
     }
-    
-    /* ===== FLOATING ALERT - TOP FIXED POSITION ===== */
-    .floating-alert {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 99999;
-        min-width: 350px;
-        max-width: 600px;
-        padding: 16px 24px;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        display: none;
-        animation: slideDownAlert 0.5s ease;
-        text-align: center;
-        font-weight: 500;
-    }
-    
-    .floating-alert.success {
-        background: #10b981;
-        color: white;
-        border-left: 6px solid #047857;
-    }
-    
-    .floating-alert.error {
-        background: #ef4444;
-        color: white;
-        border-left: 6px solid #b91c1c;
-    }
-    
-    .floating-alert.show {
+
+    .text-muted-sm {
+        font-size: 11px;
+        color: var(--gray);
         display: block;
+        margin-top: 3px;
     }
-    
-    @keyframes slideDownAlert {
-        from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-    }
-    
-    @keyframes slideUpAlert {
-        from {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-30px);
-        }
-    }
-    
-    .floating-alert.hide {
-        animation: slideUpAlert 0.5s ease forwards;
-    }
-    
-    .floating-alert .close-btn {
-        position: absolute;
-        top: 8px;
-        right: 14px;
-        background: none;
+
+    .alert-danger {
+        background: #fce4ec;
+        color: #c62828;
+        border-left: 4px solid #ef5350;
+        border-radius: var(--radius);
+        padding: 12px 18px;
+        margin-bottom: 16px;
         border: none;
-        color: rgba(255,255,255,0.7);
-        font-size: 20px;
-        cursor: pointer;
-        transition: all 0.3s;
     }
-    
-    .floating-alert .close-btn:hover {
-        color: white;
-        transform: rotate(90deg);
+
+    .alert-danger ul {
+        margin: 0;
+        padding-left: 20px;
     }
-    
-    .floating-alert i {
-        margin-right: 10px;
-        font-size: 1.2rem;
-    }
-    
-    /* SweetAlert2 Custom Styling */
-    .swal2-popup {
-        border-radius: 16px !important;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-    }
-    .swal2-title {
-        font-size: 1.4rem !important;
-        font-weight: 700 !important;
-    }
-    .swal2-confirm {
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        padding: 10px 30px !important;
-    }
-    .swal2-cancel {
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        padding: 10px 30px !important;
-    }
-    .swal2-html-container {
-        font-size: 1rem !important;
-        color: #555 !important;
-    }
-    
-    @media (max-width: 992px) {
-        .container {
-            margin-left: 70px !important;
-            max-width: calc(100% - 70px) !important;
-            width: calc(100% - 70px) !important;
-            padding: 20px !important;
-        }
-    }
-    
+
     @media (max-width: 768px) {
-        .container {
-            margin-left: 0 !important;
-            max-width: 100% !important;
-            width: 100% !important;
-            padding: 15px !important;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
-        .btn-group-custom {
-            flex-direction: column;
-            gap: 8px;
-        }
-        .floating-alert {
-            min-width: auto;
-            max-width: 95%;
-            width: 95%;
-            top: 15px;
-            padding: 14px 18px;
-            font-size: 0.9rem;
-        }
+        .admin-main-content { padding: 12px 15px; }
+        .edit-card .card-header { padding: 12px 16px; flex-direction: column; align-items: flex-start; }
+        .edit-card .card-header h4 { font-size: 16px; }
+        .edit-card .card-body { padding: 14px 16px; }
+        .form-actions { flex-direction: column; }
+        .form-actions .btn { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 576px) {
+        .edit-card .card-header h4 { font-size: 14px; }
+        .edit-card .card-body { padding: 10px 12px; }
+        .form-label { font-size: 11px; }
+        .form-control { font-size: 12px; padding: 5px 10px; height: 34px; }
+        .section-title { font-size: 12px; padding: 5px 10px; }
+        .btn-success, .btn-secondary { padding: 7px 16px; font-size: 12px; }
+        .form-check-label { font-size: 12px; }
     }
 </style>
 
-<!-- ===== FLOATING ALERT - TOP OF PAGE ===== -->
-<div class="floating-alert success" id="floatingAlert">
-    <button class="close-btn" onclick="closeFloatingAlert()">✕</button>
-    <i class="fas fa-check-circle" id="alertIcon"></i>
-    <span id="alertMessage">Alert Message</span>
-</div>
-
-<div class="container-fluid" style="margin-top:30px;">
-    <div class="card">
+<div class="admin-main-content">
+    <div class="edit-card">
         <div class="card-header">
-            <h4><i class="fas fa-edit"></i> Edit Deliverable State</h4>
+            <div>
+                <h4><i class="fas fa-edit"></i> Edit Deliverable State</h4>
+                <small>Update state details</small>
+            </div>
+            <a href="{{ route('admin.pincodes.index') }}" class="btn btn-secondary" style="background:#f0f4f8; color:var(--gray); border:1px solid var(--border-color); padding:6px 16px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:500; font-size:12px; transition:all 0.3s;">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
         </div>
+
         <div class="card-body">
             @if($errors->any())
-                <div class="alert alert-danger">
-                    @foreach($errors->all() as $error)
-                        <p class="mb-0"><i class="fas fa-exclamation-circle me-2"></i> {{ $error }}</p>
-                    @endforeach
+                <div class="alert-danger">
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
             <form action="{{ route('admin.pincodes.update', $pincode->id) }}" method="POST" id="editForm">
                 @csrf
                 @method('PUT')
-                
-                <div class="mb-3">
-                    <label class="form-label">State Name <span class="text-danger">*</span></label>
-                    <input type="text" name="state" class="form-control @error('state') is-invalid @enderror" 
-                           value="{{ old('state', $pincode->state) }}" placeholder="e.g., Tamil Nadu" required>
-                    @error('state')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+
+                <div class="section-title">
+                    <i class="fas fa-truck"></i> State Details
                 </div>
-                
-                <div class="mb-3">
-                    <label class="form-label">Shipping Charge (₹) <span class="text-danger">*</span></label>
-                    <input type="number" name="shipping_charge" class="form-control @error('shipping_charge') is-invalid @enderror" 
-                           value="{{ old('shipping_charge', $pincode->shipping_charge) }}" step="0.01" min="0" max="1000" required>
-                    @error('shipping_charge')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+
+                <div class="row compact-row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">State Name <span class="text-danger">*</span></label>
+                        <input type="text" name="state" class="form-control" value="{{ old('state', $pincode->state) }}" placeholder="e.g., Tamil Nadu" required>
+                        <small class="text-muted-sm">Enter the full state name</small>
+                    </div>
                 </div>
-                
-                <div class="mb-3 form-check">
-                    <input type="checkbox" name="is_active" class="form-check-input" id="isActive" value="1" 
-                           {{ old('is_active', $pincode->is_active) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="isActive">
-                        <i class="fas fa-check-circle text-success me-1"></i> Active (Delivery available)
-                    </label>
+
+                <div class="row compact-row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Shipping Charge (₹) <span class="text-danger">*</span></label>
+                        <input type="number" name="shipping_charge" class="form-control" value="{{ old('shipping_charge', $pincode->shipping_charge) }}" step="0.01" min="0" max="1000" required>
+                        <small class="text-muted-sm">Shipping charge for this state (in INR)</small>
+                    </div>
                 </div>
-                
-                <div class="btn-group-custom">
+
+                <div class="row compact-row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="isActive" value="1" {{ old('is_active', $pincode->is_active) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="isActive">
+                                <i class="fas fa-check-circle text-success"></i> Active (Delivery available)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
                     <button type="submit" class="btn btn-success" id="updateBtn">
                         <i class="fas fa-save"></i> Update State
                     </button>
@@ -333,80 +313,13 @@
                         <i class="fas fa-times"></i> Cancel
                     </a>
                 </div>
+
             </form>
         </div>
     </div>
 </div>
 
 <script>
-// ===== FLOATING ALERT FUNCTIONS =====
-let alertTimeout = null;
-
-function showFloatingAlert(message, type = 'success') {
-    const alertDiv = document.getElementById('floatingAlert');
-    const alertIcon = document.getElementById('alertIcon');
-    const alertMessage = document.getElementById('alertMessage');
-    
-    // Clear any existing timeout
-    if (alertTimeout) {
-        clearTimeout(alertTimeout);
-        alertTimeout = null;
-    }
-    
-    // Reset animations
-    alertDiv.classList.remove('show', 'hide', 'success', 'error');
-    
-    // Set type
-    if (type === 'success') {
-        alertDiv.className = 'floating-alert success';
-        alertIcon.className = 'fas fa-check-circle';
-    } else {
-        alertDiv.className = 'floating-alert error';
-        alertIcon.className = 'fas fa-exclamation-circle';
-    }
-    
-    // Set message
-    alertMessage.textContent = message;
-    
-    // Show alert
-    alertDiv.classList.add('show');
-    
-    // Auto hide after 5 seconds
-    alertTimeout = setTimeout(function() {
-        closeFloatingAlert();
-    }, 5000);
-}
-
-function closeFloatingAlert() {
-    const alertDiv = document.getElementById('floatingAlert');
-    alertDiv.classList.remove('show');
-    alertDiv.classList.add('hide');
-    
-    if (alertTimeout) {
-        clearTimeout(alertTimeout);
-        alertTimeout = null;
-    }
-    
-    setTimeout(function() {
-        alertDiv.classList.remove('hide');
-    }, 500);
-}
-
-// ===== CHECK FOR SESSION MESSAGES ON PAGE LOAD =====
-document.addEventListener('DOMContentLoaded', function() {
-    @if(session('success'))
-        showFloatingAlert('{{ session('success') }}', 'success');
-    @endif
-
-    @if(session('error'))
-        showFloatingAlert('{{ session('error') }}', 'error');
-    @endif
-
-    @if($errors->any())
-        showFloatingAlert('{{ $errors->first() }}', 'error');
-    @endif
-});
-
 // Show loading state on form submit
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('editForm');
@@ -420,4 +333,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
 @endsection

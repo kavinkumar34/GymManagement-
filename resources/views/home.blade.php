@@ -37,7 +37,6 @@
             position: relative;
         }
 
-        /* ===== FIXED: BANNER ITEM WITH FIXED HEIGHT ===== */
         .banner-full-width .carousel-item {
             width: 100%;
             height: 500px;
@@ -62,7 +61,6 @@
             transition: transform 0.3s ease;
         }
 
-        /* ===== BANNER PLACEHOLDER ===== */
         .banner-placeholder {
             width: 100%;
             height: 500px;
@@ -79,7 +77,6 @@
             margin-right: 12px;
         }
 
-        /* ===== CAROUSEL CONTROLS ===== */
         .banner-full-width .carousel-control-prev,
         .banner-full-width .carousel-control-next {
             width: 44px;
@@ -113,7 +110,6 @@
             background-size: 100% 100%;
         }
 
-        /* ===== CAROUSEL INDICATORS ===== */
         .banner-full-width .carousel-indicators {
             bottom: 15px;
             z-index: 11;
@@ -228,7 +224,6 @@
             text-align: left;
         }
 
-        /* ===== PRODUCT BRAND ===== */
         .product-brand {
             font-size: 0.75rem;
             color: #6c757d;
@@ -257,7 +252,6 @@
             text-align: left;
         }
 
-        /* Price container */
         .product-price-container {
             display: flex;
             align-items: center;
@@ -318,7 +312,7 @@
             color: #999;
         }
 
-        /* ===== COLOR OPTIONS - ONLY COLORS WITH COUNT ===== */
+        /* ===== COLOR OPTIONS - WITH COLOR COUNT ===== */
         .color-options-container {
             display: flex;
             gap: 5px;
@@ -495,7 +489,6 @@
             padding-right: 15px;
         }
 
-        /* ===== LOADER ===== */
         .loader {
             text-align: center;
             padding: 50px;
@@ -522,6 +515,176 @@
             padding: 50px;
             background: white;
             border-radius: 15px;
+        }
+
+        /* ============================================================ */
+        /* ===== CUSTOM ALERT / TOAST STYLES ===== */
+        /* ============================================================ */
+        .custom-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-alert-overlay.show {
+            display: flex;
+        }
+
+        .custom-alert-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px 35px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .custom-alert-box .alert-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2.2rem;
+        }
+
+        .custom-alert-box .alert-icon.warning {
+            background: #fff3cd;
+            color: #dc3545;
+        }
+
+        .custom-alert-box .alert-icon.success {
+            background: #d4edda;
+            color: #28a745;
+        }
+
+        .custom-alert-box .alert-icon.info {
+            background: #d1ecf1;
+            color: #17a2b8;
+        }
+
+        .custom-alert-box .alert-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .custom-alert-box .alert-message {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .custom-alert-box .alert-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .custom-alert-box .alert-btn {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .custom-alert-box .alert-btn-primary {
+            background: #dc3545;
+            color: white;
+        }
+
+        .custom-alert-box .alert-btn-primary:hover {
+            background: #b02a37;
+            transform: scale(1.02);
+        }
+
+        .custom-alert-box .alert-btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .custom-alert-box .alert-btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .custom-alert-box .alert-btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .custom-alert-box .alert-btn-success:hover {
+            background: #1e7e34;
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px) scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 576px) {
+            .custom-alert-box {
+                padding: 25px 20px;
+                max-width: 95%;
+            }
+
+            .custom-alert-box .alert-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 1.8rem;
+            }
+
+            .custom-alert-box .alert-title {
+                font-size: 1rem;
+            }
+
+            .custom-alert-box .alert-message {
+                font-size: 0.8rem;
+            }
+
+            .custom-alert-box .alert-btn {
+                padding: 6px 18px;
+                font-size: 0.8rem;
+            }
         }
 
         /* ============================================================ */
@@ -641,7 +804,6 @@
             .product-card .product-name {
                 font-size: 0.7rem;
                 min-height: 28px;
-                -webkit-line-clamp: 2;
             }
 
             .product-brand {
@@ -807,7 +969,22 @@
         }
     </style>
 
-    <!-- ===== FULL WIDTH BANNER - SMOOTH ===== -->
+    <!-- ===== CUSTOM ALERT OVERLAY ===== -->
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon warning" id="alertIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="alert-title" id="alertTitle">Login Required</div>
+            <div class="alert-message" id="alertMessage">Please login to add items to wishlist!</div>
+            <div class="alert-buttons" id="alertButtons">
+                <button class="alert-btn alert-btn-secondary" onclick="closeCustomAlert()">Cancel</button>
+                <a href="{{ route('login') }}" class="alert-btn alert-btn-primary" id="alertActionBtn">Login Now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FULL WIDTH BANNER ===== -->
     <div class="banner-full-width">
         <div id="bannerSlider" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
             <div class="carousel-inner" id="bannerContainer">
@@ -850,7 +1027,69 @@
 
     <script>
         // ================================================================
-        // ===== BANNER LOADING - SMOOTH =====
+        // ===== CUSTOM ALERT FUNCTIONS =====
+        // ================================================================
+
+        function showCustomAlert(title, message, type = 'warning', buttonText = 'Login Now', buttonLink =
+            '{{ route('login') }}') {
+            const overlay = document.getElementById('customAlertOverlay');
+            const icon = document.getElementById('alertIcon');
+            const titleEl = document.getElementById('alertTitle');
+            const messageEl = document.getElementById('alertMessage');
+            const actionBtn = document.getElementById('alertActionBtn');
+
+            // Set icon
+            icon.className = 'alert-icon ' + type;
+            if (type === 'warning') {
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            } else if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            }
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            if (buttonText && buttonLink) {
+                actionBtn.textContent = buttonText;
+                actionBtn.href = buttonLink;
+                actionBtn.style.display = 'inline-block';
+            } else {
+                actionBtn.style.display = 'none';
+            }
+
+            overlay.classList.add('show');
+        }
+
+        function closeCustomAlert() {
+            const overlay = document.getElementById('customAlertOverlay');
+            overlay.classList.remove('show');
+        }
+
+        // Close alert on overlay click
+        document.getElementById('customAlertOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCustomAlert();
+            }
+        });
+
+        // ================================================================
+        // ===== SHOW LOGIN REQUIRED ALERT =====
+        // ================================================================
+
+        function showLoginRequiredAlert() {
+            showCustomAlert(
+                '🔒 Login Required',
+                'Please login to add items to wishlist!',
+                'warning',
+                'Login Now',
+                '{{ route('login') }}'
+            );
+        }
+
+        // ================================================================
+        // ===== BANNER LOADING =====
         // ================================================================
         let bannerLoaded = false;
 
@@ -889,15 +1128,12 @@
 
                 bannerContainer.innerHTML = bannerHtml;
 
-                // ===== RE-INITIALIZE CAROUSEL SMOOTHLY =====
                 const carouselElement = document.getElementById('bannerSlider');
                 if (carouselElement) {
-                    // Destroy existing instance if any
                     const existingInstance = bootstrap.Carousel.getInstance(carouselElement);
                     if (existingInstance) {
                         existingInstance.dispose();
                     }
-                    // Create new carousel instance with smooth settings
                     new bootstrap.Carousel(carouselElement, {
                         interval: 5000,
                         pause: 'hover',
@@ -968,9 +1204,8 @@
 
         function toggleWishlist(id, name, price, image) {
             @if (!auth()->check())
-                if (confirm('Please login to add items to wishlist. Go to login page?')) {
-                    window.location.href = "{{ route('login') }}";
-                }
+                // Show custom alert instead of confirm
+                showLoginRequiredAlert();
                 return;
             @endif
 
@@ -981,7 +1216,7 @@
             if (existingIndex !== -1) {
                 currentWishlist.splice(existingIndex, 1);
                 if (icon) icon.className = 'far fa-heart';
-                showNotification('Removed from wishlist!', 'info');
+                showCustomToast('💔 Removed', 'Item removed from wishlist!', 'info');
             } else {
                 currentWishlist.push({
                     id: id,
@@ -991,7 +1226,7 @@
                     added_at: new Date().toISOString()
                 });
                 if (icon) icon.className = 'fas fa-heart';
-                showNotification('Added to wishlist!', 'success');
+                showCustomToast('❤️ Added', 'Item added to wishlist!', 'success');
             }
 
             localStorage.setItem('wishlist', JSON.stringify(currentWishlist));
@@ -1008,19 +1243,28 @@
             window.location.href = `/product/${productId}`;
         }
 
-        function showNotification(message, type) {
-            let notification = document.createElement('div');
-            notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'info') +
-                ' alert-dismissible fade show';
-            notification.style.position = 'fixed';
-            notification.style.top = '20px';
-            notification.style.right = '20px';
-            notification.style.zIndex = '9999';
-            notification.style.minWidth = '250px';
-            notification.innerHTML = '<i class="fas fa-check-circle"></i> ' + message +
-                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+        // ===== CUSTOM TOAST NOTIFICATION =====
+        function showCustomToast(title, message, type = 'info') {
+            // Use the existing toast from app.blade.php if available
+            if (typeof showNotification === 'function') {
+                showNotification(message, type);
+            } else {
+                // Fallback simple toast
+                let notification = document.createElement('div');
+                notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'info') +
+                    ' alert-dismissible fade show';
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '99999';
+                notification.style.minWidth = '250px';
+                notification.style.boxShadow = '0 10px 30px rgba(0,0,0,0.15)';
+                notification.style.borderRadius = '12px';
+                notification.innerHTML = '<i class="fas fa-check-circle me-2"></i> ' + message +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
         }
 
         function goToCategoryProducts(categoryId, categoryName) {
@@ -1132,7 +1376,7 @@
         }
 
         // ================================================================
-        // ===== GET VARIANT DATA WITH COLORS ONLY =====
+        // ===== GET VARIANT DATA WITH COLORS =====
         // ================================================================
         function getVariantData(product) {
             if (product.variants && product.variants.length > 0) {
@@ -1169,29 +1413,21 @@
                     variantImages.push(`data:image/svg+xml;base64,${encoded}`);
                 }
 
-                let totalStock = 0;
-                product.variants.forEach(v => {
-                    totalStock += parseInt(v.stock) || 0;
-                });
-
-                // ===== EXTRACT COLORS FROM VARIANT ATTRIBUTES =====
                 let colors = [];
                 if (product.variants && product.variants.length > 0) {
                     const colorSet = new Set();
                     product.variants.forEach(variant => {
-                        if (variant.attributes && variant.attributes.length > 0) {
-                            variant.attributes.forEach(attr => {
-                                if (attr.attribute && attr.attribute.name &&
-                                    attr.attribute.name.toLowerCase() === 'color') {
-                                    if (attr.value && attr.value.trim() !== '') {
-                                        colorSet.add(attr.value);
-                                    }
-                                }
-                            });
+                        if (variant.color && variant.color.trim() !== '') {
+                            colorSet.add(variant.color);
                         }
                     });
                     colors = Array.from(colorSet);
                 }
+
+                let totalStock = 0;
+                product.variants.forEach(v => {
+                    totalStock += parseInt(v.stock) || 0;
+                });
 
                 const originalPrice = parseFloat(firstVariant.total_price) || parseFloat(firstVariant.mrp) || parseFloat(
                     firstVariant.price) || 0;
@@ -1368,7 +1604,6 @@
                     `;
                     }
 
-                    // ===== COLOR OPTIONS - ONLY COLORS WITH COUNT =====
                     let colorHtml = '';
                     const totalColors = variantData.colors.length;
 
@@ -1380,8 +1615,8 @@
                         <div class="color-options-container">
                             <span class="color-label">${totalColors} Color${totalColors > 1 ? 's' : ''}:</span>
                             ${displayColors.map(color => `
-                                            <span class="color-dot" style="background: ${color.toLowerCase()};" title="${color}"></span>
-                                        `).join('')}
+                                        <span class="color-dot" style="background: ${color.toLowerCase()};" title="${color}"></span>
+                                    `).join('')}
                             ${remaining > 0 ? `<span class="color-dot more-colors">+${remaining}</span>` : ''}
                         </div>
                     `;
@@ -1400,7 +1635,6 @@
                     return `
                     <div class="col-md-3 col-sm-6 mb-4">
                         <div class="product-card card" onclick="goToProductDetail(${product.id}, event)">
-                            ${hasDiscount && displayPrice > 0 ? `<div class="discount-badge">${discountDisplay}</div>` : ''}
                             <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist(${product.id}, '${escapeName}', ${displayPrice}, '${firstImage}')">
                                 <i class="${heartClass}" id="wishlist-icon-${product.id}"></i>
                             </button>
@@ -1440,7 +1674,6 @@
             wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
             cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-            // Load banners first, then categories and products
             loadBanners();
             loadCategories();
             loadProducts();
@@ -1449,7 +1682,6 @@
             updateWishlistCount();
         });
 
-        // ===== RELOAD BANNERS ON PAGE VISIBILITY CHANGE =====
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden && !bannerLoaded) {
                 loadBanners();

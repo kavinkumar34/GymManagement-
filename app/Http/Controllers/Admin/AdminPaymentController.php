@@ -75,6 +75,7 @@ class AdminPaymentController extends Controller
     public function show($id)
     {
         $order = Order::with('user', 'items')->findOrFail($id);
+        
         return view('admin.payments.show', compact('order'));
     }
     
@@ -194,6 +195,8 @@ public function getOrderDetails($id)
                 'id' => $order->id,
                 'order_number' => $order->order_number,
                 'total_amount' => $order->total_amount,
+                    'shipping_charge' => $order->shipping_charge ?? 0,
+
                 'payment_status' => $order->payment_status,
                 'order_status' => $order->order_status,
                 'payment_method' => $order->payment_method,

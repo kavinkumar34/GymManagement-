@@ -994,7 +994,188 @@
             font-size: 0.7rem;
             font-weight: 500;
         }
+
+        /* ===== CUSTOM ALERT ===== */
+        .custom-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-alert-overlay.show {
+            display: flex;
+        }
+
+        .custom-alert-box {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px 35px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .custom-alert-box .alert-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2.2rem;
+        }
+
+        .custom-alert-box .alert-icon.warning {
+            background: #fff3cd;
+            color: #dc3545;
+        }
+
+        .custom-alert-box .alert-icon.success {
+            background: #d4edda;
+            color: #28a745;
+        }
+
+        .custom-alert-box .alert-icon.info {
+            background: #d1ecf1;
+            color: #17a2b8;
+        }
+
+        .custom-alert-box .alert-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .custom-alert-box .alert-message {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .custom-alert-box .alert-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .custom-alert-box .alert-btn {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .custom-alert-box .alert-btn-primary {
+            background: #dc3545;
+            color: white;
+        }
+
+        .custom-alert-box .alert-btn-primary:hover {
+            background: #b02a37;
+            transform: scale(1.02);
+        }
+
+        .custom-alert-box .alert-btn-secondary {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .custom-alert-box .alert-btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .custom-alert-box .alert-btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .custom-alert-box .alert-btn-success:hover {
+            background: #1e7e34;
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px) scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .custom-alert-box {
+                padding: 25px 20px;
+                max-width: 95%;
+            }
+
+            .custom-alert-box .alert-icon {
+                width: 55px;
+                height: 55px;
+                font-size: 1.8rem;
+            }
+
+            .custom-alert-box .alert-title {
+                font-size: 1rem;
+            }
+
+            .custom-alert-box .alert-message {
+                font-size: 0.8rem;
+            }
+
+            .custom-alert-box .alert-btn {
+                padding: 6px 18px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
+
+    <!-- ===== CUSTOM ALERT OVERLAY ===== -->
+    <div class="custom-alert-overlay" id="customAlertOverlay">
+        <div class="custom-alert-box">
+            <div class="alert-icon warning" id="alertIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="alert-title" id="alertTitle">Alert</div>
+            <div class="alert-message" id="alertMessage">Message</div>
+            <div class="alert-buttons">
+                <button class="alert-btn alert-btn-primary" onclick="closeCustomAlert()">OK</button>
+            </div>
+        </div>
+    </div>
 
     <div class="cart-wrapper">
         <div class="cart-container">
@@ -1005,6 +1186,49 @@
     </div>
 
     <script>
+        // ================================================================
+        // ===== CUSTOM ALERT FUNCTIONS =====
+        // ================================================================
+        function showCustomAlert(title, message, type = 'warning', buttonText = 'OK', buttonLink = null) {
+            const overlay = document.getElementById('customAlertOverlay');
+            const icon = document.getElementById('alertIcon');
+            const titleEl = document.getElementById('alertTitle');
+            const messageEl = document.getElementById('alertMessage');
+            const buttons = document.querySelector('.custom-alert-box .alert-buttons');
+
+            icon.className = 'alert-icon ' + type;
+            if (type === 'warning') {
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            } else if (type === 'success') {
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else if (type === 'info') {
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            }
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            if (buttonLink) {
+                buttons.innerHTML =
+                    `<a href="${buttonLink}" class="alert-btn alert-btn-primary">${buttonText}</a>`;
+            } else {
+                buttons.innerHTML =
+                    `<button class="alert-btn alert-btn-primary" onclick="closeCustomAlert()">${buttonText}</button>`;
+            }
+
+            overlay.classList.add('show');
+        }
+
+        function closeCustomAlert() {
+            document.getElementById('customAlertOverlay').classList.remove('show');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('customAlertOverlay').classList.contains('show')) {
+                closeCustomAlert();
+            }
+        });
+
         // Get CSRF token from meta tag
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
             '{{ csrf_token() }}';
@@ -1032,7 +1256,7 @@
         let couponDiscount = 0;
         let codAvailable = true;
 
-        // ============ LOAD DELIVERABLE STATES FROM ADMIN ============
+        // ============ LOAD DELIVERABLE STATES ============
         async function loadDeliverableStates() {
             try {
                 const response = await fetch('/api/deliverable-pincodes');
@@ -1158,44 +1382,20 @@
             }
         }
 
-        async function updateAddressInDatabase(addressId, address) {
-            try {
-                const response = await fetch(`/api/user-addresses/${addressId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(address)
-                });
-                const data = await response.json();
-                if (data.success && data.address) {
-                    return data.address;
-                }
-                return null;
-            } catch (error) {
-                console.error('Error updating address:', error);
-                return null;
-            }
-        }
-
         function saveAddressesToLocal() {
             localStorage.setItem('user_addresses', JSON.stringify(savedAddresses));
         }
 
         // ============ CHECK COD AVAILABILITY ============
-    function checkCodAvailability() {
-    for (const item of cartData) {
-        const product = productData[item.id];
-
-        if (product && Number(product.cod_available) === 0) {
-            return false;
+        function checkCodAvailability() {
+            for (const item of cartData) {
+                const product = productData[item.id];
+                if (product && Number(product.cod_available) === 0) {
+                    return false;
+                }
+            }
+            return true;
         }
-    }
-
-    return true;
-}   
 
         // ============ PRODUCT DATA FUNCTIONS ============
         async function loadProductsData() {
@@ -1216,15 +1416,9 @@
                 if (productsArray.length > 0) {
                     productsArray.forEach(product => {
                         if (product.id) {
-                            // Store full product data
                             productData[product.id] = product;
-                            console.log("Product ID:", product.id);
-                            console.log(product);
-                            console.log("COD:", product.cod_available);
-                            // Get stock from variants or product
                             let stock = 0;
                             if (product.variants && product.variants.length > 0) {
-                                // Sum stock from all variants
                                 product.variants.forEach(v => {
                                     stock += parseInt(v.stock) || 0;
                                 });
@@ -1233,15 +1427,12 @@
                             }
                             productStock[product.id] = stock;
 
-                            // Get first image - for variant products, get first variant image
                             let imageUrl = null;
                             if (product.product_images && product.product_images.length > 0) {
-                                // Sort by is_main (main first)
                                 const sortedImages = [...product.product_images].sort((a, b) => {
                                     if (a.is_main !== b.is_main) return b.is_main - a.is_main;
                                     return (a.display_order || 0) - (b.display_order || 0);
                                 });
-                                // For variant products, get image with variant_id
                                 if (product.variants && product.variants.length > 0) {
                                     const firstVariant = product.variants[0];
                                     const variantImage = sortedImages.find(img => img.variant_id == firstVariant
@@ -1252,13 +1443,11 @@
                                         imageUrl = '/storage/' + sortedImages[0].image_path;
                                     }
                                 } else {
-                                    // Normal product
                                     if (sortedImages.length > 0) {
                                         imageUrl = '/storage/' + sortedImages[0].image_path;
                                     }
                                 }
                             }
-                            // Fallback to product.image
                             if (!imageUrl && product.image) {
                                 imageUrl = '/storage/' + product.image;
                             }
@@ -1269,7 +1458,6 @@
                     });
                 }
 
-                // Check COD availability for cart items
                 codAvailable = checkCodAvailability();
 
                 cart.forEach(item => {
@@ -1290,19 +1478,6 @@
             }
         }
 
-        // ============ GET VARIANT STOCK ============
-        function getVariantStock(productId, size, color) {
-            const product = productData[productId];
-            if (!product || !product.variants) return 0;
-
-            const variant = product.variants.find(v =>
-                v.size === size && v.color === color
-            );
-
-            return variant ? parseInt(variant.stock) || 0 : 0;
-        }
-
-        // ============ GET VARIANT BY SIZE AND COLOR ============
         function getVariantBySizeColor(productId, size, color) {
             const product = productData[productId];
             if (!product || !product.variants) return null;
@@ -1327,13 +1502,7 @@
 
         function checkStockIssues() {
             for (let item of cartData) {
-                let stock = 0;
-                // For variant products, check specific variant stock
-                if (item.size && item.color) {
-                    stock = getVariantStock(item.id, item.size, item.color);
-                } else {
-                    stock = productStock[item.id] || 0;
-                }
+                let stock = productStock[item.id] || 0;
                 if (item.quantity > stock || stock <= 0) {
                     return true;
                 }
@@ -1342,7 +1511,7 @@
         }
 
         function getTotalWithShipping() {
-            return getSubtotal() + shippingCharge - couponDiscount;
+            return getSubtotal() + shippingCharge - parseFloat(couponDiscount || 0);
         }
 
         function updateNavbarCartCount() {
@@ -1362,14 +1531,10 @@
             return div.innerHTML;
         }
 
-        function showToast(message, type = 'success') {
-            alert(message);
-        }
-
         // ============ NAVIGATION ============
         function goToCheckout() {
             if (checkStockIssues()) {
-                alert('Some items have stock issues. Please check your cart.');
+                showCustomAlert('⚠️ Stock Issue', 'Some items have stock issues. Please check your cart.', 'warning');
                 return;
             }
             currentPage = 'checkout';
@@ -1414,30 +1579,28 @@
         }
 
         function deleteAddress(index) {
-            if (confirm('Are you sure you want to delete this address?')) {
-                let address = savedAddresses[index];
-                if (address.id) {
-                    deleteAddressFromDatabase(address.id);
-                }
-                savedAddresses.splice(index, 1);
-                saveAddressesToLocal();
-                if (selectedAddress && selectedAddress.id === address.id) {
-                    selectedAddress = savedAddresses.length > 0 ? savedAddresses[0] : null;
-                    if (selectedAddress) {
-                        const addrState = selectedAddress.state;
-                        const stateData = deliverableStates.find(s => s.state === addrState);
-                        if (stateData) {
-                            selectedState = stateData;
-                            shippingCharge = parseFloat(stateData.shipping_charge) || 0;
-                        }
-                    } else {
-                        selectedState = null;
-                        shippingCharge = 0;
-                    }
-                }
-                showAddressForm = false;
-                renderPage();
+            let address = savedAddresses[index];
+            if (address.id) {
+                deleteAddressFromDatabase(address.id);
             }
+            savedAddresses.splice(index, 1);
+            saveAddressesToLocal();
+            if (selectedAddress && selectedAddress.id === address.id) {
+                selectedAddress = savedAddresses.length > 0 ? savedAddresses[0] : null;
+                if (selectedAddress) {
+                    const addrState = selectedAddress.state;
+                    const stateData = deliverableStates.find(s => s.state === addrState);
+                    if (stateData) {
+                        selectedState = stateData;
+                        shippingCharge = parseFloat(stateData.shipping_charge) || 0;
+                    }
+                } else {
+                    selectedState = null;
+                    shippingCharge = 0;
+                }
+            }
+            showAddressForm = false;
+            renderPage();
         }
 
         function showAddAddressForm() {
@@ -1478,12 +1641,12 @@
             const stateName = stateSelect ? stateSelect.options[stateSelect.selectedIndex]?.text?.split(' (')[0] || '' : '';
 
             if (!address || !city || !pincode || !stateId) {
-                alert('Please fill all required fields');
+                showCustomAlert('❌ Required', 'Please fill all required fields', 'warning');
                 return false;
             }
 
             if (pincode.length < 6) {
-                alert('Please enter a valid 6-digit pincode');
+                showCustomAlert('❌ Invalid', 'Please enter a valid 6-digit pincode', 'warning');
                 return false;
             }
 
@@ -1507,45 +1670,21 @@
 
             if (isEditingAddress && editingAddressIndex !== null) {
                 const existingAddress = savedAddresses[editingAddressIndex];
-                if (existingAddress.id) {
-                    updateAddressInDatabase(existingAddress.id, addressData).then(updated => {
-                        if (updated) {
-                            savedAddresses[editingAddressIndex] = {
-                                ...existingAddress,
-                                ...addressData
-                            };
-                            saveAddressesToLocal();
-                            if (selectedAddress && selectedAddress.id === existingAddress.id) {
-                                selectedAddress = savedAddresses[editingAddressIndex];
-                            }
-                            showAddressForm = false;
-                            isEditingAddress = false;
-                            editingAddressIndex = null;
-                            editAddressData = null;
-                            renderPage();
-                            showToast('Address updated successfully!');
-                        } else {
-                            alert('Failed to update address. Please try again.');
-                        }
-                    });
-                    return true;
-                } else {
-                    savedAddresses[editingAddressIndex] = {
-                        ...existingAddress,
-                        ...addressData
-                    };
-                    saveAddressesToLocal();
-                    if (selectedAddress && selectedAddress.id === existingAddress.id) {
-                        selectedAddress = savedAddresses[editingAddressIndex];
-                    }
-                    showAddressForm = false;
-                    isEditingAddress = false;
-                    editingAddressIndex = null;
-                    editAddressData = null;
-                    renderPage();
-                    showToast('Address updated successfully!');
-                    return true;
+                savedAddresses[editingAddressIndex] = {
+                    ...existingAddress,
+                    ...addressData
+                };
+                saveAddressesToLocal();
+                if (selectedAddress && selectedAddress.id === existingAddress.id) {
+                    selectedAddress = savedAddresses[editingAddressIndex];
                 }
+                showAddressForm = false;
+                isEditingAddress = false;
+                editingAddressIndex = null;
+                editAddressData = null;
+                renderPage();
+                showCustomAlert('✅ Success', 'Address updated successfully!', 'success');
+                return true;
             } else {
                 saveAddressToDatabase(addressData).then(saved => {
                     if (saved) {
@@ -1554,14 +1693,14 @@
                         selectedAddress = saved;
                         showAddressForm = false;
                         renderPage();
-                        showToast('Address added successfully!');
+                        showCustomAlert('✅ Success', 'Address added successfully!', 'success');
                     } else {
                         savedAddresses.push(addressData);
                         saveAddressesToLocal();
                         selectedAddress = addressData;
                         showAddressForm = false;
                         renderPage();
-                        showToast('Address added successfully!');
+                        showCustomAlert('✅ Success', 'Address added successfully!', 'success');
                     }
                 });
                 return true;
@@ -1609,14 +1748,14 @@
         async function applyCouponFromDropdown() {
             const select = document.getElementById('couponSelect');
             if (!select) {
-                alert('Coupon selection not found');
+                showCustomAlert('❌ Error', 'Coupon selection not found', 'warning');
                 return;
             }
 
             const code = select.value;
 
             if (!code) {
-                alert('Please select a coupon from the dropdown');
+                showCustomAlert('❌ Error', 'Please select a coupon from the dropdown', 'warning');
                 return;
             }
 
@@ -1627,6 +1766,7 @@
             }
 
             try {
+                const subtotal = getSubtotal();
                 const response = await fetch('/api/validate-coupon', {
                     method: 'POST',
                     headers: {
@@ -1636,7 +1776,7 @@
                     },
                     body: JSON.stringify({
                         code: code,
-                        subtotal: getSubtotal()
+                        subtotal: subtotal
                     })
                 });
 
@@ -1651,9 +1791,9 @@
                     couponCode = data.coupon.code;
                     couponDiscount = parseFloat(data.discount) || 0;
                     renderPage();
-                    alert('✅ Coupon applied! Discount: ₹' + couponDiscount.toFixed(2));
+                    showCustomAlert('✅ Coupon Applied!', `You saved ₹${couponDiscount.toFixed(2)}`, 'success');
                 } else {
-                    alert('❌ ' + (data.message || 'Invalid coupon code'));
+                    showCustomAlert('❌ Invalid Coupon', data.message || 'Invalid coupon code', 'warning');
                     couponCode = null;
                     couponDiscount = 0;
                     renderPage();
@@ -1664,7 +1804,7 @@
                     btn.innerHTML = 'Apply';
                     btn.disabled = false;
                 }
-                alert('Error applying coupon. Please try again.');
+                showCustomAlert('❌ Error', 'Error applying coupon. Please try again.', 'warning');
             }
         }
 
@@ -1672,23 +1812,16 @@
             couponCode = null;
             couponDiscount = 0;
             renderPage();
-            alert('Coupon removed');
+            showCustomAlert('✅ Removed', 'Coupon removed successfully', 'info');
         }
 
         // ============ CART OPERATIONS ============
-        window.updateQty = async function(index, change) {
+        window.updateQty = function(index, change) {
             let cart = JSON.parse(localStorage.getItem('cart')) || [];
             if (index >= cart.length) return;
 
             let item = cart[index];
-            let stock = 0;
-
-            // For variant products, check specific variant stock
-            if (item.size && item.color) {
-                stock = getVariantStock(item.id, item.size, item.color);
-            } else {
-                stock = productStock[item.id] || 0;
-            }
+            let stock = productStock[item.id] || 0;
 
             let newQty = item.quantity + change;
 
@@ -1699,7 +1832,7 @@
                     return;
                 }
             } else if (newQty > stock && stock > 0) {
-                alert(`Sorry, only ${stock} items available for this size and color!`);
+                showCustomAlert('⚠️ Stock Limit', `Sorry, only ${stock} items available!`, 'warning');
                 return;
             } else {
                 item.quantity = newQty;
@@ -1712,53 +1845,56 @@
         };
 
         window.removeItem = function(index) {
-            if (confirm('Remove this item?')) {
-                let cart = JSON.parse(localStorage.getItem('cart')) || [];
-                cart.splice(index, 1);
-                localStorage.setItem('cart', JSON.stringify(cart));
-                cartData = cart;
-                if (cartData.length === 0) {
-                    currentPage = 'cart';
-                }
-                renderPage();
-                updateNavbarCartCount();
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (index >= cart.length) return;
+
+            let item = cart[index];
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            cartData = cart;
+            if (cartData.length === 0) {
+                currentPage = 'cart';
             }
+            renderPage();
+            updateNavbarCartCount();
+            showCustomAlert('🗑️ Removed', `"${item.name}" removed from cart`, 'info');
         };
 
         window.clearCart = function() {
-            if (confirm('Are you sure you want to clear your entire cart?')) {
-                localStorage.removeItem('cart');
-                cartData = [];
-                renderPage();
-                updateNavbarCartCount();
-            }
+            localStorage.removeItem('cart');
+            cartData = [];
+            renderPage();
+            updateNavbarCartCount();
+            showCustomAlert('🗑️ Cleared', 'Cart cleared successfully', 'info');
         };
 
         window.updateCart = function() {
             renderPage();
-            alert('Cart updated!');
+            showCustomAlert('✅ Updated', 'Cart updated successfully!', 'success');
         };
 
         // ============ PLACE ORDER ============
         async function placeOrder() {
             if (checkStockIssues()) {
-                alert('Some items are out of stock or quantity exceeds available stock!');
+                showCustomAlert('⚠️ Stock Issue', 'Some items are out of stock or quantity exceeds available stock!',
+                    'warning');
                 return;
             }
 
-            // ===== CHECK COD AVAILABILITY BEFORE PLACING ORDER =====
             if (selectedPayment === 'cod' && !codAvailable) {
-                alert('Cash on Delivery is not available for this order. Please select Online Payment.');
+                showCustomAlert('⚠️ COD Unavailable',
+                    'Cash on Delivery is not available for this order. Please select Online Payment.',
+                    'warning');
                 return;
             }
 
             if (!selectedPayment) {
-                alert('Please select a payment method');
+                showCustomAlert('⚠️ Payment Required', 'Please select a payment method', 'warning');
                 return;
             }
 
             if (!selectedState) {
-                alert('Please select a state in the address section');
+                showCustomAlert('⚠️ Address Required', 'Please select a state in the address section', 'warning');
                 return;
             }
 
@@ -1773,7 +1909,7 @@
             }
 
             if (!selectedAddress) {
-                alert('Please add a delivery address');
+                showCustomAlert('⚠️ Address Required', 'Please add a delivery address', 'warning');
                 return;
             }
 
@@ -1783,11 +1919,9 @@
                 checkoutBtn.disabled = true;
             }
 
-            // Calculate all amounts
             const subtotal = getSubtotal();
             const totalWithShipping = getTotalWithShipping();
 
-            // Prepare order data
             const orderData = {
                 cart: cartData,
                 address: selectedAddress,
@@ -1797,12 +1931,9 @@
                 subtotal: subtotal,
                 total_amount: totalWithShipping,
                 coupon_code: couponCode || null,
-                coupon_discount: couponDiscount || 0,
+                coupon_discount: parseFloat(couponDiscount || 0),
                 payment_method: selectedPayment
             };
-
-            console.log('Order Data:', orderData);
-            console.log('Grand Total to be charged:', totalWithShipping);
 
             try {
                 const saveResponse = await fetch('/api/set-checkout-cart', {
@@ -1815,7 +1946,7 @@
                         cart: cartData,
                         total_amount: totalWithShipping,
                         shipping_charge: shippingCharge,
-                        coupon_discount: couponDiscount,
+                        coupon_discount: parseFloat(couponDiscount || 0),
                         coupon_code: couponCode
                     })
                 });
@@ -1826,7 +1957,6 @@
                     const form = document.createElement('form');
                     form.method = 'POST';
 
-                    // For COD - use direct order placement, for Online - use buy-now
                     if (selectedPayment === 'cod') {
                         form.action = '/place-cod-order';
                     } else {
@@ -1867,7 +1997,7 @@
                         const couponDiscountInput = document.createElement('input');
                         couponDiscountInput.type = 'hidden';
                         couponDiscountInput.name = 'coupon_discount';
-                        couponDiscountInput.value = couponDiscount;
+                        couponDiscountInput.value = parseFloat(couponDiscount || 0);
                         form.appendChild(couponDiscountInput);
                     }
 
@@ -1918,7 +2048,7 @@
                     document.body.appendChild(form);
                     form.submit();
                 } else {
-                    alert('Error processing order');
+                    showCustomAlert('❌ Error', 'Error processing order. Please try again.', 'warning');
                     if (checkoutBtn) {
                         checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
                         checkoutBtn.disabled = false;
@@ -1927,7 +2057,7 @@
                 }
             } catch (error) {
                 console.error('Order error:', error);
-                alert('Network error. Please try again.');
+                showCustomAlert('❌ Network Error', 'Please try again.', 'warning');
                 if (checkoutBtn) {
                     checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
                     checkoutBtn.disabled = false;
@@ -1970,109 +2100,30 @@
 
             for (let i = 0; i < cartData.length; i++) {
                 let item = cartData[i];
-
-                // Get stock for this specific variant
-                let stock = 0;
-                let variantDetails = '';
+                let stock = productStock[item.id] || 0;
                 let price = parseFloat(item.price) || 0;
                 let originalPrice = parseFloat(item.original_price) || price;
-                let discountType = item.discount_type || 'flat';
-                let discountValue = parseFloat(item.discount_value) || 0;
-
-                // Get product data
-                let product = productData[item.id];
-
-                // For variant products, find the specific variant
-                if (item.size && item.color) {
-                    const variant = getVariantBySizeColor(item.id, item.size, item.color);
-                    if (variant) {
-                        stock = parseInt(variant.stock) || 0;
-                        originalPrice = parseFloat(variant.total_price) || parseFloat(variant.mrp) || price;
-                        price = parseFloat(variant.final_price) || parseFloat(variant.price) || price;
-                        discountType = variant.discount_type || 'flat';
-                        discountValue = parseFloat(variant.discount_value) || 0;
-                        variantDetails = `Size: ${item.size} | Color: ${item.color}`;
-                    } else {
-                        // If variant not found, use product data
-                        stock = productStock[item.id] || 0;
-                        if (product) {
-                            originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
-                            price = parseFloat(product.final_price) || parseFloat(product.price) || price;
-                        }
-                        variantDetails = `Size: ${item.size} | Color: ${item.color}`;
-                    }
-                } else if (item.size) {
-                    // Only size specified
-                    const variant = product?.variants?.find(v => v.size === item.size);
-                    if (variant) {
-                        stock = parseInt(variant.stock) || 0;
-                        originalPrice = parseFloat(variant.total_price) || parseFloat(variant.mrp) || price;
-                        price = parseFloat(variant.final_price) || parseFloat(variant.price) || price;
-                        discountType = variant.discount_type || 'flat';
-                        discountValue = parseFloat(variant.discount_value) || 0;
-                    } else {
-                        stock = productStock[item.id] || 0;
-                        if (product) {
-                            originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
-                            price = parseFloat(product.final_price) || parseFloat(product.price) || price;
-                        }
-                    }
-                    variantDetails = `Size: ${item.size}`;
-                } else if (item.color) {
-                    // Only color specified
-                    const variant = product?.variants?.find(v => v.color === item.color);
-                    if (variant) {
-                        stock = parseInt(variant.stock) || 0;
-                        originalPrice = parseFloat(variant.total_price) || parseFloat(variant.mrp) || price;
-                        price = parseFloat(variant.final_price) || parseFloat(variant.price) || price;
-                        discountType = variant.discount_type || 'flat';
-                        discountValue = parseFloat(variant.discount_value) || 0;
-                    } else {
-                        stock = productStock[item.id] || 0;
-                        if (product) {
-                            originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
-                            price = parseFloat(product.final_price) || parseFloat(product.price) || price;
-                        }
-                    }
-                    variantDetails = `Color: ${item.color}`;
-                } else {
-                    // Normal product (no variant)
-                    stock = productStock[item.id] || 0;
-                    if (product) {
-                        originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || price;
-                        price = parseFloat(product.final_price) || parseFloat(product.price) || price;
-                        discountType = product.discount_type || 'flat';
-                        discountValue = parseFloat(product.discount_value) || 0;
-                    }
-                }
-
-                // If item has original_price stored in cart, use it
-                if (item.original_price) {
-                    originalPrice = parseFloat(item.original_price);
-                }
-
                 let qty = item.quantity;
                 let itemTotal = price * qty;
                 subtotal += itemTotal;
                 totalItems += qty;
 
-                // Calculate discount display
                 let discountPercent = 0;
                 let discountDisplay = '';
                 let hasDiscount = false;
                 if (originalPrice > 0 && price < originalPrice) {
                     hasDiscount = true;
                     discountPercent = Math.round(((originalPrice - price) / originalPrice) * 100);
-                    if (discountType === 'flat') {
-                        discountDisplay = '₹' + discountValue.toFixed(2) + ' off';
-                    } else {
-                        discountDisplay = discountPercent + '% off';
-                    }
+                    discountDisplay = discountPercent + '% off';
                 }
 
                 let stockText = stock > 0 ? (stock <= 5 ? `Only ${stock} left` : 'In Stock') : 'Out of Stock';
                 let stockClass = stock > 0 ? (stock <= 5 ? 'stock-low' : 'stock-available') : 'stock-out';
                 let imageUrl = productImages[item.id] || '';
+                let variantDetails = '';
+                if (item.size) variantDetails += `Size: ${item.size}`;
+                if (item.size && item.color) variantDetails += ' | ';
+                if (item.color) variantDetails += `Color: ${item.color}`;
 
                 let priceHtml = '';
                 if (hasDiscount) {
@@ -2167,14 +2218,10 @@
         function renderCheckoutPage() {
             let subtotal = getSubtotal();
             let totalItems = getTotalItems();
+            let couponDiscountAmount = parseFloat(couponDiscount || 0);
             let totalWithShipping = getTotalWithShipping();
 
-            // Check COD availability - ONLY if ALL products have cod_available = 1
             codAvailable = checkCodAvailability();
-
-            // Debug: Log COD availability
-            console.log('COD Available:', codAvailable);
-            console.log('Cart Items:', cartData);
 
             let stateOptions = '';
             if (deliverableStates && deliverableStates.length > 0) {
@@ -2249,16 +2296,13 @@
 
             let editAddress = editAddressData || {};
 
-            // ===== COUPON SECTION HTML =====
             let couponHtml = '';
-            if (couponCode) {
-                const discountAmount = typeof couponDiscount === 'number' ? couponDiscount : parseFloat(couponDiscount) ||
-                    0;
+            if (couponCode && couponDiscountAmount > 0) {
                 couponHtml = `
                     <div class="coupon-applied">
                         <i class="fas fa-check-circle" style="color: #22c55e;"></i>
                         Coupon <strong>${couponCode}</strong> applied! 
-                        Discount: ₹${discountAmount.toFixed(2)}
+                        Discount: <strong>₹${couponDiscountAmount.toFixed(2)}</strong>
                         <span class="remove-coupon" onclick="removeCoupon()">✕ Remove</span>
                     </div>
                 `;
@@ -2274,7 +2318,6 @@
                 `;
             }
 
-            // ===== PAYMENT METHODS - COD ONLY IF AVAILABLE =====
             let paymentMethodsHtml = `
                 <div class="payment-methods">
                     <div class="payment-option ${selectedPayment === 'online' ? 'selected' : ''}" onclick="selectPayment('online')">
@@ -2287,7 +2330,6 @@
                     </div>
             `;
 
-            // ===== COD OPTION - ONLY SHOW IF codAvailable = true =====
             if (codAvailable === true) {
                 paymentMethodsHtml += `
                     <div class="payment-option ${selectedPayment === 'cod' ? 'selected' : ''}" onclick="selectPayment('cod')">
@@ -2314,6 +2356,16 @@
 
             paymentMethodsHtml += `</div>`;
 
+            let couponSummaryRow = '';
+            if (couponCode && couponDiscountAmount > 0) {
+                couponSummaryRow = `
+                    <div class="summary-row" style="color: #15803d;">
+                        <span>Coupon Discount (${couponCode})</span>
+                        <span>- ₹${couponDiscountAmount.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
             let html = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h2 style="font-size: 1.8rem; font-weight: 700; color: #1e293b;">
@@ -2324,9 +2376,7 @@
                     </button>
                 </div>
                 <div class="cart-grid">
-                    <!-- LEFT SIDE -->
                     <div>
-                        <!-- Contact Information -->
                         <div class="checkout-contact-section">
                             <div class="section-title">Contact Information</div>
                             <div class="form-row">
@@ -2345,7 +2395,6 @@
                             </div>
                         </div>
                         
-                        <!-- Delivery Address -->
                         <div class="delivery-address-section">
                             <div class="section-title">Delivery Address</div>
                             
@@ -2387,9 +2436,7 @@
                         </div>
                     </div>
                     
-                    <!-- RIGHT SIDE -->
                     <div class="order-summary-section">
-                        <!-- Coupon / Promo Code Section -->
                         <div class="coupon-section-wrapper">
                             <div class="section-title">
                                 <i class="fas fa-ticket-alt" style="color: #8b5cf6;"></i> Coupon / Promo Code
@@ -2411,14 +2458,8 @@
                                 <span>Shipping</span>
                                 <span>${selectedState ? selectedState.state + ' ₹' + shippingCharge.toFixed(2) : '₹0.00'}</span>
                             </div>
-                            ${(couponCode && couponDiscount > 0) ? `
-                                            <div class="summary-row" style="color: #15803d;">
-                                                <span>Coupon Discount (${couponCode})</span>
-                                                <span>- ₹${parseFloat(couponDiscount || 0).toFixed(2)}</span>
-                                            </div>
-                                        ` : ''}
+                            ${couponSummaryRow}
                             
-                            <!-- Payment Method -->
                             <div style="margin-top: 1rem; border-top: 1px solid #eef2f6; padding-top: 1rem;">
                                 ${paymentMethodsHtml}
                             </div>
@@ -2442,7 +2483,6 @@
 
             document.getElementById('cartContainer').innerHTML = html;
 
-            // Load available coupons into dropdown
             if (!couponCode) {
                 const select = document.getElementById('couponSelect');
                 if (select) {

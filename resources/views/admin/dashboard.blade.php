@@ -2,81 +2,113 @@
 
 @section('content')
 <style>
-    /* Dashboard Cards */
+    /* ===== DASHBOARD STAT CARDS ===== */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    @media (max-width: 1200px) {
+        .stat-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stat-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .stat-card {
         background: white;
         border-radius: 16px;
-        padding: 20px 24px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        padding: 20px 20px 20px 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
         transition: all 0.3s ease;
-        border: none;
+        border: 1px solid #f1f5f9;
         position: relative;
         overflow: hidden;
         height: 100%;
+        display: flex;
+        flex-direction: column;
     }
-    
+
     .stat-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        border-color: transparent;
     }
-    
-    .stat-card .stat-icon {
+
+    /* Card Top Section - Icon and Content */
+    .stat-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .stat-card .stat-icon-wrapper {
         width: 48px;
         height: 48px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.4rem;
-        margin-bottom: 12px;
+        font-size: 1.3rem;
+        flex-shrink: 0;
     }
-    
+
     .stat-card .stat-number {
-        font-size: 1.8rem;
+        font-size: 1.75rem;
         font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 4px;
+        color: #0f172a;
+        line-height: 1.2;
     }
-    
+
     .stat-card .stat-label {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         color: #64748b;
         font-weight: 500;
+        margin-top: 2px;
     }
-    
+
     .stat-card .stat-change {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         font-weight: 600;
         padding: 2px 10px;
         border-radius: 20px;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
         margin-top: 6px;
+        align-self: flex-start;
     }
-    
+
     .stat-change.positive {
         background: #dcfce7;
         color: #15803d;
     }
-    
+
     .stat-change.negative {
         background: #fee2e2;
         color: #b91c1c;
     }
-    
+
     .stat-change.neutral {
         background: #f1f5f9;
         color: #64748b;
     }
-    
-    .stat-card .icon-bg {
-        position: absolute;
-        right: -10px;
-        bottom: -10px;
-        font-size: 5rem;
-        opacity: 0.06;
-        color: #1e293b;
-    }
-    
+
     /* Icon Colors */
     .icon-purple { background: #ede9fe; color: #7c3aed; }
     .icon-blue { background: #dbeafe; color: #2563eb; }
@@ -85,62 +117,104 @@
     .icon-red { background: #fee2e2; color: #dc2626; }
     .icon-cyan { background: #cffafe; color: #0891b2; }
     .icon-pink { background: #fce7f3; color: #db2777; }
-    
-    /* Chart Container */
+    .icon-indigo { background: #e0e7ff; color: #4f46e5; }
+    .icon-teal { background: #ccfbf1; color: #0d9488; }
+
+    /* Card Bottom Decoration */
+    .stat-card .stat-decoration {
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 5rem;
+        opacity: 0.04;
+        color: #1e293b;
+        pointer-events: none;
+    }
+
+    /* ===== CHART CONTAINERS ===== */
     .chart-container {
         background: white;
         border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        border: none;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        border: 1px solid #f1f5f9;
         height: 100%;
+        transition: all 0.3s ease;
     }
-    
+
+    .chart-container:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    }
+
     .chart-container .chart-title {
-        font-size: 1rem;
+        font-size: 0.95rem;
         font-weight: 600;
         color: #1e293b;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    
+
     .chart-container canvas {
         width: 100% !important;
         height: 280px !important;
+        max-height: 280px;
     }
-    
-    /* Table Styles */
+
+    /* ===== DASHBOARD GRID ===== */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ===== TABLE STYLES ===== */
     .table-dashboard {
         margin-bottom: 0;
+        font-size: 0.85rem;
     }
-    
+
     .table-dashboard th {
         background: #f8fafc;
         color: #475569;
         font-weight: 600;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         border-bottom: 2px solid #e2e8f0;
-        padding: 12px 16px;
+        padding: 10px 14px;
+        position: sticky;
+        top: 0;
+        z-index: 2;
     }
-    
+
     .table-dashboard td {
-        padding: 12px 16px;
+        padding: 10px 14px;
         vertical-align: middle;
         border-bottom: 1px solid #f1f5f9;
+        color: #1e293b;
     }
-    
+
     .table-dashboard tr:hover {
         background: #f8fafc;
     }
-    
+
     .table-dashboard .badge-status {
-        padding: 4px 12px;
+        padding: 3px 12px;
         border-radius: 20px;
         font-size: 0.7rem;
         font-weight: 600;
+        display: inline-block;
     }
-    
+
     .badge-pending { background: #fef3c7; color: #92400e; }
     .badge-confirmed { background: #dbeafe; color: #1d4ed8; }
     .badge-shipped { background: #e0e7ff; color: #3730a3; }
@@ -149,101 +223,206 @@
     .badge-failed { background: #fee2e2; color: #b91c1c; }
     .badge-read { background: #dbeafe; color: #1d4ed8; }
     .badge-replied { background: #dcfce7; color: #15803d; }
-    
-    /* Dashboard Grid */
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-    
-    @media (max-width: 992px) {
-        .dashboard-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-bottom: 25px;
-    }
-    
-    @media (max-width: 768px) {
-        .stat-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .stat-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    /* Quick Actions */
+    .badge-new { background: #fef3c7; color: #92400e; }
+
+    /* ===== QUICK ACTIONS ===== */
     .quick-actions {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
     }
-    
+
     .quick-action-btn {
-        padding: 10px 20px;
+        padding: 10px 22px;
         border-radius: 12px;
         border: none;
         font-weight: 600;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.3s ease;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        border: 1px solid transparent;
     }
-    
+
     .quick-action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        color: white !important;
+        text-decoration: none;
     }
-    
+
+    .quick-action-btn i {
+        font-size: 0.9rem;
+    }
+
     .btn-primary-custom { background: #3b82f6; color: white; }
+    .btn-primary-custom:hover { background: #2563eb; color: white; }
+
     .btn-success-custom { background: #22c55e; color: white; }
+    .btn-success-custom:hover { background: #16a34a; color: white; }
+
     .btn-purple-custom { background: #8b5cf6; color: white; }
+    .btn-purple-custom:hover { background: #7c3aed; color: white; }
+
     .btn-orange-custom { background: #f59e0b; color: white; }
+    .btn-orange-custom:hover { background: #d97706; color: white; }
+
     .btn-pink-custom { background: #ec4899; color: white; }
+    .btn-pink-custom:hover { background: #db2777; color: white; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-header h4 {
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header .header-date {
+        color: #64748b;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #f8fafc;
+        padding: 6px 14px;
+        border-radius: 20px;
+    }
+
+    /* ===== SCROLLABLE TABLE CONTAINER ===== */
+    .table-scroll {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .table-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .table-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* ===== WELCOME BANNER ===== */
+    .welcome-banner {
+        background: linear-gradient(135deg, #1e293b 0%, #2d3a4b 100%);
+        border-radius: 16px;
+        padding: 24px 30px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    .welcome-banner h4 {
+        color: white;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .welcome-banner p {
+        color: #94a3b8;
+        margin: 4px 0 0 0;
+        font-size: 0.9rem;
+    }
+
+    .welcome-banner .welcome-stats {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .welcome-banner .welcome-stat-item {
+        text-align: center;
+    }
+
+    .welcome-banner .welcome-stat-item .number {
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .welcome-banner .welcome-stat-item .label {
+        color: #94a3b8;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 768px) {
+        .welcome-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+        .welcome-banner .welcome-stats {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
 </style>
 
 <div class="admin-main-content">
     <div class="container-fluid">
-        <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- ===== WELCOME BANNER ===== -->
+        <div class="welcome-banner">
             <div>
-                <h4 class="mb-1" style="font-weight: 700; color: #1e293b;">
-                    <i class="fas fa-chart-line me-2" style="color: #3b82f6;"></i>Dashboard
-                </h4>
-                <small style="color: #64748b;">Welcome back, {{ Auth::user()->name ?? 'Admin' }}!</small>
+                <h4><i class="fas fa-chart-line me-2"></i> Welcome back, {{ Auth::user()->name ?? 'Admin' }}!</h4>
+                <p>Here's what's happening with your store today.</p>
             </div>
-            <div>
-                <span style="color: #64748b; font-size: 0.9rem;">
-                    <i class="fas fa-calendar-alt me-1"></i> {{ now()->format('d M Y, h:i A') }}
-                </span>
+            <div class="welcome-stats">
+                <div class="welcome-stat-item">
+                    <div class="number">{{ $totalOrders ?? 0 }}</div>
+                    <div class="label">Orders</div>
+                </div>
+                <div class="welcome-stat-item">
+                    <div class="number">₹{{ number_format($totalRevenue ?? 0, 0) }}</div>
+                    <div class="label">Revenue</div>
+                </div>
+                <div class="welcome-stat-item">
+                    <div class="number">{{ $totalMembers ?? 0 }}</div>
+                    <div class="label">Users</div>
+                </div>
+                <div class="welcome-stat-item">
+                    <div class="number">{{ $pendingOrders ?? 0 }}</div>
+                    <div class="label">Pending</div>
+                </div>
             </div>
         </div>
-        
-        <!-- Quick Actions -->
+
+        <!-- ===== QUICK ACTIONS ===== -->
         <div class="quick-actions">
             <a href="{{ route('admin.products.create') }}" class="quick-action-btn btn-primary-custom">
-                <i class="fas fa-plus"></i> Add Product
+                <i class="fas fa-plus-circle"></i> Add Product
             </a>
             <a href="{{ route('admin.payments.index') }}" class="quick-action-btn btn-success-custom">
                 <i class="fas fa-shopping-bag"></i> View Orders
-            </a>
-            <a href="{{ route('admin.members') }}" class="quick-action-btn btn-purple-custom">
-                <i class="fas fa-users"></i> Manage Members
             </a>
             <a href="{{ route('admin.offers.index') }}" class="quick-action-btn btn-orange-custom">
                 <i class="fas fa-tags"></i> Manage Offers
@@ -251,121 +430,154 @@
             <a href="{{ route('admin.contacts.index') }}" class="quick-action-btn btn-pink-custom">
                 <i class="fas fa-envelope"></i> Messages
             </a>
+            <a href="{{ route('admin.products.index') }}" class="quick-action-btn btn-purple-custom">
+                <i class="fas fa-box"></i> Products
+            </a>
         </div>
-        
-        <!-- Statistics Cards -->
+
+        <!-- ===== STATISTICS CARDS ===== -->
         <div class="stat-grid">
             <!-- Total Orders -->
             <div class="stat-card">
-                <div class="stat-icon icon-blue">
-                    <i class="fas fa-shopping-cart"></i>
+                <div class="stat-card-top">
+                    <div>
+                        <div class="stat-icon-wrapper icon-blue">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stat-number">{{ $totalOrders ?? 0 }}</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $totalOrders ?? 0 }}</div>
-                <div class="stat-label">Total Orders</div>
                 <span class="stat-change positive">
                     <i class="fas fa-arrow-up"></i> {{ $ordersGrowth ?? '0' }}%
                 </span>
-                <div class="icon-bg"><i class="fas fa-shopping-cart"></i></div>
             </div>
-            
+
             <!-- Total Revenue -->
             <div class="stat-card">
-                <div class="stat-icon icon-green">
-                    <i class="fas fa-rupee-sign"></i>
+                <div class="stat-card-top">
+                    <div>
+                        <div class="stat-icon-wrapper icon-green">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stat-number">₹{{ number_format($totalRevenue ?? 0, 0) }}</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
                 </div>
-                <div class="stat-number">₹{{ number_format($totalRevenue ?? 0, 2) }}</div>
-                <div class="stat-label">Total Revenue</div>
                 <span class="stat-change positive">
                     <i class="fas fa-arrow-up"></i> {{ $revenueGrowth ?? '0' }}%
                 </span>
-                <div class="icon-bg"><i class="fas fa-rupee-sign"></i></div>
             </div>
-            
+
             <!-- Total Products -->
             <div class="stat-card">
-                <div class="stat-icon icon-purple">
-                    <i class="fas fa-box"></i>
+                <div class="stat-card-top">
+                    <div>
+                        <div class="stat-icon-wrapper icon-purple">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stat-number">{{ $totalProducts ?? 0 }}</div>
+                        <div class="stat-label">Total Products</div>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $totalProducts ?? 0 }}</div>
-                <div class="stat-label">Total Products</div>
                 <span class="stat-change neutral">
                     <i class="fas fa-minus"></i> {{ $productsGrowth ?? '0' }}%
                 </span>
-                <div class="icon-bg"><i class="fas fa-box"></i></div>
             </div>
-            
-            <!-- Total Members (Users) -->
+
+            <!-- Total Users -->
             <div class="stat-card">
-                <div class="stat-icon icon-cyan">
-                    <i class="fas fa-users"></i>
+                <div class="stat-card-top">
+                    <div>
+                        <div class="stat-icon-wrapper icon-cyan">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stat-number">{{ $totalMembers ?? 0 }}</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $totalMembers ?? 0 }}</div>
-                <div class="stat-label">Total Members</div>
                 <span class="stat-change positive">
                     <i class="fas fa-arrow-up"></i> {{ $membersGrowth ?? '0' }}%
                 </span>
-                <div class="icon-bg"><i class="fas fa-users"></i></div>
             </div>
-            
+
             <!-- Pending Orders -->
             <div class="stat-card">
-                <div class="stat-icon icon-red">
-                    <i class="fas fa-clock"></i>
+                <div class="stat-card-top">
+                    <div>
+                        <div class="stat-icon-wrapper icon-red">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stat-number">{{ $pendingOrders ?? 0 }}</div>
+                        <div class="stat-label">Pending Orders</div>
+                    </div>
                 </div>
-                <div class="stat-number">{{ $pendingOrders ?? 0 }}</div>
-                <div class="stat-label">Pending Orders</div>
                 <span class="stat-change negative">
                     <i class="fas fa-exclamation-triangle"></i> Needs Attention
                 </span>
-                <div class="icon-bg"><i class="fas fa-clock"></i></div>
             </div>
-            
+
             <!-- Revenue This Month -->
             <div class="stat-card">
-                <div class="stat-icon icon-orange">
-                    <i class="fas fa-calendar-check"></i>
+                <div class="stat-card-top">
+                    <div>
+                        <div class="stat-icon-wrapper icon-orange">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="stat-number">₹{{ number_format($monthlyRevenue ?? 0, 0) }}</div>
+                        <div class="stat-label">Revenue This Month</div>
+                    </div>
                 </div>
-                <div class="stat-number">₹{{ number_format($monthlyRevenue ?? 0, 2) }}</div>
-                <div class="stat-label">Revenue This Month</div>
                 <span class="stat-change neutral">
                     <i class="fas fa-calendar-alt"></i> {{ now()->format('M Y') }}
                 </span>
-                <div class="icon-bg"><i class="fas fa-calendar-check"></i></div>
             </div>
         </div>
-        
-        <!-- Charts Section -->
-        <div class="dashboard-grid mb-4">
+
+        <!-- ===== CHARTS SECTION ===== -->
+        <div class="dashboard-grid">
             <!-- Revenue Chart -->
             <div class="chart-container">
                 <div class="chart-title">
-                    <i class="fas fa-chart-bar me-2" style="color: #3b82f6;"></i>
+                    <i class="fas fa-chart-bar" style="color: #3b82f6;"></i>
                     Monthly Revenue
                 </div>
                 <canvas id="revenueChart"></canvas>
             </div>
-            
+
             <!-- Order Status Chart -->
             <div class="chart-container">
                 <div class="chart-title">
-                    <i class="fas fa-chart-pie me-2" style="color: #8b5cf6;"></i>
+                    <i class="fas fa-chart-pie" style="color: #8b5cf6;"></i>
                     Order Status Distribution
                 </div>
                 <canvas id="orderStatusChart"></canvas>
             </div>
         </div>
-        
-        <!-- Recent Orders & Top Products -->
+
+        <!-- ===== RECENT ORDERS & TOP PRODUCTS ===== -->
         <div class="dashboard-grid">
             <!-- Recent Orders -->
             <div class="chart-container">
                 <div class="chart-title d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-receipt me-2" style="color: #3b82f6;"></i> Recent Orders</span>
-                    <a href="{{ route('admin.payments.index') }}" style="font-size: 0.8rem; color: #3b82f6; text-decoration: none;">
+                    <span><i class="fas fa-receipt" style="color: #3b82f6;"></i> Recent Orders</span>
+                    <a href="{{ route('admin.payments.index') }}" style="font-size: 0.75rem; color: #3b82f6; text-decoration: none; font-weight: 500;">
                         View All <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
-                <div class="table-responsive">
+                <div class="table-scroll">
                     <table class="table table-dashboard">
                         <thead>
                             <tr>
@@ -396,16 +608,16 @@
                     </table>
                 </div>
             </div>
-            
+
             <!-- Top Selling Products -->
             <div class="chart-container">
                 <div class="chart-title d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-fire me-2" style="color: #f59e0b;"></i> Top Selling Products</span>
-                    <a href="{{ route('admin.products.index') }}" style="font-size: 0.8rem; color: #3b82f6; text-decoration: none;">
+                    <span><i class="fas fa-fire" style="color: #f59e0b;"></i> Top Selling Products</span>
+                    <a href="{{ route('admin.products.index') }}" style="font-size: 0.75rem; color: #3b82f6; text-decoration: none; font-weight: 500;">
                         View All <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
-                <div class="table-responsive">
+                <div class="table-scroll">
                     <table class="table table-dashboard">
                         <thead>
                             <tr>
@@ -417,7 +629,7 @@
                         <tbody>
                             @forelse($topProducts ?? [] as $product)
                             <tr>
-                                <td>{{ $product->name ?? 'N/A' }}</td>
+                                <td><strong>{{ $product->name ?? 'N/A' }}</strong></td>
                                 <td>{{ $product->total_sold ?? 0 }}</td>
                                 <td>₹{{ number_format($product->total_revenue ?? 0, 2) }}</td>
                             </tr>
@@ -431,24 +643,23 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Recent Members (Users) & Contact Messages -->
-        <div class="dashboard-grid mt-4">
-            <!-- Recent Members (from users table) -->
+
+        <!-- ===== RECENT USERS & MESSAGES ===== -->
+        <div class="dashboard-grid">
+            <!-- Recent Users -->
             <div class="chart-container">
                 <div class="chart-title d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-user-plus me-2" style="color: #10b981;"></i> Recent Members</span>
-                    <a href="{{ route('admin.members') }}" style="font-size: 0.8rem; color: #3b82f6; text-decoration: none;">
+                    <span><i class="fas fa-user-plus" style="color: #10b981;"></i> Recent Users</span>
+                    <a href="{{ route('admin.users.index') }}" style="font-size: 0.75rem; color: #3b82f6; text-decoration: none; font-weight: 500;">
                         View All <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
-                <div class="table-responsive">
+                <div class="table-scroll">
                     <table class="table table-dashboard">
                         <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Phone</th>
                                 <th>Joined</th>
                             </tr>
                         </thead>
@@ -457,28 +668,27 @@
                             <tr>
                                 <td><strong>{{ $member->name }}</strong></td>
                                 <td>{{ $member->email }}</td>
-                                <td>{{ $member->phone ?? 'N/A' }}</td>
                                 <td>{{ $member->created_at->format('d M Y') }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-3">No users found</td>
+                                <td colspan="3" class="text-center text-muted py-3">No users found</td>
                             </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
-            
-            <!-- Recent Contact Messages -->
+
+            <!-- Recent Messages -->
             <div class="chart-container">
                 <div class="chart-title d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-envelope me-2" style="color: #f59e0b;"></i> Recent Messages</span>
-                    <a href="{{ route('admin.contacts.index') }}" style="font-size: 0.8rem; color: #3b82f6; text-decoration: none;">
+                    <span><i class="fas fa-envelope" style="color: #f59e0b;"></i> Recent Messages</span>
+                    <a href="{{ route('admin.contacts.index') }}" style="font-size: 0.75rem; color: #3b82f6; text-decoration: none; font-weight: 500;">
                         View All <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
-                <div class="table-responsive">
+                <div class="table-scroll">
                     <table class="table table-dashboard">
                         <thead>
                             <tr>
@@ -511,12 +721,12 @@
     </div>
 </div>
 
-<!-- Chart.js -->
+<!-- ===== CHART.JS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Revenue Chart
+    // ===== REVENUE CHART =====
     const revenueCtx = document.getElementById('revenueChart').getContext('2d');
     new Chart(revenueCtx, {
         type: 'line',
@@ -525,15 +735,16 @@ document.addEventListener('DOMContentLoaded', function() {
             datasets: [{
                 label: 'Revenue (₹)',
                 data: {!! json_encode($monthlyRevenueData ?? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) !!},
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                backgroundColor: 'rgba(59, 130, 246, 0.08)',
                 borderColor: '#3b82f6',
-                borderWidth: 2,
+                borderWidth: 2.5,
                 fill: true,
                 tension: 0.4,
                 pointBackgroundColor: '#3b82f6',
                 pointBorderColor: '#fff',
                 pointBorderWidth: 2,
-                pointRadius: 4
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
@@ -547,17 +758,29 @@ document.addEventListener('DOMContentLoaded', function() {
             scales: {
                 y: {
                     beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    },
                     ticks: {
                         callback: function(value) {
                             return '₹' + value.toLocaleString();
                         }
                     }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
         }
     });
-    
-    // Order Status Chart
+
+    // ===== ORDER STATUS CHART =====
     const statusCtx = document.getElementById('orderStatusChart').getContext('2d');
     new Chart(statusCtx, {
         type: 'doughnut',
@@ -567,7 +790,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: {!! json_encode($statusData ?? [0, 0, 0, 0, 0, 0]) !!},
                 backgroundColor: ['#f59e0b', '#3b82f6', '#8b5cf6', '#22c55e', '#ef4444', '#64748b'],
                 borderWidth: 2,
-                borderColor: '#fff'
+                borderColor: '#fff',
+                hoverOffset: 8
             }]
         },
         options: {
@@ -577,13 +801,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 15,
+                        padding: 14,
                         usePointStyle: true,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        }
                     }
                 }
             },
-            cutout: '65%'
+            cutout: '68%'
         }
     });
 });

@@ -3,31 +3,35 @@
 @section('content')
     <style>
         .success-container {
-            max-width: 800px;
-            margin: 40px auto;
+            max-width: 820px;
+            margin: 30px auto;
+            padding: 0 15px;
         }
 
         .success-card {
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
             overflow: hidden;
+            background: white;
         }
 
         .success-header {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            padding: 20px;
+            padding: 25px 20px;
             text-align: center;
             color: white;
+            position: relative;
         }
 
         .success-header i {
-            font-size: 3rem;
+            font-size: 3.5rem;
         }
 
         .success-header h3 {
             margin: 10px 0 0;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            font-weight: 700;
         }
 
         .success-header .sub-text {
@@ -39,96 +43,115 @@
         .email-sent-badge {
             display: inline-block;
             background: rgba(255, 255, 255, 0.2);
-            padding: 4px 15px;
+            padding: 5px 18px;
             border-radius: 20px;
             font-size: 12px;
-            margin-top: 8px;
+            margin-top: 10px;
+        }
+
+        .email-sent-badge i {
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .success-body {
+            padding: 25px 30px;
+        }
+
+        .email-info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .email-info-box i {
+            color: #3b82f6;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .email-info-box span {
+            color: #475569;
+        }
+
+        .email-info-box strong {
+            color: #1e293b;
         }
 
         .order-details-table {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .order-details-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
         }
 
         .order-details-table td:first-child {
-            font-weight: bold;
-            width: 40%;
-            color: #555;
+            font-weight: 600;
+            width: 45%;
+            color: #64748b;
         }
 
         .order-details-table td:last-child {
-            color: #333;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        .order-details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #dc3545;
         }
 
         .items-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 14px;
         }
 
         .items-table th {
-            background: #f8f9fa;
-            padding: 10px;
+            background: #f8fafc;
+            padding: 10px 12px;
             text-align: left;
-            font-weight: bold;
-            border-bottom: 2px solid #ddd;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .items-table td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
         }
 
-        .btn-success-custom {
-            background: #28a745;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 25px;
-            text-decoration: none;
-            display: inline-block;
-            margin: 5px;
-            transition: all 0.3s;
-        }
-
-        .btn-success-custom:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            color: white;
-        }
-
-        .btn-primary-custom {
-            background: #3b82f6;
-            color: white;
-            padding: 10px 25px;
-            border-radius: 25px;
-            text-decoration: none;
-            display: inline-block;
-            margin: 5px;
-            transition: all 0.3s;
-        }
-
-        .btn-primary-custom:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-            color: white;
-        }
-
-        .grand-total {
-            background: #f8f9fa;
-            font-weight: bold;
-        }
-
-        .grand-total td {
-            padding: 12px;
+        .items-table tr:last-child td {
+            border-bottom: none;
         }
 
         .order-status-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
@@ -154,64 +177,9 @@
             color: #15803d;
         }
 
-        .email-info-box {
-            background: #eff6ff;
-            border-left: 4px solid #3b82f6;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .email-info-box i {
-            color: #3b82f6;
-            font-size: 18px;
-        }
-
-        .email-info-box span {
-            color: #475569;
-        }
-
-        .email-info-box strong {
-            color: #1e293b;
-        }
-
-        .shipping-row {
-            background: #f8fafc;
-        }
-
-        .shipping-row td {
-            color: #0f172a;
-        }
-
-        .subtotal-row td {
-            color: #475569;
-        }
-
-        .discount-row td {
-            color: #15803d;
-        }
-
-        .grand-total-row td {
-            font-size: 1.1rem;
-            padding: 15px 12px;
-        }
-
-        .grand-total-row .grand-total-label {
-            font-size: 1.1rem;
-        }
-
-        .grand-total-row .grand-total-amount {
-            font-size: 1.3rem;
-            color: #28a745;
-        }
-
         .payment-method-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
@@ -229,15 +197,16 @@
 
         .shipping-address-box {
             background: #f8fafc;
-            padding: 12px 15px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             border: 1px solid #e2e8f0;
             margin-top: 5px;
+            font-size: 13px;
+            line-height: 1.6;
         }
 
         .shipping-address-box p {
-            margin: 3px 0;
-            font-size: 14px;
+            margin: 2px 0;
             color: #475569;
         }
 
@@ -246,12 +215,17 @@
             color: #1e293b;
         }
 
-        /* Original Price Styling */
+        .price-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
         .original-price {
             text-decoration: line-through;
             color: #999;
             font-size: 12px;
-            margin-right: 5px;
         }
 
         .discount-tag {
@@ -260,7 +234,6 @@
             padding: 1px 8px;
             border-radius: 4px;
             font-size: 10px;
-            margin-left: 5px;
         }
 
         .final-price {
@@ -268,11 +241,210 @@
             color: #0f172a;
         }
 
-        .price-wrapper {
+        .subtotal-row td {
+            color: #475569;
+        }
+
+        .shipping-row td {
+            color: #0f172a;
+        }
+
+        .discount-row td {
+            color: #15803d;
+        }
+
+        .grand-total-row td {
+            padding: 15px 12px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .grand-total-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .grand-total-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .btn-success-custom {
+            background: #28a745;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            transition: all 0.3s;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-success-custom:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .btn-primary-custom {
+            background: #3b82f6;
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+            transition: all 0.3s;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary-custom:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .cod-payment-info {
+            background: #fef3c7;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: #92400e;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .cod-payment-info i {
+            margin-right: 8px;
+        }
+
+        .mobile-summary-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .mobile-summary-row {
             display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+
+        .order-number {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .success-body {
+                padding: 18px 16px;
+            }
+
+            .success-header {
+                padding: 20px 15px;
+            }
+
+            .success-header h3 {
+                font-size: 1.3rem;
+            }
+
+            .items-table {
+                font-size: 12px;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 6px 8px;
+            }
+
+            .order-details-table td {
+                font-size: 13px;
+                padding: 6px 0;
+            }
+
+            .email-info-box {
+                font-size: 13px;
+                padding: 10px 14px;
+                flex-wrap: wrap;
+            }
+
+            .btn-success-custom,
+            .btn-primary-custom {
+                width: 100%;
+                text-align: center;
+                padding: 12px;
+            }
+
+            .grand-total-amount {
+                font-size: 17px;
+            }
+
+            .section-title {
+                font-size: 14px;
+            }
+
+            .shipping-address-box {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .success-container {
+                padding: 0 10px;
+                margin: 20px auto;
+            }
+
+            .success-header i {
+                font-size: 2.8rem;
+            }
+
+            .success-header h3 {
+                font-size: 1.1rem;
+            }
+
+            .items-table {
+                font-size: 11px;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 5px 6px;
+            }
+
+            .order-details-table td {
+                font-size: 12px;
+                padding: 5px 0;
+            }
+
+            .success-body {
+                padding: 14px 12px;
+            }
+
+            .email-info-box {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .grand-total-amount {
+                font-size: 16px;
+            }
+
+            .mobile-summary-row {
+                font-size: 13px;
+            }
+
+            .btn-success-custom,
+            .btn-primary-custom {
+                padding: 10px;
+                font-size: 14px;
+            }
         }
     </style>
 
@@ -280,16 +452,19 @@
         <div class="card success-card">
             <div class="success-header">
                 <i class="fas fa-check-circle"></i>
-                <h3>Payment Successful!</h3>
-                <p class="sub-text">Thank you for your purchase!</p>
-             
+                <h3>🎉 Order Placed Successfully!</h3>
+                <p class="sub-text">Thank you for your purchase! Your order is confirmed.</p>
+                <div class="email-sent-badge">
+                    <i class="fas fa-envelope"></i> Order confirmation sent to your email
+                </div>
             </div>
-            <div class="success-body p-4">
+
+            <div class="success-body">
                 <!-- Email Confirmation Notice -->
                 <div class="email-info-box">
                     <i class="fas fa-envelope"></i>
                     <span>
-                        <strong>Order confirmation email sent!</strong><br>
+                        <strong>📧 Order confirmation email sent!</strong><br>
                         We've sent the order details to
                         <strong>{{ Auth::user()->email ?? ($order->user->email ?? 'your registered email') }}</strong>
                     </span>
@@ -298,11 +473,13 @@
                 <!-- Order Details -->
                 <div class="row">
                     <div class="col-md-6">
-                        <h5 style="margin-bottom: 15px; color: #333;"><i class="fas fa-receipt"></i> Order Details</h5>
+                        <div class="section-title">
+                            <i class="fas fa-receipt"></i> Order Details
+                        </div>
                         <table class="order-details-table">
                             <tr>
                                 <td>Order Number</td>
-                                <td><strong>{{ $order->order_number }}</strong></td>
+                                <td><strong class="order-number">#{{ $order->order_number }}</strong></td>
                             </tr>
                             <tr>
                                 <td>Order Date</td>
@@ -311,17 +488,19 @@
                             </tr>
                             <tr>
                                 <td>Payment Status</td>
-                                <td><span class="badge bg-success">Paid</span></td>
+                                <td><span class="badge bg-success">✅ Paid</span></td>
                             </tr>
                             <tr>
                                 <td>Payment Method</td>
                                 <td>
                                     @if ($order->payment_method == 'COD')
-                                        <span class="payment-method-badge payment-cod"><i
-                                                class="fas fa-money-bill-wave"></i> Cash on Delivery</span>
+                                        <span class="payment-method-badge payment-cod">
+                                            <i class="fas fa-money-bill-wave"></i> Cash on Delivery
+                                        </span>
                                     @else
-                                        <span class="payment-method-badge payment-online"><i class="fas fa-credit-card"></i>
-                                            {{ $order->payment_method ?? 'Online' }}</span>
+                                        <span class="payment-method-badge payment-online">
+                                            <i class="fas fa-credit-card"></i> {{ $order->payment_method ?? 'Online' }}
+                                        </span>
                                     @endif
                                 </td>
                             </tr>
@@ -335,8 +514,11 @@
                             </tr>
                         </table>
                     </div>
+
                     <div class="col-md-6">
-                        <h5 style="margin-bottom: 15px; color: #333;"><i class="fas fa-user"></i> Customer Details</h5>
+                        <div class="section-title">
+                            <i class="fas fa-user"></i> Customer Details
+                        </div>
                         <table class="order-details-table">
                             <tr>
                                 <td>Name</td>
@@ -371,9 +553,9 @@
                         @endphp
 
                         @if ($shippingAddress)
-                            <h5 style="margin: 15px 0 10px; color: #333; font-size: 14px;">
+                            <div class="section-title" style="margin-top: 15px; font-size: 14px;">
                                 <i class="fas fa-truck"></i> Shipping Address
-                            </h5>
+                            </div>
                             <div class="shipping-address-box">
                                 <p><span class="address-label">Name:</span> {{ $shippingAddress['name'] ?? 'N/A' }}</p>
                                 <p><span class="address-label">Address:</span> {{ $shippingAddress['address'] ?? '' }}</p>
@@ -389,13 +571,15 @@
                 </div>
 
                 <!-- Order Items -->
-                <h5 style="margin: 20px 0 15px; color: #333;"><i class="fas fa-box"></i> Order Items</h5>
+                <div class="section-title" style="margin-top: 20px;">
+                    <i class="fas fa-box"></i> Order Items
+                </div>
                 <div class="table-responsive">
                     <table class="items-table">
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th>Quantity</th>
+                                <th>Qty</th>
                                 <th>Price</th>
                                 <th>Total</th>
                             </tr>
@@ -407,7 +591,6 @@
                                 $couponDiscount = 0;
                                 $couponCode = null;
 
-                                // Get coupon discount from payment_details if available
                                 if ($order->payment_details) {
                                     try {
                                         $paymentDetails = is_string($order->payment_details)
@@ -426,12 +609,10 @@
 
                             @foreach ($order->items as $item)
                                 @php
-                                    // 🔥 IMPORTANT: Use final_price (discounted price) if available
                                     $itemPrice = $item->final_price ?? ($item->price ?? 0);
                                     $itemTotal = $itemPrice * $item->quantity;
                                     $subtotal += $itemTotal;
 
-                                    // Check if there's a difference between price and final_price (discount applied)
                                     $hasDiscount = isset($item->final_price) && $item->final_price < $item->price;
                                     $discountPercent = $hasDiscount
                                         ? round((($item->price - $item->final_price) / $item->price) * 100)
@@ -441,12 +622,14 @@
                                     <td>
                                         {{ $item->product_name }}
                                         @if (isset($item->size) && $item->size)
-                                            <br><small style="color: #64748b; font-size: 11px;">Size:
-                                                {{ $item->size }}</small>
+                                            <br><small style="color: #64748b; font-size: 11px;">
+                                                📏 Size: {{ $item->size }}
+                                            </small>
                                         @endif
                                         @if (isset($item->color) && $item->color)
-                                            <br><small style="color: #64748b; font-size: 11px;">Color:
-                                                {{ $item->color }}</small>
+                                            <br><small style="color: #64748b; font-size: 11px;">
+                                                🎨 Color: {{ $item->color }}
+                                            </small>
                                         @endif
                                     </td>
                                     <td>{{ $item->quantity }}</td>
@@ -455,7 +638,7 @@
                                             @if ($hasDiscount)
                                                 <span class="original-price">₹{{ number_format($item->price, 2) }}</span>
                                                 <span class="final-price">₹{{ number_format($itemPrice, 2) }}</span>
-                                                <span class="discount-tag">{{ $discountPercent }}% off</span>
+                                                <span class="discount-tag">-{{ $discountPercent }}%</span>
                                             @else
                                                 <span class="final-price">₹{{ number_format($itemPrice, 2) }}</span>
                                             @endif
@@ -468,13 +651,11 @@
                             @endforeach
                         </tbody>
                         <tfoot>
-                            <!-- Subtotal Row -->
                             <tr class="subtotal-row">
                                 <td colspan="3" style="text-align: right;"><strong>Subtotal</strong></td>
                                 <td><strong>₹{{ number_format($subtotal, 2) }}</strong></td>
                             </tr>
 
-                            <!-- Shipping Charge Row -->
                             <tr class="shipping-row">
                                 <td colspan="3" style="text-align: right;">
                                     <strong>
@@ -497,7 +678,6 @@
                                 </td>
                             </tr>
 
-                            <!-- Coupon Discount Row (if applicable) -->
                             @if ($couponDiscount > 0)
                                 <tr class="discount-row">
                                     <td colspan="3" style="text-align: right;">
@@ -513,8 +693,7 @@
                                 </tr>
                             @endif
 
-                            <!-- Grand Total Row -->
-                            <tr class="grand-total grand-total-row">
+                            <tr class="grand-total-row">
                                 <td colspan="3" style="text-align: right;">
                                     <strong class="grand-total-label"><i class="fas fa-rupee-sign"></i> Grand Total</strong>
                                 </td>
@@ -524,16 +703,14 @@
                                 </td>
                             </tr>
 
-                            <!-- COD Payment Info -->
                             @if ($order->payment_method == 'COD')
                                 <tr>
-                                    <td colspan="4"
-                                        style="padding: 12px; background: #fef3c7; border-radius: 0 0 10px 10px;">
-                                        <small style="color: #92400e;">
+                                    <td colspan="4" style="padding: 12px;">
+                                        <div class="cod-payment-info">
                                             <i class="fas fa-money-bill-wave"></i>
                                             <strong>Cash on Delivery</strong> - Pay
                                             ₹{{ number_format($order->total_amount, 2) }} when your order arrives
-                                        </small>
+                                        </div>
                                     </td>
                                 </tr>
                             @endif
@@ -541,36 +718,32 @@
                     </table>
                 </div>
 
-                <!-- Mobile Order Summary Card -->
+                <!-- Mobile Order Summary -->
                 <div class="d-md-none mt-3">
-                    <div class="card" style="border-radius: 12px; border: 1px solid #e2e8f0;">
-                        <div class="card-body">
-                            <h6 style="font-weight: 700; margin-bottom: 12px;">Order Summary</h6>
-                            <div style="display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px;">
-                                <span style="color: #64748b;">Subtotal</span>
-                                <span>₹{{ number_format($subtotal, 2) }}</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px;">
-                                <span style="color: #64748b;">Shipping</span>
-                                @if ($shippingCharge > 0)
-                                    <span>₹{{ number_format($shippingCharge, 2) }}</span>
-                                @else
-                                    <span style="color: #15803d;">Free</span>
-                                @endif
-                            </div>
-                            @if ($couponDiscount > 0)
-                                <div
-                                    style="display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; color: #15803d;">
-                                    <span>Coupon Discount</span>
-                                    <span>- ₹{{ number_format($couponDiscount, 2) }}</span>
-                                </div>
+                    <div class="mobile-summary-card">
+                        <h6 style="font-weight: 700; margin-bottom: 10px; color: #1e293b;">📋 Order Summary</h6>
+                        <div class="mobile-summary-row">
+                            <span style="color: #64748b;">Subtotal</span>
+                            <span>₹{{ number_format($subtotal, 2) }}</span>
+                        </div>
+                        <div class="mobile-summary-row">
+                            <span style="color: #64748b;">Shipping</span>
+                            @if ($shippingCharge > 0)
+                                <span>₹{{ number_format($shippingCharge, 2) }}</span>
+                            @else
+                                <span style="color: #15803d;">Free</span>
                             @endif
-                            <hr style="margin: 8px 0;">
-                            <div
-                                style="display: flex; justify-content: space-between; padding: 8px 0; font-size: 16px; font-weight: 700;">
-                                <span>Total</span>
-                                <span style="color: #28a745;">₹{{ number_format($order->total_amount, 2) }}</span>
+                        </div>
+                        @if ($couponDiscount > 0)
+                            <div class="mobile-summary-row" style="color: #15803d;">
+                                <span>Coupon Discount</span>
+                                <span>- ₹{{ number_format($couponDiscount, 2) }}</span>
                             </div>
+                        @endif
+                        <hr style="margin: 8px 0;">
+                        <div class="mobile-summary-row" style="font-size: 16px; font-weight: 700;">
+                            <span>Total</span>
+                            <span style="color: #28a745;">₹{{ number_format($order->total_amount, 2) }}</span>
                         </div>
                     </div>
                 </div>
@@ -591,12 +764,7 @@
                     </small>
                 </div>
 
-                <!-- Track Order Link -->
-                <div class="text-center mt-2">
-                    <a href="{{ route('track.order') }}" style="color: #3b82f6; text-decoration: none; font-size: 14px;">
-                        <i class="fas fa-search"></i> Track Your Order
-                    </a>
-                </div>
+             
             </div>
         </div>
     </div>
@@ -608,7 +776,6 @@
             localStorage.removeItem('checkout_cart');
         }
 
-        // Clear session storage
         if (typeof sessionStorage !== 'undefined') {
             sessionStorage.removeItem('checkout_cart');
         }
@@ -621,10 +788,9 @@
             cartCountElement.style.display = 'none';
         }
 
-        // Update wishlist count if needed
+        // Update wishlist count
         let wishlistCountElement = document.getElementById('navbarWishlistCount');
         if (wishlistCountElement) {
-            // Don't clear wishlist, just refresh count
             let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
             let count = wishlist.length;
             if (count > 0) {
@@ -638,7 +804,9 @@
             }
         }
 
-        // Store that order was successful (optional)
         localStorage.setItem('last_order_successful', Date.now());
+
+        console.log('✅ Order placed successfully!');
+        console.log('📧 Order confirmation email sent!');
     </script>
 @endsection

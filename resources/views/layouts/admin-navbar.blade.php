@@ -79,6 +79,13 @@
                 <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
             </a>
         </li>
+      <!-- Users -->
+<li class="nav-item">
+    <a class="nav-link" href="{{ route('admin.users.index') }}">
+        <i class="fas fa-users"></i>
+        <span>Users</span>
+    </a>
+</li>
 
         <!-- Products Dropdown -->
         <li class="nav-item has-dropdown">

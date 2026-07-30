@@ -227,5 +227,5 @@ public function getDetails($id)
             'message' => $e->getMessage()
         ], 404);
     }
-}w
+}
 }

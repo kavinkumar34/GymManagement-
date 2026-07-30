@@ -21,6 +21,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TrackOrderController;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\BannerApiController;
+use App\Http\Controllers\Admin\UserController;
+
 
 // ============ NEW CONTROLLERS ============
 use App\Http\Controllers\Admin\AttributeController;
@@ -177,6 +179,7 @@ Route::get('/api/offers/category/{category_id}', [PublicOfferController::class, 
 
 // ============ ADMIN ROUTES ============
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/products/{id}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
@@ -502,107 +505,10 @@ Route::get('/api/deliverable-pincodes', function () {
 })->name('deliverable.pincodes');
 
 // ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ============
-Route::get('/api/order-details/{id}', function ($id) {
-    if (!auth()->check()) {
-        return response()->json(['success' => false, 'message' => 'Not logged in']);
-    }
-    
-    try {
-        $order = Order::with(['user', 'items'])
-            ->where('user_id', auth()->id())
-            ->find($id);
-        
-        if (!$order) {
-            return response()->json(['success' => false, 'message' => 'Order not found']);
-        }
-        
-        $shippingAddress = null;
-        
-        if ($order->payment_details) {
-            try {
-                $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
-                if (isset($paymentDetails['shipping_address']) && !empty($paymentDetails['shipping_address'])) {
-                    $shippingAddress = $paymentDetails['shipping_address'];
-                } elseif (isset($paymentDetails['address']) && !empty($paymentDetails['address'])) {
-                    $shippingAddress = $paymentDetails['address'];
-                }
-            } catch (\Exception $e) {}
-        }
-        
-        if (!$shippingAddress || empty($shippingAddress['address'])) {
-            $userAddress = UserAddress::where('user_id', auth()->id())
-                ->orderBy('is_default', 'desc')
-                ->orderBy('created_at', 'desc')
-                ->first();
-            
-            if ($userAddress) {
-                $shippingAddress = [
-                    'name' => $userAddress->name,
-                    'address' => $userAddress->address,
-                    'area' => $userAddress->area ?? '',
-                    'city' => $userAddress->city,
-                    'state' => $userAddress->state,
-                    'pincode' => $userAddress->pincode,
-                    'phone' => $userAddress->phone
-                ];
-            }
-        }
-        
-        $subtotal = 0;
-        $items = [];
-        foreach ($order->items as $item) {
-            $itemTotal = $item->price * $item->quantity;
-            $subtotal += $itemTotal;
-            
-            $productImage = null;
-            if ($item->product_id) {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $productImage = $product->image;
-                }
-            }
-            
-            $items[] = [
-                'id' => $item->id,
-                'product_id' => $item->product_id,
-                'product_name' => $item->product_name,
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-                'product_image' => $productImage
-            ];
-        }
-        
-        return response()->json([
-            'success' => true,
-            'order' => [
-                'id' => $order->id,
-                'order_number' => $order->order_number,
-                'total_amount' => $order->total_amount,
-                'payment_status' => $order->payment_status,
-                'order_status' => $order->order_status,
-                'payment_method' => $order->payment_method,
-                'transaction_id' => $order->transaction_id,
-                'payment_id' => $order->payment_id,
-                'payment_details' => $order->payment_details,
-                'created_at' => $order->created_at,
-                'user' => $order->user ? [
-                    'name' => $order->user->name,
-                    'email' => $order->user->email,
-                    'phone' => $order->user->phone ?? 'N/A'
-                ] : null,
-                'items' => $items,
-                'shipping_address' => $shippingAddress,
-                'subtotal' => $subtotal,
-                'shipping_cost' => 0
-            ]
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ]);
-    }
-})->name('api.order.details')->middleware('auth');
+// ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ============
+Route::get('/api/order-details/{id}', [PaymentController::class, 'getOrderDetails'])
+    ->middleware('auth')
+    ->name('api.order.details');
 
 // ============ CANCEL ORDER ROUTE ============
 Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');

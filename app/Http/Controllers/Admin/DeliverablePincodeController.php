@@ -11,7 +11,8 @@ class DeliverablePincodeController extends Controller
     public function index()
     {
         // Order by ID DESCENDING - Newest first (last added shows at top)
-        $pincodes = DeliverablePincode::orderBy('id', 'desc')->get();
+        // Paginate with 10 rows per page
+        $pincodes = DeliverablePincode::orderBy('id', 'desc')->paginate(10);
         return view('admin.pincodes.index', compact('pincodes'));
     }
     
