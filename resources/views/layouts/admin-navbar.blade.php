@@ -124,11 +124,12 @@
                         <i class="fas fa-building"></i> Brands
                     </a>
                 </li>
-                <li>
+               
+               {{-- <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.attributes.index') }}">
                         <i class="fas fa-list-ul"></i> Attributes
                     </a>
-                </li>
+                </li> --}}
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.topcategories.index') }}">
                         <i class="fas fa-layer-group"></i> Top Categories
