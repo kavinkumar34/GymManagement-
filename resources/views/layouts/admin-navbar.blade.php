@@ -221,8 +221,8 @@
             </a>
         </li>
 
-        <!-- ===== OFFERS MENU - NEW ===== -->
-        <li class="nav-item has-dropdown">
+     <!-- ===== OFFERS MENU - NEW ===== -->
+        {{--<li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-tags"></i> <span>Offers</span>
                 <span class="dropdown-arrow">▼</span>
@@ -265,7 +265,9 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> --}}
+
+        
         <!-- ===== COUPONS MENU ===== -->
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">

@@ -1119,7 +1119,7 @@
 
                     bannerHtml += `
                         <div class="carousel-item ${isActive}">
-                            ${banner.link ? `<a href="${banner.link}" target="_blank" style="display:block;width:100%;height:100%;">` : ''}
+                            ${banner.link ? `<a href="${banner.link}" target="_self" style="display:block;width:100%;height:100%;">` : ''}
                                 <img src="${imageUrl}" alt="Banner" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
                             ${banner.link ? `</a>` : ''}
                         </div>

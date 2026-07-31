@@ -231,7 +231,7 @@
             <a href="{{ url('/') }}" class="btn-shop-now">
                 <i class="fas fa-shopping-cart"></i> Shop Now
             </a>
-            <a href="{{ route('member.register') }}" class="btn-join-gym1">
+            <a href="{{ route('member.trainer.login') }}" class="btn-join-gym1">
                 <i class="fas fa-dumbbell"></i> Join Our Gym
             </a>
         </div>
@@ -448,7 +448,7 @@
                     <li><i class="fas fa-check"></i> Locker facility</li>
                     <li><i class="fas fa-check"></i> Changing rooms</li>
                 </ul>
-                <a href="{{ route('member.register') }}" class="btn-membership">Join Now</a>
+                <a href="{{ route('member.trainer.login') }}" class="btn-membership">Join Now</a>
             </div>
         </div>
         <div class="col-md-4 mb-4">
@@ -463,7 +463,7 @@
                     <li><i class="fas fa-check"></i> Group classes included</li>
                     <li><i class="fas fa-check"></i> 10% off on store products</li>
                 </ul>
-                <a href="{{ route('member.register') }}" class="btn-membership">Join Now</a>
+                <a href="{{ route('member.trainer.login') }}" class="btn-membership">Join Now</a>
             </div>
         </div>
         <div class="col-md-4 mb-4">
@@ -478,7 +478,7 @@
                     <li><i class="fas fa-check"></i> 20% off on store products</li>
                     <li><i class="fas fa-check"></i> Free fitness assessment</li>
                 </ul>
-                <a href="{{ route('member.register') }}" class="btn-membership">Join Now</a>
+                <a href="{{ route('member.trainer.login') }}" class="btn-membership">Join Now</a>
             </div>
         </div>
     </div>
@@ -496,7 +496,7 @@
             <a href="{{ url('/') }}" class="btn-shop-now">
                 <i class="fas fa-shopping-cart"></i> Shop Now
             </a>
-            <a href="{{ route('member.register') }}" class="btn-join-gym1">
+            <a href="{{ route('member.trainer.login') }}" class="btn-join-gym1">
                 <i class="fas fa-dumbbell"></i> Join Gym
             </a>
         </div>

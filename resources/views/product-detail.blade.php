@@ -2649,7 +2649,6 @@
                         <div class="col-md-3 col-sm-6 mb-4">
                             <div class="related-product-card" onclick="window.location.href='/product/{{ $related->id }}'">
                                 @if ($relatedDiscountPercent > 0)
-                                    <div class="discount-badge">{{ $relatedDiscountText }}</div>
                                 @endif
                                 <button class="wishlist-btn" onclick="event.stopPropagation(); toggleRelatedWishlist({{ $related->id }}, '{{ addslashes($related->name) }}', {{ $relatedDisplayPrice }}, '{{ $relatedImageUrls[0] ?? '' }}')">
                                     <i class="far fa-heart" id="related-wishlist-icon-{{ $related->id }}"></i>
