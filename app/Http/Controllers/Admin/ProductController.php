@@ -277,78 +277,10 @@ class ProductController extends Controller
 
         // ===================== HANDLE VARIANTS =====================
         
-        // 1. Get existing variant IDs from request
-        $existingVariantIds = [];
-        $variantKeys = [];
+        // Get all existing variant IDs from database
+        $existingDbVariantIds = ProductVariant::where('product_id', $product->id)->pluck('id')->toArray();
+        $updatedVariantIds = [];
         
-        if ($request->has('variants') && is_array($request->variants)) {
-            foreach ($request->variants as $variantKey => $variantData) {
-                $variantKeys[] = $variantKey;
-                if (isset($variantData['sizes']) && is_array($variantData['sizes'])) {
-                    foreach ($variantData['sizes'] as $sizeData) {
-                        if (isset($sizeData['id']) && !empty($sizeData['id'])) {
-                            $existingVariantIds[] = $sizeData['id'];
-                        }
-                    }
-                }
-            }
-        }
-
-        // 2. Delete variants that are not in the request
-        if (!empty($existingVariantIds)) {
-            $variantsToDelete = ProductVariant::where('product_id', $product->id)
-                ->whereNotIn('id', $existingVariantIds)
-                ->get();
-        } else {
-            // If no variants in request, delete all
-            $variantsToDelete = ProductVariant::where('product_id', $product->id)->get();
-        }
-
-        foreach ($variantsToDelete as $variant) {
-            // Delete variant images
-            $images = ProductImage::where('variant_id', $variant->id)->get();
-            foreach ($images as $img) {
-                if (Storage::disk('public')->exists($img->image_path)) {
-                    Storage::disk('public')->delete($img->image_path);
-                }
-                $img->delete();
-            }
-            $variant->delete();
-        }
-
-        // 3. Handle deleted variants from hidden field
-        if ($request->has('deleted_variants')) {
-            $deletedIds = json_decode($request->deleted_variants, true);
-            if (is_array($deletedIds) && count($deletedIds) > 0) {
-                $variantsToDelete = ProductVariant::whereIn('id', $deletedIds)->get();
-                foreach ($variantsToDelete as $variant) {
-                    $images = ProductImage::where('variant_id', $variant->id)->get();
-                    foreach ($images as $img) {
-                        if (Storage::disk('public')->exists($img->image_path)) {
-                            Storage::disk('public')->delete($img->image_path);
-                        }
-                        $img->delete();
-                    }
-                    $variant->delete();
-                }
-            }
-        }
-
-        // 4. Handle deleted variant images
-        if ($request->has('deleted_variant_images')) {
-            $deletedImageIds = json_decode($request->deleted_variant_images, true);
-            if (is_array($deletedImageIds) && count($deletedImageIds) > 0) {
-                $imagesToDelete = ProductImage::whereIn('id', $deletedImageIds)->get();
-                foreach ($imagesToDelete as $img) {
-                    if (Storage::disk('public')->exists($img->image_path)) {
-                        Storage::disk('public')->delete($img->image_path);
-                    }
-                    $img->delete();
-                }
-            }
-        }
-
-        // 5. Update or create variants
         if ($request->has('variants') && is_array($request->variants)) {
             foreach ($request->variants as $variantKey => $variantData) {
                 $color = $variantData['color'] ?? null;
@@ -381,10 +313,10 @@ class ProductController extends Controller
                         }
                         
                         // Check if this is an existing variant
-                        if (isset($sizeData['id']) && !empty($sizeData['id'])) {
+                        if (isset($sizeData['id']) && !empty($sizeData['id']) && is_numeric($sizeData['id'])) {
                             // Update existing variant
                             $variant = ProductVariant::find($sizeData['id']);
-                            if ($variant) {
+                            if ($variant && $variant->product_id == $product->id) {
                                 $variant->update([
                                     'size' => $sizeData['size'] ?? null,
                                     'color' => $color,
@@ -400,6 +332,10 @@ class ProductController extends Controller
                                     'discount_amount' => $sizeDiscountAmount,
                                     'stock' => intval($sizeData['stock'] ?? 0),
                                 ]);
+                                $updatedVariantIds[] = $variant->id;
+                                
+                                // Handle new images for this existing variant
+                                $this->handleVariantImages($request, $variantKey, $variant->id, $product->id);
                             }
                         } else {
                             // Create new variant
@@ -419,23 +355,64 @@ class ProductController extends Controller
                                 'discount_amount' => $sizeDiscountAmount,
                                 'stock' => intval($sizeData['stock'] ?? 0),
                             ]);
+                            $updatedVariantIds[] = $newVariant->id;
                             
-                            // Save new variant images if any
-                            if (isset($variantData['images']) && is_array($variantData['images'])) {
-                                foreach ($variantData['images'] as $index => $image) {
-                                    if ($image && $image->isValid()) {
-                                        $path = $image->store('products', 'public');
-                                        ProductImage::create([
-                                            'product_id' => $product->id,
-                                            'variant_id' => $newVariant->id,
-                                            'image_path' => $path,
-                                            'is_main' => $index == 0 ? 1 : 0,
-                                            'display_order' => $index,
-                                        ]);
-                                    }
+                            // Handle new images for this new variant
+                            $this->handleVariantImages($request, $variantKey, $newVariant->id, $product->id);
+                        }
+                    }
                 }
             }
+        }
+
+        // Delete variants that are not in the request
+        $variantsToDelete = array_diff($existingDbVariantIds, $updatedVariantIds);
+        foreach ($variantsToDelete as $variantId) {
+            $variant = ProductVariant::find($variantId);
+            if ($variant) {
+                // Delete variant images
+                $images = ProductImage::where('variant_id', $variant->id)->get();
+                foreach ($images as $img) {
+                    if (Storage::disk('public')->exists($img->image_path)) {
+                        Storage::disk('public')->delete($img->image_path);
+                    }
+                    $img->delete();
+                }
+                $variant->delete();
+            }
+        }
+
+        // Handle deleted variants from hidden field
+        if ($request->has('deleted_variants')) {
+            $deletedIds = json_decode($request->deleted_variants, true);
+            if (is_array($deletedIds) && count($deletedIds) > 0) {
+                foreach ($deletedIds as $deletedId) {
+                    $variant = ProductVariant::find($deletedId);
+                    if ($variant && $variant->product_id == $product->id) {
+                        $images = ProductImage::where('variant_id', $variant->id)->get();
+                        foreach ($images as $img) {
+                            if (Storage::disk('public')->exists($img->image_path)) {
+                                Storage::disk('public')->delete($img->image_path);
+                            }
+                            $img->delete();
                         }
+                        $variant->delete();
+                    }
+                }
+            }
+        }
+
+        // Handle deleted variant images
+        if ($request->has('deleted_variant_images')) {
+            $deletedImageIds = json_decode($request->deleted_variant_images, true);
+            if (is_array($deletedImageIds) && count($deletedImageIds) > 0) {
+                foreach ($deletedImageIds as $imageId) {
+                    $img = ProductImage::find($imageId);
+                    if ($img && $img->variant_id) {
+                        if (Storage::disk('public')->exists($img->image_path)) {
+                            Storage::disk('public')->delete($img->image_path);
+                        }
+                        $img->delete();
                     }
                 }
             }
@@ -447,12 +424,14 @@ class ProductController extends Controller
         if ($request->has('deleted_images')) {
             $deletedIds = json_decode($request->deleted_images, true);
             if (is_array($deletedIds) && count($deletedIds) > 0) {
-                $imagesToDelete = ProductImage::whereIn('id', $deletedIds)->whereNull('variant_id')->get();
-                foreach ($imagesToDelete as $img) {
-                    if (Storage::disk('public')->exists($img->image_path)) {
-                        Storage::disk('public')->delete($img->image_path);
+                foreach ($deletedIds as $imageId) {
+                    $img = ProductImage::find($imageId);
+                    if ($img && is_null($img->variant_id)) {
+                        if (Storage::disk('public')->exists($img->image_path)) {
+                            Storage::disk('public')->delete($img->image_path);
+                        }
+                        $img->delete();
                     }
-                    $img->delete();
                 }
             }
         }
@@ -480,6 +459,47 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product updated successfully!');
+    }
+
+    /**
+     * Handle variant images upload
+     */
+    private function handleVariantImages($request, $variantKey, $variantId, $productId = null)
+    {
+        // If productId is not passed, try to get it from request
+        if ($productId === null) {
+            $productId = $request->product_id ?? $request->id ?? null;
+        }
+        
+        if ($request->has("variants.{$variantKey}.images")) {
+            $images = $request->file("variants.{$variantKey}.images");
+            if (is_array($images)) {
+                // Get existing images count for this variant
+                $existingCount = ProductImage::where('variant_id', $variantId)->count();
+                
+                foreach ($images as $index => $image) {
+                    if ($image && $image->isValid()) {
+                        $path = $image->store('products', 'public');
+                        ProductImage::create([
+                            'product_id' => $productId,
+                            'variant_id' => $variantId,
+                            'image_path' => $path,
+                            'is_main' => ($existingCount == 0 && $index == 0) ? 1 : 0,
+                            'display_order' => $existingCount + $index,
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        // Handle existing images - keep them
+        if ($request->has("variants.{$variantKey}.existing_images")) {
+            $existingImages = $request->input("variants.{$variantKey}.existing_images");
+            if (is_array($existingImages)) {
+                // These are already saved, just keep them
+                // No need to do anything, they are already in the database
+            }
+        }
     }
 
     public function destroy($id)

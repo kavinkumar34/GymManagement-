@@ -1428,17 +1428,28 @@
             }
 
             // Remove Size
-            window.removeSize = function(element, variantId) {
-                var row = $(element).closest('.size-row');
-                var container = $('#sizesContainer_' + variantId);
-                var totalRows = container.find('.size-row').length;
-                if (totalRows > 1) {
-                    row.remove();
-                    updateAllStocks();
-                } else {
-                    alert('At least one size is required!');
-                }
-            };
+          window.removeSize = function(element, variantId) {
+    var row = $(element).closest('.size-row');
+    var container = $('#sizesContainer_' + variantId);
+    var totalRows = container.find('.size-row').length;
+    if (totalRows > 1) {
+        // Check if this is an existing size with an ID
+        var sizeId = row.find('input[name*="[id]"]').val();
+        if (sizeId) {
+            // Add to deleted variants list
+            var deletedVariants = $('#deleted_variants').val();
+            var deletedArray = deletedVariants ? JSON.parse(deletedVariants) : [];
+            if (!deletedArray.includes(sizeId)) {
+                deletedArray.push(sizeId);
+                $('#deleted_variants').val(JSON.stringify(deletedArray));
+            }
+        }
+        row.remove();
+        updateAllStocks();
+    } else {
+        alert('At least one size is required!');
+    }
+};
 
             // Remove Variant
             window.removeVariant = function(variantId) {
@@ -1465,17 +1476,27 @@
             };
 
             // Preview Variant Images
-            window.previewVariantImages = function(input, variantId) {
-                variantId = variantId || 'default';
-                var files = Array.from(input.files);
+        window.previewVariantImages = function(input, variantId) {
+    variantId = variantId || 'default';
+    var files = Array.from(input.files);
 
-                if (!window.variantImageFiles[variantId]) {
-                    window.variantImageFiles[variantId] = [];
-                }
+    if (!window.variantImageFiles[variantId]) {
+        window.variantImageFiles[variantId] = [];
+    }
 
-                window.variantImageFiles[variantId] = window.variantImageFiles[variantId].concat(files);
-                updateVariantImagePreview(variantId);
-            };
+    // Store the actual file objects
+    window.variantImageFiles[variantId] = window.variantImageFiles[variantId].concat(files);
+    
+    // Show preview
+    updateVariantImagePreview(variantId);
+    
+    // IMPORTANT: Keep the files in the input
+    var dataTransfer = new DataTransfer();
+    window.variantImageFiles[variantId].forEach(function(file) {
+        dataTransfer.items.add(file);
+    });
+    input.files = dataTransfer.files;
+};
 
             function updateVariantImagePreview(variantId) {
                 var previewId = 'variant_images_preview_' + variantId;
@@ -1500,32 +1521,45 @@
                 });
             }
 
-            window.removeVariantImage = function(variantId, index) {
-                if (window.variantImageFiles[variantId]) {
-                    window.variantImageFiles[variantId].splice(index, 1);
-                    var previewId = 'variant_images_preview_' + variantId;
-                    $('#' + previewId).find('.new-image').remove();
-                    updateVariantImagePreview(variantId);
-                }
-            };
+      window.removeVariantImage = function(variantId, index) {
+    if (window.variantImageFiles[variantId]) {
+        window.variantImageFiles[variantId].splice(index, 1);
+        
+        // Update the file input
+        var input = document.getElementById('variant_images_input_' + variantId);
+        if (input) {
+            var dataTransfer = new DataTransfer();
+            window.variantImageFiles[variantId].forEach(function(file) {
+                dataTransfer.items.add(file);
+            });
+            input.files = dataTransfer.files;
+        }
+        
+        var previewId = 'variant_images_preview_' + variantId;
+        $('#' + previewId).find('.new-image').remove();
+        updateVariantImagePreview(variantId);
+    }
+};
 
-            window.removeExistingVariantImage = function(imageId, variantId) {
-                if (confirm('Remove this image?')) {
-                    var element = $('input[name="variants[' + variantId + '][existing_images][]"][value="' +
-                        imageId + '"]');
-                    element.parent().remove();
+        window.removeExistingVariantImage = function(imageId, variantId) {
+    if (confirm('Remove this image?')) {
+        var element = $('input[name="variants[' + variantId + '][existing_images][]"][value="' +
+            imageId + '"]');
+        element.closest('.variant-image-preview-item').remove();
 
-                    var deletedInput = $('#deleted_variant_images');
-                    var deleted = deletedInput.val();
-                    if (deleted) {
-                        var deletedArray = JSON.parse(deleted);
-                        deletedArray.push(imageId);
-                        deletedInput.val(JSON.stringify(deletedArray));
-                    } else {
-                        deletedInput.val(JSON.stringify([imageId]));
-                    }
-                }
-            };
+        var deletedInput = $('#deleted_variant_images');
+        var deleted = deletedInput.val();
+        if (deleted) {
+            var deletedArray = JSON.parse(deleted);
+            if (!deletedArray.includes(imageId)) {
+                deletedArray.push(imageId);
+                deletedInput.val(JSON.stringify(deletedArray));
+            }
+        } else {
+            deletedInput.val(JSON.stringify([imageId]));
+        }
+    }
+};
 
             // Remove Existing Image
             window.removeExistingImage = function(imageId) {
@@ -2021,101 +2055,117 @@
             });
 
             // ===== FORM SUBMIT =====
-            $('#productForm').on('submit', function(e) {
-                if (isVariantMode) {
-                    var hasError = false;
+       // ===== FORM SUBMIT =====
+$('#productForm').on('submit', function(e) {
+    if (isVariantMode) {
+        var hasError = false;
 
-                    $('.variant-item').each(function() {
-                        var variantId = $(this).attr('id').replace('variant-', '');
+        $('.variant-item').each(function() {
+            var variantId = $(this).attr('id').replace('variant-', '');
 
-                        var colorInput = $(this).find('input[name*="[color]"]');
-                        if (colorInput.length && !colorInput.val().trim()) {
-                            hasError = true;
-                            colorInput.addClass('is-invalid');
-                            alert('Please enter color for Variant #' + (variantId === 'default' ?
-                                1 : variantCounter));
-                            colorInput.focus();
-                            return false;
-                        }
+            var colorInput = $(this).find('input[name*="[color]"]');
+            if (colorInput.length && !colorInput.val().trim()) {
+                hasError = true;
+                colorInput.addClass('is-invalid');
+                alert('Please enter color for Variant #' + (variantId === 'default' ?
+                    1 : variantCounter));
+                colorInput.focus();
+                return false;
+            }
 
-                        var sizeRows = $(this).find('.size-row');
-                        sizeRows.each(function(index) {
-                            var sizeInput = $(this).find('input[name*="[size]"]');
-                            var costPriceInput = $(this).find(
-                            'input[name*="[cost_price]"]');
-                            var mrpInput = $(this).find('input[name*="[mrp]"]');
+            var sizeRows = $(this).find('.size-row');
+            sizeRows.each(function(index) {
+                var sizeInput = $(this).find('input[name*="[size]"]');
+                var costPriceInput = $(this).find(
+                'input[name*="[cost_price]"]');
+                var mrpInput = $(this).find('input[name*="[mrp]"]');
 
-                            if (!sizeInput.val().trim()) {
-                                hasError = true;
-                                sizeInput.addClass('is-invalid');
-                                alert('Please enter size for Variant #' + (variantId ===
-                                    'default' ? 1 : variantCounter) + ', Size ' + (
-                                    index + 1));
-                                sizeInput.focus();
-                                return false;
-                            }
-                            if (!costPriceInput.val() || parseFloat(costPriceInput.val()) <=
-                                0) {
-                                hasError = true;
-                                costPriceInput.addClass('is-invalid');
-                                alert('Please enter valid cost price for Variant #' + (
-                                        variantId === 'default' ? 1 : variantCounter) +
-                                    ', Size ' + (index + 1));
-                                costPriceInput.focus();
-                                return false;
-                            }
-                            if (!mrpInput.val() || parseFloat(mrpInput.val()) <= 0) {
-                                hasError = true;
-                                mrpInput.addClass('is-invalid');
-                                alert('Please enter valid MRP for Variant #' + (
-                                        variantId === 'default' ? 1 : variantCounter) +
-                                    ', Size ' + (index + 1));
-                                mrpInput.focus();
-                                return false;
-                            }
-                        });
-
-                        if (hasError) return false;
-                    });
-
-                    if (hasError) {
-                        e.preventDefault();
-                        return false;
-                    }
+                if (!sizeInput.val().trim()) {
+                    hasError = true;
+                    sizeInput.addClass('is-invalid');
+                    alert('Please enter size for Variant #' + (variantId ===
+                        'default' ? 1 : variantCounter) + ', Size ' + (
+                        index + 1));
+                    sizeInput.focus();
+                    return false;
                 }
-
-                if (!isVariantMode) {
-                    var stock = parseInt($('#stock').val());
-                    if (isNaN(stock) || stock < 0) {
-                        e.preventDefault();
-                        alert('Stock cannot be negative.');
-                        return false;
-                    }
-
-                    var sellingPrice = parseFloat($('#mrp').val()) || 0;
-                    var finalPrice = parseFloat($('#final_price').val()) || 0;
-
-                    if (sellingPrice <= 0) {
-                        e.preventDefault();
-                        alert('Please enter a valid selling price.');
-                        return false;
-                    }
-
-                    if (finalPrice < 0) {
-                        e.preventDefault();
-                        alert('Final price cannot be negative. Please check your discount.');
-                        return false;
-                    }
+                if (!costPriceInput.val() || parseFloat(costPriceInput.val()) <=
+                    0) {
+                    hasError = true;
+                    costPriceInput.addClass('is-invalid');
+                    alert('Please enter valid cost price for Variant #' + (
+                            variantId === 'default' ? 1 : variantCounter) +
+                        ', Size ' + (index + 1));
+                    costPriceInput.focus();
+                    return false;
                 }
-
-                var dataTransfer = new DataTransfer();
-                for (var i = 0; i < window.imageFiles.length; i++) {
-                    dataTransfer.items.add(window.imageFiles[i]);
+                if (!mrpInput.val() || parseFloat(mrpInput.val()) <= 0) {
+                    hasError = true;
+                    mrpInput.addClass('is-invalid');
+                    alert('Please enter valid MRP for Variant #' + (
+                            variantId === 'default' ? 1 : variantCounter) +
+                        ', Size ' + (index + 1));
+                    mrpInput.focus();
+                    return false;
                 }
-                document.getElementById('product_images_input').files = dataTransfer.files;
-
-                return true;
             });
+
+            if (hasError) return false;
+        });
+
+        if (hasError) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // IMPORTANT: Set the variant images in the file inputs before submit
+        for (var key in window.variantImageFiles) {
+            if (window.variantImageFiles[key] && window.variantImageFiles[key].length > 0) {
+                var input = document.getElementById('variant_images_input_' + key);
+                if (input) {
+                    var dataTransfer = new DataTransfer();
+                    window.variantImageFiles[key].forEach(function(file) {
+                        dataTransfer.items.add(file);
+                    });
+                    input.files = dataTransfer.files;
+                }
+            }
+        }
+    }
+
+    if (!isVariantMode) {
+        var stock = parseInt($('#stock').val());
+        if (isNaN(stock) || stock < 0) {
+            e.preventDefault();
+            alert('Stock cannot be negative.');
+            return false;
+        }
+
+        var sellingPrice = parseFloat($('#mrp').val()) || 0;
+        var finalPrice = parseFloat($('#final_price').val()) || 0;
+
+        if (sellingPrice <= 0) {
+            e.preventDefault();
+            alert('Please enter a valid selling price.');
+            return false;
+        }
+
+        if (finalPrice < 0) {
+            e.preventDefault();
+            alert('Final price cannot be negative. Please check your discount.');
+            return false;
+        }
+    }
+
+    // For product images
+    var dataTransfer = new DataTransfer();
+    for (var i = 0; i < window.imageFiles.length; i++) {
+        dataTransfer.items.add(window.imageFiles[i]);
+    }
+    document.getElementById('product_images_input').files = dataTransfer.files;
+
+    return true;
+});
 
             // ===== INITIAL CALCULATION =====
             calculateAll();
