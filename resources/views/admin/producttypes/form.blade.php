@@ -33,11 +33,28 @@
                     @endif
 
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control"
-                                value="{{ old('name', $productType->name ?? '') }}" required>
-                        </div>
+                     <div class="col-md-6 mb-3">
+    <label class="form-label">Name <span class="text-danger">*</span></label>
+
+    <select name="name" class="form-control" required>
+        <option value="">Select Product Type</option>
+
+        <option value="Top Wear"
+            {{ old('name', $productType->name ?? '') == 'Top Wear' ? 'selected' : '' }}>
+            Top Wear
+        </option>
+
+        <option value="Bottom Wear"
+            {{ old('name', $productType->name ?? '') == 'Bottom Wear' ? 'selected' : '' }}>
+            Bottom Wear
+        </option>
+
+        <option value="Foot Wear"
+            {{ old('name', $productType->name ?? '') == 'Foot Wear' ? 'selected' : '' }}>
+            Foot Wear
+        </option>
+    </select>
+</div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Category <span class="text-danger">*</span></label>

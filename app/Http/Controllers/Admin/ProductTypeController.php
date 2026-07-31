@@ -28,7 +28,7 @@ class ProductTypeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:product_types,name',
+'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'is_active' => 'nullable|boolean'
@@ -75,7 +75,7 @@ class ProductTypeController extends Controller
         $productType = ProductType::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:product_types,name,' . $id,
+'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'is_active' => 'nullable|boolean'

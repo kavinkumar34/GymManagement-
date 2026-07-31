@@ -758,38 +758,7 @@
                                                     <div class="help-text">Total Price - Discount</div>
                                                 </div>
 
-                                                <div class="col-md-9">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div class="final-amount-box"
-                                                                style="border-color: #dc3545; background: #f8f9fa; border: 2px solid #dc3545; border-radius: 8px; padding: 15px 20px; text-align: center;">
-                                                                <div class="label"
-                                                                    style="font-size:13px; color:#6c757d; font-weight:500;">
-                                                                    You Save</div>
-                                                                <div class="amount" id="saved_amount"
-                                                                    style="font-size:28px; font-weight:bold; color:#28a745;">
-                                                                    ₹0.00</div>
-                                                                <div class="discount-info" id="discount_percent_info"
-                                                                    style="font-size:12px; color:#6c757d; margin-top:5px;">
-                                                                    0% off</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="final-amount-box"
-                                                                style="border-color: #28a745; background: #f8f9fa; border: 2px solid #28a745; border-radius: 8px; padding: 15px 20px; text-align: center;">
-                                                                <div class="label"
-                                                                    style="font-size:13px; color:#6c757d; font-weight:500;">
-                                                                    Final Price (Customer Pays)</div>
-                                                                <div class="amount" id="final_total_display"
-                                                                    style="font-size:28px; font-weight:bold; color:#28a745;">
-                                                                    ₹0.00</div>
-                                                                <div class="discount-info"
-                                                                    style="font-size:12px; color:#6c757d; margin-top:5px;">
-                                                                    Incl. GST</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                          
                                             </div>
                                         </div>
                                     </div>

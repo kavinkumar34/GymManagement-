@@ -57,21 +57,15 @@ class ProductController extends Controller
         ]);
 
         try {
-            // Get GST from top category
             $topCategory = TopCategory::find($request->top_category_id);
             $gstRate = $topCategory->gst_rate ?? 0;
             
-            // Calculate values
             $sellingPrice = $request->mrp ?? 0;
             $costPrice = $request->price ?? 0;
             
-            // 1. Calculate GST Amount on Selling Price
             $gstAmount = ($sellingPrice * $gstRate) / 100;
-            
-            // 2. Calculate Price with GST (Total Price)
             $totalPrice = $sellingPrice + $gstAmount;
             
-            // 3. Calculate Discount
             $discountType = $request->discount_type ?? 'flat';
             $discountValue = $request->discount_value ?? 0;
             $discountAmount = 0;
@@ -82,15 +76,11 @@ class ProductController extends Controller
                 $discountAmount = ($sellingPrice * $discountValue) / 100;
             }
             
-            // 4. Calculate Final Price = Total Price - Discount Amount
             $finalPrice = $totalPrice - $discountAmount;
-            
-            // Ensure final price is not negative
             if ($finalPrice < 0) {
                 $finalPrice = 0;
             }
 
-            // Create product with all fields
             $product = Product::create([
                 'name' => $request->name,
                 'top_category_id' => $request->top_category_id,
@@ -119,29 +109,23 @@ class ProductController extends Controller
 
             // ====== SAVE VARIANTS ======
             if ($request->has('variants') && is_array($request->variants)) {
-                foreach ($request->variants as $variant) {
+                foreach ($request->variants as $variantKey => $variant) {
                     $color = $variant['color'] ?? null;
-
+                    
                     if (isset($variant['sizes']) && is_array($variant['sizes'])) {
                         foreach ($variant['sizes'] as $sizeData) {
-                            // Skip if no size or no stock
                             if (empty($sizeData['size']) && empty($sizeData['stock'])) {
                                 continue;
                             }
 
-                            // Calculate GST and Final Price for each size
                             $sizeMrp = floatval($sizeData['mrp'] ?? 0);
                             $sizeCostPrice = floatval($sizeData['cost_price'] ?? 0);
                             $sizeDiscountType = $sizeData['discount_type'] ?? 'flat';
                             $sizeDiscountValue = floatval($sizeData['discount_value'] ?? 0);
                             
-                            // Calculate GST Amount on MRP
                             $sizeGstAmount = ($sizeMrp * $gstRate) / 100;
-                            
-                            // Calculate Total Price (MRP + GST)
                             $sizeTotalPrice = $sizeMrp + $sizeGstAmount;
                             
-                            // Calculate Discount Amount
                             $sizeDiscountAmount = 0;
                             if ($sizeDiscountType === 'flat') {
                                 $sizeDiscountAmount = $sizeDiscountValue;
@@ -149,14 +133,12 @@ class ProductController extends Controller
                                 $sizeDiscountAmount = ($sizeMrp * $sizeDiscountValue) / 100;
                             }
                             
-                            // Calculate Final Price
                             $sizeFinalPrice = $sizeTotalPrice - $sizeDiscountAmount;
                             if ($sizeFinalPrice < 0) {
                                 $sizeFinalPrice = 0;
                             }
 
-                            // Create variant with all fields
-                            ProductVariant::create([
+                            $savedVariant = ProductVariant::create([
                                 'product_id' => $product->id,
                                 'size' => $sizeData['size'] ?? null,
                                 'color' => $color,
@@ -172,14 +154,32 @@ class ProductController extends Controller
                                 'discount_amount' => $sizeDiscountAmount,
                                 'stock' => intval($sizeData['stock'] ?? 0),
                             ]);
+                            
+                            // Save variant images
+                            if (isset($variant['images']) && is_array($variant['images'])) {
+                                foreach ($variant['images'] as $index => $image) {
+                                    if ($image && $image->isValid()) {
+                                        $path = $image->store('products', 'public');
+                                        ProductImage::create([
+                                            'product_id' => $product->id,
+                                            'variant_id' => $savedVariant->id,
+                                            'image_path' => $path,
+                                            'is_main' => $index == 0 ? 1 : 0,
+                                            'display_order' => $index,
+                                        ]);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            // Save Normal Product Images
+            // Save Normal Product Images - limit to 4
             if ($request->hasFile('images')) {
+                $imageCount = 0;
                 foreach ($request->file('images') as $index => $image) {
+                    if ($imageCount >= 4) break;
                     if ($image && $image->isValid()) {
                         $path = $image->store('products', 'public');
                         ProductImage::create([
@@ -189,33 +189,7 @@ class ProductController extends Controller
                             'is_main' => $index == 0 ? 1 : 0,
                             'display_order' => $index,
                         ]);
-                    }
-                }
-            }
-
-            // Save Variant Images
-            if ($request->has('variants')) {
-                foreach ($request->variants as $variantIndex => $variant) {
-                    $color = $variant['color'] ?? null;
-                    
-                    // Find the saved variant by color
-                    $savedVariant = ProductVariant::where('product_id', $product->id)
-                        ->where('color', $color)
-                        ->first();
-
-                    if ($savedVariant && isset($variant['images'])) {
-                        foreach ($variant['images'] as $index => $image) {
-                            if ($image && $image->isValid()) {
-                                $path = $image->store('products', 'public');
-                                ProductImage::create([
-                                    'product_id' => $product->id,
-                                    'variant_id' => $savedVariant->id,
-                                    'image_path' => $path,
-                                    'is_main' => $index == 0 ? 1 : 0,
-                                    'display_order' => $index,
-                                ]);
-                            }
-                        }
+                        $imageCount++;
                     }
                 }
             }
@@ -231,8 +205,17 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $product = Product::with('variants')->findOrFail($id);
-        $productImages = ProductImage::where('product_id', $id)->orderBy('display_order')->get();
+        $product = Product::with([
+            'variants',
+            'variants.variantImages',
+            'productImages'
+        ])->findOrFail($id);
+        
+        $productImages = ProductImage::where('product_id', $id)
+            ->whereNull('variant_id')
+            ->orderBy('display_order')
+            ->get();
+            
         $topCategories = TopCategory::where('is_active', 1)->get();
         $brands = Brand::where('is_active', 1)->get();
         $sizeCharts = SizeChart::all();
@@ -240,7 +223,16 @@ class ProductController extends Controller
         $subCategories = SubCategory::where('is_active', 1)->get();
         $productTypes = ProductType::where('is_active', 1)->get();
         
-        return view('admin.products.edit', compact('product', 'productImages', 'topCategories', 'brands', 'sizeCharts', 'categories', 'subCategories', 'productTypes'));
+        return view('admin.products.edit', compact(
+            'product', 
+            'productImages', 
+            'topCategories', 
+            'brands', 
+            'sizeCharts', 
+            'categories', 
+            'subCategories', 
+            'productTypes'
+        ));
     }
 
     public function update(Request $request, $id)
@@ -252,13 +244,17 @@ class ProductController extends Controller
             'price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'variants' => 'nullable|array',
-            'variants.*.size' => 'nullable|string',
-            'variants.*.stock' => 'nullable|integer|min:0',
+            'new_images' => 'nullable|array|max:4',
+            'new_images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Get GST from product
         $gstRate = $product->gst_percentage ?? 0;
+        if ($request->has('top_category_id') && $request->top_category_id != $product->top_category_id) {
+            $topCategory = TopCategory::find($request->top_category_id);
+            $gstRate = $topCategory->gst_rate ?? 0;
+        }
 
+        // Update product basic info
         $product->update([
             'name' => $request->name,
             'top_category_id' => $request->top_category_id,
@@ -270,6 +266,7 @@ class ProductController extends Controller
             'price' => $request->price ?? 0,
             'final_price' => $request->final_price ?? 0,
             'mrp' => $request->mrp ?? 0,
+            'gst_percentage' => $gstRate,
             'stock' => $request->stock ?? 0,
             'description' => $request->description,
             'status' => $request->status ?? 'Active',
@@ -278,21 +275,91 @@ class ProductController extends Controller
             'delivery_days' => $request->delivery_days ?? 3,
         ]);
 
-        // UPDATE VARIANTS
-        if ($request->has('deleted_variants')) {
-            $deletedIds = json_decode($request->deleted_variants, true);
-            if (is_array($deletedIds) && count($deletedIds) > 0) {
-                ProductVariant::whereIn('id', $deletedIds)->delete();
+        // ===================== HANDLE VARIANTS =====================
+        
+        // 1. Get existing variant IDs from request
+        $existingVariantIds = [];
+        $variantKeys = [];
+        
+        if ($request->has('variants') && is_array($request->variants)) {
+            foreach ($request->variants as $variantKey => $variantData) {
+                $variantKeys[] = $variantKey;
+                if (isset($variantData['sizes']) && is_array($variantData['sizes'])) {
+                    foreach ($variantData['sizes'] as $sizeData) {
+                        if (isset($sizeData['id']) && !empty($sizeData['id'])) {
+                            $existingVariantIds[] = $sizeData['id'];
+                        }
+                    }
+                }
             }
         }
 
+        // 2. Delete variants that are not in the request
+        if (!empty($existingVariantIds)) {
+            $variantsToDelete = ProductVariant::where('product_id', $product->id)
+                ->whereNotIn('id', $existingVariantIds)
+                ->get();
+        } else {
+            // If no variants in request, delete all
+            $variantsToDelete = ProductVariant::where('product_id', $product->id)->get();
+        }
+
+        foreach ($variantsToDelete as $variant) {
+            // Delete variant images
+            $images = ProductImage::where('variant_id', $variant->id)->get();
+            foreach ($images as $img) {
+                if (Storage::disk('public')->exists($img->image_path)) {
+                    Storage::disk('public')->delete($img->image_path);
+                }
+                $img->delete();
+            }
+            $variant->delete();
+        }
+
+        // 3. Handle deleted variants from hidden field
+        if ($request->has('deleted_variants')) {
+            $deletedIds = json_decode($request->deleted_variants, true);
+            if (is_array($deletedIds) && count($deletedIds) > 0) {
+                $variantsToDelete = ProductVariant::whereIn('id', $deletedIds)->get();
+                foreach ($variantsToDelete as $variant) {
+                    $images = ProductImage::where('variant_id', $variant->id)->get();
+                    foreach ($images as $img) {
+                        if (Storage::disk('public')->exists($img->image_path)) {
+                            Storage::disk('public')->delete($img->image_path);
+                        }
+                        $img->delete();
+                    }
+                    $variant->delete();
+                }
+            }
+        }
+
+        // 4. Handle deleted variant images
+        if ($request->has('deleted_variant_images')) {
+            $deletedImageIds = json_decode($request->deleted_variant_images, true);
+            if (is_array($deletedImageIds) && count($deletedImageIds) > 0) {
+                $imagesToDelete = ProductImage::whereIn('id', $deletedImageIds)->get();
+                foreach ($imagesToDelete as $img) {
+                    if (Storage::disk('public')->exists($img->image_path)) {
+                        Storage::disk('public')->delete($img->image_path);
+                    }
+                    $img->delete();
+                }
+            }
+        }
+
+        // 5. Update or create variants
         if ($request->has('variants') && is_array($request->variants)) {
-            foreach ($request->variants as $variantData) {
+            foreach ($request->variants as $variantKey => $variantData) {
                 $color = $variantData['color'] ?? null;
                 
                 if (isset($variantData['sizes']) && is_array($variantData['sizes'])) {
                     foreach ($variantData['sizes'] as $sizeData) {
-                        // Calculate values for this size
+                        // Skip empty sizes
+                        if (empty($sizeData['size']) && empty($sizeData['stock'])) {
+                            continue;
+                        }
+
                         $sizeMrp = floatval($sizeData['mrp'] ?? 0);
                         $sizeCostPrice = floatval($sizeData['cost_price'] ?? 0);
                         $sizeDiscountType = $sizeData['discount_type'] ?? 'flat';
@@ -313,8 +380,9 @@ class ProductController extends Controller
                             $sizeFinalPrice = 0;
                         }
                         
-                        // Check if variant exists (update) or create new
+                        // Check if this is an existing variant
                         if (isset($sizeData['id']) && !empty($sizeData['id'])) {
+                            // Update existing variant
                             $variant = ProductVariant::find($sizeData['id']);
                             if ($variant) {
                                 $variant->update([
@@ -335,7 +403,7 @@ class ProductController extends Controller
                             }
                         } else {
                             // Create new variant
-                            ProductVariant::create([
+                            $newVariant = ProductVariant::create([
                                 'product_id' => $product->id,
                                 'size' => $sizeData['size'] ?? null,
                                 'color' => $color,
@@ -351,17 +419,35 @@ class ProductController extends Controller
                                 'discount_amount' => $sizeDiscountAmount,
                                 'stock' => intval($sizeData['stock'] ?? 0),
                             ]);
+                            
+                            // Save new variant images if any
+                            if (isset($variantData['images']) && is_array($variantData['images'])) {
+                                foreach ($variantData['images'] as $index => $image) {
+                                    if ($image && $image->isValid()) {
+                                        $path = $image->store('products', 'public');
+                                        ProductImage::create([
+                                            'product_id' => $product->id,
+                                            'variant_id' => $newVariant->id,
+                                            'image_path' => $path,
+                                            'is_main' => $index == 0 ? 1 : 0,
+                                            'display_order' => $index,
+                                        ]);
+                                    }
+                }
+            }
                         }
                     }
                 }
             }
         }
 
-        // Handle images
+        // ===================== HANDLE PRODUCT IMAGES =====================
+        
+        // Delete product images
         if ($request->has('deleted_images')) {
             $deletedIds = json_decode($request->deleted_images, true);
             if (is_array($deletedIds) && count($deletedIds) > 0) {
-                $imagesToDelete = ProductImage::whereIn('id', $deletedIds)->get();
+                $imagesToDelete = ProductImage::whereIn('id', $deletedIds)->whereNull('variant_id')->get();
                 foreach ($imagesToDelete as $img) {
                     if (Storage::disk('public')->exists($img->image_path)) {
                         Storage::disk('public')->delete($img->image_path);
@@ -371,21 +457,23 @@ class ProductController extends Controller
             }
         }
 
-        $existingCount = ProductImage::where('product_id', $product->id)->count();
+        // Add new product images - limit to 4 total
+        $existingCount = ProductImage::where('product_id', $product->id)->whereNull('variant_id')->count();
         
         if ($request->hasFile('new_images')) {
+            $imageCount = 0;
             foreach ($request->file('new_images') as $index => $image) {
-                if ($existingCount + $index >= 4) break;
+                if (($existingCount + $imageCount) >= 4) break;
                 if ($image && $image->isValid()) {
                     $path = $image->store('products', 'public');
-                    $isMain = ($existingCount == 0 && $index == 0 && $product->image == null);
-                    
                     ProductImage::create([
                         'product_id' => $product->id,
+                        'variant_id' => null,
                         'image_path' => $path,
-                        'is_main' => $isMain ? 1 : 0,
-                        'display_order' => $existingCount + $index
+                        'is_main' => ($existingCount == 0 && $imageCount == 0) ? 1 : 0,
+                        'display_order' => $existingCount + $imageCount
                     ]);
+                    $imageCount++;
                 }
             }
         }
@@ -398,9 +486,19 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         
+        $variants = ProductVariant::where('product_id', $id)->get();
+        foreach ($variants as $variant) {
+            $images = ProductImage::where('variant_id', $variant->id)->get();
+            foreach ($images as $img) {
+                if (Storage::disk('public')->exists($img->image_path)) {
+                    Storage::disk('public')->delete($img->image_path);
+                }
+                $img->delete();
+            }
+        }
         ProductVariant::where('product_id', $id)->delete();
         
-        $images = ProductImage::where('product_id', $id)->get();
+        $images = ProductImage::where('product_id', $id)->whereNull('variant_id')->get();
         foreach ($images as $img) {
             if (Storage::disk('public')->exists($img->image_path)) {
                 Storage::disk('public')->delete($img->image_path);
@@ -441,6 +539,15 @@ class ProductController extends Controller
             ->get();
         return response()->json($productTypes);
     }
+    
+    public function getProductTypesByCategory($categoryId)
+    {
+        $productTypes = ProductType::where('category_id', $categoryId)
+            ->where('is_active', 1)
+            ->select('id', 'name')
+            ->get();
+        return response()->json($productTypes);
+    }
 
     public function updateStock(Request $request)
     {
@@ -454,12 +561,20 @@ class ProductController extends Controller
     public function getProductDetails($id)
     {
         try {
-            $product = Product::with(['category', 'subCategory', 'brand', 'variants', 'productImages'])
-                ->findOrFail($id);
+            $product = Product::with([
+                'category', 
+                'subCategory', 
+                'brand', 
+                'variants',
+                'variants.variantImages',
+                'productImages'
+            ])->findOrFail($id);
             
             $totalStock = $product->stock;
             if ($product->variants) {
-                $totalStock += $product->variants->sum('stock');
+                foreach ($product->variants as $variant) {
+                    $totalStock += $variant->stock ?? 0;
+                }
             }
             
             $mainImage = null;
@@ -520,6 +635,12 @@ class ProductController extends Controller
                         'discount_type' => $variant->discount_type,
                         'discount_value' => $variant->discount_value,
                         'discount_amount' => $variant->discount_amount,
+                        'variant_images' => $variant->variantImages ? $variant->variantImages->map(function($img) {
+                            return [
+                                'id' => $img->id,
+                                'image_path' => $img->image_path,
+                            ];
+                        }) : [],
                     ];
                 }) : [],
                 'images' => $product->productImages ? $product->productImages->map(function($image) {
@@ -540,16 +661,18 @@ class ProductController extends Controller
     
     public function getGstRate($categoryId)
     {
-        $category = \App\Models\Category::find($categoryId);
+        $category = TopCategory::find($categoryId);
 
         if (!$category) {
             return response()->json([
+                'success' => false,
                 'gst_rate' => 0
             ]);
         }
 
         return response()->json([
-            'gst_rate' => $category->gst_percentage ?? 0
+            'success' => true,
+            'gst_rate' => $category->gst_rate ?? 0
         ]);
     }
 }
