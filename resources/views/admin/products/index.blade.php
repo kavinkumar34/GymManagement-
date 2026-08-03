@@ -1,535 +1,1398 @@
 @extends('layouts.admin-layout')
 
 @section('content')
-    <style>
-        .container {
-            margin-left: 300px;
-            padding: 20px;
+<style>
+    /* ============================================ */
+    /* COLOR VARIABLES - MATCHING NAVBAR          */
+    /* ============================================ */
+    :root {
+        --primary: #4a9eff;
+        --primary-dark: #2b7be0;
+        --primary-light: #8ab4f8;
+        --success: #4caf50;
+        --warning: #ffa726;
+        --danger: #ef5350;
+        --dark: #1a1a2e;
+        --gray: #6c757d;
+        --light-gray: #f8f9fa;
+        --border-color: #e9ecef;
+        --shadow: 0 2px 20px rgba(0,0,0,0.05);
+        --shadow-hover: 0 8px 35px rgba(0,0,0,0.12);
+        --radius: 10px;
+        --radius-lg: 16px;
+    }
+
+    .admin-main-content {
+        padding: 20px 25px !important;
+        background: #f0f4f8;
+        min-height: 100vh;
+        margin-left: 270px !important;
+        width: auto !important;
+        max-width: calc(100% - 270px) !important;
+        box-sizing: border-box;
+    }
+
+    /* ============================================ */
+    /* LIST CARD                                   */
+    /* ============================================ */
+    .list-card {
+        background: #ffffff;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(0,0,0,0.04);
+        overflow: hidden;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .list-card .card-header {
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #0d1b2a 0%, #1b3a5c 100%);
+        color: #ffffff;
+        border-bottom: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .list-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .list-card .card-header h4 i {
+        color: #4a9eff;
+    }
+
+    .list-card .card-header small {
+        font-size: 12px;
+        opacity: 0.8;
+        font-weight: 400;
+    }
+
+    .list-card .card-body {
+        padding: 20px 24px;
+    }
+
+    /* ============================================ */
+    /* SEARCH & FILTER SECTION                    */
+    /* ============================================ */
+    .search-filter-section {
+        background: var(--light-gray);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-filter-section .search-box {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+    .search-filter-section .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        font-size: 14px;
+    }
+
+    .search-filter-section .search-box input {
+        width: 100%;
+        padding: 7px 12px 7px 36px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 13px;
+        transition: all 0.3s;
+        background: #fff;
+        height: 36px;
+    }
+
+    .search-filter-section .search-box input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+        outline: none;
+    }
+
+    .search-filter-section .filter-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .search-filter-section .filter-group select {
+        padding: 7px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 13px;
+        background: #fff;
+        height: 36px;
+        min-width: 130px;
+        transition: all 0.3s;
+        color: var(--dark);
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 30px;
+    }
+
+    .search-filter-section .filter-group select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+        outline: none;
+    }
+
+    .search-filter-section .filter-group .btn-reset {
+        padding: 7px 16px;
+        background: var(--danger);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 36px;
+    }
+
+    .search-filter-section .filter-group .btn-reset:hover {
+        background: #c62828;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(239, 83, 80, 0.35);
+    }
+
+    /* ============================================ */
+    /* CUSTOM ALERT - AUTO HIDE                    */
+    /* ============================================ */
+    .custom-alert {
+        padding: 12px 18px;
+        border-radius: var(--radius);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        animation: slideDown 0.4s ease;
+        border-left: 4px solid;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .custom-alert.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-left-color: #4caf50;
+    }
+
+    .custom-alert.error {
+        background: #fce4ec;
+        color: #c62828;
+        border-left-color: #ef5350;
+    }
+
+    .custom-alert .alert-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .custom-alert .alert-content {
+        flex: 1;
+    }
+
+    .custom-alert .alert-content strong {
+        font-weight: 600;
+    }
+
+    .custom-alert .alert-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.5;
+        padding: 0 4px;
+        transition: all 0.3s;
+        flex-shrink: 0;
+    }
+
+    .custom-alert .alert-close:hover {
+        opacity: 1;
+    }
+
+    .custom-alert .alert-timer {
+        width: 60px;
+        height: 3px;
+        background: rgba(0,0,0,0.1);
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .custom-alert .alert-timer .timer-bar {
+        height: 100%;
+        border-radius: 4px;
+        animation: timerShrink 3s linear forwards;
+    }
+
+    .custom-alert.success .alert-timer .timer-bar {
+        background: #4caf50;
+    }
+
+    .custom-alert.error .alert-timer .timer-bar {
+        background: #ef5350;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes timerShrink {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+
+    /* ============================================ */
+    /* TABLE STYLES                                */
+    /* ============================================ */
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: var(--radius);
+        border: 1px solid var(--border-color);
+    }
+
+    .table-products {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .table-products thead {
+        background: var(--light-gray);
+    }
+
+    .table-products thead th {
+        padding: 12px 14px;
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--dark);
+        border-bottom: 2px solid var(--border-color);
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    .table-products thead th.text-center {
+        text-align: center;
+    }
+
+    .table-products tbody td {
+        padding: 10px 14px;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-products tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .table-products tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-products .sno {
+        font-weight: 600;
+        color: var(--gray);
+        font-size: 12px;
+        text-align: center;
+        width: 40px;
+    }
+
+    .product-image-thumb {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius);
+        object-fit: cover;
+        border: 2px solid var(--border-color);
+    }
+
+    .product-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius);
+        background: var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray);
+        font-size: 16px;
+        border: 2px solid var(--border-color);
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .category-name {
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-size: 10px;
+        font-weight: 500;
+        background: #e3f2fd;
+        color: #1565c0;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .status-badge {
+        padding: 4px 14px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+    }
+
+    .status-badge.active {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-badge.inactive {
+        background: #fce4ec;
+        color: #c62828;
+    }
+
+    .status-badge.draft {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-badge .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-badge.active .dot {
+        background: #4caf50;
+    }
+
+    .status-badge.inactive .dot {
+        background: #ef5350;
+    }
+
+    .status-badge.draft .dot {
+        background: #ffc107;
+    }
+
+    /* ============================================ */
+    /* PRICE TAG                                   */
+    /* ============================================ */
+    .price-tag {
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .price-tag .original {
+        font-size: 12px;
+        color: var(--gray);
+        text-decoration: line-through;
+        font-weight: 400;
+        margin-left: 5px;
+    }
+
+    .price-tag .discount-tag {
+        background: var(--danger);
+        color: white;
+        padding: 1px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 5px;
+    }
+
+    /* ============================================ */
+    /* ACTION BUTTONS                              */
+    /* ============================================ */
+    .action-btns {
+        display: flex;
+        gap: 4px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .action-btns .btn-action {
+        width: 32px;
+        height: 32px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-decoration: none;
+        flex-shrink: 0;
+    }
+
+    .action-btns .btn-action.view {
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+
+    .action-btns .btn-action.view:hover {
+        background: #0d6efd;
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+    .action-btns .btn-action.edit {
+        background: rgba(255, 167, 38, 0.1);
+        color: #ffa726;
+    }
+
+    .action-btns .btn-action.edit:hover {
+        background: #ffa726;
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+    .action-btns .btn-action.delete {
+        background: rgba(239, 83, 80, 0.1);
+        color: #ef5350;
+    }
+
+    .action-btns .btn-action.delete:hover {
+        background: #ef5350;
+        color: #fff;
+        transform: scale(1.1);
+    }
+
+    /* ============================================ */
+    /* CUSTOM DELETE MODAL                         */
+    /* ============================================ */
+    .delete-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.25);
+        backdrop-filter: blur(2px);
+        z-index: 9999;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding: 25px 30px;
+        animation: fadeIn 0.25s ease;
+    }
+
+    .delete-modal-overlay.active {
+        display: flex;
+    }
+
+    .delete-modal {
+        background: #ffffff;
+        border-radius: var(--radius-lg);
+        padding: 16px 20px 18px;
+        max-width: 280px;
+        width: 100%;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        animation: slideDownModal 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    @keyframes slideDownModal {
+        from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .delete-modal .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .delete-modal .modal-header h4 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .delete-modal .modal-header h4 i {
+        color: #ef5350;
+        font-size: 14px;
+    }
+
+    .delete-modal .modal-close {
+        background: none;
+        border: none;
+        font-size: 16px;
+        color: var(--gray);
+        cursor: pointer;
+        padding: 0 4px;
+        transition: all 0.3s;
+        line-height: 1;
+    }
+
+    .delete-modal .modal-close:hover {
+        color: var(--dark);
+        transform: rotate(90deg);
+    }
+
+    .delete-modal .modal-body {
+        font-size: 12px;
+        color: var(--gray);
+        line-height: 1.5;
+        margin-bottom: 12px;
+        padding-left: 2px;
+    }
+
+    .delete-modal .modal-body .warning-text {
+        color: #ef5350;
+        font-weight: 500;
+        font-size: 11px;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .delete-modal .modal-body .warning-text i {
+        font-size: 10px;
+        margin-right: 3px;
+    }
+
+    .delete-modal .modal-actions {
+        display: flex;
+        gap: 6px;
+        justify-content: flex-end;
+    }
+
+    .delete-modal .modal-actions .btn-modal {
+        padding: 5px 14px;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .delete-modal .modal-actions .btn-modal.cancel {
+        background: #f0f4f8;
+        color: var(--gray);
+    }
+
+    .delete-modal .modal-actions .btn-modal.cancel:hover {
+        background: #e9ecef;
+    }
+
+    .delete-modal .modal-actions .btn-modal.confirm {
+        background: #ef5350;
+        color: #fff;
+    }
+
+    .delete-modal .modal-actions .btn-modal.confirm:hover {
+        background: #c62828;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 12px rgba(239, 83, 80, 0.3);
+    }
+
+    /* ============================================ */
+    /* PAGINATION                                 */
+    /* ============================================ */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .pagination-wrapper .pagination-info {
+        font-size: 13px;
+        color: var(--gray);
+    }
+
+    .pagination-wrapper .pagination-info strong {
+        color: var(--dark);
+    }
+
+    .pagination-wrapper .pagination-links {
+        display: flex;
+        gap: 4px;
+    }
+
+    .pagination-wrapper .pagination-links .page-item {
+        display: inline-block;
+    }
+
+    .pagination-wrapper .pagination-links .page-item a,
+    .pagination-wrapper .pagination-links .page-item span {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--gray);
+        text-decoration: none;
+        transition: all 0.3s;
+        border: 1px solid transparent;
+        min-width: 36px;
+        text-align: center;
+    }
+
+    .pagination-wrapper .pagination-links .page-item a:hover {
+        background: #f0f0f0;
+        color: var(--dark);
+    }
+
+    .pagination-wrapper .pagination-links .page-item.active a,
+    .pagination-wrapper .pagination-links .page-item.active span {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+    }
+
+    .pagination-wrapper .pagination-links .page-item.disabled a,
+    .pagination-wrapper .pagination-links .page-item.disabled span {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* ============================================ */
+    /* EMPTY STATE                                 */
+    /* ============================================ */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .empty-state i {
+        color: #dee2e6;
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h5 {
+        color: var(--dark);
+        margin-bottom: 4px;
+    }
+
+    .empty-state p {
+        color: var(--gray);
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    /* ============================================ */
+    /* VIEW MODAL STYLES                           */
+    /* ============================================ */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--border-color);
+        padding: 20px 25px;
+        background: var(--light-gray);
+        border-radius: 16px 16px 0 0;
+    }
+
+    .modal-header .modal-title {
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    .modal-body {
+        padding: 25px;
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--border-color);
+        padding: 15px 25px;
+        background: var(--light-gray);
+        border-radius: 0 0 16px 16px;
+    }
+
+    .product-detail-image {
+        width: 100%;
+        height: 320px;
+        object-fit: contain;
+        border-radius: 12px;
+        background: var(--light-gray);
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .detail-label {
+        font-size: 11px;
+        color: var(--gray);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--dark);
+    }
+
+    .detail-row {
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2px 20px;
+    }
+
+    .product-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 5px;
+    }
+
+    .product-badges .badge {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .gallery-thumb {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--light-gray);
+    }
+
+    .gallery-thumb:hover {
+        border-color: var(--primary);
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(74, 158, 255, 0.2);
+    }
+
+    .gallery-thumb.active {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px var(--primary);
+    }
+
+    .gallery-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .gallery-thumbnails {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+    }
+
+    /* ============================================ */
+    /* RESPONSIVE                                  */
+    /* ============================================ */
+    @media (max-width: 992px) {
+        .admin-main-content {
+            margin-left: 70px !important;
+            max-width: calc(100% - 70px) !important;
+            padding: 15px 18px !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-main-content {
+            margin-left: 0 !important;
+            max-width: 100% !important;
+            padding: 12px 15px !important;
         }
 
-        .product-image-thumb {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
+        .list-card .card-header {
+            padding: 12px 16px;
+            flex-direction: column;
+            align-items: flex-start;
         }
 
-        .product-image-placeholder {
-            width: 50px;
-            height: 50px;
-            background: #e9ecef;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #adb5bd;
-            font-size: 20px;
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-badge.active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-badge.inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-badge.draft {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .action-btns .btn {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-        }
-
-        .action-btns .btn-view {
-            background: #e7f3ff;
-            color: #0d6efd;
-            border: 1px solid #b6d4fe;
-        }
-
-        .action-btns .btn-view:hover {
-            background: #0d6efd;
-            color: white;
-        }
-
-        .action-btns .btn-edit {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffe69c;
-        }
-
-        .action-btns .btn-edit:hover {
-            background: #856404;
-            color: white;
-        }
-
-        .action-btns .btn-delete {
-            background: #f8d7da;
-            color: #dc3545;
-            border: 1px solid #f5c2c7;
-        }
-
-        .action-btns .btn-delete:hover {
-            background: #dc3545;
-            color: white;
-        }
-
-        /* View Modal Styles */
-        .modal-content {
-            border-radius: 16px;
-            border: none;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .modal-header {
-            border-bottom: 1px solid #e9ecef;
-            padding: 20px 25px;
-            background: #f8f9fa;
-            border-radius: 16px 16px 0 0;
-        }
-
-        .modal-header .modal-title {
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .modal-body {
-            padding: 25px;
-        }
-
-        .product-detail-image {
-            width: 100%;
-            height: 320px;
-            object-fit: contain;
-            border-radius: 12px;
-            background: #f8f9fa;
-            padding: 10px;
-            border: 1px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-
-        .detail-label {
-            font-size: 11px;
-            color: #6c757d;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .detail-value {
-            font-size: 15px;
-            font-weight: 500;
-            color: #1a1a2e;
-        }
-
-        .detail-row {
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .variant-badge {
-            display: inline-block;
-            background: #e9ecef;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            margin: 2px 4px 2px 0;
-        }
-
-        .variant-badge .size {
-            font-weight: 600;
-            color: #0d6efd;
-        }
-
-        .variant-badge .color {
-            color: #6c757d;
-        }
-
-        .variant-badge .stock {
-            color: #28a745;
-            font-weight: 600;
-        }
-
-        .gallery-thumb {
-            width: 70px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid #dee2e6;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-
-        .gallery-thumb:hover {
-            border-color: #0d6efd;
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
-        }
-
-        .gallery-thumb.active {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 2px #0d6efd;
-        }
-
-        .gallery-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .price-tag {
-            font-size: 24px;
-            font-weight: 700;
-            color: #28a745;
-        }
-
-        .price-tag .original {
+        .list-card .card-header h4 {
             font-size: 16px;
-            color: #6c757d;
-            text-decoration: line-through;
-            font-weight: 400;
-            margin-left: 10px;
         }
 
-        .discount-tag {
-            background: #dc3545;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 10px;
+        .list-card .card-body {
+            padding: 14px 16px;
         }
 
-        .modal-footer {
-            border-top: 1px solid #e9ecef;
-            padding: 15px 25px;
-            background: #f8f9fa;
-            border-radius: 0 0 16px 16px;
+        .search-filter-section {
+            flex-direction: column;
+            padding: 12px 14px;
         }
 
-        .loading-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-        }
-
-        .product-detail-left {
-            padding-right: 20px;
-        }
-
-        .product-detail-right {
-            padding-left: 20px;
-        }
-
-        .gallery-container {
-            margin-top: 15px;
-        }
-
-        .gallery-thumbnails {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .gallery-main-image {
+        .search-filter-section .filter-group {
+            flex-direction: column;
             width: 100%;
-            height: 320px;
-            object-fit: contain;
-            border-radius: 12px;
-            background: #f8f9fa;
-            padding: 10px;
-            border: 1px solid #e9ecef;
-            transition: all 0.3s ease;
+        }
+
+        .search-filter-section .filter-group select {
+            width: 100%;
+        }
+
+        .search-filter-section .filter-group .btn-reset {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pagination-wrapper {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .action-btns .btn-action {
+            width: 28px;
+            height: 28px;
+            font-size: 10px;
+        }
+
+        .table-products thead th {
+            font-size: 10px;
+            padding: 6px 8px;
+        }
+
+        .table-products tbody td {
+            padding: 6px 8px;
+            font-size: 11px;
         }
 
         .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px 20px;
+            grid-template-columns: 1fr;
         }
 
-        .product-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 5px;
+        .product-detail-image {
+            height: 250px;
         }
 
-        .product-badges {
+        .gallery-thumb {
+            width: 60px;
+            height: 60px;
+        }
+
+        .delete-modal-overlay {
+            padding: 16px;
+            align-items: flex-start;
+        }
+
+        .delete-modal {
+            max-width: 260px;
+            padding: 14px 16px 16px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .list-card .card-header h4 {
+            font-size: 14px;
+        }
+
+        .list-card .card-body {
+            padding: 10px 12px;
+        }
+
+        .search-filter-section .search-box input {
+            font-size: 12px;
+            height: 34px;
+        }
+
+        .search-filter-section .filter-group select {
+            font-size: 12px;
+            height: 34px;
+        }
+
+        .search-filter-section .filter-group .btn-reset {
+            font-size: 12px;
+            height: 34px;
+        }
+
+        .table-products tbody td {
+            padding: 4px 6px;
+            font-size: 10px;
+        }
+
+        .table-products thead th {
+            padding: 4px 6px;
+            font-size: 9px;
+        }
+
+        .action-btns .btn-action {
+            width: 24px;
+            height: 24px;
+            font-size: 9px;
+        }
+
+        .status-badge {
+            font-size: 9px;
+            padding: 2px 8px;
+        }
+
+        .price-tag .original {
+            font-size: 10px;
+        }
+
+        .price-tag .discount-tag {
+            font-size: 8px;
+            padding: 1px 6px;
+        }
+
+        .delete-modal-overlay {
+            padding: 12px;
+        }
+
+        .delete-modal {
+            max-width: 240px;
+            padding: 12px 14px 14px;
+        }
+
+        .delete-modal .modal-header h4 {
+            font-size: 12px;
+        }
+
+        .delete-modal .modal-body {
+            font-size: 10px;
             margin-bottom: 10px;
         }
 
-        .product-badges .badge {
-            font-size: 12px;
-            padding: 6px 12px;
+        .delete-modal .modal-actions .btn-modal {
+            padding: 4px 10px;
+            font-size: 10px;
         }
+    }
+</style>
 
-        @media (max-width: 768px) {
-            .product-detail-left {
-                padding-right: 0;
-            }
-
-            .product-detail-right {
-                padding-left: 0;
-            }
-
-            .detail-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .product-detail-image,
-            .gallery-main-image {
-                height: 250px;
-            }
-
-            .gallery-thumb {
-                width: 60px;
-                height: 60px;
-            }
-        }
-    </style>
-
-    <div class="container">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                <h5 class="mb-0">
-                    <i class="fas fa-box me-2 text-primary"></i>
-                    Products
-                    <span class="badge bg-secondary ms-2">{{ $products->total() }}</span>
-                </h5>
-                <div>
-                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus me-1"></i> Add Product
-                    </a>
-                </div>
+<!-- ============================================ -->
+<!-- MAIN CONTENT                                -->
+<!-- ============================================ -->
+<div class="admin-main-content">
+    <div class="list-card">
+        <div class="card-header">
+            <div>
+                <h4><i class="fas fa-box"></i> Products</h4>
+                <small style="opacity:0.8;">Manage all products</small>
             </div>
-            <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
-                @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th width="60">ID</th>
-                                <th width="70">Image</th>
-                                <th>Product</th>
-                                <th>Price</th>
-                                <th>Stock</th>
-                                <th>Status</th>
-                                <th width="140">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($products as $product)
-                                <tr>
-                                    <td class="text-muted">#{{ $product->id }}</td>
-                                    <td>
-                                        @php
-                                            $mainImage = null;
-                                            if ($product->productImages && $product->productImages->count() > 0) {
-                                                $mainImage = $product->productImages->where('is_main', 1)->first();
-                                                if (!$mainImage) {
-                                                    $mainImage = $product->productImages->first();
-                                                }
-                                            }
-                                            $imagePath = $mainImage ? $mainImage->image_path : $product->image;
-                                        @endphp
-                                        @if ($imagePath)
-                                            <img src="{{ asset('storage/' . $imagePath) }}" class="product-image-thumb"
-                                                alt="{{ $product->name }}" onerror="this.style.display='none'">
-                                        @endif
-                                        @if (!$imagePath)
-                                            <div class="product-image-placeholder">
-                                                <i class="fas fa-box"></i>
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <strong>{{ $product->name }}</strong>
-                                        <br>
-                                        <small class="text-muted">
-                                            <i class="fas fa-tag me-1"></i>
-                                            {{ $product->category->name ?? 'N/A' }}
-                                            @if ($product->subCategory)
-                                                > {{ $product->subCategory->name }}
-                                            @endif
-                                        </small>
-                                    </td>
-                                    <td>
-                                        <div class="price-tag" style="font-size: 18px;">
-                                            ₹{{ number_format($product->final_price ?? $product->mrp, 2) }}
-                                            @if ($product->final_price && $product->final_price < $product->mrp)
-                                                <span class="original" style="font-size: 13px;">
-                                                    ₹{{ number_format($product->mrp, 2) }}
-                                                </span>
-                                                <span class="discount-tag" style="font-size: 10px;">
-                                                    -{{ round((($product->mrp - $product->final_price) / $product->mrp) * 100) }}%
-                                                </span>
-                                            @endif
-                                        </div>
-                                        <small class="text-muted">Cost: ₹{{ number_format($product->price, 2) }}</small>
-                                    </td>
-                                    <td>
-                                        @php
-                                            $totalStock = $product->stock;
-                                            if ($product->variants) {
-                                                $totalStock += $product->variants->sum('stock');
-                                            }
-                                        @endphp
-                                        <span
-                                            class="badge bg-{{ $totalStock > 0 ? 'success' : 'danger' }} rounded-pill px-3 py-2">
-                                            {{ $totalStock }}
-                                        </span>
-                                        @if ($product->variants && $product->variants->count() > 0)
-                                            <br>
-                                            <small class="text-muted">{{ $product->variants->count() }} variants</small>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="status-badge {{ strtolower($product->status) }}">
-                                            {{ $product->status }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="action-btns d-flex gap-1">
-                                            <button class="btn btn-view" onclick="viewProduct({{ $product->id }})"
-                                                title="View Product">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-edit"
-                                                title="Edit Product">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button class="btn btn-delete" onclick="deleteItem({{ $product->id }})"
-                                                title="Delete Product">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <form id="delete-form-{{ $product->id }}"
-                                                action="{{ route('admin.products.destroy', $product->id) }}" method="POST"
-                                                style="display:none;">
-                                                @csrf
-                                                @method('DELETE')
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center py-5">
-                                        <i class="fas fa-box-open fa-3x text-muted mb-3 d-block"></i>
-                                        <h6 class="text-muted">No products found</h6>
-                                        <a href="{{ route('admin.products.create') }}" class="btn btn-primary btn-sm mt-2">
-                                            <i class="fas fa-plus me-1"></i> Add Your First Product
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <div>
-                        <small class="text-muted">
-                            Showing {{ $products->firstItem() ?? 0 }} to {{ $products->lastItem() ?? 0 }} of
-                            {{ $products->total() }} products
-                        </small>
-                    </div>
-                    <div>
-                        {{ $products->links() }}
-                    </div>
-                </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <a href="{{ route('admin.products.create') }}" class="btn btn-primary" style="background:#4a9eff; color:#fff; border:none; padding:7px 16px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-weight:500; font-size:12px; transition:all 0.3s;">
+                    <i class="fas fa-plus"></i> Add Product
+                </a>
+                <span style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
+                    <i class="fas fa-tags"></i> Total: {{ $products->total() }}
+                </span>
             </div>
         </div>
-    </div>
 
-    <!-- View Product Modal -->
-    <div class="modal fade" id="viewProductModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-box me-2 text-primary"></i>
-                        <span id="modalProductTitle">Product Details</span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="card-body">
+            <!-- Custom Alert -->
+            @if(session('success'))
+                <div class="custom-alert success" id="customAlert">
+                    <span class="alert-icon"><i class="fas fa-check-circle"></i></span>
+                    <span class="alert-content"><strong>Success!</strong> {{ session('success') }}</span>
+                    <button class="alert-close" onclick="closeAlert()">&times;</button>
+                    <div class="alert-timer"><div class="timer-bar"></div></div>
                 </div>
-                <div class="modal-body" id="productDetailBody">
-                    <div class="loading-spinner">
-                        <div class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2 text-muted">Loading product details...</p>
-                        </div>
-                    </div>
+            @endif
+
+            @if(session('error'))
+                <div class="custom-alert error" id="customAlert">
+                    <span class="alert-icon"><i class="fas fa-exclamation-circle"></i></span>
+                    <span class="alert-content"><strong>Error!</strong> {{ session('error') }}</span>
+                    <button class="alert-close" onclick="closeAlert()">&times;</button>
+                    <div class="alert-timer"><div class="timer-bar"></div></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Close
+            @endif
+
+            <!-- Search & Filter -->
+            <div class="search-filter-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="filterTable()">
+                </div>
+                <div class="filter-group">
+                    <select id="statusFilter" onchange="filterTable()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                    <button class="btn-reset" onclick="resetFilters()">
+                        <i class="fas fa-undo"></i> Reset
                     </button>
-                    <a href="#" id="editProductBtn" class="btn btn-primary">
-                        <i class="fas fa-edit me-1"></i> Edit Product
-                    </a>
                 </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+                <table class="table-products" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width:45px;">#</th>
+                            <th style="width:50px;">Image</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center" style="width:120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        @forelse($products as $index => $product)
+                        <tr>
+                            <td class="text-center sno">{{ $products->firstItem() + $index }}</td>
+                            <td>
+                                @php
+                                    $mainImage = null;
+                                    if ($product->productImages && $product->productImages->count() > 0) {
+                                        $mainImage = $product->productImages->where('is_main', 1)->first();
+                                        if (!$mainImage) {
+                                            $mainImage = $product->productImages->first();
+                                        }
+                                    }
+                                    $imagePath = $mainImage ? $mainImage->image_path : $product->image;
+                                @endphp
+                                @if($imagePath)
+                                    <img src="{{ asset('storage/'.$imagePath) }}" class="product-image-thumb" alt="{{ $product->name }}">
+                                @else
+                                    <div class="product-placeholder">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="product-name">{{ $product->name }}</span>
+                                <br>
+                                <span class="category-name">
+                                    <i class="fas fa-tag"></i> {{ $product->category->name ?? 'N/A' }}
+                                    @if($product->subCategory) > {{ $product->subCategory->name }} @endif
+                                </span>
+                            </td>
+                            <td>
+                                <div class="price-tag">
+                                    ₹{{ number_format($product->final_price ?? $product->mrp, 2) }}
+                                    @if($product->final_price && $product->final_price < $product->mrp)
+                                        <span class="original">₹{{ number_format($product->mrp, 2) }}</span>
+                                        <span class="discount-tag">-{{ round((($product->mrp - $product->final_price) / $product->mrp) * 100) }}%</span>
+                                    @endif
+                                </div>
+                                <small class="text-muted">Cost: ₹{{ number_format($product->price, 2) }}</small>
+                            </td>
+                            <td>
+                                @php
+                                    $totalStock = $product->stock;
+                                    if ($product->variants) {
+                                        $totalStock += $product->variants->sum('stock');
+                                    }
+                                @endphp
+                                <span class="badge bg-{{ $totalStock > 0 ? 'success' : 'danger' }} rounded-pill px-3 py-2" style="font-size:12px;">
+                                    {{ $totalStock }}
+                                </span>
+                                @if($product->variants && $product->variants->count() > 0)
+                                    <br>
+                                    <small class="text-muted">{{ $product->variants->count() }} variants</small>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                <span class="status-badge {{ strtolower($product->status) }}">
+                                    <span class="dot"></span> {{ $product->status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <button type="button" class="btn-action view" onclick="viewProduct({{ $product->id }})" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{{ route('admin.products.edit', $product->id) }}" class="btn-action edit" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn-action delete" onclick="openDeleteModal({{ $product->id }})" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="fas fa-box-open"></i>
+                                    <h5>No Products Found</h5>
+                                    <p><a href="{{ route('admin.products.create') }}">Create your first product!</a></p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-wrapper">
+                <div class="pagination-info">
+                    Showing <strong>{{ $products->firstItem() ?? 0 }}</strong> to <strong>{{ $products->lastItem() ?? 0 }}</strong> of <strong>{{ $products->total() ?? 0 }}</strong> entries
+                </div>
+                <div class="pagination-links">
+                    {{ $products->links() }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- CUSTOM DELETE MODAL                         -->
+<!-- ============================================ -->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="modal-header">
+            <h4><i class="fas fa-trash-alt"></i> Confirm Delete</h4>
+            <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            Are you sure you want to delete this product?
+            <span class="warning-text"><i class="fas fa-exclamation-triangle"></i> This action cannot be undone.</span>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-modal cancel" onclick="closeDeleteModal()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn-modal confirm" id="confirmDeleteBtn">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- DELETE FORM                                 -->
+<!-- ============================================ -->
+<form id="delete-form" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<!-- ============================================ -->
+<!-- VIEW PRODUCT MODAL                          -->
+<!-- ============================================ -->
+<div class="modal fade" id="viewProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-box me-2 text-primary"></i>
+                    <span id="modalProductTitle">Product Details</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="productDetailBody">
+                <div class="loading-spinner">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading product details...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
+                <a href="#" id="editProductBtn" class="btn btn-primary">
+                    <i class="fas fa-edit me-1"></i> Edit Product
+                </a>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // ========== DELETE FUNCTION ==========
-        function deleteItem(id) {
-            if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-                document.getElementById('delete-form-' + id).submit();
+<!-- ============================================ -->
+<!-- SCRIPTS                                      -->
+<!-- ============================================ -->
+<script>
+    // ============================================
+    // DELETE MODAL FUNCTIONS
+    // ============================================
+    var deleteId = null;
+
+    function openDeleteModal(id) {
+        deleteId = id;
+        document.getElementById('deleteModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('active');
+        document.body.style.overflow = '';
+        deleteId = null;
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (deleteId) {
+            let form = document.getElementById('delete-form');
+            form.action = '/admin/products/' + deleteId;
+            form.submit();
+        }
+    });
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDeleteModal();
+        }
+    });
+
+    // ============================================
+    // SEARCH & FILTER TABLE
+    // ============================================
+    function filterTable() {
+        var searchValue = document.getElementById('searchInput').value.toLowerCase();
+        var statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+
+        var rows = document.querySelectorAll('#tableBody tr');
+
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            var status = row.querySelector('td:nth-child(6)')?.textContent.toLowerCase() || '';
+
+            var matchesSearch = text.includes(searchValue);
+            var matchesStatus = statusFilter === '' || status.includes(statusFilter);
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
             }
+        });
+
+        var visibleRows = document.querySelectorAll('#tableBody tr[style*="display: none"]');
+        var allRows = document.querySelectorAll('#tableBody tr');
+
+        var noResultRow = document.querySelector('#noResultRow');
+        if (noResultRow) {
+            noResultRow.remove();
         }
 
-        // ========== VIEW PRODUCT FUNCTION ==========
-        function viewProduct(productId) {
-            var modal = new bootstrap.Modal(document.getElementById('viewProductModal'));
-            var body = document.getElementById('productDetailBody');
-            var title = document.getElementById('modalProductTitle');
+        if (allRows.length > 0 && allRows.length === visibleRows.length) {
+            var tbody = document.getElementById('tableBody');
+            var tr = document.createElement('tr');
+            tr.id = 'noResultRow';
+            var td = document.createElement('td');
+            td.colSpan = 7;
+            td.style.textAlign = 'center';
+            td.style.padding = '30px';
+            td.style.color = '#6c757d';
+            td.innerHTML = '<i class="fas fa-search" style="font-size:24px; display:block; margin-bottom:8px; color:#dee2e6;"></i> No products found matching your filters.';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+        }
+    }
 
-            body.innerHTML = `
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
+        filterTable();
+    }
+
+    // ============================================
+    // CUSTOM ALERT - AUTO HIDE
+    // ============================================
+    function closeAlert() {
+        var alert = document.getElementById('customAlert');
+        if (alert) {
+            alert.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var alert = document.getElementById('customAlert');
+        if (alert) {
+            setTimeout(function() {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+    });
+
+    // ============================================
+    // VIEW PRODUCT FUNCTION
+    // ============================================
+    function viewProduct(productId) {
+        var modal = new bootstrap.Modal(document.getElementById('viewProductModal'));
+        var body = document.getElementById('productDetailBody');
+        var title = document.getElementById('modalProductTitle');
+
+        body.innerHTML = `
             <div class="loading-spinner">
                 <div class="text-center">
                     <div class="spinner-border text-primary" role="status">
@@ -540,93 +1403,86 @@
             </div>
         `;
 
-            modal.show();
+        modal.show();
 
-            fetch(`/admin/products/${productId}/details`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        var product = data.product;
-                        var variants = data.variants || [];
-                        var images = data.images || [];
+        fetch(`/admin/products/${productId}/details`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                var product = data.product;
+                var variants = data.variants || [];
+                var images = data.images || [];
 
-                        title.textContent = product.name + ' - Product Details';
+                title.textContent = product.name + ' - Product Details';
 
-                        // ===== SET FIRST IMAGE AS MAIN =====
-                        var mainImageSrc = '';
-                        var allImages = [];
+                var mainImageSrc = '';
+                var allImages = [];
 
-                        if (images.length > 0) {
-                            // Get all image paths from product_images table
-                            images.forEach(function(img) {
-                                allImages.push('/storage/' + img.image_path);
-                            });
-                            mainImageSrc = allImages[0]; // First image as main
-                        } else if (product.image) {
-                            // Fallback to product.image if no product_images
-                            mainImageSrc = '/storage/' + product.image;
-                            allImages = [mainImageSrc];
-                        } else {
-                            mainImageSrc = 'https://via.placeholder.com/400x400?text=No+Image';
-                            allImages = [mainImageSrc];
-                        }
+                if (images.length > 0) {
+                    images.forEach(function(img) {
+                        allImages.push('/storage/' + img.image_path);
+                    });
+                    mainImageSrc = allImages[0];
+                } else if (product.image) {
+                    mainImageSrc = '/storage/' + product.image;
+                    allImages = [mainImageSrc];
+                } else {
+                    mainImageSrc = 'https://via.placeholder.com/400x400?text=No+Image';
+                    allImages = [mainImageSrc];
+                }
 
-                        // ===== BUILD GALLERY HTML =====
-                        var galleryHtml = '';
-                        if (allImages.length > 0) {
-                            galleryHtml = `
+                var galleryHtml = '';
+                if (allImages.length > 0) {
+                    galleryHtml = `
                         <div class="gallery-container">
                             <span class="detail-label"><i class="fas fa-images me-1"></i> Product Gallery</span>
                             <div class="gallery-thumbnails">
                                 ${allImages.map(function(imgSrc, index) {
                                     return `
-                                            <div class="gallery-thumb ${index === 0 ? 'active' : ''}" 
-                                                onclick="changeGalleryImage(this, '${imgSrc}')" 
-                                                title="Image ${index + 1}">
-                                                <img src="${imgSrc}" alt="Product Image ${index + 1}" onerror="this.parentElement.style.display='none'">
-                                            </div>
-                                        `;
+                                        <div class="gallery-thumb ${index === 0 ? 'active' : ''}" 
+                                            onclick="changeGalleryImage(this, '${imgSrc}')" 
+                                            title="Image ${index + 1}">
+                                            <img src="${imgSrc}" alt="Product Image ${index + 1}" onerror="this.parentElement.style.display='none'">
+                                        </div>
+                                    `;
                                 }).join('')}
                             </div>
                         </div>
                     `;
-                        }
+                }
 
-                        // ===== BUILD VARIANTS HTML =====
-                        var variantsHtml = '';
-                        if (variants.length > 0) {
-                            variantsHtml = `
+                var variantsHtml = '';
+                if (variants.length > 0) {
+                    variantsHtml = `
                         <div class="mt-3">
                             <span class="detail-label"><i class="fas fa-palette me-1"></i> Variants</span>
                             <div class="mt-2">
                                 ${variants.map(function(v) {
                                     return `
-                                            <span class="variant-badge">
-                                                <span class="size">${v.size || 'N/A'}</span>
-                                                ${v.color ? '<span class="color">| ' + v.color + '</span>' : ''}
-                                                <span class="stock">| Stock: ${v.stock}</span>
-                                                ${v.price ? '| ₹' + parseFloat(v.price).toFixed(2) : ''}
-                                            </span>
-                                        `;
+                                        <span class="variant-badge" style="display:inline-block; background:#e9ecef; padding:2px 10px; border-radius:12px; font-size:12px; margin:2px 4px 2px 0;">
+                                            <span style="font-weight:600; color:#0d6efd;">${v.size || 'N/A'}</span>
+                                            ${v.color ? '<span style="color:#6c757d;">| ' + v.color + '</span>' : ''}
+                                            <span style="color:#28a745; font-weight:600;">| Stock: ${v.stock}</span>
+                                            ${v.price ? '| ₹' + parseFloat(v.price).toFixed(2) : ''}
+                                        </span>
+                                    `;
                                 }).join('')}
                             </div>
                         </div>
                     `;
-                        }
+                }
 
-                        // ===== BUILD PRODUCT DETAILS HTML =====
-                        var html = `
+                var html = `
                     <div class="row">
-                        <!-- LEFT COLUMN - Product Image & Gallery -->
                         <div class="col-md-5 product-detail-left">
                             <img src="${mainImageSrc}" 
                                 id="mainProductImage" 
@@ -635,28 +1491,22 @@
                                 onerror="this.src='https://via.placeholder.com/400x400?text=No+Image'">
                             ${galleryHtml}
                         </div>
-                        
-                        <!-- RIGHT COLUMN - All Product Details -->
                         <div class="col-md-7 product-detail-right">
                             <h4 class="product-title">${product.name}</h4>
-                            
                             <div class="product-badges">
                                 ${product.category_name ? '<span class="badge bg-secondary me-1">' + product.category_name + '</span>' : ''}
                                 ${product.sub_category_name ? '<span class="badge bg-secondary me-1">' + product.sub_category_name + '</span>' : ''}
                                 ${product.brand_name ? '<span class="badge bg-secondary">' + product.brand_name + '</span>' : ''}
                             </div>
-                            
                             <div class="mb-3">
-                                <div class="price-tag">
+                                <div class="price-tag" style="font-size:24px; font-weight:700; color:#28a745;">
                                     ₹${parseFloat(product.final_price || product.price).toFixed(2)}
                                     ${product.mrp && product.final_price < product.mrp ? 
-                                        '<span class="original">₹' + parseFloat(product.mrp).toFixed(2) + '</span>' + 
-                                        '<span class="discount-tag">-' + Math.round(((product.mrp - product.final_price) / product.mrp) * 100) + '%</span>' 
+                                        '<span style="font-size:16px; color:#6c757d; text-decoration:line-through; font-weight:400; margin-left:10px;">₹' + parseFloat(product.mrp).toFixed(2) + '</span>' + 
+                                        '<span style="background:#dc3545; color:white; padding:2px 10px; border-radius:12px; font-size:12px; font-weight:600; margin-left:10px;">-' + Math.round(((product.mrp - product.final_price) / product.mrp) * 100) + '%</span>' 
                                         : ''}
                                 </div>
                             </div>
-                            
-                            <!-- Detail Grid -->
                             <div class="detail-grid">
                                 <div class="detail-row">
                                     <div class="detail-label">Cost Price</div>
@@ -687,8 +1537,12 @@
                                     <div class="detail-value">₹${parseFloat(product.gst_amount || 0).toFixed(2)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label">Total Price (with GST)</div>
+                                    <div class="detail-label">Total Price</div>
                                     <div class="detail-value">₹${parseFloat(product.total_price || 0).toFixed(2)}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Final Price</div>
+                                    <div class="detail-value"><strong style="color:#28a745;">₹${parseFloat(product.final_price || 0).toFixed(2)}</strong></div>
                                 </div>
                                 <div class="detail-row">
                                     <div class="detail-label">Stock</div>
@@ -702,7 +1556,7 @@
                                     <div class="detail-label">Status</div>
                                     <div class="detail-value">
                                         <span class="status-badge ${(product.status || 'draft').toLowerCase()}">
-                                            ${product.status || 'Draft'}
+                                            <span class="dot"></span> ${product.status || 'Draft'}
                                         </span>
                                     </div>
                                 </div>
@@ -722,83 +1576,59 @@
                                     <div class="detail-label">Delivery Days</div>
                                     <div class="detail-value">${product.delivery_days || 'N/A'} days</div>
                                 </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Top Category</div>
-                                    <div class="detail-value">${product.top_category_id || 'N/A'}</div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Category</div>
-                                    <div class="detail-value">${product.category_id || 'N/A'}</div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Sub Category</div>
-                                    <div class="detail-value">${product.sub_category_id || 'N/A'}</div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Product Type</div>
-                                    <div class="detail-value">${product.product_type_id || 'N/A'}</div>
-                                </div>
                             </div>
-                            
                             ${variantsHtml}
-                            
                             ${product.description ? `
-                                    <div class="mt-3">
-                                        <span class="detail-label"><i class="fas fa-align-left me-1"></i> Description</span>
-                                        <p class="detail-value mt-1">${product.description}</p>
-                                    </div>
-                                ` : ''}
+                                <div class="mt-3">
+                                    <span class="detail-label"><i class="fas fa-align-left me-1"></i> Description</span>
+                                    <p class="detail-value mt-1">${product.description}</p>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
 
-                        body.innerHTML = html;
+                body.innerHTML = html;
+                window.galleryImages = allImages;
+                document.getElementById('editProductBtn').href = `/admin/products/${product.id}/edit`;
 
-                        // Store all images for gallery functionality
-                        window.galleryImages = allImages;
-
-                        document.getElementById('editProductBtn').href = `/admin/products/${product.id}/edit`;
-
-                    } else {
-                        body.innerHTML = `
+            } else {
+                body.innerHTML = `
                     <div class="text-center py-5">
                         <i class="fas fa-exclamation-circle fa-3x text-danger mb-3 d-block"></i>
                         <h6 class="text-danger">Error loading product details</h6>
                         <p class="text-muted">${data.message || 'Please try again later'}</p>
                     </div>
                 `;
-                    }
-                })
-                .catch(error => {
-                    body.innerHTML = `
+            }
+        })
+        .catch(error => {
+            body.innerHTML = `
                 <div class="text-center py-5">
                     <i class="fas fa-exclamation-circle fa-3x text-danger mb-3 d-block"></i>
                     <h6 class="text-danger">Error loading product details</h6>
                     <p class="text-muted">Please try again later</p>
                 </div>
             `;
-                    console.error('Error:', error);
-                });
+            console.error('Error:', error);
+        });
+    }
+
+    // ============================================
+    // GALLERY IMAGE CHANGE
+    // ============================================
+    function changeGalleryImage(element, imageSrc) {
+        document.querySelectorAll('.gallery-thumb').forEach(function(thumb) {
+            thumb.classList.remove('active');
+        });
+        element.classList.add('active');
+        var mainImage = document.getElementById('mainProductImage');
+        if (mainImage) {
+            mainImage.src = imageSrc;
+            mainImage.onerror = function() {
+                this.src = 'https://via.placeholder.com/400x400?text=No+Image';
+            };
         }
-
-        // ========== GALLERY IMAGE CHANGE ==========
-        function changeGalleryImage(element, imageSrc) {
-            // Remove active class from all thumbnails
-            document.querySelectorAll('.gallery-thumb').forEach(function(thumb) {
-                thumb.classList.remove('active');
-            });
-
-            // Add active class to clicked thumbnail
-            element.classList.add('active');
-
-            // Change main image
-            var mainImage = document.getElementById('mainProductImage');
-            if (mainImage) {
-                mainImage.src = imageSrc;
-                mainImage.onerror = function() {
-                    this.src = 'https://via.placeholder.com/400x400?text=No+Image';
-                };
-            }
-        }
-    </script>
+    }
+</script>
 @endsection

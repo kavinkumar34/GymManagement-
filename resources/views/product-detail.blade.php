@@ -49,13 +49,15 @@
         }
 
         /* ============================================================ */
-        /* ===== PRODUCT WRAPPER - 50px GAP ===== */
+        /* ===== PRODUCT WRAPPER - 80% WIDTH WITH CENTER ===== */
         /* ============================================================ */
         .product-wrapper {
             display: flex;
             align-items: flex-start;
-            gap: 50px;
-            width: 100%;
+            gap: 60px;
+            width: 80%;
+            max-width: 1400px;
+            margin: 0 auto;
             position: relative;
         }
 
@@ -1028,7 +1030,7 @@
         }
 
         /* ============================================================ */
-        /* ===== RELATED PRODUCTS ===== */
+        /* ===== RELATED PRODUCTS - RESPONSIVE ===== */
         /* ============================================================ */
         .related-products-section {
             margin-top: 35px;
@@ -1602,10 +1604,14 @@
         /* ===== RESPONSIVE ===== */
         /* ============================================================ */
 
+        /* ===== TABLET (≤991px) ===== */
         @media (max-width: 991px) {
             .product-wrapper {
                 flex-direction: column;
                 gap: 30px;
+                width: 100%;
+                max-width: 100%;
+                padding: 0 10px;
             }
 
             .left-column {
@@ -1664,9 +1670,10 @@
             }
         }
 
+        /* ===== MOBILE (≤767px) ===== */
         @media (max-width: 767px) {
             .product-detail-container {
-                padding: 0 10px;
+                padding: 0 8px;
                 margin-top: 20px;
             }
 
@@ -1699,6 +1706,7 @@
                 justify-content: center;
             }
 
+            /* ===== RELATED PRODUCTS - 2 PER ROW ON MOBILE ===== */
             .related-product-card .product-image-container {
                 height: 160px;
             }
@@ -1710,6 +1718,27 @@
 
             .related-product-card .product-price-container .final-price {
                 font-size: 0.9rem;
+            }
+
+            .related-product-card .product-brand {
+                font-size: 0.6rem;
+            }
+
+            .related-product-card .color-dot {
+                width: 14px;
+                height: 14px;
+            }
+
+            .related-product-card .color-dot.more-colors {
+                width: 14px;
+                height: 14px;
+                font-size: 5px;
+            }
+
+            /* ===== 2 COLUMNS ON MOBILE ===== */
+            .col-sm-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
             }
 
             .sizeguide-modal-box {
@@ -1782,9 +1811,10 @@
             }
         }
 
+        /* ===== SMALL MOBILE (≤575px) ===== */
         @media (max-width: 575px) {
             .product-detail-container {
-                padding: 0 8px;
+                padding: 0 5px;
                 margin-top: 15px;
             }
 
@@ -1881,6 +1911,7 @@
                 font-size: 13px;
             }
 
+            /* ===== RELATED PRODUCTS - 2 PER ROW ===== */
             .related-product-card .product-image-container {
                 height: 130px;
             }
@@ -1894,8 +1925,47 @@
                 font-size: 0.8rem;
             }
 
+            .related-product-card .product-price-container .original-price {
+                font-size: 0.7rem;
+            }
+
+            .related-product-card .product-price-container .discount-percent {
+                font-size: 0.6rem;
+                padding: 1px 6px;
+            }
+
             .related-product-card .card-body {
                 padding: 8px 10px 10px;
+            }
+
+            .related-product-card .color-options-container .color-label {
+                font-size: 0.5rem;
+            }
+
+            .related-product-card .color-dot {
+                width: 12px;
+                height: 12px;
+            }
+
+            .related-product-card .color-dot.more-colors {
+                width: 12px;
+                height: 12px;
+                font-size: 4px;
+            }
+
+            .related-product-card .product-stock-low {
+                font-size: 0.6rem;
+            }
+
+            .related-product-card .product-stock-out {
+                font-size: 0.6rem;
+                padding: 2px 6px;
+            }
+
+            /* ===== 2 COLUMNS ON SMALL MOBILE ===== */
+            .col-sm-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
             }
 
             .review-card {
@@ -1990,6 +2060,7 @@
             }
         }
 
+        /* ===== VERY SMALL (≤400px) ===== */
         @media (max-width: 400px) {
             .main-image-area {
                 height: 220px;
@@ -2042,8 +2113,26 @@
                 font-size: 12px;
             }
 
+            /* ===== RELATED PRODUCTS - 2 PER ROW ===== */
             .related-product-card .product-image-container {
                 height: 110px;
+            }
+
+            .related-product-card .product-name {
+                font-size: 0.65rem;
+                min-height: 20px;
+            }
+
+            .related-product-card .product-price-container .final-price {
+                font-size: 0.75rem;
+            }
+
+            .related-product-card .product-brand {
+                font-size: 0.5rem;
+            }
+
+            .related-product-card .card-body {
+                padding: 6px 8px 8px;
             }
 
             .custom-modal-box {
@@ -2081,6 +2170,36 @@
             .review-card .review-media .media-item {
                 width: 48px;
                 height: 48px;
+            }
+
+            .related-product-card .color-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .related-product-card .color-dot.more-colors {
+                width: 10px;
+                height: 10px;
+                font-size: 4px;
+            }
+        }
+
+        /* ============================================================ */
+        /* ===== ROW GAP FIX FOR RELATED PRODUCTS ===== */
+        /* ============================================================ */
+        .row.gap-3 {
+            --bs-gutter-y: 1rem;
+        }
+
+        @media (max-width: 767px) {
+            .row.gap-3 {
+                --bs-gutter-y: 0.75rem;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .row.gap-3 {
+                --bs-gutter-y: 0.5rem;
             }
         }
     </style>
@@ -2548,7 +2667,6 @@
                                 <p>You can return this product within {{ $product->return_days ?? 30 }} days of delivery.</p>
                                 <p><strong>Exchange Available:</strong> Yes</p>
                                 <p>Exchange within {{ $product->return_days ?? 30 }} days of delivery.</p>
-                                <p><strong>Warranty:</strong> {{ $product->warranty_months ?? 0 }} months manufacturer warranty</p>
                                 <p><strong>Conditions:</strong> Product must be unused and in original packaging.</p>
                                 <hr>
                                 <h6>How to Return?</h6>
@@ -2565,7 +2683,7 @@
             </div>
         </div>
 
-        <!-- ===== RELATED PRODUCTS ===== -->
+        <!-- ===== RELATED PRODUCTS - RESPONSIVE 2 PER ROW ON MOBILE ===== -->
         @if (isset($relatedProducts) && $relatedProducts->count() > 0)
             <div class="related-products-section">
                 <h3 class="section-title"><i class="fas fa-sync-alt"></i> You May Also Like</h3>
@@ -2681,7 +2799,7 @@
         @endif
 
         <!-- ============================================================ -->
-        <!-- ===== REVIEWS SECTION - FIXED FOR MOBILE ===== -->
+        <!-- ===== REVIEWS SECTION ===== -->
         <!-- ============================================================ -->
         <div class="reviews-section" id="reviewsSection">
             <div class="section-title">
@@ -3365,7 +3483,7 @@
         }
 
         // ================================================================
-        // ===== LOAD REVIEWS - FIXED FOR MOBILE =====
+        // ===== LOAD REVIEWS =====
         // ================================================================
         async function loadReviews() {
             const container = document.getElementById('reviewsList');
@@ -3432,7 +3550,7 @@
         }
 
         // ================================================================
-        // ===== RENDER REVIEW CARD - MOBILE OPTIMIZED =====
+        // ===== RENDER REVIEW CARD =====
         // ================================================================
         function renderReviewCard(review) {
             let starsHtml = '';
