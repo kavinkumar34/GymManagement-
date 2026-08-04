@@ -12,54 +12,24 @@
         }
 
         /* ===== FULL WIDTH BANNER - SMOOTH ===== */
-        .banner-full-width {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            left: 0;
-            right: 0;
-            overflow: hidden;
-            background: #f0f0f0;
-        }
+.banner-full-width{
+    width:100%;
+    overflow:hidden;
+}
 
-        .banner-full-width .carousel {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            border-radius: 0;
-        }
+.banner-full-width .carousel,
+.banner-full-width .carousel-inner,
+.banner-full-width .carousel-item{
+    width:100%;
+    height:500px;
+}
 
-        .banner-full-width .carousel-inner {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            position: relative;
-        }
-
-        .banner-full-width .carousel-item {
-            width: 100%;
-            height: 500px;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow: hidden;
-            background: #f0f0f0;
-            transition: none;
-        }
-
-        .banner-full-width .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            transition: transform 0.3s ease;
-        }
+.banner-full-width .carousel-item img{
+    width:100%;
+    height:100%;
+    object-fit:fill;   /* Full width + Full height */
+    display:block;
+}
 
         .banner-placeholder {
             width: 100%;
@@ -743,14 +713,25 @@
         }
 
         @media (max-width: 576px) {
-            .banner-full-width .carousel-item {
-                height: 220px;
-            }
+         @media (max-width: 576px) {
 
-            .banner-placeholder {
-                height: 220px;
-                font-size: 0.85rem;
-            }
+    .banner-full-width,
+    .banner-full-width .carousel,
+    .banner-full-width .carousel-inner,
+    .banner-full-width .carousel-item {
+        height: 160px !important;
+    }
+
+    .banner-full-width .carousel-item img {
+        width: 100%;
+        height: 160px !important;
+        object-fit: fill;
+    }
+
+    .banner-placeholder {
+        height: 160px !important;
+    }
+}
 
             .banner-placeholder i {
                 font-size: 1.5rem;
@@ -1119,9 +1100,11 @@
 
                     bannerHtml += `
                         <div class="carousel-item ${isActive}">
-                            ${banner.link ? `<a href="${banner.link}" target="_self" style="display:block;width:100%;height:100%;">` : ''}
-                                <img src="${imageUrl}" alt="Banner" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-                            ${banner.link ? `</a>` : ''}
+                            ${banner.link ? `<a href="${banner.link}" target="_self" style="display:block;width:100%;height:500px;">` : ''}
+<img src="${imageUrl}"
+     alt="Banner"
+     style="display:block;width:100%;height:500px;object-fit:fill;">
+${banner.link ? `</a>` : ''}
                         </div>
                     `;
                 });
