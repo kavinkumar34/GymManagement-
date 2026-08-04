@@ -486,9 +486,9 @@
                         <div class="stat-label">Total Products</div>
                     </div>
                 </div>
-                <span class="stat-change neutral">
+            {{--    <span class="stat-change neutral">
                     <i class="fas fa-minus"></i> {{ $productsGrowth ?? '0' }}%
-                </span>
+                </span> --}}
             </div>
 
             <!-- Total Users -->

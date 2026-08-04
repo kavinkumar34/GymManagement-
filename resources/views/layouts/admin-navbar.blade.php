@@ -200,6 +200,22 @@
             </a>
         </li>
 
+
+        <!-- Reports -->
+<li class="nav-item has-dropdown">
+    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+        <i class="fas fa-chart-pie"></i> <span>Reports</span>
+        <span class="dropdown-arrow">▼</span>
+    </a>
+    <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.reports.orders') }}">
+                <i class="fas fa-shopping-cart"></i> Orders Report
+            </a>
+        </li>
+    </ul>
+</li>
+
         <!-- Deliverable Pincodes -->
         <li class="nav-item">
             <a class="nav-link" href="{{ url('/admin/pincodes') }}">

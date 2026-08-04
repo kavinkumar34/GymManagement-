@@ -998,3 +998,16 @@ Route::prefix('member')->name('member.')->group(function () {
         ->name('payments.index');
 
 });
+
+
+
+
+
+// Add this inside your admin routes group
+Route::prefix('admin')->name('admin.')->group(function() {
+    // ... other routes ...
+    
+    // Reports
+    Route::get('/reports/orders', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.orders');
+    Route::get('/reports/export', [App\Http\Controllers\Admin\AdminReportController::class, 'export'])->name('reports.export');
+});

@@ -1575,8 +1575,8 @@
                         <div class="section-title"><i class="fas fa-credit-card"></i> Payment Summary</div>
                         <div class="payment-summary" id="modalPaymentSummary"></div>
                         <div class="action-buttons" id="modalActions">
-                            <button class="btn-cancel-order" id="cancelOrderBtn"
-                                onclick="openCancelModalFromDetails()">Cancel Order</button>
+                            {{--<button class="btn-cancel-order" id="cancelOrderBtn"
+                                onclick="openCancelModalFromDetails()">Cancel Order</button> --}}
                             <button class="btn-contact-support" onclick="contactSupport()">Contact Support</button>
                         </div>
                     </div>

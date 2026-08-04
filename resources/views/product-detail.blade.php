@@ -108,28 +108,32 @@
 
         .main-image-area {
             flex: 1;
+            width: 100%;
             height: 550px;
-            background: #f8f8f8;
-            border-radius: var(--radius);
+            background: #fff;
+            border-radius: 16px;
             overflow: hidden;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e5e7eb;
         }
 
         .main-image {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            padding: 20px;
-            transition: var(--transition);
+            object-fit: cover;
+            /* Image will completely fill the container */
+            object-position: center;
+            padding: 0;
+            /* Remove white space */
+            display: block;
+            transition: 0.3s ease;
         }
 
         .main-image-area:hover .main-image {
-            transform: scale(1.02);
+            transform: scale(1.05);
         }
 
         .vertical-thumbnails {
@@ -260,7 +264,7 @@
             cursor: pointer;
             transition: var(--transition);
             z-index: 9999999;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -284,7 +288,7 @@
             font-size: 40px;
             cursor: pointer;
             z-index: 9999999;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -313,7 +317,7 @@
             left: 50%;
             transform: translateX(-50%);
             color: white;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             padding: 8px 20px;
             border-radius: 20px;
             font-size: 14px;
@@ -549,6 +553,8 @@
         .size-btn:hover:not(.out-of-stock-size):not(:disabled) {
             border-color: var(--primary-red);
             background: #fff5f5;
+            color: black;
+
         }
 
         .size-btn.selected {
@@ -1322,6 +1328,7 @@
                 opacity: 0;
                 transform: scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -1345,6 +1352,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1477,6 +1485,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -1498,6 +1507,7 @@
             from {
                 transform: translateX(100%);
             }
+
             to {
                 transform: translateX(0);
             }
@@ -1594,6 +1604,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -2202,6 +2213,41 @@
                 --bs-gutter-y: 0.5rem;
             }
         }
+
+
+        .discount-text {
+            font-size: 9px;
+            display: block;
+            color: white;
+            transition: color 0.3s ease;
+        }
+
+        .size-btn:hover .discount-text {
+            color: black;
+        }
+
+        .size-btn.selected .discount-text {
+            color: white;
+        }
+
+        .size-btn:hover span {
+            color: black !important;
+        }
+
+        .discount-text{
+    font-size:9px;
+    display:block;
+    color:white;
+    transition: color .3s ease;
+}
+
+.size-btn:hover .discount-text{
+    color:#000;
+}
+
+.size-btn.selected .discount-text{
+    color:#fff;
+}
     </style>
 
     @php
@@ -2373,8 +2419,8 @@
                 <div class="product-gallery-wrapper">
                     <div class="vertical-thumbnails" id="verticalThumbnails">
                         @foreach ($allImages as $index => $img)
-                            <div class="vertical-thumb {{ $index == 0 ? 'active' : '' }}"
-                                data-index="{{ $index }}" onclick="changeMainImage({{ $index }})">
+                            <div class="vertical-thumb {{ $index == 0 ? 'active' : '' }}" data-index="{{ $index }}"
+                                onclick="changeMainImage({{ $index }})">
                                 <img src="{{ asset('storage/' . $img->image_path) }}" alt="Thumbnail {{ $index + 1 }}">
                             </div>
                         @endforeach
@@ -2403,7 +2449,8 @@
                     @endif
 
                     <h1 class="product-title">{{ $product->name }}</h1>
-                    <p class="product-category"><i class="fas fa-tag"></i> {{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
+                    <p class="product-category"><i class="fas fa-tag"></i>
+                        {{ $product->category ? $product->category->name : 'Uncategorized' }}</p>
 
                     <!-- RATING -->
                     <div class="rating">
@@ -2411,7 +2458,7 @@
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                             <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
                         </span>
-                        <span class="rating-text">Based on 0 ratings</span>
+                     {{--   <span class="rating-text">Based on 0 ratings</span> --}}
                     </div>
 
                     <!-- PRICE -->
@@ -2454,25 +2501,32 @@
                                             ->where('variant_id', $colorVariant->id)
                                             ->orderBy('display_order')
                                             ->get();
-                                        $colorImage = $colorImages->count() > 0
-                                            ? asset('storage/' . $colorImages->first()->image_path)
-                                            : asset('storage/' . ($allImages[0]->image_path ?? ''));
-                                        $isLightColor = in_array(strtolower($color), ['white', 'yellow', 'pink', 'lightblue', 'lightgreen', 'cream', 'beige', 'ivory', 'gold']);
+                                        $colorImage =
+                                            $colorImages->count() > 0
+                                                ? asset('storage/' . $colorImages->first()->image_path)
+                                                : asset('storage/' . ($allImages[0]->image_path ?? ''));
+                                        $isLightColor = in_array(strtolower($color), [
+                                            'white',
+                                            'yellow',
+                                            'pink',
+                                            'lightblue',
+                                            'lightgreen',
+                                            'cream',
+                                            'beige',
+                                            'ivory',
+                                            'gold',
+                                        ]);
                                     @endphp
                                     <div class="color-btn {{ $isFirst ? 'selected' : '' }}"
                                         data-color="{{ $color }}"
                                         data-images="{{ json_encode(
                                             $colorImages->count() > 0
-                                                ? $colorImages->pluck('image_path')
-                                                    ->map(function ($p) {
+                                                ? $colorImages->pluck('image_path')->map(function ($p) {
                                                         return asset('storage/' . $p);
-                                                    })
-                                                    ->toArray()
-                                                : $allImages->pluck('image_path')
-                                                    ->map(function ($p) {
+                                                    })->toArray()
+                                                : $allImages->pluck('image_path')->map(function ($p) {
                                                         return asset('storage/' . $p);
-                                                    })
-                                                    ->toArray(),
+                                                    })->toArray(),
                                         ) }}"
                                         onclick="selectColor(this, '{{ $color }}')"
                                         style="background: {{ $color }}; {{ $isLightColor ? 'border: 3px solid #ddd;' : '' }}">
@@ -2500,18 +2554,28 @@
                                             $sizeVariant = $variants->where('size', $size)->first();
                                             $variantStock = $sizeVariant ? intval($sizeVariant->stock ?? 0) : 0;
                                             $isOutOfStock = $variantStock <= 0;
-                                            $variantPrice = $sizeVariant ? floatval($sizeVariant->final_price ?? ($sizeVariant->price ?? 0)) : 0;
-                                            $variantMrp = $sizeVariant ? floatval($sizeVariant->total_price ?? ($sizeVariant->mrp ?? ($sizeVariant->price ?? 0))) : 0;
+                                            $variantPrice = $sizeVariant
+                                                ? floatval($sizeVariant->final_price ?? ($sizeVariant->price ?? 0))
+                                                : 0;
+                                            $variantMrp = $sizeVariant
+                                                ? floatval(
+                                                    $sizeVariant->total_price ??
+                                                        ($sizeVariant->mrp ?? ($sizeVariant->price ?? 0)),
+                                                )
+                                                : 0;
                                             $variantDiscountPercent = 0;
                                             if ($variantMrp > 0 && $variantPrice > 0 && $variantPrice < $variantMrp) {
-                                                $variantDiscountPercent = round((($variantMrp - $variantPrice) / $variantMrp) * 100);
+                                                $variantDiscountPercent = round(
+                                                    (($variantMrp - $variantPrice) / $variantMrp) * 100,
+                                                );
                                             }
                                             $variantDiscountType = $sizeVariant->discount_type ?? 'flat';
                                             $variantDiscountValue = floatval($sizeVariant->discount_value ?? 0);
                                             $variantDiscountText = '';
                                             if ($variantDiscountValue > 0 && $variantDiscountPercent > 0) {
                                                 if ($variantDiscountType === 'flat') {
-                                                    $variantDiscountText = '₹' . number_format($variantDiscountValue, 2) . ' off';
+                                                    $variantDiscountText =
+                                                        '₹' . number_format($variantDiscountValue, 2) . ' off';
                                                 } else {
                                                     $variantDiscountText = $variantDiscountPercent . '% off';
                                                 }
@@ -2521,18 +2585,16 @@
                                         @endphp
                                         <button type="button"
                                             class="size-btn {{ $loop->first && !$hasColors ? 'selected' : '' }} {{ $isOutOfStock ? 'out-of-stock-size' : '' }}"
-                                            data-size="{{ $size }}"
-                                            data-variant-id="{{ $sizeVariant->id ?? '' }}"
+                                            data-size="{{ $size }}" data-variant-id="{{ $sizeVariant->id ?? '' }}"
                                             data-price="{{ $variantPrice }}" data-mrp="{{ $variantMrp }}"
-                                            data-discount="{{ $variantDiscountPercent }}"
-                                            data-stock="{{ $variantStock }}"
+                                            data-discount="{{ $variantDiscountPercent }}" data-stock="{{ $variantStock }}"
                                             data-discount-type="{{ $variantDiscountType }}"
-                                            data-discount-value="{{ $variantDiscountValue }}"
-                                            onclick="selectSize(this)"
+                                            data-discount-value="{{ $variantDiscountValue }}" onclick="selectSize(this)"
                                             {{ $isOutOfStock ? 'disabled' : '' }}>
                                             {{ $size }}
                                             @if ($variantDiscountPercent > 0)
-                                                <span style="font-size:9px; display:block; color:#28a745;">-{{ $variantDiscountText }}</span>
+                                                <span
+                                                    style="font-size:9px; display:block; color:white;">-{{ $variantDiscountText }}</span>
                                             @endif
                                         </button>
                                     @endforeach
@@ -2560,8 +2622,8 @@
                         <label class="quantity-label">Quantity</label>
                         <div class="quantity-selector">
                             <button class="quantity-btn" onclick="decrementQuantity()">-</button>
-                            <input type="number" id="quantity" class="quantity-input" value="1"
-                                min="1" max="{{ $displayStock > 0 ? $displayStock : 10 }}">
+                            <input type="number" id="quantity" class="quantity-input" value="1" min="1"
+                                max="{{ $displayStock > 0 ? $displayStock : 10 }}">
                             <button class="quantity-btn" onclick="incrementQuantity()">+</button>
                         </div>
                     </div>
@@ -2620,11 +2682,13 @@
 
                     <!-- OFFERS -->
                     @if (isset($product->offers) && $product->offers->count() > 0)
-                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px; padding: 12px 15px; margin-bottom: 16px;">
+                        <div
+                            style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px; padding: 12px 15px; margin-bottom: 16px;">
                             <strong style="color: #856404;"><i class="fas fa-tags"></i> Special Offers</strong>
                             <ul style="margin: 6px 0 0 0; padding-left: 20px; color: #856404; font-size: 13px;">
                                 @foreach ($product->offers as $offer)
-                                    <li>{{ $offer->title ?? ($offer->name ?? 'Offer') }} - {{ $offer->discount }}% off</li>
+                                    <li>{{ $offer->title ?? ($offer->name ?? 'Offer') }} - {{ $offer->discount }}% off
+                                    </li>
                                 @endforeach
                             </ul>
                         </div>
@@ -2664,7 +2728,8 @@
                                 <span class="arrow">▼</span>
                             </div>
                             <div class="info-tab-content">
-                                <p>You can return this product within {{ $product->return_days ?? 30 }} days of delivery.</p>
+                                <p>You can return this product within {{ $product->return_days ?? 30 }} days of delivery.
+                                </p>
                                 <p><strong>Exchange Available:</strong> Yes</p>
                                 <p>Exchange within {{ $product->return_days ?? 30 }} days of delivery.</p>
                                 <p><strong>Conditions:</strong> Product must be unused and in original packaging.</p>
@@ -2690,7 +2755,9 @@
                 <div class="row">
                     @foreach ($relatedProducts as $related)
                         @php
-                            $relatedImages = \App\Models\ProductImage::where('product_id', $related->id)->orderBy('display_order')->get();
+                            $relatedImages = \App\Models\ProductImage::where('product_id', $related->id)
+                                ->orderBy('display_order')
+                                ->get();
                             $relatedImageUrls = [];
                             if ($relatedImages->count() > 0) {
                                 foreach ($relatedImages as $img) {
@@ -2707,15 +2774,26 @@
 
                             if ($hasRelatedVariants && $relatedVariants->first()) {
                                 $firstVariant = $relatedVariants->first();
-                                $relatedDisplayPrice = floatval($firstVariant->final_price ?? ($firstVariant->price ?? 0));
-                                $relatedMrp = floatval($firstVariant->total_price ?? ($firstVariant->mrp ?? ($firstVariant->price ?? 0)));
+                                $relatedDisplayPrice = floatval(
+                                    $firstVariant->final_price ?? ($firstVariant->price ?? 0),
+                                );
+                                $relatedMrp = floatval(
+                                    $firstVariant->total_price ?? ($firstVariant->mrp ?? ($firstVariant->price ?? 0)),
+                                );
                                 $relatedStock = $relatedVariants->sum('stock');
                                 $relatedDiscountType = $firstVariant->discount_type ?? 'flat';
                                 $relatedDiscountValue = floatval($firstVariant->discount_value ?? 0);
-                                $relatedColors = $relatedVariants->pluck('color')->unique()->filter()->values()->toArray();
+                                $relatedColors = $relatedVariants
+                                    ->pluck('color')
+                                    ->unique()
+                                    ->filter()
+                                    ->values()
+                                    ->toArray();
                             } else {
                                 $relatedDisplayPrice = floatval($related->final_price ?? ($related->price ?? 0));
-                                $relatedMrp = floatval($related->total_price ?? ($related->mrp ?? ($related->price ?? 0)));
+                                $relatedMrp = floatval(
+                                    $related->total_price ?? ($related->mrp ?? ($related->price ?? 0)),
+                                );
                                 $relatedStock = intval($related->stock ?? 0);
                                 $relatedDiscountType = $related->discount_type ?? 'flat';
                                 $relatedDiscountValue = floatval($related->discount_value ?? 0);
@@ -2724,7 +2802,9 @@
 
                             $relatedDiscountPercent = 0;
                             if ($relatedMrp > 0 && $relatedDisplayPrice > 0 && $relatedDisplayPrice < $relatedMrp) {
-                                $relatedDiscountPercent = round((($relatedMrp - $relatedDisplayPrice) / $relatedMrp) * 100);
+                                $relatedDiscountPercent = round(
+                                    (($relatedMrp - $relatedDisplayPrice) / $relatedMrp) * 100,
+                                );
                             }
 
                             $relatedBrandName = $related->brand ? $related->brand->name : null;
@@ -2743,9 +2823,13 @@
 
                             $relatedStockAlert = '';
                             if ($relatedStock <= 5 && $relatedStock > 0) {
-                                $relatedStockAlert = '<div class="product-stock-low"><i class="fas fa-exclamation-triangle"></i> Only ' . $relatedStock . ' left in stock!</div>';
+                                $relatedStockAlert =
+                                    '<div class="product-stock-low"><i class="fas fa-exclamation-triangle"></i> Only ' .
+                                    $relatedStock .
+                                    ' left in stock!</div>';
                             } elseif ($relatedStock === 0) {
-                                $relatedStockAlert = '<div class="product-stock-out"><i class="fas fa-times-circle"></i> Out of Stock</div>';
+                                $relatedStockAlert =
+                                    '<div class="product-stock-out"><i class="fas fa-times-circle"></i> Out of Stock</div>';
                             }
 
                             $relatedColorHtml = '';
@@ -2754,21 +2838,34 @@
                                 $displayColors = array_slice($relatedColors, 0, 4);
                                 $remaining = $totalRelatedColors - 4;
                                 $relatedColorHtml = '<div class="color-options-container">';
-                                $relatedColorHtml .= '<span class="color-label">' . $totalRelatedColors . ' Color' . ($totalRelatedColors > 1 ? 's' : '') . ':</span>';
+                                $relatedColorHtml .=
+                                    '<span class="color-label">' .
+                                    $totalRelatedColors .
+                                    ' Color' .
+                                    ($totalRelatedColors > 1 ? 's' : '') .
+                                    ':</span>';
                                 foreach ($displayColors as $color) {
-                                    $relatedColorHtml .= '<span class="color-dot" style="background: ' . strtolower($color) . ';" title="' . $color . '"></span>';
+                                    $relatedColorHtml .=
+                                        '<span class="color-dot" style="background: ' .
+                                        strtolower($color) .
+                                        ';" title="' .
+                                        $color .
+                                        '"></span>';
                                 }
                                 if ($remaining > 0) {
-                                    $relatedColorHtml .= '<span class="color-dot more-colors">+' . $remaining . '</span>';
+                                    $relatedColorHtml .=
+                                        '<span class="color-dot more-colors">+' . $remaining . '</span>';
                                 }
                                 $relatedColorHtml .= '</div>';
                             }
                         @endphp
                         <div class="col-md-3 col-sm-6 mb-4">
-                            <div class="related-product-card" onclick="window.location.href='/product/{{ $related->id }}'">
+                            <div class="related-product-card"
+                                onclick="window.location.href='/product/{{ $related->id }}'">
                                 @if ($relatedDiscountPercent > 0)
                                 @endif
-                                <button class="wishlist-btn" onclick="event.stopPropagation(); toggleRelatedWishlist({{ $related->id }}, '{{ addslashes($related->name) }}', {{ $relatedDisplayPrice }}, '{{ $relatedImageUrls[0] ?? '' }}')">
+                                <button class="wishlist-btn"
+                                    onclick="event.stopPropagation(); toggleRelatedWishlist({{ $related->id }}, '{{ addslashes($related->name) }}', {{ $relatedDisplayPrice }}, '{{ $relatedImageUrls[0] ?? '' }}')">
                                     <i class="far fa-heart" id="related-wishlist-icon-{{ $related->id }}"></i>
                                 </button>
                                 <div class="product-image-container">
@@ -2778,7 +2875,8 @@
                                 </div>
                                 <div class="card-body">
                                     @if ($hasRelatedBrand)
-                                        <div class="product-brand"><i class="fas fa-tag"></i> {{ $relatedBrandName }}</div>
+                                        <div class="product-brand"><i class="fas fa-tag"></i> {{ $relatedBrandName }}
+                                        </div>
                                     @endif
                                     <div class="product-name">{{ $related->name }}</div>
                                     <div class="product-price-container">
@@ -2827,7 +2925,8 @@
         <button class="image-modal-nav next" onclick="changeModalImage(1)">❯</button>
         <div class="image-modal-content" id="imageModalContent">
             <img id="modalDisplayImage" src="" alt="Product Image">
-            <video id="modalDisplayVideo" controls style="display:none; max-width:90vw; max-height:85vh; border-radius:8px; background:#000;"></video>
+            <video id="modalDisplayVideo" controls
+                style="display:none; max-width:90vw; max-height:85vh; border-radius:8px; background:#000;"></video>
         </div>
         <div class="image-modal-counter" id="imageModalCounter">1 / 1</div>
     </div>
@@ -2859,12 +2958,36 @@
                             </tr>
                         @endforeach
                     @else
-                        <tr><td>XS</td><td>34-36</td><td>27</td></tr>
-                        <tr><td>S</td><td>36-38</td><td>28</td></tr>
-                        <tr><td>M</td><td>38-40</td><td>29</td></tr>
-                        <tr><td>L</td><td>40-42</td><td>30</td></tr>
-                        <tr><td>XL</td><td>42-44</td><td>31</td></tr>
-                        <tr><td>XXL</td><td>44-46</td><td>32</td></tr>
+                        <tr>
+                            <td>XS</td>
+                            <td>34-36</td>
+                            <td>27</td>
+                        </tr>
+                        <tr>
+                            <td>S</td>
+                            <td>36-38</td>
+                            <td>28</td>
+                        </tr>
+                        <tr>
+                            <td>M</td>
+                            <td>38-40</td>
+                            <td>29</td>
+                        </tr>
+                        <tr>
+                            <td>L</td>
+                            <td>40-42</td>
+                            <td>30</td>
+                        </tr>
+                        <tr>
+                            <td>XL</td>
+                            <td>42-44</td>
+                            <td>31</td>
+                        </tr>
+                        <tr>
+                            <td>XXL</td>
+                            <td>44-46</td>
+                            <td>32</td>
+                        </tr>
                     @endif
                 </tbody>
             </table>
@@ -2903,7 +3026,8 @@
                 <div class="modal-body text-center p-0">
                     <button type="button" class="btn-close btn-close-white position-absolute"
                         style="top: 15px; right: 15px; z-index: 10;" data-bs-dismiss="modal"></button>
-                    <div id="reviewLightboxContent" style="max-height: 90vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                    <div id="reviewLightboxContent"
+                        style="max-height: 90vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
                         <img id="reviewLightboxImage" src="" alt="Review Media"
                             style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">
                     </div>
@@ -2922,8 +3046,7 @@
         const images = @json(
             $allImages->map(function ($img) {
                 return asset('storage/' . $img->image_path);
-            })
-        );
+            }));
 
         const allImagePaths = @json($allImagePaths);
         let modalCurrentIndex = 0;
@@ -3040,7 +3163,9 @@
                     const thumb = document.createElement('div');
                     thumb.className = 'vertical-thumb' + (index === 0 ? ' active' : '');
                     thumb.dataset.index = index;
-                    thumb.onclick = function() { changeMainImage(index); };
+                    thumb.onclick = function() {
+                        changeMainImage(index);
+                    };
                     thumb.innerHTML = `<img src="${imgUrl}" alt="Thumbnail ${index + 1}">`;
                     thumbnailsContainer.appendChild(thumb);
                 });
@@ -3068,7 +3193,8 @@
                     const isOutOfStock = variant.stock <= 0;
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'size-btn' + (index === 0 ? ' selected' : '') + (isOutOfStock ? ' out-of-stock-size' : '');
+                    btn.className = 'size-btn' + (index === 0 ? ' selected' : '') + (isOutOfStock ?
+                        ' out-of-stock-size' : '');
                     btn.dataset.size = variant.size;
                     btn.dataset.variantId = variant.id;
                     btn.dataset.price = variant.price;
@@ -3077,7 +3203,9 @@
                     btn.dataset.stock = variant.stock;
                     btn.dataset.discountType = variant.discount_type;
                     btn.dataset.discountValue = variant.discount_value;
-                    btn.onclick = function() { selectSize(this); };
+                    btn.onclick = function() {
+                        selectSize(this);
+                    };
                     btn.disabled = isOutOfStock;
 
                     let html = variant.size;
@@ -3088,7 +3216,10 @@
                         } else {
                             discountText = variant.discount_percent + '% off';
                         }
-                        html += `<span style="font-size:9px; display:block; color:#28a745;">-${discountText}</span>`;
+  html += `
+<span class="discount-text">
+    -${discountText}
+</span>`;
                     }
                     btn.innerHTML = html;
                     sizeOptions.appendChild(btn);
@@ -3226,7 +3357,12 @@
         // ================================================================
         function toggleRelatedWishlist(id, name, price, image) {
             @if (!auth()->check())
-                showLoginModal('wishlist', { id: id, name: name, price: price, image: image });
+                showLoginModal('wishlist', {
+                    id: id,
+                    name: name,
+                    price: price,
+                    image: image
+                });
                 return;
             @endif
 
@@ -3239,7 +3375,13 @@
                 if (icon) icon.className = 'far fa-heart';
                 showNotification('Removed from wishlist!', 'info');
             } else {
-                currentWishlist.push({ id: id, name: name, price: price, image: image, added_at: new Date().toISOString() });
+                currentWishlist.push({
+                    id: id,
+                    name: name,
+                    price: price,
+                    image: image,
+                    added_at: new Date().toISOString()
+                });
                 if (icon) icon.className = 'fas fa-heart';
                 showNotification('Added to wishlist!', 'success');
             }
@@ -3301,7 +3443,12 @@
         // ================================================================
         function toggleWishlistDetail() {
             @if (!auth()->check())
-                showLoginModal('wishlist', { id: productId, name: productName, price: selectedPrice, image: productImage });
+                showLoginModal('wishlist', {
+                    id: productId,
+                    name: productName,
+                    price: selectedPrice,
+                    image: productImage
+                });
                 return;
             @endif
 
@@ -3317,7 +3464,13 @@
                 btn.style.color = '#dc3545';
                 showNotification('Removed from wishlist!', 'info');
             } else {
-                wishlist.push({ id: productId, name: productName, price: selectedPrice, image: productImage, added_at: new Date().toISOString() });
+                wishlist.push({
+                    id: productId,
+                    name: productName,
+                    price: selectedPrice,
+                    image: productImage,
+                    added_at: new Date().toISOString()
+                });
                 icon.className = 'fas fa-heart';
                 btn.style.background = '#dc3545';
                 btn.style.color = 'white';
@@ -3349,14 +3502,22 @@
         // ================================================================
         function addToCartDetail() {
             @if (!auth()->check())
-                showLoginModal('cart', { id: productId, name: productName, price: selectedPrice, image: productImage });
+                showLoginModal('cart', {
+                    id: productId,
+                    name: productName,
+                    price: selectedPrice,
+                    image: productImage
+                });
                 return;
             @endif
 
             @if ($hasSizes || $hasSizeChart)
                 if (!selectedSize) {
                     document.getElementById('sizeWarning').style.display = 'block';
-                    document.getElementById('sizeWarning').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('sizeWarning').scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
                     return;
                 }
             @endif
@@ -3375,11 +3536,13 @@
             }
 
             let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-            let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize && item.color === selectedColor);
+            let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize && item
+                .color === selectedColor);
 
             if (existingItem) {
                 if (existingItem.quantity + quantity > selectedStock) {
-                    alert('Only ' + selectedStock + ' items available in stock! You already have ' + existingItem.quantity + ' in cart.');
+                    alert('Only ' + selectedStock + ' items available in stock! You already have ' + existingItem.quantity +
+                        ' in cart.');
                     return;
                 }
                 existingItem.quantity += quantity;
@@ -3410,7 +3573,8 @@
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
-            notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} me-2"></i> ${message}`;
+            notification.innerHTML =
+                `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} me-2"></i> ${message}`;
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 3000);
         }
@@ -3534,7 +3698,7 @@
             } catch (error) {
                 console.error('Error loading reviews:', error);
                 loading.style.display = 'none';
-                
+
                 container.innerHTML = `
                     <div class="no-reviews" style="border-color: #fee2e2; background: #fef2f2;">
                         <i class="fas fa-wifi text-warning" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
@@ -3569,7 +3733,8 @@
 
             if (review.images && review.images.length > 0) {
                 const displayImages = review.images.slice(0, maxImages);
-                mediaHtml += '<div class="review-media" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;">';
+                mediaHtml +=
+                    '<div class="review-media" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;">';
                 displayImages.forEach(function(image) {
                     mediaHtml += `
                         <div class="media-item" onclick="openReviewMedia('${image}')" 
@@ -3591,7 +3756,8 @@
 
             if (review.videos && review.videos.length > 0) {
                 const displayVideos = review.videos.slice(0, maxVideos);
-                mediaHtml += '<div class="review-media" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">';
+                mediaHtml +=
+                    '<div class="review-media" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">';
                 displayVideos.forEach(function(video) {
                     mediaHtml += `
                         <div class="media-item" onclick="openReviewMedia('${video}', 'video')" 
