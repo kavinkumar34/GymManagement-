@@ -205,6 +205,38 @@
             border-radius: 4px;
         }
 
+        .color-options-container {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    align-items: center;
+}
+
+.color-label {
+    font-size: 0.65rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.color-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #e0e0e0;
+    display: inline-block;
+}
+
+.color-dot.more-colors {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+    font-size: 7px;
+    color: #666;
+    font-weight: 600;
+}
+
         .product-stock-out i {
             font-size: 0.8rem;
             margin-right: 4px;
@@ -837,6 +869,46 @@
                             `;
                         }
 
+// ===== COLOR HTML =====
+let colors = [];
+
+if (product.variants && product.variants.length > 0) {
+    const colorSet = new Set();
+
+    product.variants.forEach(variant => {
+        if (variant.color && variant.color.trim() !== '') {
+            colorSet.add(variant.color);
+        }
+    });
+
+    colors = Array.from(colorSet);
+}
+
+let colorHtml = '';
+
+if (colors.length > 0) {
+
+    const displayColors = colors.slice(0, 4);
+    const remaining = colors.length - 4;
+
+    colorHtml = `
+        <div class="color-options-container">
+            <span class="color-label">${colors.length} Colors:</span>
+
+            ${displayColors.map(color => `
+                <span class="color-dot"
+                    style="background:${color.toLowerCase()};"
+                    title="${color}">
+                </span>
+            `).join('')}
+
+            ${remaining > 0 ? `
+                <span class="color-dot more-colors">+${remaining}</span>
+            ` : ''}
+        </div>
+    `;
+}
+
                         let priceHtml = '';
                         if (discount.hasDiscount && discount.originalPrice > 0 && discount.displayPrice > 0) {
                             priceHtml = `
@@ -854,9 +926,8 @@
                             `;
                         }
 
-                        const variantBadge = (product.variants && product.variants.length > 0) ?
-                            `<span style="position:absolute;bottom:10px;right:10px;background:#0d6efd;color:white;padding:2px 8px;border-radius:4px;font-size:10px;z-index:1;">${product.variants.length} Variants</span>` :
-                            '';
+                        const variantBadge =     '';
+                        
 
                         const escapeName = product.name.replace(/'/g, "\\'");
 
@@ -868,6 +939,7 @@
                             price: discount.displayPrice,
                             brandHtml: brandHtml,
                             priceHtml: priceHtml,
+                            colorHtml: colorHtml,
                             stockHtml: stockHtml,
                             variantBadge: variantBadge,
                             hasDiscount: discount.hasDiscount,
@@ -906,8 +978,6 @@
             container.innerHTML = wishlistItems.map(item => `
                 <div class="col-md-3 col-sm-6 mb-4">
                     <div class="product-card card" onclick="goToProductDetail(${item.id}, event)">
-                        ${item.hasDiscount && item.price > 0 ? `<div class="discount-badge">${item.discountDisplay}</div>` : ''}
-                        ${item.variantBadge}
                         <button class="remove-wishlist-btn" onclick="event.stopPropagation(); openRemoveConfirm(${item.id}, '${item.escapeName}')" title="Remove from wishlist">
                             <i class="fas fa-times"></i>
                         </button>
@@ -918,14 +988,13 @@
                                 loading="lazy">
                         </div>
                         
-                        <div class="card-body">
-                            ${item.brandHtml}
-                            <div class="product-name">${item.name}</div>
-                            ${item.priceHtml}
-                            ${item.stockHtml}
-                            
-                         
-                        </div>
+                     <div class="card-body">
+    ${item.brandHtml}
+    <div class="product-name">${item.name}</div>
+    ${item.priceHtml}
+    ${item.colorHtml}
+    ${item.stockHtml}
+</div>
                     </div>
                 </div>
             `).join('');
