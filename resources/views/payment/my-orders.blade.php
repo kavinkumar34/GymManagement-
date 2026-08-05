@@ -3,46 +3,113 @@
 
 @section('content')
     <style>
-        /* ============================================================ */
-        /* ===== ORDER PAGE COLORS MATCHING APP.BLADE.PHP ===== */
-        /* ============================================================ */
+        /* ================================================================
+           DESIGN TOKENS — FitForge Athletic System
+           Display: Anton (poster-weight, athletic)
+           Body:    Plus Jakarta Sans (clean, modern e-commerce)
+        ================================================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
         :root {
-            --primary-red: #dc3545;
-            --primary-dark: #1a1a2e;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --text-dark: #1a1a2e;
-            --text-muted: #64748b;
-            --bg-light: #f8fafc;
-            --border-color: #eef2f6;
-            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1);
-            --radius: 16px;
+            --ink: #14161A;
+            --ink-soft: #2B2E34;
+            --canvas: #FAF9F6;
+            --fog: #EFEDE7;
+            --steel: #6B7280;
+            --line: #E4E1D8;
+            --signal: #FF4405;
+            --signal-dark: #D93A03;
+            --signal-tint: #FFF1EC;
+            --success: #16A34A;
+            --success-tint: #E8F8ED;
+            --info: #2563EB;
+            --info-tint: #EAF1FE;
+            --font-display: 'Anton', 'Arial Narrow', sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+        }
+
+        /* ===== PREVENT HORIZONTAL SCROLL ===== */
+        html,
+        body {
+            overflow-x: hidden !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--canvas);
+        }
+
+        /* Signature element: a repeating diagonal "energy stripe" */
+        .energy-stripe {
+            height: 4px;
+            width: 56px;
+            border-radius: 3px;
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--signal) 0px,
+                var(--signal) 6px,
+                var(--ink) 6px,
+                var(--ink) 12px
+            );
+        }
+
+        .section-eyebrow {
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--signal);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .section-heading {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1;
         }
 
         /* ============================================================ */
         /* ===== PAGE HEADER ===== */
         /* ============================================================ */
         .page-header-custom {
-            background: linear-gradient(135deg, #1a1a2e 0%, #2d3a4b 100%);
+            background: var(--ink);
             padding: 30px 25px;
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
         .page-header-custom h2 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
             color: white;
             margin: 0;
-            font-weight: 700;
             font-size: 1.5rem;
         }
 
         .page-header-custom h2 i {
-            color: var(--primary-red);
+            color: var(--signal);
             margin-right: 12px;
         }
 
@@ -59,6 +126,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            font-weight: 500;
         }
 
         .page-header-custom .header-stats .stat-item strong {
@@ -92,26 +160,26 @@
         /* ============================================================ */
         .order-card {
             background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-card);
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.28s ease;
             height: 100%;
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
         }
 
         .order-card:hover {
             transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
+            box-shadow: var(--shadow-card-hover);
             border-color: transparent;
         }
 
         .order-header {
             padding: 16px 20px;
-            background: var(--bg-light);
-            border-bottom: 1px solid var(--border-color);
+            background: var(--fog);
+            border-bottom: 1px solid var(--line);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -122,14 +190,14 @@
         .order-number {
             font-weight: 700;
             font-size: 0.95rem;
-            color: var(--text-dark);
+            color: var(--ink);
         }
 
         .order-number .order-number-badge {
-            background: var(--text-dark);
+            background: var(--ink);
             color: white;
             padding: 2px 10px;
-            border-radius: 12px;
+            border-radius: var(--radius-sm);
             font-size: 0.65rem;
             font-weight: 600;
             margin-left: 8px;
@@ -141,7 +209,7 @@
 
         .order-date {
             font-size: 0.75rem;
-            color: var(--text-muted);
+            color: var(--steel);
             margin-top: 2px;
         }
 
@@ -150,8 +218,10 @@
             padding: 4px 14px;
             border-radius: 20px;
             font-size: 0.7rem;
-            font-weight: 600;
+            font-weight: 700;
             align-self: flex-start;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .order-status.Pending {
@@ -202,43 +272,45 @@
             width: 60px;
             height: 60px;
             object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--line);
             transition: all 0.3s;
         }
 
         .order-product-image img:hover {
             transform: scale(1.05);
-            border-color: var(--primary-red);
+            border-color: var(--signal);
         }
 
         .order-product-image .no-image-placeholder {
             width: 60px;
             height: 60px;
-            background: var(--bg-light);
-            border-radius: 10px;
+            background: var(--fog);
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--border-color);
-            color: #94a3b8;
+            border: 2px solid var(--line);
+            color: var(--steel);
             font-size: 1.2rem;
         }
 
         .order-total {
             font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text-dark);
+            font-weight: 800;
+            color: var(--ink);
+            font-family: var(--font-body);
         }
 
         .order-total i {
-            color: var(--primary-red);
+            color: var(--signal);
             margin-right: 4px;
         }
 
         .order-items-count {
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: var(--steel);
+            font-weight: 500;
         }
 
         .order-items-count i {
@@ -253,12 +325,14 @@
             padding: 3px 12px;
             border-radius: 20px;
             font-size: 0.65rem;
-            font-weight: 600;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .payment-paid {
-            background: #dcfce7;
-            color: #15803d;
+            background: var(--success-tint);
+            color: var(--success);
         }
 
         .payment-pending {
@@ -267,8 +341,8 @@
         }
 
         .payment-failed {
-            background: #fee2e2;
-            color: #b91c1c;
+            background: var(--signal-tint);
+            color: var(--signal-dark);
         }
 
         /* ===== ORDER ACTIONS ===== */
@@ -280,7 +354,7 @@
         }
 
         .btn-view-details {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--ink);
             color: white;
             border: none;
             padding: 8px 20px;
@@ -288,17 +362,23 @@
             font-size: 0.78rem;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 500;
+            font-weight: 600;
+            font-family: var(--font-body);
+            letter-spacing: 0.2px;
         }
 
         .btn-view-details:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(20, 22, 26, 0.4);
             color: white;
         }
 
+        .btn-view-details i {
+            margin-right: 4px;
+        }
+
         .btn-review {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: var(--signal);
             color: white;
             border: none;
             padding: 8px 20px;
@@ -309,17 +389,20 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-weight: 500;
+            font-weight: 600;
+            font-family: var(--font-body);
+            letter-spacing: 0.2px;
         }
 
         .btn-review:hover {
+            background: var(--signal-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 68, 5, 0.4);
             color: white;
         }
 
         .btn-review.reviewed {
-            background: #64748b;
+            background: var(--steel);
             cursor: not-allowed;
             opacity: 0.7;
         }
@@ -334,75 +417,84 @@
         /* ============================================================ */
         .filter-section {
             background: white;
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-card);
         }
 
         .filter-section .form-label {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.8rem;
-            color: var(--text-dark);
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .filter-section .form-control,
         .filter-section .form-select {
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--line);
             font-size: 0.85rem;
             padding: 8px 14px;
             transition: all 0.3s;
+            font-family: var(--font-body);
         }
 
         .filter-section .form-control:focus,
         .filter-section .form-select:focus {
-            border-color: var(--primary-red);
-            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.1);
         }
 
         .filter-section .input-group-text {
             background: white;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
             border-right: none;
-            border-radius: 10px 0 0 10px;
-            color: var(--text-muted);
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+            color: var(--steel);
         }
 
         .filter-section .input-group .form-control {
-            border-radius: 0 10px 10px 0;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
         }
 
         .btn-filter-primary {
-            background: var(--primary-red);
+            background: var(--signal);
             color: white;
             border: none;
             padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
             transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-size: 0.75rem;
         }
 
         .btn-filter-primary:hover {
-            background: #b02a37;
+            background: var(--signal-dark);
             transform: translateY(-2px);
             color: white;
         }
 
         .btn-filter-secondary {
-            background: var(--bg-light);
-            color: var(--text-dark);
-            border: 1px solid var(--border-color);
+            background: var(--fog);
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
             padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 600;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
             transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-size: 0.75rem;
         }
 
         .btn-filter-secondary:hover {
-            background: #e2e8f0;
-            color: var(--text-dark);
+            background: var(--line);
+            color: var(--ink);
         }
 
         /* ============================================================ */
@@ -415,13 +507,13 @@
         }
 
         .review-modal .modal-content {
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             overflow: hidden;
             border: none;
         }
 
         .review-modal .modal-header {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: var(--ink);
             color: white;
             border-bottom: none;
             padding: 18px 24px;
@@ -431,13 +523,21 @@
             filter: brightness(0) invert(1);
         }
 
+        .review-modal .modal-header .modal-title {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+        }
+
         .review-modal .modal-body {
             padding: 24px;
         }
 
         .review-modal .modal-footer {
             padding: 12px 24px 24px;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid var(--line);
         }
 
         .review-stars {
@@ -468,33 +568,34 @@
         .review-textarea {
             width: 100%;
             padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
             resize: vertical;
             font-size: 0.9rem;
             min-height: 80px;
             transition: all 0.3s;
+            font-family: var(--font-body);
         }
 
         .review-textarea:focus {
             outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.1);
         }
 
         .file-upload-area {
-            border: 2px dashed var(--border-color);
-            border-radius: 10px;
+            border: 2px dashed var(--line);
+            border-radius: var(--radius-sm);
             padding: 16px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: var(--bg-light);
+            background: var(--fog);
         }
 
         .file-upload-area:hover {
-            border-color: #10b981;
-            background: #f0fdf4;
+            border-color: var(--signal);
+            background: var(--signal-tint);
         }
 
         .file-upload-area .file-preview {
@@ -508,9 +609,9 @@
             position: relative;
             width: 60px;
             height: 60px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             overflow: hidden;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
         }
 
         .file-upload-area .file-preview-item img,
@@ -527,7 +628,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--primary-red);
+            background: var(--signal);
             color: white;
             border: none;
             font-size: 10px;
@@ -539,13 +640,13 @@
 
         /* ===== CANCEL MODAL ===== */
         .cancel-modal .modal-content {
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             overflow: hidden;
             border: none;
         }
 
         .cancel-modal .modal-header {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: var(--signal);
             color: white;
             border-bottom: none;
             padding: 18px 24px;
@@ -555,30 +656,38 @@
             filter: brightness(0) invert(1);
         }
 
+        .cancel-modal .modal-header .modal-title {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+        }
+
         .reason-option {
             display: flex;
             align-items: center;
             padding: 12px 16px;
             margin-bottom: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .reason-option:hover {
-            border-color: #ef4444;
-            background: #fef2f2;
+            border-color: var(--signal);
+            background: var(--signal-tint);
         }
 
         .reason-option.selected {
-            border-color: #ef4444;
-            background: #fef2f2;
+            border-color: var(--signal);
+            background: var(--signal-tint);
         }
 
         .reason-option input[type="radio"] {
             margin-right: 12px;
-            accent-color: #ef4444;
+            accent-color: var(--signal);
         }
 
         .reason-option label {
@@ -587,22 +696,24 @@
             margin: 0;
             font-weight: 500;
             font-size: 0.9rem;
+            font-family: var(--font-body);
         }
 
         .cancel-comment {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
             resize: vertical;
             font-size: 0.9rem;
             transition: all 0.3s;
+            font-family: var(--font-body);
         }
 
         .cancel-comment:focus {
             outline: none;
-            border-color: #ef4444;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.1);
         }
 
         /* ===== ORDER DETAILS MODAL ===== */
@@ -611,13 +722,13 @@
         }
 
         .order-details-modal .modal-content {
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             overflow: hidden;
             border: none;
         }
 
         .modal-header-custom {
-            background: linear-gradient(135deg, #1a1a2e 0%, #2d3a4b 100%);
+            background: var(--ink);
             color: white;
             padding: 20px 24px;
             border-bottom: none;
@@ -630,12 +741,21 @@
             filter: brightness(0) invert(1);
         }
 
+        .modal-header-custom h5 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
         .order-status-steps {
             display: flex;
             justify-content: space-between;
             padding: 20px 24px;
-            background: var(--bg-light);
-            border-bottom: 1px solid var(--border-color);
+            background: var(--fog);
+            border-bottom: 1px solid var(--line);
         }
 
         .status-step {
@@ -647,45 +767,46 @@
         .status-step .step-icon {
             width: 40px;
             height: 40px;
-            background: #e2e8f0;
+            background: var(--line);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 8px;
-            color: #64748b;
+            color: var(--steel);
             font-size: 1rem;
             transition: all 0.3s;
         }
 
         .status-step.active .step-icon {
-            background: #667eea;
+            background: var(--signal);
             color: white;
         }
 
         .status-step.completed .step-icon {
-            background: #10b981;
+            background: var(--success);
             color: white;
         }
 
         .status-step .step-label {
             font-size: 0.65rem;
-            font-weight: 500;
-            color: #64748b;
+            font-weight: 600;
+            color: var(--steel);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .status-step.active .step-label {
-            color: #667eea;
-            font-weight: 600;
+            color: var(--signal);
         }
 
         .status-step.completed .step-label {
-            color: #10b981;
+            color: var(--success);
         }
 
         .detail-section {
             padding: 20px 24px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--line);
         }
 
         .detail-section:last-child {
@@ -693,9 +814,12 @@
         }
 
         .section-title {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: var(--ink);
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -703,7 +827,7 @@
         }
 
         .section-title i {
-            color: #667eea;
+            color: var(--signal);
         }
 
         .info-grid {
@@ -726,24 +850,25 @@
 
         .info-label {
             font-size: 0.65rem;
-            color: var(--text-muted);
+            color: var(--steel);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .info-value {
             font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-dark);
+            font-weight: 600;
+            color: var(--ink);
         }
 
         .address-block {
-            background: var(--bg-light);
+            background: var(--fog);
             padding: 16px;
-            border-radius: 12px;
+            border-radius: var(--radius-sm);
             line-height: 1.8;
             font-size: 0.9rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
         }
 
         /* ===== ORDER ITEMS IN MODAL ===== */
@@ -757,15 +882,15 @@
             display: flex;
             gap: 15px;
             padding: 15px;
-            background: var(--bg-light);
-            border-radius: 12px;
+            background: var(--fog);
+            border-radius: var(--radius-sm);
             align-items: center;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
             transition: all 0.3s;
         }
 
         .order-item-card:hover {
-            border-color: #667eea;
+            border-color: var(--signal);
         }
 
         .order-item-image {
@@ -773,12 +898,12 @@
             height: 80px;
             min-width: 80px;
             background: white;
-            border-radius: 12px;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
         }
 
         .order-item-image img {
@@ -793,8 +918,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f1f5f9;
-            color: #94a3b8;
+            background: var(--fog);
+            color: var(--steel);
             font-size: 2rem;
         }
 
@@ -805,46 +930,46 @@
 
         .order-item-name {
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--ink);
             margin-bottom: 4px;
             font-size: 0.95rem;
         }
 
         .order-item-price {
             font-weight: 600;
-            color: var(--text-dark);
+            color: var(--ink);
             font-size: 0.9rem;
         }
 
         .order-item-price i {
-            color: var(--primary-red);
+            color: var(--signal);
         }
 
         .order-item-quantity {
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: var(--steel);
         }
 
         .order-item-variant {
             font-size: 0.75rem;
-            color: var(--text-muted);
+            color: var(--steel);
             margin-top: 2px;
         }
 
         .order-item-total {
             text-align: right;
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--ink);
             flex-shrink: 0;
             font-size: 0.95rem;
         }
 
         /* ===== PAYMENT SUMMARY ===== */
         .payment-summary {
-            background: var(--bg-light);
+            background: var(--fog);
             padding: 16px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--line);
         }
 
         .summary-row {
@@ -852,21 +977,22 @@
             justify-content: space-between;
             padding: 8px 0;
             font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .summary-row .shipping-free {
-            color: #10b981;
-            font-weight: 600;
+            color: var(--success);
+            font-weight: 700;
         }
 
         .summary-total {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
-            border-top: 2px solid var(--border-color);
+            border-top: 2px solid var(--line);
             font-weight: 800;
             font-size: 1.1rem;
-            color: var(--text-dark);
+            color: var(--ink);
         }
 
         /* ===== ACTION BUTTONS ===== */
@@ -878,7 +1004,7 @@
         }
 
         .btn-cancel-order {
-            background: var(--primary-red);
+            background: var(--signal);
             color: white;
             border: none;
             padding: 10px 24px;
@@ -886,11 +1012,13 @@
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 500;
+            font-weight: 600;
+            font-family: var(--font-body);
+            letter-spacing: 0.2px;
         }
 
         .btn-cancel-order:hover {
-            background: #b02a37;
+            background: var(--signal-dark);
             transform: translateY(-2px);
             color: white;
         }
@@ -902,7 +1030,7 @@
         }
 
         .btn-contact-support {
-            background: #64748b;
+            background: var(--steel);
             color: white;
             border: none;
             padding: 10px 24px;
@@ -910,13 +1038,131 @@
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.3s;
-            font-weight: 500;
+            font-weight: 600;
+            font-family: var(--font-body);
+            letter-spacing: 0.2px;
         }
 
         .btn-contact-support:hover {
-            background: #475569;
+            background: var(--ink-soft);
             transform: translateY(-2px);
             color: white;
+        }
+
+        /* ============================================================ */
+        /* ===== MODAL Z-INDEX FIX ===== */
+        /* ============================================================ */
+        .modal {
+            z-index: 99999 !important;
+        }
+
+        .modal-backdrop {
+            z-index: 99998 !important;
+        }
+
+        .modal-open {
+            overflow: auto !important;
+            padding-right: 0 !important;
+        }
+
+        .modal-open .navbar {
+            z-index: 9999 !important;
+        }
+
+        /* ============================================================ */
+        /* ===== EMPTY STATE ===== */
+        /* ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--steel);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h4 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--steel);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .empty-state .btn-start-shopping {
+            background: var(--signal);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-size: 0.85rem;
+        }
+
+        .empty-state .btn-start-shopping:hover {
+            background: var(--signal-dark);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* ============================================================ */
+        /* ===== TOAST / ALERT ===== */
+        /* ============================================================ */
+        .custom-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 99999;
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.9rem;
+            max-width: 350px;
+            animation: slideUp 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-toast.success {
+            background: var(--success);
+            color: white;
+        }
+
+        .custom-toast.error {
+            background: var(--signal);
+            color: white;
+        }
+
+        .custom-toast.info {
+            background: var(--info);
+            color: white;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
         }
 
         /* ============================================================ */
@@ -1056,6 +1302,14 @@
             .section-title {
                 font-size: 0.85rem;
             }
+
+            .custom-toast {
+                bottom: 20px;
+                right: 20px;
+                max-width: 90%;
+                font-size: 0.8rem;
+                padding: 12px 18px;
+            }
         }
 
         @media (max-width: 400px) {
@@ -1141,68 +1395,6 @@
                 padding: 6px 10px;
             }
         }
-
-        /* ============================================================ */
-        /* ===== MODAL Z-INDEX FIX ===== */
-        /* ============================================================ */
-        .modal {
-            z-index: 99999 !important;
-        }
-
-        .modal-backdrop {
-            z-index: 99998 !important;
-        }
-
-        .modal-open {
-            overflow: auto !important;
-            padding-right: 0 !important;
-        }
-
-        .modal-open .navbar {
-            z-index: 9999 !important;
-        }
-
-        /* ============================================================ */
-        /* ===== EMPTY STATE ===== */
-        /* ============================================================ */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            color: #cbd5e1;
-            margin-bottom: 20px;
-        }
-
-        .empty-state h4 {
-            color: var(--text-dark);
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            color: var(--text-muted);
-            margin-bottom: 20px;
-        }
-
-        .empty-state .btn-start-shopping {
-            background: var(--primary-red);
-            color: white;
-            padding: 10px 30px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-        .empty-state .btn-start-shopping:hover {
-            background: #b02a37;
-            transform: translateY(-2px);
-            color: white;
-        }
     </style>
 
     <div class="container mt-4 pt-2 pb-5 mb-4">
@@ -1217,7 +1409,7 @@
                     <i class="fas fa-clock"></i> Pending: <strong>{{ $orders->where('order_status', 'Pending')->count() ?? 0 }}</strong>
                 </span>
                 <span class="stat-item">
-                    <i class="fas fa-check-circle" style="color: #10b981;"></i> Delivered: <strong>{{ $orders->where('order_status', 'Delivered')->count() ?? 0 }}</strong>
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i> Delivered: <strong>{{ $orders->where('order_status', 'Delivered')->count() ?? 0 }}</strong>
                 </span>
             </div>
         </div>
@@ -1284,11 +1476,18 @@
         </div>
 
         <!-- ===== ORDERS LIST ===== -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
+        <div class="card border-0 shadow-sm" style="border-radius: var(--radius-lg); overflow: hidden;">
+            <div class="card-body" style="padding: 0;">
                 @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <div class="alert alert-success alert-dismissible fade show m-3" role="alert" style="border-radius: var(--radius-sm);">
                         <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert" style="border-radius: var(--radius-sm);">
+                        <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
@@ -1301,7 +1500,7 @@
                             ->toArray();
                     @endphp
 
-                    <div class="orders-grid">
+                    <div class="orders-grid p-3">
                         @foreach ($sortedOrders as $order)
                             <div class="order-card-wrapper">
                                 <div class="order-card">
@@ -1378,13 +1577,13 @@
                                                 <i class="fas fa-box"></i> {{ $order->items->count() }} item(s) •
                                                 @if ($order->payment_status == 'SUCCESS')
                                                     <span class="payment-badge payment-paid"><i
-                                                            class="fas fa-check-circle"></i> PAYMENT PAID</span>
+                                                            class="fas fa-check-circle"></i> Payment Paid</span>
                                                 @elseif($order->payment_status == 'FAILED')
                                                     <span class="payment-badge payment-failed"><i
-                                                            class="fas fa-times-circle"></i> PAYMENT FAILED</span>
+                                                            class="fas fa-times-circle"></i> Payment Failed</span>
                                                 @else
                                                     <span class="payment-badge payment-pending"><i
-                                                            class="fas fa-clock"></i> PAYMENT PENDING</span>
+                                                            class="fas fa-clock"></i> Payment Pending</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -1423,7 +1622,7 @@
                         @endforeach
                     </div>
 
-                    <div class="mt-4 d-flex justify-content-center">
+                    <div class="mt-4 d-flex justify-content-center pb-3">
                         {{ $orders->links('pagination::bootstrap-5') }}
                     </div>
                 @else
@@ -1486,7 +1685,7 @@
                     <div class="mb-2">
                         <label class="form-label fw-bold">Upload Photos</label>
                         <div class="file-upload-area" onclick="document.getElementById('review_files').click()">
-                            <i class="fas fa-cloud-upload-alt text-primary"></i>
+                            <i class="fas fa-cloud-upload-alt" style="color: var(--signal);"></i>
                             <p class="mb-0 small">Click to upload photos or videos</p>
                             <small class="text-muted">You can upload multiple files</small>
                             <input type="file" id="review_files" name="review_files[]" multiple
@@ -1496,11 +1695,11 @@
                     </div>
 
                     <div id="review_error_message" class="alert alert-danger"
-                        style="display:none; padding: 8px 12px; font-size: 0.85rem;"></div>
+                        style="display:none; padding: 8px 12px; font-size: 0.85rem; border-radius: var(--radius-sm);"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-sm btn-success" id="submitReviewBtn" onclick="submitReview()">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal" style="border-radius: var(--radius-sm); font-weight: 600;">Close</button>
+                    <button type="button" class="btn btn-sm" id="submitReviewBtn" onclick="submitReview()" style="background: var(--signal); color: white; border-radius: var(--radius-sm); font-weight: 600;">
                         <i class="fas fa-paper-plane"></i> Submit Review
                     </button>
                 </div>
@@ -1515,7 +1714,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header-custom">
-                    <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i> Order Details</h5>
+                    <h5><i class="fas fa-shopping-bag me-2"></i> Order Details</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-0">
@@ -1574,15 +1773,15 @@
                     <div class="detail-section">
                         <div class="section-title"><i class="fas fa-credit-card"></i> Payment Summary</div>
                         <div class="payment-summary" id="modalPaymentSummary"></div>
-                        <div class="action-buttons" id="modalActions">
-                            {{--<button class="btn-cancel-order" id="cancelOrderBtn"
+                       <div class="action-buttons" id="modalActions">
+                          {{--   <button class="btn-cancel-order" id="cancelOrderBtn"
                                 onclick="openCancelModalFromDetails()">Cancel Order</button> --}}
                             <button class="btn-contact-support" onclick="contactSupport()">Contact Support</button>
-                        </div>
+                        </div> 
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: var(--radius-sm); font-weight: 600;">Close</button>
                 </div>
             </div>
         </div>
@@ -1636,14 +1835,14 @@
                         <textarea id="cancelComment" class="cancel-comment" rows="3"
                             placeholder="Please provide any additional details about your cancellation request..."></textarea>
                     </div>
-                    <div class="alert alert-warning mt-3">
+                    <div class="alert alert-warning mt-3" style="border-radius: var(--radius-sm);">
                         <i class="fas fa-info-circle"></i> Once cancelled, your order will be processed for refund as per
                         our policy.
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-danger" onclick="submitCancellation()">Submit
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: var(--radius-sm); font-weight: 600;">Close</button>
+                    <button type="button" class="btn btn-danger" onclick="submitCancellation()" style="border-radius: var(--radius-sm); font-weight: 600;">Submit
                         Cancellation</button>
                 </div>
             </div>
@@ -1661,6 +1860,23 @@
         let currentOrderId = null;
         let reviewFiles = [];
         let orderItemsData = [];
+
+        // ============================================================
+        // ===== TOAST NOTIFICATION =====
+        // ============================================================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                         type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
         // ============================================================
         // ===== SELECT REASON FOR CANCELLATION =====
@@ -1765,13 +1981,14 @@
                             select.innerHTML = '<option value="">-- Error loading products --</option>';
                             select.disabled = false;
                         }
+                        showToast('Error loading products', 'error');
                     });
 
                 const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
                 modal.show();
             } catch (error) {
                 console.error('Error in openReviewModal:', error);
-                alert('Error opening review modal. Please try again.');
+                showToast('Error opening review modal', 'error');
             }
         }
 
@@ -1816,8 +2033,6 @@
         // ===== SUBMIT REVIEW =====
         // ============================================================
         async function submitReview() {
-            console.log('submitReview function called!');
-
             try {
                 const orderId = document.getElementById('review_order_id').value;
                 const productSelect = document.getElementById('review_product_select');
@@ -1865,7 +2080,7 @@
                         errorDiv.style.display = 'block';
                         errorDiv.innerHTML = errorMessages.join('<br>');
                     } else {
-                        alert(errorMessages.join('\n'));
+                        showToast(errorMessages.join('\n'), 'error');
                     }
                     return;
                 }
@@ -1875,7 +2090,7 @@
                 }
 
                 if (!submitBtn) {
-                    alert('Error: Submit button not found.');
+                    showToast('Error: Submit button not found.', 'error');
                     return;
                 }
 
@@ -1911,14 +2126,14 @@
                     if (modal) {
                         modal.hide();
                     }
-                    alert(data.message || 'Thank you! Your review has been submitted for approval.');
-                    location.reload();
+                    showToast(data.message || 'Thank you! Your review has been submitted for approval.', 'success');
+                    setTimeout(() => location.reload(), 1500);
                 } else {
                     if (errorDiv) {
                         errorDiv.style.display = 'block';
                         errorDiv.innerHTML = data.message || 'Error submitting review';
                     } else {
-                        alert(data.message || 'Error submitting review');
+                        showToast(data.message || 'Error submitting review', 'error');
                     }
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
@@ -1930,7 +2145,7 @@
                     errorDiv.style.display = 'block';
                     errorDiv.innerHTML = 'Network error: ' + error.message;
                 } else {
-                    alert('Network error: ' + error.message);
+                    showToast('Network error: ' + error.message, 'error');
                 }
                 const submitBtn = document.getElementById('submitReviewBtn');
                 if (submitBtn) {
@@ -1947,7 +2162,7 @@
             if (currentOrderForCancel) {
                 openCancelModal(currentOrderForCancel);
             } else {
-                alert('No order selected for cancellation');
+                showToast('No order selected for cancellation', 'error');
             }
         }
 
@@ -1973,7 +2188,7 @@
             const comment = document.getElementById('cancelComment').value;
 
             if (!selectedReason) {
-                alert('Please select a reason for cancellation');
+                showToast('Please select a reason for cancellation', 'error');
                 return;
             }
 
@@ -2003,14 +2218,14 @@
                     const orderModal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
                     if (cancelModal) cancelModal.hide();
                     if (orderModal) orderModal.hide();
-                    alert('Your cancellation request has been submitted successfully!');
-                    location.reload();
+                    showToast('Your cancellation request has been submitted successfully!', 'success');
+                    setTimeout(() => location.reload(), 1500);
                 } else {
-                    alert(data.message || 'Error submitting cancellation request');
+                    showToast(data.message || 'Error submitting cancellation request', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Network error. Please try again.');
+                showToast('Network error. Please try again.', 'error');
             } finally {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -2040,11 +2255,11 @@
                     const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
                     modal.show();
                 } else {
-                    alert(data.message || 'Error loading order details');
+                    showToast(data.message || 'Error loading order details', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error loading order details. Please try again.');
+                showToast('Error loading order details. Please try again.', 'error');
             } finally {
                 button.innerHTML = originalText;
                 button.disabled = false;
@@ -2216,7 +2431,7 @@
                     <span>Total</span>
                     <span>₹${formatNumber(total)}</span>
                 </div>
-                <div class="summary-row mt-2" style="border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <div class="summary-row mt-2" style="border-top: 1px solid var(--line); padding-top: 12px;">
                     <span>${paymentMethodDisplay}</span>
                     <span class="payment-badge ${paymentStatusClass}">${paymentStatusText}</span>
                 </div>

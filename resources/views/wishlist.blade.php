@@ -2,6 +2,36 @@
 
 @section('content')
     <style>
+        /* ================================================================
+           DESIGN TOKENS — FitForge Athletic System
+           Display: Anton (poster-weight, athletic)
+           Body:    Plus Jakarta Sans (clean, modern e-commerce)
+        ================================================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --ink: #14161A;
+            --ink-soft: #2B2E34;
+            --canvas: #FAF9F6;
+            --fog: #EFEDE7;
+            --steel: #6B7280;
+            --line: #E4E1D8;
+            --signal: #FF4405;
+            --signal-dark: #D93A03;
+            --signal-tint: #FFF1EC;
+            --success: #16A34A;
+            --success-tint: #E8F8ED;
+            --info: #2563EB;
+            --info-tint: #EAF1FE;
+            --font-display: 'Anton', 'Arial Narrow', sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+        }
+
         /* ===== PREVENT HORIZONTAL SCROLL ===== */
         html,
         body {
@@ -11,51 +41,99 @@
             padding: 0 !important;
         }
 
+        body {
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--canvas);
+        }
+
+        /* Signature element: a repeating diagonal "energy stripe" */
+        .energy-stripe {
+            height: 4px;
+            width: 56px;
+            border-radius: 3px;
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--signal) 0px,
+                var(--signal) 6px,
+                var(--ink) 6px,
+                var(--ink) 12px
+            );
+        }
+
+        .section-eyebrow {
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--signal);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .section-heading {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1;
+        }
+
+        /* ===== WISHLIST HEADER ===== */
         .wishlist-header {
             padding: 30px 0 20px 0;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid var(--line);
             margin-bottom: 30px;
         }
 
         .wishlist-header h2 {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 28px;
-            font-weight: 700;
-            color: #1a1a2e;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--ink);
         }
 
         .wishlist-header h2 i {
-            color: #dc3545;
+            color: var(--signal);
+            margin-right: 10px;
         }
 
         .wishlist-header p {
-            color: #64748b;
+            color: var(--steel);
             font-size: 15px;
+            font-weight: 500;
             margin-top: 5px;
         }
 
         /* ===== PRODUCT CARD - SAME AS HOME PAGE ===== */
         .product-card {
-            border: 1px solid #eee;
-            border-radius: 12px;
-            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
             overflow: hidden;
             margin-bottom: 25px;
             height: 100%;
             position: relative;
-            background: white;
+            background: #FFFFFF;
             cursor: pointer;
+            box-shadow: var(--shadow-card);
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-card-hover);
+            border-color: transparent;
         }
 
         .product-image-container {
             width: 100%;
             height: 250px;
             overflow: hidden;
-            background: #f8f9fa;
+            background: var(--fog);
             position: relative;
         }
 
@@ -69,29 +147,31 @@
         }
 
         .product-card:hover .product-image-container img {
-            transform: scale(1.03);
+            transform: scale(1.04);
         }
 
         .discount-badge {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #dc3545;
+            background: var(--signal);
             color: white;
             padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.8rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
             font-weight: 700;
+            letter-spacing: 0.3px;
             z-index: 1;
         }
 
-        /* Remove from wishlist button - similar to wishlist-btn on home */
+        /* Remove from wishlist button */
         .remove-wishlist-btn {
             position: absolute;
             top: 10px;
             left: 10px;
-            background: white;
-            border: none;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--line);
             border-radius: 50%;
             width: 35px;
             height: 35px;
@@ -100,57 +180,60 @@
             justify-content: center;
             cursor: pointer;
             z-index: 2;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s;
-            color: #dc3545;
+            box-shadow: 0 2px 6px rgba(20, 22, 26, 0.1);
+            transition: all 0.25s;
+            color: var(--signal);
         }
 
         .remove-wishlist-btn i {
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.25s;
         }
 
         .remove-wishlist-btn:hover {
             transform: scale(1.1);
-            background: #dc3545;
+            background: var(--signal);
             color: white;
+            border-color: var(--signal);
         }
 
         .product-card .card-body {
-            padding: 12px 15px 15px;
+            padding: 14px 16px 16px;
             text-align: left;
         }
 
         /* ===== PRODUCT BRAND - SAME AS HOME ===== */
         .product-brand {
-            font-size: 0.75rem;
-            color: #6c757d;
-            font-weight: 500;
-            margin-bottom: 2px;
+            font-size: 0.72rem;
+            color: var(--steel);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 4px;
             text-align: left;
-            letter-spacing: 0.3px;
         }
 
         .product-brand i {
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             margin-right: 4px;
-            color: #6c757d;
+            color: var(--signal);
         }
 
         .product-card .product-name {
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #1e293b;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--ink);
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             min-height: 40px;
             text-align: left;
+            line-height: 1.35;
         }
 
-        /* Price container - VD LOOKS style */
+        /* Price container */
         .product-price-container {
             display: flex;
             align-items: center;
@@ -160,89 +243,113 @@
         }
 
         .product-price-container .final-price {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1e293b;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--ink);
+            font-family: var(--font-body);
         }
 
         .product-price-container .original-price {
             font-size: 0.85rem;
-            color: #999;
+            color: #A3A9B2;
             text-decoration: line-through;
         }
 
         .product-price-container .discount-percent {
-            background: #dc3545;
-            color: white;
-            padding: 1px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            background: var(--signal-tint);
+            color: var(--signal-dark);
+            padding: 2px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.72rem;
             font-weight: 700;
         }
 
         .product-stock-low {
-            font-size: 0.8rem;
-            color: #dc3545;
-            margin-top: 6px;
+            font-size: 0.78rem;
+            color: var(--signal-dark);
+            margin-top: 8px;
             text-align: left;
             font-weight: 600;
         }
 
         .product-stock-low i {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             margin-right: 4px;
-            color: #dc3545;
+            color: var(--signal);
         }
 
         .product-stock-out {
-            font-size: 0.8rem;
-            color: #999;
-            margin-top: 6px;
+            font-size: 0.78rem;
+            color: var(--steel);
+            margin-top: 8px;
             text-align: left;
-            font-weight: 500;
-            background: #f5f5f5;
+            font-weight: 600;
+            background: var(--fog);
             padding: 4px 10px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
+            display: inline-block;
         }
-
-        .color-options-container {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-    margin-top: 6px;
-    align-items: center;
-}
-
-.color-label {
-    font-size: 0.65rem;
-    color: #666;
-    font-weight: 500;
-}
-
-.color-dot {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 2px solid #e0e0e0;
-    display: inline-block;
-}
-
-.color-dot.more-colors {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #f0f0f0;
-    font-size: 7px;
-    color: #666;
-    font-weight: 600;
-}
 
         .product-stock-out i {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             margin-right: 4px;
-            color: #999;
+            color: var(--steel);
         }
 
+        /* ===== COLOR OPTIONS - WITH COLOR COUNT ===== */
+        .color-options-container {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .color-options-container .color-label {
+            font-size: 0.65rem;
+            color: var(--steel);
+            font-weight: 600;
+            margin-right: 2px;
+        }
+
+        .color-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--line);
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .color-dot:hover {
+            transform: scale(1.15);
+            border-color: var(--signal);
+        }
+
+        .color-dot.more-colors {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--fog);
+            border: 2px solid var(--line);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            color: var(--steel);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .color-dot.more-colors:hover {
+            border-color: var(--signal);
+            background: var(--signal);
+            color: white;
+        }
+
+        /* ===== PRODUCT ACTIONS ===== */
         .product-actions {
             display: flex;
             gap: 8px;
@@ -251,7 +358,7 @@
         }
 
         .btn-add-cart-wishlist {
-            background: #000000;
+            background: var(--ink);
             border: none;
             border-radius: 25px;
             padding: 6px 15px;
@@ -260,14 +367,19 @@
             transition: all 0.3s;
             font-size: 0.75rem;
             flex: 1;
+            font-weight: 700;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-add-cart-wishlist:hover {
-            background: #dc3545;
+            background: var(--signal);
+            color: white;
         }
 
         .btn-buy-now-wishlist {
-            background: #dc3545;
+            background: var(--signal);
             border: none;
             border-radius: 25px;
             padding: 6px 15px;
@@ -276,13 +388,18 @@
             transition: all 0.3s;
             font-size: 0.75rem;
             flex: 1;
+            font-weight: 700;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-buy-now-wishlist:hover {
-            background: #000000;
+            background: var(--signal-dark);
+            color: white;
         }
 
-        /* Empty wishlist */
+        /* ===== EMPTY WISHLIST ===== */
         .empty-wishlist {
             text-align: center;
             padding: 80px 20px;
@@ -290,37 +407,45 @@
 
         .empty-wishlist i {
             font-size: 4rem;
-            color: #e0e0e0;
+            color: var(--steel);
             margin-bottom: 20px;
         }
 
         .empty-wishlist h4 {
-            color: #1a1a2e;
-            font-weight: 600;
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
             margin-bottom: 10px;
         }
 
         .empty-wishlist p {
-            color: #999;
+            color: var(--steel);
+            font-weight: 500;
             margin-bottom: 20px;
         }
 
         .btn-shop-now {
-            background: #dc3545;
+            background: var(--signal);
             color: white;
             border: none;
             border-radius: 25px;
             padding: 10px 30px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-shop-now:hover {
-            background: #000000;
+            background: var(--signal-dark);
             color: white;
+            transform: scale(1.02);
         }
 
         /* ===== CUSTOM CONFIRMATION NOTIFICATION ===== */
@@ -332,11 +457,12 @@
             min-width: 320px;
             max-width: 400px;
             background: white;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             padding: 20px 25px;
             animation: slideInRight 0.3s ease;
-            border-left: 5px solid #dc3545;
+            border-left: 5px solid var(--signal);
+            font-family: var(--font-body);
         }
 
         @keyframes slideInRight {
@@ -344,7 +470,6 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
-
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -354,7 +479,7 @@
         .confirm-notification .notif-icon {
             width: 45px;
             height: 45px;
-            background: #dc3545;
+            background: var(--signal);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -369,15 +494,16 @@
         }
 
         .confirm-notification .notif-title {
-            font-weight: 600;
-            color: #1a1a2e;
+            font-weight: 700;
+            color: var(--ink);
             font-size: 15px;
             margin-bottom: 2px;
         }
 
         .confirm-notification .notif-message {
             font-size: 13px;
-            color: #64748b;
+            color: var(--steel);
+            font-weight: 500;
         }
 
         .confirm-notification .notif-actions {
@@ -387,35 +513,38 @@
         }
 
         .confirm-notification .btn-notif-confirm {
-            background: #dc3545;
+            background: var(--signal);
             color: white;
             border: none;
             border-radius: 20px;
             padding: 6px 20px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            font-family: var(--font-body);
         }
 
         .confirm-notification .btn-notif-confirm:hover {
-            background: #bd2130;
+            background: var(--signal-dark);
         }
 
         .confirm-notification .btn-notif-cancel {
-            background: #e2e8f0;
-            color: #64748b;
+            background: var(--fog);
+            color: var(--steel);
             border: none;
             border-radius: 20px;
             padding: 6px 20px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            font-family: var(--font-body);
         }
 
         .confirm-notification .btn-notif-cancel:hover {
-            background: #cbd5e1;
+            background: var(--line);
+            color: var(--ink);
         }
 
         .confirm-notification .notif-close {
@@ -425,13 +554,52 @@
             background: none;
             border: none;
             font-size: 18px;
-            color: #999;
+            color: var(--steel);
             cursor: pointer;
             transition: all 0.3s;
         }
 
         .confirm-notification .notif-close:hover {
-            color: #dc3545;
+            color: var(--signal);
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .custom-toast {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: var(--success);
+            color: #fff;
+            padding: 15px 22px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 999999;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: .4s;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: var(--font-body);
+        }
+
+        .custom-toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .custom-toast i {
+            font-size: 20px;
+        }
+
+        .custom-toast.error {
+            background: var(--signal);
+        }
+
+        .custom-toast.info {
+            background: var(--info);
         }
 
         /* ===== RESPONSIVE ===== */
@@ -445,16 +613,16 @@
             }
 
             .product-card .product-name {
-                font-size: 0.75rem;
-                min-height: 30px;
+                font-size: 0.8rem;
+                min-height: 35px;
             }
 
             .product-price-container .final-price {
-                font-size: 0.95rem;
+                font-size: 1rem;
             }
 
             .product-brand {
-                font-size: 0.65rem;
+                font-size: 0.68rem;
             }
 
             .product-actions {
@@ -473,6 +641,17 @@
                 top: 10px;
                 padding: 15px 20px;
             }
+
+            .color-dot {
+                width: 16px;
+                height: 16px;
+            }
+
+            .color-dot.more-colors {
+                width: 16px;
+                height: 16px;
+                font-size: 6px;
+            }
         }
 
         @media (max-width: 576px) {
@@ -482,15 +661,98 @@
 
             .product-card .product-name {
                 font-size: 0.7rem;
-                min-height: 25px;
+                min-height: 28px;
+            }
+
+            .product-brand {
+                font-size: 0.6rem;
+                margin-bottom: 2px;
+            }
+
+            .product-brand i {
+                font-size: 0.55rem;
             }
 
             .product-price-container .final-price {
                 font-size: 0.85rem;
             }
 
-            .product-brand {
+            .product-price-container .original-price {
+                font-size: 0.7rem;
+            }
+
+            .product-price-container .discount-percent {
                 font-size: 0.6rem;
+                padding: 1px 6px;
+            }
+
+            .product-price-container {
+                gap: 4px;
+            }
+
+            .discount-badge {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+                top: 6px;
+                right: 6px;
+            }
+
+            .remove-wishlist-btn {
+                width: 28px;
+                height: 28px;
+                top: 6px;
+                left: 6px;
+            }
+
+            .remove-wishlist-btn i {
+                font-size: 0.8rem;
+            }
+
+            .product-stock-low {
+                font-size: 0.65rem;
+                margin-top: 4px;
+            }
+
+            .product-stock-out {
+                font-size: 0.65rem;
+                margin-top: 4px;
+                padding: 3px 8px;
+            }
+
+            .color-options-container {
+                margin-top: 4px;
+                gap: 4px;
+            }
+
+            .color-options-container .color-label {
+                font-size: 0.55rem;
+            }
+
+            .color-dot {
+                width: 14px;
+                height: 14px;
+                border-width: 1.5px;
+            }
+
+            .color-dot.more-colors {
+                width: 14px;
+                height: 14px;
+                font-size: 5px;
+                border-width: 1.5px;
+            }
+
+            .col-sm-6 {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            .container {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+
+            .section-heading {
+                font-size: 1.3rem !important;
             }
 
             .confirm-notification {
@@ -510,14 +772,83 @@
                 width: 100%;
                 text-align: center;
             }
+
+            .empty-wishlist {
+                padding: 50px 15px;
+            }
+
+            .empty-wishlist i {
+                font-size: 3rem;
+            }
+
+            .empty-wishlist h4 {
+                font-size: 1.1rem;
+            }
+
+            .empty-wishlist p {
+                font-size: 0.85rem;
+            }
+
+            .btn-shop-now {
+                font-size: 0.8rem;
+                padding: 8px 20px;
+            }
+
+            .custom-toast {
+                top: 15px;
+                right: 15px;
+                font-size: 13px;
+                padding: 12px 18px;
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .product-image-container {
+                height: 120px;
+            }
+
+            .product-card .product-name {
+                font-size: 0.65rem;
+                min-height: 24px;
+            }
+
+            .product-price-container .final-price {
+                font-size: 0.75rem;
+            }
+
+            .product-brand {
+                font-size: 0.55rem;
+            }
+
+            .color-dot {
+                width: 12px;
+                height: 12px;
+            }
+
+            .color-dot.more-colors {
+                width: 12px;
+                height: 12px;
+                font-size: 4px;
+            }
+
+            .wishlist-header h2 {
+                font-size: 18px;
+            }
+
+            .wishlist-header p {
+                font-size: 13px;
+            }
         }
     </style>
 
     <div class="container">
         <!-- Wishlist Header -->
         <div class="wishlist-header">
+            <span class="section-eyebrow">Saved Items</span>
             <h2><i class="fas fa-heart"></i> My Wishlist</h2>
-            <p>Products you've saved for later</p>
+            <div class="energy-stripe" style="margin-top: 8px;"></div>
+            <p class="mt-2">Products you've saved for later</p>
         </div>
 
         <!-- Wishlist Products Container -->
@@ -533,13 +864,60 @@
     </div>
 
     <script>
+        // ================================================================
         // ===== WISHLIST DATA =====
+        // ================================================================
         let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         let pendingRemoveId = null;
         let pendingRemoveName = '';
 
+        // ================================================================
+        // ===== TOAST NOTIFICATION =====
+        // ================================================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('customToast');
+            if (!toast) {
+                // Fallback
+                const fallback = document.createElement('div');
+                fallback.className = 'custom-toast show';
+                fallback.style.cssText =
+                    'position:fixed;top:25px;right:25px;background:var(--signal);color:#fff;padding:15px 22px;border-radius:var(--radius-md);box-shadow:0 10px 25px rgba(0,0,0,.2);display:flex;align-items:center;gap:10px;z-index:999999;font-weight:600;font-family:var(--font-body);';
+                fallback.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+                document.body.appendChild(fallback);
+                setTimeout(() => {
+                    fallback.style.opacity = '0';
+                    fallback.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => fallback.remove(), 300);
+                }, 3000);
+                return;
+            }
+
+            const icon = toast.querySelector('i');
+            const msg = toast.querySelector('#toastMessage');
+            if (icon) {
+                icon.className = type === 'success' ? 'fas fa-check-circle' :
+                    type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle';
+            }
+            if (msg) msg.textContent = message;
+            toast.className = 'custom-toast show';
+            if (type === 'error') {
+                toast.style.background = 'var(--signal)';
+            } else if (type === 'success') {
+                toast.style.background = 'var(--success)';
+            } else {
+                toast.style.background = 'var(--info)';
+            }
+
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ================================================================
         // ===== CONFIRMATION NOTIFICATION =====
+        // ================================================================
         function showConfirmNotification(id, name) {
             pendingRemoveId = id;
             pendingRemoveName = name;
@@ -561,7 +939,7 @@
                     </div>
                     <div class="notif-content">
                         <div class="notif-title">Remove from Wishlist?</div>
-                        <div class="notif-message">Are you sure you want to remove "<strong>${name}</strong>" from your wishlist?</div>
+                        <div class="notif-message">Are you sure you want to remove "<strong>${escapeHtml(name)}</strong>" from your wishlist?</div>
                         <div class="notif-actions">
                             <button class="btn-notif-confirm" onclick="confirmRemove()">
                                 <i class="fas fa-trash-alt me-1"></i> Remove
@@ -601,7 +979,9 @@
             }
         }
 
-        // ===== UPDATE WISHLIST COUNT =====
+        // ================================================================
+        // ===== UPDATE COUNTS =====
+        // ================================================================
         function updateWishlistCount() {
             let count = wishlist.length;
             let wishlistCountElement = document.getElementById('navbarWishlistCount');
@@ -615,7 +995,6 @@
             }
         }
 
-        // ===== UPDATE CART COUNT =====
         function updateCartCount() {
             let count = cart.reduce((total, item) => total + item.quantity, 0);
             let cartCountElement = document.getElementById('navbarCartCount');
@@ -629,27 +1008,9 @@
             }
         }
 
-        // ===== SHOW NOTIFICATION =====
-        function showNotification(message, type) {
-            let notification = document.createElement('div');
-            notification.className = 'alert alert-' + (type === 'success' ? 'success' : 'info') +
-                ' alert-dismissible fade show';
-            notification.style.position = 'fixed';
-            notification.style.top = '20px';
-            notification.style.right = '20px';
-            notification.style.zIndex = '9999';
-            notification.style.minWidth = '250px';
-            notification.innerHTML = '<i class="fas fa-check-circle"></i> ' + message +
-                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
-
-   
-
-       
-
+        // ================================================================
         // ===== REMOVE FROM WISHLIST =====
+        // ================================================================
         function removeFromWishlist(id) {
             wishlist = wishlist.filter(item => item.id !== id);
             localStorage.setItem('wishlist', JSON.stringify(wishlist));
@@ -660,25 +1021,42 @@
 
             loadWishlist();
             updateWishlistCount();
-            showNotification('Removed from wishlist', 'info');
+            showToast('Removed from wishlist', 'info');
         }
 
+        // ================================================================
         // ===== OPEN REMOVE CONFIRMATION =====
+        // ================================================================
         function openRemoveConfirm(id, name) {
             showConfirmNotification(id, name);
         }
 
+        // ================================================================
         // ===== GO TO PRODUCT DETAIL =====
+        // ================================================================
         function goToProductDetail(productId, event) {
             if (event && (event.target.closest('.remove-wishlist-btn') ||
                     event.target.closest('.btn-add-cart-wishlist') ||
-                    event.target.closest('.btn-buy-now-wishlist'))) {
+                    event.target.closest('.btn-buy-now-wishlist') ||
+                    event.target.closest('.color-dot'))) {
                 return;
             }
             window.location.href = `/product/${productId}`;
         }
 
+        // ================================================================
+        // ===== ESCAPE HTML =====
+        // ================================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ================================================================
         // ===== GET VARIANT DATA =====
+        // ================================================================
         function getVariantData(product) {
             if (product.variants && product.variants.length > 0) {
                 const firstVariant = product.variants[0];
@@ -688,10 +1066,18 @@
                     totalStock += parseInt(v.stock) || 0;
                 });
 
-                // Use total_price as original price, final_price as discounted price
                 const originalPrice = parseFloat(firstVariant.total_price) || parseFloat(firstVariant.mrp) || parseFloat(
                     firstVariant.price) || 0;
                 const displayPrice = parseFloat(firstVariant.final_price) || parseFloat(firstVariant.price) || 0;
+
+                let colors = [];
+                const colorSet = new Set();
+                product.variants.forEach(variant => {
+                    if (variant.color && variant.color.trim() !== '') {
+                        colorSet.add(variant.color);
+                    }
+                });
+                colors = Array.from(colorSet);
 
                 return {
                     hasVariant: true,
@@ -699,11 +1085,12 @@
                     originalPrice: originalPrice,
                     discountType: firstVariant.discount_type || 'flat',
                     discountValue: parseFloat(firstVariant.discount_value) || 0,
-                    totalStock: totalStock
+                    totalStock: totalStock,
+                    colors: colors,
+                    variantCount: product.variants.length
                 };
             }
 
-            // Normal product
             const originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || parseFloat(product.price) ||
                 0;
             const displayPrice = parseFloat(product.final_price) || parseFloat(product.price) || 0;
@@ -714,11 +1101,15 @@
                 originalPrice: originalPrice,
                 discountType: product.discount_type || 'flat',
                 discountValue: parseFloat(product.discount_value) || 0,
-                totalStock: parseInt(product.stock) || 0
+                totalStock: parseInt(product.stock) || 0,
+                colors: [],
+                variantCount: 0
             };
         }
 
+        // ================================================================
         // ===== CALCULATE DISCOUNT =====
+        // ================================================================
         function calculateDiscount(priceData) {
             const originalPrice = priceData.originalPrice || 0;
             const displayPrice = priceData.price || 0;
@@ -734,16 +1125,16 @@
                 const discountPercent = Math.round((discountAmount / originalPrice) * 100);
 
                 if (discountType === 'flat') {
-                    discountDisplay = '₹' + discountValue.toFixed(2) + ' off';
+                    discountDisplay = `₹${discountValue.toFixed(2)} off`;
                 } else if (discountType === 'percentage') {
-                    discountDisplay = discountValue + '% off';
+                    discountDisplay = `${discountValue}% off`;
                 } else {
-                    discountDisplay = '₹' + discountValue.toFixed(2) + ' off';
+                    discountDisplay = `₹${discountValue.toFixed(2)} off`;
                 }
             } else if (originalPrice > 0 && displayPrice > 0 && displayPrice < originalPrice) {
                 hasDiscount = true;
                 const discountPercent = Math.round(((originalPrice - displayPrice) / originalPrice) * 100);
-                discountDisplay = discountPercent + '% off';
+                discountDisplay = `${discountPercent}% off`;
             }
 
             return {
@@ -754,11 +1145,12 @@
             };
         }
 
+        // ================================================================
         // ===== GET PRODUCT IMAGES =====
+        // ================================================================
         function getProductImages(product) {
             let images = [];
 
-            // Check variant images first
             if (product.variants && product.variants.length > 0) {
                 const firstVariant = product.variants[0];
                 if (product.product_images && product.product_images.length > 0) {
@@ -773,7 +1165,6 @@
                 }
             }
 
-            // Check all_images from API
             if (images.length === 0 && product.all_images && product.all_images.length > 0) {
                 images = product.all_images.map(img => {
                     if (img.startsWith('http')) return img;
@@ -781,7 +1172,6 @@
                 });
             }
 
-            // Check product.image field
             if (images.length === 0 && product.image) {
                 if (product.image.startsWith('http')) {
                     images.push(product.image);
@@ -790,15 +1180,29 @@
                 }
             }
 
-            // Fallback
             if (images.length === 0) {
-                images.push('https://via.placeholder.com/300x300?text=No+Image');
+                const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8A5C', '#A29BFE'];
+                const colorIndex = (product.id || 1) % colors.length;
+                const bgColor = colors[colorIndex];
+                const text = product.name ? product.name.substring(0, 2).toUpperCase() : '?';
+
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+                    <rect width="300" height="300" fill="${bgColor}" opacity="0.3"/>
+                    <rect x="50" y="50" width="200" height="200" fill="${bgColor}" rx="10"/>
+                    <text x="150" y="175" font-family="Arial" font-size="80" fill="${bgColor}" text-anchor="middle" dominant-baseline="central">${text}</text>
+                    <text x="150" y="250" font-family="Arial" font-size="14" fill="#999" text-anchor="middle">${product.name || 'Product'}</text>
+                </svg>`;
+
+                const encoded = btoa(unescape(encodeURIComponent(svg)));
+                images.push(`data:image/svg+xml;base64,${encoded}`);
             }
 
             return images;
         }
 
+        // ================================================================
         // ===== LOAD WISHLIST =====
+        // ================================================================
         async function loadWishlist() {
             const container = document.getElementById('wishlistContainer');
             const emptyDiv = document.getElementById('emptyWishlist');
@@ -810,6 +1214,7 @@
             }
 
             container.style.display = 'flex';
+            container.style.flexWrap = 'wrap';
             emptyDiv.style.display = 'none';
 
             let wishlistItems = [];
@@ -846,7 +1251,7 @@
                             brandHtml = `
                                 <div class="product-brand">
                                     <i class="fas fa-tag"></i>
-                                    ${brandName}
+                                    ${escapeHtml(brandName)}
                                 </div>
                             `;
                         }
@@ -869,45 +1274,23 @@
                             `;
                         }
 
-// ===== COLOR HTML =====
-let colors = [];
+                        // Color HTML
+                        const colors = variantData.colors || [];
+                        let colorHtml = '';
+                        if (colors.length > 0) {
+                            const displayColors = colors.slice(0, 4);
+                            const remaining = colors.length - 4;
 
-if (product.variants && product.variants.length > 0) {
-    const colorSet = new Set();
-
-    product.variants.forEach(variant => {
-        if (variant.color && variant.color.trim() !== '') {
-            colorSet.add(variant.color);
-        }
-    });
-
-    colors = Array.from(colorSet);
-}
-
-let colorHtml = '';
-
-if (colors.length > 0) {
-
-    const displayColors = colors.slice(0, 4);
-    const remaining = colors.length - 4;
-
-    colorHtml = `
-        <div class="color-options-container">
-            <span class="color-label">${colors.length} Colors:</span>
-
-            ${displayColors.map(color => `
-                <span class="color-dot"
-                    style="background:${color.toLowerCase()};"
-                    title="${color}">
-                </span>
-            `).join('')}
-
-            ${remaining > 0 ? `
-                <span class="color-dot more-colors">+${remaining}</span>
-            ` : ''}
-        </div>
-    `;
-}
+                            colorHtml = `
+                                <div class="color-options-container">
+                                    <span class="color-label">${colors.length} Color${colors.length > 1 ? 's' : ''}:</span>
+                                    ${displayColors.map(color => `
+                                        <span class="color-dot" style="background: ${color.toLowerCase()};" title="${escapeHtml(color)}"></span>
+                                    `).join('')}
+                                    ${remaining > 0 ? `<span class="color-dot more-colors">+${remaining}</span>` : ''}
+                                </div>
+                            `;
+                        }
 
                         let priceHtml = '';
                         if (discount.hasDiscount && discount.originalPrice > 0 && discount.displayPrice > 0) {
@@ -926,9 +1309,6 @@ if (colors.length > 0) {
                             `;
                         }
 
-                        const variantBadge =     '';
-                        
-
                         const escapeName = product.name.replace(/'/g, "\\'");
 
                         return {
@@ -941,7 +1321,6 @@ if (colors.length > 0) {
                             priceHtml: priceHtml,
                             colorHtml: colorHtml,
                             stockHtml: stockHtml,
-                            variantBadge: variantBadge,
                             hasDiscount: discount.hasDiscount,
                             discountDisplay: discount.discountDisplay
                         };
@@ -966,12 +1345,18 @@ if (colors.length > 0) {
                                 <span class="final-price">₹${price.toFixed(2)}</span>
                             </div>
                         `,
+                        colorHtml: '',
                         stockHtml: '',
-                        variantBadge: '',
                         hasDiscount: false,
                         discountDisplay: ''
                     };
                 });
+            }
+
+            if (wishlistItems.length === 0) {
+                container.style.display = 'none';
+                emptyDiv.style.display = 'block';
+                return;
             }
 
             // Render wishlist items
@@ -983,18 +1368,18 @@ if (colors.length > 0) {
                         </button>
                         
                         <div class="product-image-container">
-                            <img src="${item.image}" alt="${item.name}" 
+                            <img src="${item.image}" alt="${escapeHtml(item.name)}" 
                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNmMGYwZjAiLz48dGV4dCB4PSIxNTAiIHk9IjE1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjQwIiBmaWxsPSIjY2NjIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+TG9hZCBFcnJvcjwvdGV4dD48L3N2Zz4='"
                                 loading="lazy">
                         </div>
                         
-                     <div class="card-body">
-    ${item.brandHtml}
-    <div class="product-name">${item.name}</div>
-    ${item.priceHtml}
-    ${item.colorHtml}
-    ${item.stockHtml}
-</div>
+                        <div class="card-body">
+                            ${item.brandHtml}
+                            <div class="product-name">${escapeHtml(item.name)}</div>
+                            ${item.priceHtml}
+                            ${item.colorHtml}
+                            ${item.stockHtml}
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -1002,13 +1387,28 @@ if (colors.length > 0) {
             updateWishlistCount();
         }
 
+        // ================================================================
         // ===== INITIALIZE =====
+        // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
             wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
             cart = JSON.parse(localStorage.getItem('cart')) || [];
             loadWishlist();
             updateCartCount();
             updateWishlistCount();
+
+            // Listen for storage changes from other tabs
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'wishlist') {
+                    wishlist = JSON.parse(e.newValue) || [];
+                    loadWishlist();
+                    updateWishlistCount();
+                }
+                if (e.key === 'cart') {
+                    cart = JSON.parse(e.newValue) || [];
+                    updateCartCount();
+                }
+            });
         });
     </script>
 @endsection

@@ -2,14 +2,62 @@
 
 @section('content')
     <style>
-        /* Remove navbar hiding - Now navbar will show */
+        /* ================================================================
+           DESIGN TOKENS — FitForge Athletic System
+        ================================================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --ink: #14161A;
+            --ink-soft: #2B2E34;
+            --canvas: #FAF9F6;
+            --fog: #EFEDE7;
+            --steel: #6B7280;
+            --line: #E4E1D8;
+            --signal: #FF4405;
+            --signal-dark: #D93A03;
+            --signal-tint: #FFF1EC;
+            --success: #16A34A;
+            --success-tint: #E8F8ED;
+            --info: #2563EB;
+            --info-tint: #EAF1FE;
+            --font-display: 'Anton', 'Arial Narrow', sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+        }
+
+        html, body {
+            overflow-x: hidden !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
         body {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--canvas);
             min-height: 100vh;
         }
 
-        /* ===== CENTER CONTAINER - REDUCED WIDTH ===== */
+        .energy-stripe {
+            height: 4px;
+            width: 56px;
+            border-radius: 3px;
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--signal) 0px,
+                var(--signal) 6px,
+                var(--ink) 6px,
+                var(--ink) 12px
+            );
+        }
+
+        /* ===== REGISTER WRAPPER ===== */
         .register-wrapper {
             display: flex;
             justify-content: center;
@@ -18,17 +66,22 @@
             padding: 20px;
         }
 
-        /* Card Styling - REDUCED WIDTH */
+        /* ===== REGISTER CARD ===== */
         .user-register-card {
-            border: none;
-            border-radius: 20px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-card);
             animation: fadeInUp 0.5s ease;
             background: white;
             max-width: 420px;
             width: 100%;
             margin: 0 auto;
+            transition: all 0.3s;
+        }
+
+        .user-register-card:hover {
+            box-shadow: var(--shadow-card-hover);
         }
 
         @keyframes fadeInUp {
@@ -36,7 +89,6 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -44,69 +96,114 @@
         }
 
         .user-register-card .card-header {
-            background: #000000;
-            padding: 18px 20px 15px;
+            background: var(--ink);
+            padding: 22px 20px 18px;
             border: none;
             text-align: center;
+            border-bottom: 3px solid var(--signal);
+        }
+
+        .user-register-card .card-header .header-icon {
+            font-size: 28px;
+            color: var(--signal);
+            margin-bottom: 6px;
+            display: block;
         }
 
         .user-register-card .card-header h4 {
+            font-family: var(--font-display);
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 3px;
             color: white;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .user-register-card .card-header small {
             font-size: 11px;
             opacity: 0.7;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255,255,255,0.6);
+            font-weight: 400;
         }
 
         .user-register-card .card-body {
-            padding: 22px 25px 25px;
+            padding: 25px 28px 28px;
             background: white;
         }
 
-        /* Form Styling - COMPACT */
+        /* ===== FORM STYLES ===== */
         .form-label {
-            font-weight: 500;
-            color: #333;
+            font-weight: 700;
+            color: var(--ink);
             margin-bottom: 4px;
             font-size: 12px;
             letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .form-label i {
+            color: var(--signal);
+            margin-right: 4px;
         }
 
         .form-control,
         .form-select {
-            border-radius: 8px;
-            border: 1.5px solid #e0e0e0;
-            padding: 7px 12px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--line);
+            padding: 8px 12px;
             transition: all 0.3s ease;
             font-size: 13px;
-            height: 38px;
+            height: 40px;
+            font-family: var(--font-body);
+            background: white;
+            color: var(--ink);
         }
 
         .form-control:focus,
         .form-select:focus {
-            border-color: #dc3545;
-            box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.2);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 0.2rem rgba(255, 68, 5, 0.2);
             outline: none;
         }
 
+        .form-control::placeholder {
+            color: var(--steel);
+            font-weight: 400;
+        }
+
         .form-control.is-invalid {
-            border-color: #dc3545;
+            border-color: var(--signal);
+        }
+
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+        }
+
+        .form-select option {
+            color: var(--ink);
+            background: white;
+            padding: 8px 12px;
+        }
+
+        .form-select option:checked {
+            background: var(--signal-tint);
+            color: var(--ink);
         }
 
         .invalid-feedback {
-            color: #dc3545;
+            color: var(--signal);
             font-size: 11px;
-            margin-top: 2px;
-            display: block;
+            font-weight: 500;
+            margin-top: 3px;
         }
 
-        /* Password Input Group */
+        /* ===== PASSWORD TOGGLE ===== */
         .password-wrapper {
             position: relative;
         }
@@ -122,7 +219,7 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #999;
+            color: var(--steel);
             cursor: pointer;
             font-size: 14px;
             padding: 5px;
@@ -130,28 +227,66 @@
         }
 
         .password-toggle:hover {
-            color: #dc3545;
+            color: var(--signal);
         }
 
-        /* Button Styling - COMPACT */
-        .btn-user-register {
-            background: #000000;
-            border: none;
-            border-radius: 8px;
-            padding: 9px;
-            font-size: 14px;
+        /* ===== PHONE INPUT ===== */
+        .phone-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .phone-input-group .country-code {
+            background: var(--fog);
+            border: 1.5px solid var(--line);
+            border-right: none;
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 13px;
             font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+            min-width: 50px;
+            text-align: center;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-input-group .form-control {
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            border-left: none;
+            height: 40px;
+        }
+
+        .phone-input-group .form-control:focus {
+            border-color: var(--signal);
+        }
+
+        /* ===== BUTTON ===== */
+        .btn-user-register {
+            background: var(--signal);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 700;
             transition: all 0.3s ease;
             color: white;
             width: 100%;
             letter-spacing: 0.5px;
-            height: 40px;
+            height: 42px;
+            font-family: var(--font-body);
+            text-transform: uppercase;
         }
 
         .btn-user-register:hover {
-            background: #dc3545;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+            background: var(--signal-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 68, 5, 0.3);
+            color: white;
         }
 
         .btn-user-register:disabled {
@@ -160,104 +295,75 @@
             transform: none;
         }
 
-        /* Login Link */
-        .login-link {
-            color: #dc3545;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-size: 12px;
+        .btn-user-register i {
+            margin-right: 6px;
         }
 
-        .login-link:hover {
-            color: #000000;
-            text-decoration: underline;
-        }
-
-        /* Captcha Image - COMPACT */
+        /* ===== CAPTCHA ===== */
         .captcha-img {
-            border-radius: 8px;
-            border: 1.5px solid #e0e0e0;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--line);
             cursor: pointer;
             transition: all 0.3s ease;
-            height: 38px;
+            height: 40px;
             width: 100%;
             object-fit: cover;
         }
 
         .captcha-img:hover {
-            border-color: #dc3545;
+            border-color: var(--signal);
             transform: scale(0.97);
         }
 
-        /* Alert Styling - COMPACT */
+        /* ===== ALERT ===== */
         .alert {
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             margin-bottom: 12px;
-            padding: 6px 12px;
+            padding: 8px 12px;
             font-size: 12px;
+            font-weight: 500;
+            border-left: 4px solid;
         }
 
         .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+            background-color: var(--signal-tint);
+            border-color: var(--signal);
+            color: var(--signal-dark);
         }
 
         .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+            background-color: var(--success-tint);
+            border-color: var(--success);
+            color: var(--success);
         }
 
-        /* Phone input with country code - COMPACT */
-        .phone-input-group {
-            display: flex;
-            align-items: center;
-            gap: 0;
+        /* ===== LINKS ===== */
+        .login-link {
+            color: var(--signal);
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
-        .phone-input-group .country-code {
-            background: #f8f9fa;
-            border: 1.5px solid #e0e0e0;
-            border-right: none;
-            border-radius: 8px 0 0 8px;
-            padding: 7px 10px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #333;
-            white-space: nowrap;
-            min-width: 50px;
-            text-align: center;
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .login-link:hover {
+            color: var(--signal-dark);
+            text-decoration: underline;
         }
 
-        .phone-input-group .form-control {
-            border-radius: 0 8px 8px 0;
-            border-left: none;
-            height: 38px;
+        .login-link i {
+            margin-right: 4px;
         }
 
-        .phone-input-group .form-control:focus {
-            border-color: #dc3545;
-        }
-
-        .phone-input-group .form-control.is-invalid {
-            border-color: #dc3545;
-        }
-
-        /* Icon spacing */
-        .fas,
-        .far {
+        /* ===== MISC ===== */
+        .fas, .far {
             margin-right: 6px;
         }
 
-        /* Form spacing - COMPACT */
         .mb-3 {
-            margin-bottom: 12px !important;
+            margin-bottom: 14px !important;
         }
 
         .mt-4 {
@@ -268,16 +374,18 @@
             margin-top: 12px !important;
         }
 
+        .text-muted {
+            font-size: 11px !important;
+            margin-top: 3px !important;
+            color: var(--steel) !important;
+            font-weight: 400;
+        }
+
         .g-2 {
             gap: 6px !important;
         }
 
-        .text-muted {
-            font-size: 11px !important;
-            margin-top: 3px !important;
-        }
-
-        /* Responsive - MOBILE FIRST */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 576px) {
             .register-wrapper {
                 min-height: 70vh;
@@ -286,7 +394,7 @@
 
             .user-register-card {
                 max-width: 100%;
-                border-radius: 15px;
+                border-radius: var(--radius-md);
             }
 
             .user-register-card .card-body {
@@ -294,7 +402,7 @@
             }
 
             .user-register-card .card-header {
-                padding: 14px 15px 12px;
+                padding: 16px 15px 14px;
             }
 
             .user-register-card .card-header h4 {
@@ -303,19 +411,19 @@
 
             .form-control,
             .form-select {
-                height: 36px;
+                height: 38px;
                 font-size: 12px;
-                padding: 5px 10px;
+                padding: 6px 10px;
             }
 
             .btn-user-register {
-                height: 38px;
+                height: 40px;
                 font-size: 13px;
-                padding: 7px;
+                padding: 8px;
             }
 
             .captcha-img {
-                height: 36px;
+                height: 38px;
             }
 
             .form-label {
@@ -323,22 +431,22 @@
             }
 
             .mb-3 {
-                margin-bottom: 10px !important;
+                margin-bottom: 12px !important;
             }
 
             .phone-input-group .country-code {
-                height: 36px;
+                height: 38px;
                 font-size: 12px;
-                padding: 5px 8px;
+                padding: 6px 10px;
                 min-width: 45px;
             }
 
             .phone-input-group .form-control {
-                height: 36px;
+                height: 38px;
             }
 
-            .col-md-6 {
-                padding: 0 10px;
+            .user-register-card .card-header .header-icon {
+                font-size: 22px;
             }
         }
 
@@ -353,13 +461,27 @@
 
             .btn-user-register {
                 font-size: 12px;
-                height: 36px;
+                height: 38px;
             }
 
             .phone-input-group .country-code {
                 font-size: 11px;
                 min-width: 40px;
                 padding: 4px 6px;
+                height: 36px;
+            }
+
+            .phone-input-group .form-control {
+                height: 36px;
+            }
+
+            .form-control,
+            .form-select {
+                height: 36px;
+            }
+
+            .captcha-img {
+                height: 36px;
             }
         }
     </style>
@@ -367,9 +489,10 @@
     <div class="register-wrapper">
         <div class="card user-register-card">
             <div class="card-header">
-                <i class="fas fa-dumbbell" style="font-size: 24px; margin-bottom: 4px; color: white; display: block;"></i>
+                <span class="header-icon"><i class="fas fa-dumbbell"></i></span>
                 <h4>Create Account</h4>
                 <small>Join our fitness community</small>
+                <div class="energy-stripe mx-auto" style="margin-top: 12px;"></div>
             </div>
             <div class="card-body">
                 @if (session('error'))
@@ -429,7 +552,6 @@
                         <small class="text-muted">Enter 10-digit phone number</small>
                     </div>
 
-                    <!-- ===== PASSWORD FIELD ===== -->
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-lock"></i>Password</label>
                         <div class="password-wrapper">
@@ -446,7 +568,6 @@
                         <small class="text-muted">Minimum 6 characters</small>
                     </div>
 
-                    <!-- ===== CONFIRM PASSWORD FIELD (ADD THIS) ===== -->
                     <div class="mb-3">
                         <label class="form-label"><i class="fas fa-check-circle"></i>Confirm Password</label>
                         <div class="password-wrapper">
@@ -519,7 +640,6 @@
             }
         }
 
-        // Phone number validation - only numbers
         document.addEventListener('DOMContentLoaded', function() {
             const phoneInput = document.querySelector('input[name="phone"]');
             if (phoneInput) {
@@ -532,8 +652,7 @@
             const registerBtn = document.getElementById('registerBtn');
 
             // Auto-dismiss alerts after 5 seconds
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
+            document.querySelectorAll('.alert').forEach(function(alert) {
                 setTimeout(function() {
                     const closeBtn = alert.querySelector('.btn-close');
                     if (closeBtn) {
@@ -542,9 +661,7 @@
                 }, 5000);
             });
 
-            // ===== ADD CONFIRM PASSWORD VALIDATION =====
             form.addEventListener('submit', function(e) {
-                // Validate phone number length
                 const phone = document.querySelector('input[name="phone"]');
                 if (phone && phone.value.length !== 10) {
                     e.preventDefault();
@@ -553,7 +670,6 @@
                     return false;
                 }
 
-                // ===== VALIDATE PASSWORD MATCH =====
                 const password = document.getElementById('password');
                 const passwordConfirm = document.getElementById('password_confirmation');
 
@@ -574,27 +690,11 @@
                 registerBtn.disabled = true;
                 registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Registering...';
 
-                // Re-enable button after 30 seconds if not redirected
                 setTimeout(function() {
                     registerBtn.disabled = false;
-                    registerBtn.innerHTML =
-                        '<i class="fas fa-user-plus me-2"></i>Register & Verify OTP';
+                    registerBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i>Register & Verify OTP';
                 }, 30000);
             });
-        });
-
-        // Enter key to submit form
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const activeElement = document.activeElement;
-                if (activeElement && activeElement.tagName === 'INPUT') {
-                    const form = activeElement.closest('form');
-                    if (form) {
-                        e.preventDefault();
-                        form.submit();
-                    }
-                }
-            }
         });
     </script>
 @endsection

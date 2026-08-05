@@ -5,10 +5,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ App\Models\Setting::get('company_name', 'Gym Management System') }}</title>
+    <title>{{ App\Models\Setting::get('company_name', 'FitForge Athletic System') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ================================================================
+         DESIGN TOKENS — FitForge Athletic System
+         Display: Anton (poster-weight, athletic)
+         Body:    Plus Jakarta Sans (clean, modern e-commerce)
+    ================================================================ -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* ================================================================
+           DESIGN TOKENS — FitForge Athletic System
+        ================================================================ */
+        :root {
+            --ink: #14161A;
+            --ink-soft: #2B2E34;
+            --canvas: #FAF9F6;
+            --fog: #EFEDE7;
+            --steel: #6B7280;
+            --line: #E4E1D8;
+            --signal: #FF4405;
+            --signal-dark: #D93A03;
+            --signal-tint: #FFF1EC;
+            --success: #16A34A;
+            --success-tint: #E8F8ED;
+            --info: #2563EB;
+            --info-tint: #EAF1FE;
+            --font-display: 'Anton', 'Arial Narrow', sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+        }
+
         /* ============================================================ */
         /* ===== GLOBAL RESET ===== */
         /* ============================================================ */
@@ -27,9 +61,45 @@
             overflow-x: hidden !important;
             width: 100% !important;
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--canvas);
             margin: 0;
             padding: 0;
+        }
+
+        /* Signature element: a repeating diagonal "energy stripe" */
+        .energy-stripe {
+            height: 4px;
+            width: 56px;
+            border-radius: 3px;
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--signal) 0px,
+                var(--signal) 6px,
+                var(--ink) 6px,
+                var(--ink) 12px
+            );
+        }
+
+        .section-eyebrow {
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--signal);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .section-heading {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1;
         }
 
         /* ============================================================ */
@@ -73,23 +143,26 @@
             align-items: center;
             padding-bottom: 8px;
             margin-bottom: 8px;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid var(--line);
             flex-wrap: wrap;
             gap: 10px;
         }
 
         .navbar-brand {
-            color: #1a1a2e !important;
-            font-weight: 700;
+            color: var(--ink) !important;
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 1.3rem;
             text-decoration: none;
             display: flex;
             align-items: center;
             flex-shrink: 0;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .navbar-brand i {
-            color: #dc3545;
+            color: var(--signal);
             margin-right: 10px;
             font-size: 1.4rem;
         }
@@ -109,21 +182,22 @@
 
         .search-wrapper input {
             border-radius: 30px;
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--line);
             padding: 7px 40px 7px 18px;
             font-size: 0.85rem;
             width: 220px;
             transition: all 0.3s;
-            background: #f8f9fa;
+            background: var(--fog);
             height: 38px;
+            font-family: var(--font-body);
         }
 
         .search-wrapper input:focus {
             outline: none;
-            border-color: #dc3545;
+            border-color: var(--signal);
             width: 260px;
             background: white;
-            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+            box-shadow: 0 0 0 2px rgba(255, 68, 5, 0.1);
         }
 
         .search-wrapper button {
@@ -133,20 +207,20 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #999;
+            color: var(--steel);
             cursor: pointer;
             font-size: 1rem;
         }
 
         .search-wrapper button:hover {
-            color: #dc3545;
+            color: var(--signal);
         }
 
         /* Nav Icons */
         .nav-icon {
             position: relative;
             font-size: 1.2rem;
-            color: #1a1a2e;
+            color: var(--ink);
             transition: all 0.3s;
             text-decoration: none;
             display: flex;
@@ -154,21 +228,22 @@
         }
 
         .nav-icon:hover {
-            color: #dc3545;
+            color: var(--signal);
         }
 
         .cart-count {
             position: absolute;
             top: -8px;
             right: -10px;
-            background: #ff4757;
+            background: var(--signal);
             color: white;
             border-radius: 50%;
             padding: 1px 6px;
             font-size: 10px;
-            font-weight: bold;
+            font-weight: 700;
             min-width: 18px;
             text-align: center;
+            font-family: var(--font-body);
         }
 
         .cart-count.hide-badge {
@@ -182,22 +257,24 @@
             gap: 8px;
             cursor: pointer;
             text-decoration: none;
-            color: #1a1a2e;
+            color: var(--ink);
             padding: 5px 10px;
             border-radius: 30px;
             transition: all 0.3s;
             font-size: 0.85rem;
+            font-family: var(--font-body);
+            font-weight: 500;
         }
 
         .user-dropdown:hover {
-            background: #f8f9fa;
-            color: #dc3545;
+            background: var(--fog);
+            color: var(--signal);
         }
 
         .profile-icon {
             width: 32px;
             height: 32px;
-            background: #e94560;
+            background: var(--signal);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -212,41 +289,47 @@
 
         /* Buttons */
         .btn-join-gym {
-            background: #dc3545;
+            background: var(--signal);
             color: white;
             border-radius: 25px;
             padding: 7px 20px;
             transition: all 0.3s;
-            font-weight: 500;
+            font-weight: 700;
             text-decoration: none;
             display: inline-block;
             font-size: 0.85rem;
             border: none;
             cursor: pointer;
             white-space: nowrap;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-join-gym:hover {
-            background: #000000;
+            background: var(--signal-dark);
             transform: scale(1.02);
             color: white;
         }
 
         .btn-dashboard-nav {
-            background: #28a745;
+            background: var(--ink);
             color: white;
             border-radius: 25px;
             padding: 7px 20px;
             transition: all 0.3s;
-            font-weight: 500;
+            font-weight: 700;
             text-decoration: none;
             display: inline-block;
             font-size: 0.85rem;
             white-space: nowrap;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-dashboard-nav:hover {
-            background: #000000;
+            background: var(--ink-soft);
             transform: scale(1.02);
             color: white;
         }
@@ -257,7 +340,7 @@
             background: none;
             border: none;
             font-size: 1.6rem;
-            color: #1a1a2e;
+            color: var(--ink);
             cursor: pointer;
             padding: 5px 8px;
             transition: all 0.3s;
@@ -265,7 +348,7 @@
         }
 
         .hamburger-btn:hover {
-            color: #dc3545;
+            color: var(--signal);
         }
 
         /* ============================================================ */
@@ -293,8 +376,8 @@
         }
 
         .navbar-nav .nav-link {
-            color: #1a1a2e !important;
-            font-weight: 500;
+            color: var(--ink) !important;
+            font-weight: 600;
             font-size: 0.85rem;
             padding: 6px 12px;
             transition: all 0.3s;
@@ -302,10 +385,12 @@
             display: inline-block;
             cursor: pointer;
             white-space: nowrap;
+            font-family: var(--font-body);
+            letter-spacing: 0.2px;
         }
 
         .navbar-nav .nav-link:hover {
-            color: #dc3545 !important;
+            color: var(--signal) !important;
         }
 
         /* ============================================================ */
@@ -323,14 +408,14 @@
             background: #ffffff;
             min-width: 160px;
             max-width: 200px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
             padding: 8px 0;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
             z-index: 99999;
-            border: 1px solid #eef2f6;
+            border: 1px solid var(--line);
             pointer-events: none;
         }
 
@@ -347,38 +432,40 @@
         .sub-category-dropdown .all-link {
             display: block;
             padding: 5px 16px;
-            color: #1a1a2e;
+            color: var(--ink);
             text-decoration: none;
             font-size: 0.78rem;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.3s;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid var(--line);
             margin: 0 0 4px 0;
             text-align: left;
+            font-family: var(--font-body);
         }
 
         .sub-category-dropdown .all-link:hover {
-            color: #dc3545;
-            background: #f8fafc;
+            color: var(--signal);
+            background: var(--fog);
         }
 
         .sub-category-dropdown .sub-cat-item {
             display: block;
             padding: 4px 16px;
-            color: #4a5568;
+            color: var(--steel);
             text-decoration: none;
             font-size: 0.76rem;
             transition: all 0.3s;
-            font-weight: 400;
+            font-weight: 500;
             text-align: left;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-family: var(--font-body);
         }
 
         .sub-category-dropdown .sub-cat-item:hover {
-            color: #dc3545;
-            background: #f8fafc;
+            color: var(--signal);
+            background: var(--fog);
         }
 
         /* ===== DESKTOP: HIDE ARROW ICON ===== */
@@ -394,7 +481,7 @@
         .dropdown-menu {
             border: none;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             padding: 8px 0;
             margin-top: 8px;
         }
@@ -402,14 +489,20 @@
         .dropdown-item {
             padding: 8px 20px;
             font-size: 0.85rem;
-            color: #333;
+            color: var(--ink);
             transition: all 0.2s;
+            font-family: var(--font-body);
+            font-weight: 500;
         }
 
         .dropdown-item:hover {
-            background: #dc3545;
+            background: var(--signal);
             color: white;
         }
+        .dropdown-item.text-danger:hover,
+.dropdown-item.text-danger:hover i {
+    color: #fff !important;
+}
 
         /* ============================================================ */
         /* ============================================================ */
@@ -438,7 +531,7 @@
                 display: none;
                 flex-direction: column;
                 width: 100%;
-                border-top: 1px solid #eef2f6;
+                border-top: 1px solid var(--line);
                 margin-top: 8px;
                 padding-top: 10px;
                 text-align: left;
@@ -490,7 +583,7 @@
                 display: inline-block !important;
                 font-size: 0.7rem;
                 transition: transform 0.3s;
-                color: #999;
+                color: var(--steel);
             }
 
             .nav-item-category.active .arrow-icon {
@@ -503,13 +596,13 @@
                 transform: none;
                 box-shadow: none;
                 border: none;
-                border-top: 1px solid #eef2f6;
+                border-top: 1px solid var(--line);
                 border-radius: 0;
                 opacity: 1;
                 visibility: visible;
                 pointer-events: auto;
                 display: none;
-                background: #f8fafc;
+                background: var(--fog);
                 padding: 5px 0;
                 min-width: 100%;
                 max-width: 100%;
@@ -594,7 +687,7 @@
                 padding: 4px 30px 4px 10px;
                 font-size: 0.7rem;
                 border-radius: 20px;
-                border: 1px solid #e0e0e0;
+                border: 1px solid var(--line);
             }
 
             .search-wrapper input:focus {
@@ -610,7 +703,7 @@
             .search-results-dropdown {
                 max-height: 300px;
                 margin-top: 3px;
-                border-radius: 8px;
+                border-radius: var(--radius-sm);
                 min-width: 200px;
                 right: 0;
                 left: auto;
@@ -637,7 +730,7 @@
             .search-result-item .result-name {
                 font-size: 0.78rem;
                 font-weight: 500;
-                color: #1a1a2e;
+                color: var(--ink);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -820,23 +913,24 @@
 
         .captcha-img {
             cursor: pointer;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--line);
             height: 45px;
             width: auto;
         }
 
         .card {
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--signal);
             border: none;
         }
 
         .btn-primary:hover {
+            background: var(--signal-dark);
             transform: translateY(-2px);
             transition: 0.3s;
         }
@@ -856,7 +950,6 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -868,7 +961,6 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-
             to {
                 opacity: 0;
                 transform: translateY(-20px);
@@ -893,7 +985,7 @@
         }
 
         .profile-modal .modal-content {
-            border-radius: 16px !important;
+            border-radius: var(--radius-lg) !important;
             min-height: 0 !important;
             max-height: 85vh !important;
             overflow-y: auto !important;
@@ -909,14 +1001,21 @@
         }
 
         .profile-modal .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            background: var(--ink) !important;
             color: white !important;
             border-bottom: none !important;
             padding: 20px !important;
             position: sticky !important;
             top: 0 !important;
             z-index: 10 !important;
-            border-radius: 16px 16px 0 0 !important;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+        }
+
+        .profile-modal .modal-header .modal-title {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
 
         .profile-modal .modal-header .btn-close {
@@ -934,7 +1033,7 @@
             position: sticky !important;
             bottom: 0 !important;
             background: white !important;
-            border-radius: 0 0 16px 16px !important;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
         }
 
         .profile-avatar-lg {
@@ -953,7 +1052,7 @@
         .profile-info-item {
             display: flex;
             padding: 8px 0;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid var(--line);
         }
 
         .profile-info-item:last-child {
@@ -962,30 +1061,34 @@
 
         .profile-info-label {
             width: 85px;
-            font-weight: 600;
-            color: #64748b;
+            font-weight: 700;
+            color: var(--steel);
             font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .profile-info-value {
             flex: 1;
-            color: #1e293b;
+            color: var(--ink);
             font-size: 13px;
+            font-weight: 500;
         }
 
         .profile-info-value .edit-input {
             display: none;
             width: 100%;
             padding: 4px 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
             font-size: 13px;
+            font-family: var(--font-body);
         }
 
         .profile-info-value .edit-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.1);
         }
 
         .profile-info-value .edit-input.show {
@@ -997,7 +1100,7 @@
         }
 
         .btn-edit-profile-modal {
-            background: #667eea;
+            background: var(--signal);
             color: white;
             border: none;
             padding: 8px 25px;
@@ -1006,15 +1109,19 @@
             cursor: pointer;
             transition: all 0.3s;
             width: 100%;
+            font-family: var(--font-body);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-edit-profile-modal:hover {
-            background: #5a4bd1;
+            background: var(--signal-dark);
             transform: translateY(-2px);
         }
 
         .btn-save-profile-modal {
-            background: #10b981;
+            background: var(--success);
             color: white;
             border: none;
             padding: 8px 25px;
@@ -1024,16 +1131,20 @@
             transition: all 0.3s;
             display: none;
             width: 100%;
+            font-family: var(--font-body);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-save-profile-modal:hover {
-            background: #059669;
+            background: #128A3E;
             transform: translateY(-2px);
         }
 
         .btn-cancel-profile-modal {
-            background: #e2e8f0;
-            color: #64748b;
+            background: var(--fog);
+            color: var(--steel);
             border: none;
             padding: 8px 25px;
             border-radius: 25px;
@@ -1042,10 +1153,14 @@
             transition: all 0.3s;
             display: none;
             width: 100%;
+            font-family: var(--font-body);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-cancel-profile-modal:hover {
-            background: #cbd5e1;
+            background: var(--line);
         }
 
         .btn-save-profile-modal.show,
@@ -1073,27 +1188,31 @@
         /* ===== FOOTER ===== */
         /* ============================================================ */
         .footer {
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
-            color: #a0a0c0;
+            background: var(--ink);
+            color: var(--steel);
             padding-top: 50px;
             margin-top: 60px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .footer-logo {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 1.5rem;
-            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: white;
         }
 
         .footer-logo i {
-            color: #e94560;
+            color: var(--signal);
         }
 
         .footer-about {
-            line-height: 1.6;
+            line-height: 1.8;
             font-size: 0.9rem;
             max-width: 350px;
+            font-weight: 400;
         }
 
         .social-icons a {
@@ -1105,23 +1224,27 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             margin-right: 10px;
-            color: #a0a0c0;
+            color: var(--steel);
             transition: all 0.3s;
             text-decoration: none;
         }
 
         .social-icons a:hover {
-            background: #e94560;
+            background: var(--signal);
             color: white;
             transform: translateY(-3px);
         }
 
         .footer h5 {
+            font-family: var(--font-display);
+            font-weight: 400;
             color: white;
             font-size: 1.1rem;
             margin-bottom: 25px;
             position: relative;
             padding-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .footer h5::after {
@@ -1131,7 +1254,7 @@
             bottom: 0;
             width: 40px;
             height: 2px;
-            background: #e94560;
+            background: var(--signal);
         }
 
         .footer-links {
@@ -1147,21 +1270,22 @@
         .footer-links li a {
             display: flex;
             align-items: center;
-            color: #a0a0c0;
+            color: var(--steel);
             text-decoration: none;
             transition: all 0.3s ease;
             font-size: 0.9rem;
+            font-weight: 400;
         }
 
         .footer-links li a i {
             width: 16px;
             margin-right: 10px;
             font-size: 10px;
-            color: #e94560;
+            color: var(--signal);
         }
 
         .footer-links li a:hover {
-            color: #e94560;
+            color: var(--signal);
             transform: translateX(5px);
         }
 
@@ -1179,7 +1303,7 @@
         }
 
         .footer-contact li i {
-            color: #e94560;
+            color: var(--signal);
             font-size: 1rem;
             margin-top: 3px;
             min-width: 20px;
@@ -1187,7 +1311,19 @@
 
         .footer-contact li span {
             font-size: 0.9rem;
-            line-height: 1.5;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .footer-contact li a {
+            color: var(--steel);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .footer-contact li a:hover {
+            color: var(--signal);
         }
 
         .bottom-bar {
@@ -1282,11 +1418,9 @@
             0% {
                 box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4);
             }
-
             70% {
                 box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
             }
-
             100% {
                 box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
             }
@@ -1299,12 +1433,14 @@
             background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 0.85rem;
             z-index: 999;
             opacity: 0;
             transition: all 0.3s ease;
             pointer-events: none;
+            font-family: var(--font-body);
+            font-weight: 500;
         }
 
         .whatsapp-tooltip.show {
@@ -1338,14 +1474,15 @@
             }
         }
 
+        /* ===== CUSTOM TOAST ===== */
         .custom-toast {
             position: fixed;
             top: 25px;
             right: 25px;
-            background: #10b981;
+            background: var(--success);
             color: #fff;
             padding: 15px 22px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
             display: flex;
             align-items: center;
@@ -1355,7 +1492,8 @@
             transform: translateX(100%);
             transition: .4s;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
+            font-family: var(--font-body);
         }
 
         .custom-toast.show {
@@ -1367,6 +1505,14 @@
             font-size: 20px;
         }
 
+        .custom-toast.error {
+            background: var(--signal);
+        }
+
+        .custom-toast.info {
+            background: var(--info);
+        }
+
         /* ===== SEARCH RESULTS DROPDOWN ===== */
         .search-results-dropdown {
             position: absolute;
@@ -1374,9 +1520,9 @@
             left: 0;
             right: 0;
             background: #ffffff;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-            border: 1px solid #eef2f6;
+            border: 1px solid var(--line);
             max-height: 400px;
             overflow-y: auto;
             z-index: 99999;
@@ -1394,9 +1540,9 @@
             align-items: center;
             padding: 10px 16px;
             text-decoration: none;
-            color: #1a1a2e;
+            color: var(--ink);
             transition: all 0.2s;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--line);
             gap: 12px;
         }
 
@@ -1405,15 +1551,15 @@
         }
 
         .search-result-item:hover {
-            background: #f8f9fa;
+            background: var(--fog);
         }
 
         .search-result-item .result-image {
             width: 40px;
             height: 40px;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             object-fit: cover;
-            background: #f0f0f0;
+            background: var(--fog);
             flex-shrink: 0;
         }
 
@@ -1424,54 +1570,59 @@
 
         .search-result-item .result-name {
             font-size: 0.85rem;
-            font-weight: 500;
-            color: #1a1a2e;
+            font-weight: 600;
+            color: var(--ink);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-family: var(--font-body);
         }
 
         .search-result-item .result-price {
             font-size: 0.8rem;
-            color: #dc3545;
-            font-weight: 600;
+            color: var(--signal);
+            font-weight: 700;
         }
 
         .search-result-item .result-category {
             font-size: 0.7rem;
-            color: #999;
+            color: var(--steel);
+            font-weight: 500;
         }
 
         .no-results {
             padding: 15px;
             text-align: center;
-            color: #999;
+            color: var(--steel);
             font-size: 0.85rem;
+            font-weight: 500;
         }
 
         .search-loading {
             padding: 15px;
             text-align: center;
-            color: #999;
+            color: var(--steel);
             font-size: 0.85rem;
+            font-weight: 500;
         }
 
         .search-loading i {
             margin-right: 8px;
-            color: #dc3545;
+            color: var(--signal);
         }
 
         .view-all-results {
             padding: 8px 16px;
             text-align: center;
-            border-top: 1px solid #eef2f6;
+            border-top: 1px solid var(--line);
         }
 
         .view-all-results a {
-            color: #dc3545;
+            color: var(--signal);
             text-decoration: none;
             font-size: 0.8rem;
-            font-weight: 500;
+            font-weight: 700;
+            font-family: var(--font-body);
         }
 
         .view-all-results a:hover {
@@ -1536,7 +1687,7 @@
                 <a class="navbar-brand" href="{{ url('/') }}">
                     @php
                         $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
-                        $companyName = \App\Models\Setting::get('company_name', 'Gym Management');
+                        $companyName = \App\Models\Setting::get('company_name', 'FitForge Athletics');
                     @endphp
                     <i class="{{ $companyLogo }}"></i>
                     <strong>{{ $companyName }}</strong>
@@ -1685,7 +1836,7 @@
     @endauth
 
     <!-- ===== MAIN CONTENT ===== -->
-    <main style="margin: 0; padding: 0; overflow-x: hidden !important; width: 100%;">
+  {{--  <main style="margin: 0; padding: 0; overflow-x: hidden !important; width: 100%;">
         @if (session('success'))
             <div class="container" style="padding-left: 15px; padding-right: 15px;">
                 <div class="alert alert-success alert-dismissible fade show alert-auto-hide" role="alert">
@@ -1703,6 +1854,11 @@
             </div>
         @endif
         @yield('content')
+    </main>  --}}
+
+        <!-- ===== MAIN CONTENT ===== -->
+    <main style="margin: 0; padding: 0; overflow-x: hidden !important; width: 100%;">
+        @yield('content')
     </main>
 
     <!-- ===== PROFILE MODAL ===== -->
@@ -1713,10 +1869,10 @@
                 <div class="modal-content"
                     style="border-radius: 0; min-height: 100vh; max-height: 100vh; overflow-y: auto; border: none; box-shadow: -5px 0 30px rgba(0,0,0,0.1);">
                     <div class="modal-header"
-                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom: none; padding: 20px; position: sticky; top: 0; z-index: 10;">
+                        style="background: var(--ink); color: white; border-bottom: none; padding: 20px; position: sticky; top: 0; z-index: 10;">
                         <div class="text-center w-100">
                             <div class="profile-avatar-lg"><i class="fas fa-user"></i></div>
-                            <h5 class="mb-0" id="modalProfileName">{{ Auth::user()->name }}</h5>
+                            <h5 class="mb-0" id="modalProfileName" style="font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.3px;">{{ Auth::user()->name }}</h5>
                         </div>
                         <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
                             data-bs-dismiss="modal"></button>
@@ -1769,8 +1925,12 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
                     <div class="footer-logo">
-                        <i class="fas fa-dumbbell me-2"></i>
-                        <strong>Gym Management</strong>
+                        @php
+                            $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
+                            $companyName = \App\Models\Setting::get('company_name', 'FitForge Athletics');
+                        @endphp
+                        <i class="{{ $companyLogo }} me-2"></i>
+                        <strong>{{ $companyName }}</strong>
                     </div>
                     <p class="footer-about mt-3">
                         Your complete fitness management solution. We provide gym management software,
@@ -1781,7 +1941,7 @@
                         <a href="#"><i class="fab fa-instagram"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-youtube"></i></a>
-                        <a href="https://wa.me/919025595190?text=Hi%20Gym%20Management%2C%20I%20need%20assistance."
+                        <a href="https://wa.me/919025595190?text=Hi%20FitForge%2C%20I%20need%20assistance."
                             target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
@@ -1815,26 +1975,24 @@
                     <ul class="footer-contact">
                         <li><i class="fas fa-map-marker-alt"></i><span>123 Fitness Street, Chennai - 600001</span></li>
                         <li><i class="fas fa-phone-alt"></i><span>+91 98765 43210</span></li>
-                        <li><i class="fas fa-envelope"></i><span>info@gymmanagement.com</span></li>
+                        <li><i class="fas fa-envelope"></i><span>info@fitforge.com</span></li>
                         <li><i class="fab fa-whatsapp"></i><span><a
-                                    href="https://wa.me/919025595190?text=Hi%20Gym%20Management%2C%20I%20need%20assistance."
-                                    target="_blank" rel="noopener noreferrer"
-                                    style="color: #a0a0c0; text-decoration: none; font-weight: 500;">+91 90255
-                                    95190</a></span></li>
+                                    href="https://wa.me/919025595190?text=Hi%20FitForge%2C%20I%20need%20assistance."
+                                    target="_blank" rel="noopener noreferrer">+91 90255 95190</a></span></li>
                     </ul>
                 </div>
             </div>
 
             <div class="row bottom-bar">
                 <div class="col-12 text-center">
-                    <p class="mb-0">&copy; {{ date('Y') }} Gym Management. All rights reserved.</p>
+                    <p class="mb-0">&copy; {{ date('Y') }} {{ $companyName }}. All rights reserved.</p>
                 </div>
             </div>
         </div>
     </footer>
 
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/919025595190?text=Hi%20Gym%20Management%2C%20I%20need%20assistance." target="_blank"
+    <a href="https://wa.me/919025595190?text=Hi%20FitForge%2C%20I%20need%20assistance." target="_blank"
         rel="noopener noreferrer" class="whatsapp-float" aria-label="Chat on WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
@@ -2019,8 +2177,6 @@
                     const imageUrl = product.image_url || '{{ asset("images/no-image.png") }}';
                     const price = product.price || product.mrp || '0';
 
-                    // ===== DESKTOP: Show full details (name, price, category) =====
-                    // ===== MOBILE: Only show name (price & category hidden via CSS) =====
                     html += `
                         <a href="/product/${product.id}" class="search-result-item">
                             <img src="${imageUrl}" alt="${product.name}" class="result-image" onerror="this.src='{{ asset("images/no-image.png") }}'">

@@ -2,32 +2,137 @@
 
 @section('content')
 <style>
+    /* ================================================================
+       DESIGN TOKENS — FitForge Athletic System
+       Display: Anton (poster-weight, athletic)
+       Body:    Plus Jakarta Sans (clean, modern e-commerce)
+    ================================================================ */
+    @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+        --ink: #14161A;
+        --ink-soft: #2B2E34;
+        --canvas: #FAF9F6;
+        --fog: #EFEDE7;
+        --steel: #6B7280;
+        --line: #E4E1D8;
+        --signal: #FF4405;
+        --signal-dark: #D93A03;
+        --signal-tint: #FFF1EC;
+        --success: #16A34A;
+        --success-tint: #E8F8ED;
+        --info: #2563EB;
+        --info-tint: #EAF1FE;
+        --font-display: 'Anton', 'Arial Narrow', sans-serif;
+        --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --radius-lg: 18px;
+        --radius-md: 12px;
+        --radius-sm: 8px;
+        --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
+        --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+    }
+
+    /* ===== PREVENT HORIZONTAL SCROLL ===== */
+    html,
+    body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body {
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: var(--canvas);
+    }
+
+    /* Signature element: a repeating diagonal "energy stripe" */
+    .energy-stripe {
+        height: 4px;
+        width: 56px;
+        border-radius: 3px;
+        background: repeating-linear-gradient(
+            -45deg,
+            var(--signal) 0px,
+            var(--signal) 6px,
+            var(--ink) 6px,
+            var(--ink) 12px
+        );
+    }
+
+    .section-eyebrow {
+        font-family: var(--font-body);
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--signal);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .section-heading {
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: var(--ink);
+        line-height: 1;
+    }
+
     .contact-section {
         padding: 40px 0;
     }
     
     .contact-card {
-        border: none;
-        border-radius: 20px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        transition: transform 0.3s;
+        box-shadow: var(--shadow-card);
+        transition: all 0.28s ease;
         height: 100%;
+        background: white;
+        padding: 30px 20px;
+        text-align: center;
     }
     
     .contact-card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-card-hover);
+        border-color: transparent;
+    }
+    
+    .contact-card h5 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin-bottom: 10px;
+    }
+    
+    .contact-card p {
+        color: var(--steel);
+        font-weight: 500;
+        line-height: 1.6;
+        margin-bottom: 0;
     }
     
     .contact-icon {
         width: 70px;
         height: 70px;
-        background: linear-gradient(135deg, #000000 0%, #333333 100%);
+        background: var(--ink);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 20px auto;
+        transition: all 0.3s;
+    }
+    
+    .contact-card:hover .contact-icon {
+        background: var(--signal);
     }
     
     .contact-icon i {
@@ -37,43 +142,97 @@
     
     .contact-form {
         background: white;
-        border-radius: 20px;
+        border-radius: var(--radius-lg);
         padding: 30px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--line);
+    }
+    
+    .contact-form:hover {
+        box-shadow: var(--shadow-card-hover);
+    }
+    
+    .contact-form h3 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin-bottom: 20px;
+    }
+    
+    .contact-form h3 i {
+        color: var(--signal);
+        margin-right: 10px;
+    }
+    
+    .contact-form .form-label {
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--ink-soft);
     }
     
     .contact-form .form-control {
-        border-radius: 10px;
-        border: 2px solid #e0e0e0;
+        border-radius: var(--radius-sm);
+        border: 2px solid var(--line);
         padding: 12px 15px;
         transition: all 0.3s;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
+        background: white;
     }
     
     .contact-form .form-control:focus {
-        border-color: #dc3545;
-        box-shadow: none;
+        border-color: var(--signal);
+        box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.1);
+    }
+    
+    .contact-form .form-control::placeholder {
+        color: var(--steel);
+        font-weight: 400;
     }
     
     .btn-send {
-        background: #000000;
+        background: var(--signal);
         border: none;
-        border-radius: 10px;
+        border-radius: var(--radius-sm);
         padding: 12px 30px;
-        font-weight: 600;
+        font-weight: 700;
         transition: all 0.3s;
         color: white;
         width: 100%;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-family: var(--font-body);
+        font-size: 0.9rem;
     }
     
     .btn-send:hover {
-        background: #dc3545;
+        background: var(--signal-dark);
         transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 6px 20px rgba(255, 68, 5, 0.3);
+    }
+    
+    .btn-send i {
+        margin-right: 8px;
     }
     
     .map-container {
-        border-radius: 20px;
+        border-radius: var(--radius-lg);
         overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--line);
+        height: 100%;
+    }
+    
+    .map-container iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 450px;
+        border: none;
     }
     
     .page-title {
@@ -82,14 +241,24 @@
     }
     
     .page-title h1 {
+        font-family: var(--font-display);
+        font-weight: 400;
         font-size: 2.5rem;
-        font-weight: bold;
-        color: #000000;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ink);
+    }
+    
+    .page-title h1 i {
+        color: var(--signal);
+        margin-right: 12px;
     }
     
     .page-title p {
-        color: #666;
+        color: var(--steel);
         font-size: 1.1rem;
+        font-weight: 500;
+        margin-top: 8px;
     }
 
     /* ===== CUSTOM LOGIN MODAL STYLES ===== */
@@ -99,8 +268,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0,0,0,0.6);
-        backdrop-filter: blur(5px);
+        background: rgba(20, 22, 26, 0.6);
+        backdrop-filter: blur(2px);
         z-index: 99999;
         display: none;
         align-items: center;
@@ -125,7 +294,7 @@
     
     .custom-modal-box {
         background: white;
-        border-radius: 20px;
+        border-radius: var(--radius-lg);
         padding: 40px;
         max-width: 450px;
         width: 90%;
@@ -149,7 +318,7 @@
     .custom-modal-box .modal-icon {
         width: 80px;
         height: 80px;
-        background: linear-gradient(135deg, #28a745, #1e7e34);
+        background: var(--success);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -157,21 +326,30 @@
         margin: 0 auto 20px;
         font-size: 2.5rem;
         color: white;
-        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 10px 30px rgba(22, 163, 74, 0.3);
     }
     
     .custom-modal-box .modal-title {
+        font-family: var(--font-display);
+        font-weight: 400;
         font-size: 1.5rem;
-        font-weight: 700;
-        color: #1a1a2e;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--ink);
         margin-bottom: 10px;
     }
     
     .custom-modal-box .modal-subtitle {
         font-size: 0.95rem;
-        color: #64748b;
+        color: var(--steel);
         margin-bottom: 25px;
         line-height: 1.6;
+        font-weight: 500;
+    }
+    
+    .custom-modal-box .modal-subtitle span {
+        color: var(--success);
+        font-weight: 700;
     }
     
     .custom-modal-box .modal-buttons {
@@ -182,40 +360,47 @@
     }
     
     .custom-modal-box .btn-modal-primary {
-        background: linear-gradient(135deg, #28a745, #1e7e34);
+        background: var(--signal);
         color: white;
         border: none;
         padding: 12px 35px;
         border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-weight: 700;
+        font-size: 0.9rem;
         cursor: pointer;
         transition: all 0.3s;
         text-decoration: none;
         display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-family: var(--font-body);
     }
     
     .custom-modal-box .btn-modal-primary:hover {
+        background: var(--signal-dark);
         transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        box-shadow: 0 10px 25px rgba(255, 68, 5, 0.3);
         color: white;
     }
     
     .custom-modal-box .btn-modal-secondary {
-        background: #e2e8f0;
-        color: #64748b;
+        background: var(--fog);
+        color: var(--steel);
         border: none;
         padding: 12px 35px;
         border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-weight: 700;
+        font-size: 0.9rem;
         cursor: pointer;
         transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-family: var(--font-body);
     }
     
     .custom-modal-box .btn-modal-secondary:hover {
-        background: #cbd5e1;
-        color: #1a1a2e;
+        background: var(--line);
+        color: var(--ink);
     }
     
     .custom-modal-box .modal-close {
@@ -225,14 +410,31 @@
         background: none;
         border: none;
         font-size: 1.5rem;
-        color: #999;
+        color: var(--steel);
         cursor: pointer;
         transition: all 0.3s;
     }
     
     .custom-modal-box .modal-close:hover {
-        color: #dc3545;
+        color: var(--signal);
         transform: rotate(90deg);
+    }
+    
+    .custom-modal-box .register-link {
+        margin-top: 15px;
+        font-size: 0.8rem;
+        color: var(--steel);
+    }
+    
+    .custom-modal-box .register-link a {
+        color: var(--signal);
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.3s;
+    }
+    
+    .custom-modal-box .register-link a:hover {
+        text-decoration: underline;
     }
     
     @media (max-width: 576px) {
@@ -260,30 +462,33 @@
         }
     }
 
+    /* ===== NOTIFICATION ===== */
     .notification {
         position: fixed;
         top: 20px;
         right: 20px;
-        z-index: 9999;
+        z-index: 99999;
         min-width: 280px;
         padding: 15px 20px;
-        border-radius: 8px;
+        border-radius: var(--radius-sm);
         color: white;
-        font-size: 14px;
+        font-size: 0.9rem;
         animation: slideIn 0.3s ease;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-weight: 600;
+        font-family: var(--font-body);
     }
     
     .notification.success {
-        background: #28a745;
+        background: var(--success);
     }
     
     .notification.error {
-        background: #dc3545;
+        background: var(--signal);
     }
     
     .notification.info {
-        background: #17a2b8;
+        background: var(--info);
     }
     
     @keyframes slideIn {
@@ -296,18 +501,132 @@
             opacity: 1;
         }
     }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .contact-section {
+            padding: 30px 0;
+        }
+        
+        .page-title h1 {
+            font-size: 2rem;
+        }
+        
+        .map-container iframe {
+            min-height: 350px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .contact-card {
+            padding: 20px 15px;
+        }
+        
+        .contact-form {
+            padding: 20px;
+        }
+        
+        .page-title h1 {
+            font-size: 1.6rem;
+        }
+        
+        .page-title p {
+            font-size: 0.95rem;
+        }
+        
+        .map-container iframe {
+            min-height: 300px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .contact-section {
+            padding: 20px 0;
+        }
+        
+        .contact-card {
+            padding: 15px;
+        }
+        
+        .contact-icon {
+            width: 55px;
+            height: 55px;
+        }
+        
+        .contact-icon i {
+            font-size: 22px;
+        }
+        
+        .contact-form {
+            padding: 15px;
+        }
+        
+        .contact-form h3 {
+            font-size: 1.1rem;
+        }
+        
+        .page-title h1 {
+            font-size: 1.3rem;
+        }
+        
+        .page-title p {
+            font-size: 0.85rem;
+        }
+        
+        .btn-send {
+            font-size: 0.8rem;
+            padding: 10px 20px;
+        }
+        
+        .map-container iframe {
+            min-height: 250px;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .page-title h1 {
+            font-size: 1.1rem;
+        }
+        
+        .contact-card h5 {
+            font-size: 0.9rem;
+        }
+        
+        .contact-card p {
+            font-size: 0.8rem;
+        }
+        
+        .contact-form .form-label {
+            font-size: 0.7rem;
+        }
+        
+        .contact-form .form-control {
+            font-size: 0.8rem;
+            padding: 8px 12px;
+        }
+        
+        .notification {
+            min-width: 200px;
+            font-size: 0.8rem;
+            padding: 12px 16px;
+            top: 10px;
+            right: 10px;
+        }
+    }
 </style>
 
 <div class="container contact-section">
     <div class="page-title">
+        <span class="section-eyebrow">Get in Touch</span>
         <h1><i class="fas fa-envelope"></i> Contact Us</h1>
-        <p>We'd love to hear from you! Get in touch with us for any queries.</p>
+        <div class="energy-stripe mx-auto" style="margin-top: 10px;"></div>
+        <p class="mt-3">We'd love to hear from you! Get in touch with us for any queries.</p>
     </div>
     
     <div class="row">
         <!-- Contact Info Cards -->
         <div class="col-md-4 mb-4">
-            <div class="contact-card card text-center p-4">
+            <div class="contact-card">
                 <div class="contact-icon">
                     <i class="fas fa-map-marker-alt"></i>
                 </div>
@@ -317,7 +636,7 @@
         </div>
         
         <div class="col-md-4 mb-4">
-            <div class="contact-card card text-center p-4">
+            <div class="contact-card">
                 <div class="contact-icon">
                     <i class="fas fa-phone-alt"></i>
                 </div>
@@ -327,30 +646,30 @@
         </div>
         
         <div class="col-md-4 mb-4">
-            <div class="contact-card card text-center p-4">
+            <div class="contact-card">
                 <div class="contact-icon">
                     <i class="fas fa-envelope"></i>
                 </div>
                 <h5>Email Address</h5>
-                <p>info@gymmanagement.com<br>support@gymmanagement.com</p>
+                <p>info@fitforge.com<br>support@fitforge.com</p>
             </div>
         </div>
     </div>
     
-    <div class="row mt-5">
+    <div class="row mt-4">
         <div class="col-lg-6 mb-4">
             <div class="contact-form">
-                <h3 class="mb-4"><i class="fas fa-paper-plane"></i> Send us a Message</h3>
+                <h3><i class="fas fa-paper-plane"></i> Send us a Message</h3>
                 
                 @if(session('contact_success'))
-                    <div class="alert alert-success alert-dismissible fade show">
+                    <div class="alert alert-success alert-dismissible fade show" style="border-radius: var(--radius-sm); border-left: 4px solid var(--success);">
                         <i class="fas fa-check-circle"></i> {{ session('contact_success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
                 
                 @if(session('contact_error'))
-                    <div class="alert alert-danger alert-dismissible fade show">
+                    <div class="alert alert-danger alert-dismissible fade show" style="border-radius: var(--radius-sm); border-left: 4px solid var(--signal);">
                         <i class="fas fa-exclamation-circle"></i> {{ session('contact_error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -359,22 +678,22 @@
                 <form method="POST" action="{{ route('contact.submit') }}" id="contactForm">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label">Your Name</label>
+                        <label class="form-label">Your Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Email Address</label>
+                        <label class="form-label">Email Address <span class="text-danger">*</span></label>
                         <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Subject</label>
+                        <label class="form-label">Subject <span class="text-danger">*</span></label>
                         <input type="text" name="subject" class="form-control" placeholder="Enter subject" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Message</label>
+                        <label class="form-label">Message <span class="text-danger">*</span></label>
                         <textarea name="message" class="form-control" rows="5" placeholder="Write your message here..." required></textarea>
                     </div>
                     
@@ -389,11 +708,9 @@
             <div class="map-container">
                 <iframe 
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15542.866040940103!2d80.233642!3d13.08268!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5265c0c2c5c2c1%3A0x8c2c5c2c5c2c5c2!2sChennai!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
-                    width="100%" 
-                    height="650" 
-                    style="border:0;" 
                     allowfullscreen="" 
-                    loading="lazy">
+                    loading="lazy"
+                    title="FitForge Location Map">
                 </iframe>
             </div>
         </div>
@@ -410,7 +727,7 @@
         <h2 class="modal-title">Login Required</h2>
         <p class="modal-subtitle">
             Please login to your account to send a message. <br>
-            <span style="color: #28a745; font-weight: 500;">Don't have an account? Register now!</span>
+            <span>Don't have an account? Register now!</span>
         </p>
         <div class="modal-buttons">
             <a href="{{ route('login') }}" class="btn-modal-primary">
@@ -420,59 +737,114 @@
                 <i class="fas fa-times me-2"></i> Cancel
             </button>
         </div>
-        <div style="margin-top: 15px; font-size: 0.8rem; color: #999;">
+        <div class="register-link">
             <i class="fas fa-user-plus me-1"></i> 
-            <a href="{{ route('member.register') }}" style="color: #28a745; text-decoration: none; font-weight: 500;">
-                Create new account
-            </a>
+            <a href="{{ route('member.register') }}">Create new account</a>
         </div>
     </div>
 </div>
 
 <script>
+    // ================================================================
     // ===== CUSTOM LOGIN MODAL FUNCTIONS =====
+    // ================================================================
     function showLoginModal() {
-        document.getElementById('loginModal').classList.add('active');
-        document.body.style.overflow = 'hidden';
+        const modal = document.getElementById('loginModal');
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
     }
     
     function closeLoginModal() {
-        document.getElementById('loginModal').classList.remove('active');
-        document.body.style.overflow = '';
+        const modal = document.getElementById('loginModal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
     
     // Close modal on overlay click
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('loginModal').addEventListener('click', function(e) {
-            if (e.target === this) {
+        const modal = document.getElementById('loginModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeLoginModal();
+                }
+            });
+        }
+
+        // ================================================================
+        // ===== CONTACT FORM - CHECK LOGIN BEFORE SUBMIT =====
+        // ================================================================
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                @if(!auth()->check())
+                    e.preventDefault(); // Stop form submission
+                    showLoginModal(); // Show login modal
+                    showNotification('Please login to send a message.', 'error');
+                    return false;
+                @endif
+                return true;
+            });
+        }
+
+        // ================================================================
+        // ===== CLOSE MODAL WITH ESC KEY =====
+        // ================================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
                 closeLoginModal();
             }
         });
     });
 
-    // ===== CONTACT FORM - CHECK LOGIN BEFORE SUBMIT =====
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-        @if(!auth()->check())
-            e.preventDefault(); // Stop form submission
-            showLoginModal(); // Show login modal
-            showNotification('Please login to send a message.', 'error');
-            return false;
-        @endif
-        
-        // If logged in, allow form submission
-        return true;
-    });
-
-    function showNotification(message, type) {
+    // ================================================================
+    // ===== NOTIFICATION FUNCTION =====
+    // ================================================================
+    function showNotification(message, type = 'info') {
         // Remove existing notifications
         const existingNotifications = document.querySelectorAll('.notification');
         existingNotifications.forEach(notif => notif.remove());
         
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
-        notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} me-2"></i> ${message}`;
+        
+        let icon = 'fa-info-circle';
+        if (type === 'success') icon = 'fa-check-circle';
+        else if (type === 'error') icon = 'fa-exclamation-circle';
+        
+        notification.innerHTML = `<i class="fas ${icon} me-2"></i> ${message}`;
         document.body.appendChild(notification);
-        setTimeout(() => notification.remove(), 3000);
+        
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
+
+    // ================================================================
+    // ===== AUTO-DISMISS ALERTS =====
+    // ================================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.alert-success, .alert-danger').forEach(function(alert) {
+            setTimeout(function() {
+                const closeBtn = alert.querySelector('.btn-close');
+                if (closeBtn) {
+                    closeBtn.click();
+                } else {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(function() {
+                        alert.remove();
+                    }, 500);
+                }
+            }, 5000);
+        });
+    });
 </script>
 @endsection

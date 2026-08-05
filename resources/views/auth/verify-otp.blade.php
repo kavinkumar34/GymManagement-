@@ -2,7 +2,62 @@
 
 @section('content')
     <style>
-        /* ===== CENTER CONTAINER - REDUCED WIDTH ===== */
+        /* ================================================================
+           DESIGN TOKENS — FitForge Athletic System
+        ================================================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --ink: #14161A;
+            --ink-soft: #2B2E34;
+            --canvas: #FAF9F6;
+            --fog: #EFEDE7;
+            --steel: #6B7280;
+            --line: #E4E1D8;
+            --signal: #FF4405;
+            --signal-dark: #D93A03;
+            --signal-tint: #FFF1EC;
+            --success: #16A34A;
+            --success-tint: #E8F8ED;
+            --info: #2563EB;
+            --info-tint: #EAF1FE;
+            --font-display: 'Anton', 'Arial Narrow', sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+        }
+
+        html, body {
+            overflow-x: hidden !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--canvas);
+            min-height: 100vh;
+        }
+
+        .energy-stripe {
+            height: 4px;
+            width: 56px;
+            border-radius: 3px;
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--signal) 0px,
+                var(--signal) 6px,
+                var(--ink) 6px,
+                var(--ink) 12px
+            );
+        }
+
+        /* ===== OTP WRAPPER ===== */
         .otp-wrapper {
             display: flex;
             justify-content: center;
@@ -11,17 +66,22 @@
             padding: 20px;
         }
 
+        /* ===== OTP CARD ===== */
         .otp-card {
-            border: none;
-            border-radius: 20px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-card);
             animation: fadeInUp 0.5s ease;
             background: white;
             max-width: 400px;
-            /* REDUCED WIDTH */
             width: 100%;
             margin: 0 auto;
+            transition: all 0.3s;
+        }
+
+        .otp-card:hover {
+            box-shadow: var(--shadow-card-hover);
         }
 
         @keyframes fadeInUp {
@@ -29,7 +89,6 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -37,32 +96,44 @@
         }
 
         .otp-card .card-header {
-            background: #000000;
-            padding: 18px 20px 15px;
+            background: var(--ink);
+            padding: 22px 20px 18px;
             border: none;
             text-align: center;
+            border-bottom: 3px solid var(--signal);
+        }
+
+        .otp-card .card-header .header-icon {
+            font-size: 28px;
+            color: var(--signal);
+            margin-bottom: 6px;
+            display: block;
         }
 
         .otp-card .card-header h4 {
+            font-family: var(--font-display);
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 3px;
             color: white;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .otp-card .card-header small {
             font-size: 11px;
             opacity: 0.7;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255,255,255,0.6);
+            font-weight: 400;
         }
 
         .otp-card .card-body {
-            padding: 22px 25px 25px;
+            padding: 25px 28px 28px;
             background: white;
             text-align: center;
         }
 
+        /* ===== OTP INPUT ===== */
         .otp-input-group {
             display: flex;
             justify-content: center;
@@ -75,37 +146,44 @@
             height: 50px;
             text-align: center;
             font-size: 20px;
-            font-weight: bold;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            font-weight: 700;
+            border: 2px solid var(--line);
+            border-radius: var(--radius-sm);
             transition: all 0.3s ease;
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: white;
         }
 
         .otp-input:focus {
-            border-color: #dc3545;
-            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 0.2rem rgba(255, 68, 5, 0.25);
             outline: none;
         }
 
+        /* ===== BUTTONS ===== */
         .btn-verify-otp {
-            background: #000000;
+            background: var(--signal);
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             padding: 10px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.3s ease;
             color: white;
             width: 100%;
             margin-top: 15px;
-            height: 40px;
+            height: 42px;
             letter-spacing: 0.5px;
+            font-family: var(--font-body);
+            text-transform: uppercase;
         }
 
         .btn-verify-otp:hover {
-            background: #dc3545;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+            background: var(--signal-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 68, 5, 0.3);
+            color: white;
         }
 
         .btn-verify-otp:disabled {
@@ -114,19 +192,25 @@
             transform: none;
         }
 
+        .btn-verify-otp i {
+            margin-right: 6px;
+        }
+
         .btn-resend-otp {
             background: transparent;
             border: none;
-            color: #dc3545;
-            font-weight: 500;
+            color: var(--signal);
+            font-weight: 700;
             text-decoration: underline;
             cursor: pointer;
             margin-top: 12px;
             font-size: 13px;
+            font-family: var(--font-body);
+            transition: all 0.3s;
         }
 
         .btn-resend-otp:hover {
-            color: #000000;
+            color: var(--signal-dark);
         }
 
         .btn-resend-otp:disabled {
@@ -134,34 +218,60 @@
             cursor: not-allowed;
         }
 
+        .btn-resend-otp i {
+            margin-right: 4px;
+        }
+
+        /* ===== TIMER ===== */
         .timer {
             font-size: 13px;
-            color: #666;
+            color: var(--steel);
             margin-top: 8px;
+            font-weight: 500;
         }
 
         .timer span {
-            font-weight: bold;
-            color: #dc3545;
+            font-weight: 700;
+            color: var(--signal);
         }
 
+        /* ===== PHONE INFO ===== */
+        .phone-info {
+            background: var(--fog);
+            padding: 10px 15px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink);
+            border: 1px solid var(--line);
+        }
+
+        .phone-info i {
+            color: var(--signal);
+            margin-right: 6px;
+        }
+
+        /* ===== ALERT ===== */
         .alert {
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             margin-bottom: 12px;
             padding: 8px 12px;
             font-size: 12px;
+            font-weight: 500;
+            border-left: 4px solid;
         }
 
         .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
+            background-color: var(--signal-tint);
+            border-color: var(--signal);
+            color: var(--signal-dark);
         }
 
         .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
+            background-color: var(--success-tint);
+            border-color: var(--success);
+            color: var(--success);
         }
 
         .alert-warning {
@@ -170,56 +280,31 @@
             color: #856404;
         }
 
-        .phone-info {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        /* ===== LINKS ===== */
+        .back-link {
+            color: var(--signal);
+            text-decoration: none;
             font-size: 13px;
-        }
-
-        .phone-info i {
-            color: #dc3545;
-        }
-
-        .test-otp-box {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            border: 2px solid #1e7e34;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 12px 0 15px 0;
-            color: white;
-        }
-
-        .test-otp-box .otp-code {
-            font-size: 32px;
-            font-weight: bold;
-            color: #fff;
-            letter-spacing: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 8px 20px;
-            border-radius: 6px;
-            display: inline-block;
-            margin: 6px 0;
-        }
-
-        .copy-btn {
-            background: rgba(255, 255, 255, 0.3);
-            border: none;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
+            font-weight: 700;
             transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.5);
+        .back-link:hover {
+            color: var(--signal-dark);
+            text-decoration: underline;
         }
 
+        .back-link i {
+            margin-right: 4px;
+        }
+
+        /* ===== MISC ===== */
         .text-muted {
             font-size: 12px !important;
+            color: var(--steel) !important;
+            font-weight: 400;
         }
 
         .mt-3 {
@@ -234,19 +319,11 @@
             margin-bottom: 0 !important;
         }
 
-        .back-link {
-            color: #dc3545;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
+        .fas, .far {
+            margin-right: 4px;
         }
 
-        .back-link:hover {
-            color: #000000;
-            text-decoration: underline;
-        }
-
-        /* Responsive - MOBILE FIRST */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 576px) {
             .otp-wrapper {
                 min-height: 70vh;
@@ -255,7 +332,7 @@
 
             .otp-card {
                 max-width: 100%;
-                border-radius: 15px;
+                border-radius: var(--radius-md);
             }
 
             .otp-card .card-body {
@@ -263,7 +340,7 @@
             }
 
             .otp-card .card-header {
-                padding: 14px 15px 12px;
+                padding: 16px 15px 14px;
             }
 
             .otp-card .card-header h4 {
@@ -278,9 +355,9 @@
             }
 
             .btn-verify-otp {
-                height: 38px;
+                height: 40px;
                 font-size: 13px;
-                padding: 7px;
+                padding: 8px;
             }
 
             .phone-info {
@@ -288,19 +365,13 @@
                 padding: 8px 12px;
             }
 
-            .test-otp-box .otp-code {
-                font-size: 24px;
-                letter-spacing: 4px;
-                padding: 6px 12px;
-            }
-
-            .test-otp-box {
-                padding: 12px;
-            }
-
             .otp-input-group {
                 gap: 5px;
                 margin: 15px 0;
+            }
+
+            .otp-card .card-header .header-icon {
+                font-size: 22px;
             }
         }
 
@@ -320,7 +391,7 @@
             }
 
             .btn-verify-otp {
-                height: 36px;
+                height: 38px;
                 font-size: 12px;
             }
 
@@ -333,9 +404,10 @@
     <div class="otp-wrapper">
         <div class="card otp-card">
             <div class="card-header">
-                <i class="fas fa-shield-alt" style="font-size: 24px; margin-bottom: 4px; color: white; display: block;"></i>
+                <span class="header-icon"><i class="fas fa-shield-alt"></i></span>
                 <h4>Verify Account</h4>
                 <small>Enter the OTP to complete registration</small>
+                <div class="energy-stripe mx-auto" style="margin-top: 12px;"></div>
             </div>
             <div class="card-body">
                 @if (session('success'))
@@ -421,6 +493,16 @@
             if (inputs.length > 0) {
                 inputs[0].focus();
             }
+
+            // Auto-dismiss alerts
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                setTimeout(function() {
+                    const closeBtn = alert.querySelector('.btn-close');
+                    if (closeBtn) {
+                        closeBtn.click();
+                    }
+                }, 5000);
+            });
 
             inputs.forEach((input, index) => {
                 input.addEventListener('input', function(e) {

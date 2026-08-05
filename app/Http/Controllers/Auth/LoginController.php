@@ -22,7 +22,7 @@ class LoginController extends Controller
         ]);
 
         if ($request->captcha != session('captcha')) {
-            return back()->with('error', 'Invalid captcha')->withInput();
+            return back()->with('error', 'Invalid captcha code. Please try again.')->withInput();
         }
 
         $credentials = $request->only('email', 'password');
@@ -30,7 +30,6 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // 👇 ROLE BASED REDIRECT - ADD THIS
             $user = Auth::user();
             
             if ($user->role === 'admin') {
@@ -41,11 +40,10 @@ class LoginController extends Controller
                 return redirect()->route('member.dashboard');
             }
             
-            // Default: Redirect to home page (store)
             return redirect()->route('home');
         }
 
-        return back()->with('error', 'Invalid credentials')->withInput($request->only('email'));
+        return back()->with('error', 'Invalid email or password. Please try again.')->withInput($request->only('email'));
     }
 
     public function logout(Request $request)
@@ -54,7 +52,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        // Clear cart from localStorage via JavaScript
         return redirect('/')->withHeaders([
             'Clear-Site-Data' => 'storage'
         ]);

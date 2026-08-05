@@ -3,21 +3,84 @@
 
 @section('content')
     <style>
-        /* ============================================================ */
-        /* ===== ROOT VARIABLES ===== */
-        /* ============================================================ */
+        /* ================================================================
+           DESIGN TOKENS — FitForge Athletic System
+           Display: Anton (poster-weight, athletic)
+           Body:    Plus Jakarta Sans (clean, modern e-commerce)
+        ================================================================ */
+        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
         :root {
-            --primary-red: #dc3545;
-            --primary-dark: #1a1a2e;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --text-dark: #1a1a2e;
-            --text-muted: #64748b;
-            --bg-light: #f8fafc;
-            --border-color: #eef2f6;
-            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
-            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.1);
-            --radius: 16px;
-            --transition: all 0.3s ease;
+            --ink: #14161A;
+            --ink-soft: #2B2E34;
+            --canvas: #FAF9F6;
+            --fog: #EFEDE7;
+            --steel: #6B7280;
+            --line: #E4E1D8;
+            --signal: #FF4405;
+            --signal-dark: #D93A03;
+            --signal-tint: #FFF1EC;
+            --success: #16A34A;
+            --success-tint: #E8F8ED;
+            --info: #2563EB;
+            --info-tint: #EAF1FE;
+            --font-display: 'Anton', 'Arial Narrow', sans-serif;
+            --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+        }
+
+        /* ===== PREVENT HORIZONTAL SCROLL ===== */
+        html,
+        body {
+            overflow-x: hidden !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--ink);
+            background: var(--canvas);
+            min-height: 100vh;
+        }
+
+        /* Signature element: a repeating diagonal "energy stripe" */
+        .energy-stripe {
+            height: 4px;
+            width: 56px;
+            border-radius: 3px;
+            background: repeating-linear-gradient(
+                -45deg,
+                var(--signal) 0px,
+                var(--signal) 6px,
+                var(--ink) 6px,
+                var(--ink) 12px
+            );
+        }
+
+        .section-eyebrow {
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--signal);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .section-heading {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--ink);
+            line-height: 1;
         }
 
         /* ============================================================ */
@@ -111,25 +174,24 @@
             width: 100%;
             height: 550px;
             background: #fff;
-            border-radius: 16px;
+            border-radius: var(--radius-md);
             overflow: hidden;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--line);
+            cursor: pointer;
         }
 
         .main-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Image will completely fill the container */
             object-position: center;
             padding: 0;
-            /* Remove white space */
             display: block;
-            transition: 0.3s ease;
+            transition: transform 0.3s ease;
         }
 
         .main-image-area:hover .main-image {
@@ -157,12 +219,12 @@
         .vertical-thumb {
             width: 80px;
             height: 80px;
-            border-radius: 10px;
+            border-radius: var(--radius-sm);
             overflow: hidden;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: var(--transition);
-            background: #f8f9fa;
+            transition: all 0.3s;
+            background: var(--fog);
             flex-shrink: 0;
         }
 
@@ -173,13 +235,13 @@
         }
 
         .vertical-thumb.active {
-            border-color: var(--primary-red);
-            box-shadow: 0 0 8px rgba(220, 53, 69, 0.3);
+            border-color: var(--signal);
+            box-shadow: 0 0 8px rgba(255, 68, 5, 0.3);
         }
 
         .vertical-thumb:hover {
             transform: scale(1.05);
-            border-color: var(--primary-red);
+            border-color: var(--signal);
         }
 
         .nav-arrows {
@@ -196,7 +258,7 @@
         .nav-arrow {
             width: 36px;
             height: 36px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(20, 22, 26, 0.6);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -205,11 +267,12 @@
             font-size: 18px;
             cursor: pointer;
             pointer-events: auto;
-            transition: var(--transition);
+            transition: all 0.3s;
+            border: none;
         }
 
         .nav-arrow:hover {
-            background: var(--primary-red);
+            background: var(--signal);
         }
 
         /* ============================================================ */
@@ -223,7 +286,7 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
+            background-color: rgba(20, 22, 26, 0.95);
             cursor: pointer;
             align-items: center;
             justify-content: center;
@@ -247,7 +310,7 @@
             max-width: 90vw;
             max-height: 85vh;
             object-fit: contain;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
         }
 
         .image-modal-content video {
@@ -262,9 +325,9 @@
             font-size: 40px;
             font-weight: bold;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             z-index: 9999999;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(20, 22, 26, 0.5);
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -275,9 +338,9 @@
         }
 
         .image-modal-close:hover {
-            color: var(--primary-red);
+            color: var(--signal);
             transform: rotate(90deg);
-            background: rgba(220, 53, 69, 0.2);
+            background: rgba(255, 68, 5, 0.2);
         }
 
         .image-modal-nav {
@@ -288,19 +351,19 @@
             font-size: 40px;
             cursor: pointer;
             z-index: 9999999;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(20, 22, 26, 0.4);
             width: 50px;
             height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
+            transition: all 0.3s;
             border: none;
         }
 
         .image-modal-nav:hover {
-            background: var(--primary-red);
+            background: var(--signal);
         }
 
         .image-modal-nav.prev {
@@ -317,11 +380,13 @@
             left: 50%;
             transform: translateX(-50%);
             color: white;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(20, 22, 26, 0.6);
             padding: 8px 20px;
             border-radius: 20px;
             font-size: 14px;
             z-index: 9999999;
+            font-family: var(--font-body);
+            font-weight: 500;
         }
 
         /* ============================================================ */
@@ -329,31 +394,39 @@
         /* ============================================================ */
         .brand-name {
             font-size: 14px;
-            color: #666;
+            color: var(--steel);
             margin-bottom: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .brand-name i {
-            color: var(--primary-red);
+            color: var(--signal);
             margin-right: 6px;
         }
 
         .product-title {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 24px;
-            font-weight: 700;
-            color: var(--text-dark);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
             margin-bottom: 5px;
             line-height: 1.3;
         }
 
         .product-category {
-            color: #999;
+            color: var(--steel);
             font-size: 13px;
             margin-bottom: 10px;
+            font-weight: 500;
         }
 
         .product-category i {
             margin-right: 5px;
+            color: var(--signal);
         }
 
         /* ===== RATING ===== */
@@ -371,54 +444,71 @@
         }
 
         .rating-text {
-            color: #666;
+            color: var(--steel);
             font-size: 13px;
+            font-weight: 500;
         }
 
         /* ===== PRICE SECTION ===== */
         .price-section {
             margin-bottom: 15px;
             padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--line);
         }
 
         .current-price {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 28px;
-            font-weight: 700;
-            color: var(--primary-red);
+            letter-spacing: 0.3px;
+            color: var(--signal);
         }
 
         .old-price {
             text-decoration: line-through;
-            color: #999;
+            color: var(--steel);
             font-size: 18px;
             margin-left: 10px;
+            font-weight: 500;
         }
 
         .discount-badge {
-            background: #28a745;
+            background: var(--signal);
             color: white;
             padding: 3px 10px;
-            border-radius: 5px;
+            border-radius: var(--radius-sm);
             font-size: 12px;
             margin-left: 10px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .tax-text {
-            color: #666;
+            color: var(--steel);
             font-size: 12px;
             margin-top: 4px;
+            font-weight: 500;
         }
 
         .you-save-text {
             font-size: 13px;
-            color: #28a745;
+            color: var(--success);
             margin-top: 4px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .you-save-text i {
+            margin-right: 4px;
+        }
+
+        .variant-info {
+            font-size: 12px;
+            color: var(--steel);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .variant-info i {
+            color: var(--signal);
             margin-right: 4px;
         }
 
@@ -437,8 +527,11 @@
         }
 
         .color-label {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .color-options {
@@ -452,8 +545,8 @@
             height: 38px;
             border-radius: 50%;
             cursor: pointer;
-            transition: var(--transition);
-            border: 3px solid #e0e0e0;
+            transition: all 0.3s;
+            border: 3px solid var(--line);
             position: relative;
             display: flex;
             align-items: center;
@@ -464,12 +557,12 @@
 
         .color-btn:hover {
             transform: scale(1.1);
-            border-color: #999;
+            border-color: var(--steel);
         }
 
         .color-btn.selected {
-            border-color: var(--primary-red);
-            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.3);
             transform: scale(1.1);
         }
 
@@ -479,9 +572,10 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 10px;
-            color: #666;
+            color: var(--steel);
             white-space: nowrap;
             display: none;
+            font-weight: 600;
         }
 
         .color-btn:hover .color-name-tooltip {
@@ -514,21 +608,24 @@
         }
 
         .size-label {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .size-guide {
             font-size: 12px;
-            color: #0d6efd;
+            color: var(--info);
             text-decoration: none;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .size-guide:hover {
             text-decoration: underline;
-            color: var(--primary-red);
+            color: var(--signal);
         }
 
         .size-options {
@@ -540,27 +637,32 @@
         .size-btn {
             min-width: 70px;
             padding: 8px 14px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--line);
             background: white;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             text-align: center;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
+            font-family: var(--font-body);
+            color: var(--ink);
         }
 
         .size-btn:hover:not(.out-of-stock-size):not(:disabled) {
-            border-color: var(--primary-red);
-            background: #fff5f5;
-            color: black;
-
+            border-color: var(--signal);
+            background: var(--signal-tint);
+            color: var(--ink);
         }
 
         .size-btn.selected {
-            background: var(--primary-red);
+            background: var(--signal);
             color: white;
-            border-color: var(--primary-red);
+            border-color: var(--signal);
+        }
+
+        .size-btn.selected .discount-text {
+            color: white !important;
         }
 
         .size-btn.out-of-stock-size {
@@ -571,16 +673,43 @@
 
         .size-btn.out-of-stock-size:hover {
             background: white;
-            color: inherit;
-            border-color: #ddd;
+            color: var(--ink);
+            border-color: var(--line);
         }
 
         .size-warning {
-            color: red;
+            color: var(--signal);
             font-size: 12px;
             display: none;
             margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .size-stock-info {
+            font-size: 12px;
+            color: var(--steel);
+            margin-top: 6px;
+            display: none;
             font-weight: 500;
+        }
+
+        .size-stock-info i {
+            margin-right: 4px;
+        }
+
+        .discount-text {
+            font-size: 9px;
+            display: block;
+            color: white;
+            transition: color 0.3s ease;
+        }
+
+        .size-btn:hover .discount-text {
+            color: var(--ink) !important;
+        }
+
+        .size-btn.selected .discount-text {
+            color: white !important;
         }
 
         /* ============================================================ */
@@ -591,10 +720,13 @@
         }
 
         .quantity-label {
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
             margin-bottom: 8px;
             display: block;
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .quantity-selector {
@@ -606,36 +738,40 @@
         .quantity-btn {
             width: 38px;
             height: 38px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--line);
             background: white;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             font-size: 18px;
-            transition: var(--transition);
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: var(--ink);
+            font-weight: 700;
         }
 
         .quantity-btn:hover {
-            border-color: var(--primary-red);
-            background: #fff5f5;
+            border-color: var(--signal);
+            background: var(--signal-tint);
         }
 
         .quantity-input {
             width: 60px;
             text-align: center;
             padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
+            font-family: var(--font-body);
+            color: var(--ink);
         }
 
         .quantity-input:focus {
             outline: none;
-            border-color: var(--primary-red);
-            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+            border-color: var(--signal);
+            box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.1);
         }
 
         /* ============================================================ */
@@ -646,15 +782,15 @@
         }
 
         .in-stock {
-            color: #28a745;
+            color: var(--success);
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .in-stock-low {
-            color: var(--primary-red);
+            color: var(--signal);
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .in-stock-low i {
@@ -662,9 +798,9 @@
         }
 
         .out-of-stock {
-            color: var(--primary-red);
+            color: var(--signal);
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .out-of-stock i {
@@ -683,55 +819,70 @@
 
         .btn-wishlist {
             background: white;
-            border: 1px solid var(--primary-red);
+            border: 1px solid var(--signal);
             border-radius: 25px;
             padding: 10px 22px;
-            color: var(--primary-red);
+            color: var(--signal);
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 8px;
             flex: 0 0 auto;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-wishlist:hover:not(:disabled) {
-            background: var(--primary-red);
+            background: var(--signal);
             color: white;
         }
 
+        .btn-wishlist i {
+            font-size: 16px;
+        }
+
         .btn-add-cart {
-            background: #000000;
+            background: var(--ink);
             border: none;
             border-radius: 25px;
             padding: 10px 28px;
             color: white;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             flex: 1;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            font-family: var(--font-body);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .btn-add-cart:hover:not(:disabled) {
-            background: var(--primary-red);
+            background: var(--signal);
+        }
+
+        .btn-add-cart:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* ============================================================ */
         /* ===== DELIVERY BOX ===== */
         /* ============================================================ */
         .delivery-box {
-            background: var(--bg-light);
+            background: var(--fog);
             padding: 14px 18px;
-            border-radius: 12px;
+            border-radius: var(--radius-md);
             margin-bottom: 16px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
         }
 
         .delivery-item {
@@ -747,7 +898,7 @@
 
         .delivery-item i {
             width: 24px;
-            color: var(--primary-red);
+            color: var(--signal);
             font-size: 16px;
             flex-shrink: 0;
         }
@@ -755,27 +906,30 @@
         .delivery-text {
             font-size: 13px;
             flex: 1;
+            font-weight: 500;
         }
 
         .delivery-text strong {
             display: block;
             margin-bottom: 1px;
             font-size: 13px;
+            color: var(--ink);
         }
 
         .delivery-text small {
-            color: #666;
+            color: var(--steel);
             font-size: 12px;
+            font-weight: 500;
         }
 
         .delivery-text .cod-available {
-            color: #28a745;
-            font-weight: 600;
+            color: var(--success);
+            font-weight: 700;
         }
 
         .delivery-text .cod-not-available {
-            color: var(--primary-red);
-            font-weight: 600;
+            color: var(--signal);
+            font-weight: 700;
         }
 
         /* ============================================================ */
@@ -786,8 +940,8 @@
         }
 
         .info-tab {
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
             margin-bottom: 10px;
             overflow: hidden;
         }
@@ -799,19 +953,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: var(--transition);
-            font-weight: 600;
+            transition: all 0.3s;
+            font-weight: 700;
             font-size: 13px;
-            color: var(--text-dark);
+            color: var(--ink);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-family: var(--font-body);
         }
 
         .info-tab-header i {
             margin-right: 10px;
-            color: var(--primary-red);
+            color: var(--signal);
         }
 
         .info-tab-header.active {
-            background: var(--primary-red);
+            background: var(--signal);
             color: white;
         }
 
@@ -832,7 +989,7 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease, padding 0.3s ease;
-            background: var(--bg-light);
+            background: var(--fog);
         }
 
         .info-tab-content.show {
@@ -844,7 +1001,7 @@
         .product-description {
             font-size: 14px;
             line-height: 1.8;
-            color: #333;
+            color: var(--ink-soft);
         }
 
         .product-description p {
@@ -852,25 +1009,32 @@
         }
 
         /* ============================================================ */
-        /* ===== REVIEWS SECTION ===== */
+        /* ===== REVIEWS SECTION - CAROUSEL ===== */
         /* ============================================================ */
         .reviews-section {
             margin-top: 35px;
             padding: 0;
             background: transparent;
             border-radius: 0;
+            width: 80%;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .reviews-section .section-title {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 20px;
-            font-weight: 700;
-            color: var(--text-dark);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 12px;
             padding-bottom: 12px;
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 2px solid var(--line);
             flex-wrap: wrap;
         }
 
@@ -879,41 +1043,59 @@
         }
 
         .review-count-badge {
-            background: var(--bg-light);
-            color: var(--text-dark);
+            background: var(--fog);
+            color: var(--ink);
             border-radius: 20px;
             padding: 2px 14px;
             font-size: 14px;
-            font-weight: 600;
-            border: 1px solid var(--border-color);
+            font-weight: 700;
+            border: 1px solid var(--line);
+            font-family: var(--font-body);
+        }
+
+        /* ===== REVIEWS CAROUSEL ===== */
+        .reviews-carousel-wrapper {
+            position: relative;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+
+        .reviews-carousel-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s ease;
+            will-change: transform;
         }
 
         .review-card {
+            flex: 0 0 calc(33.333% - 14px);
+            min-width: 280px;
             background: white;
-            border-radius: 12px;
-            padding: 18px 20px;
-            margin-bottom: 14px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            border: 1px solid var(--line);
+            transition: all 0.3s;
+            box-shadow: var(--shadow-card);
         }
 
         .review-card:hover {
-            box-shadow: var(--shadow-sm);
-            border-color: #d0d7de;
+            box-shadow: var(--shadow-card-hover);
+            border-color: transparent;
+            transform: translateY(-4px);
         }
 
         .review-card .review-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 4px;
         }
 
         .review-card .review-user {
-            font-weight: 600;
-            color: var(--text-dark);
+            font-weight: 700;
+            color: var(--ink);
             font-size: 15px;
             display: flex;
             align-items: center;
@@ -929,110 +1111,136 @@
         .review-card .review-date {
             font-size: 12px;
             color: #94a3b8;
+            font-weight: 500;
         }
 
         .review-card .review-stars {
             color: #f59e0b;
             font-size: 14px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             gap: 2px;
         }
 
         .review-card .review-stars .star-empty {
-            color: #e2e8f0;
+            color: var(--line);
         }
 
         .review-card .review-text {
-            color: #475569;
+            color: var(--steel);
             font-size: 14px;
             line-height: 1.7;
-            margin-bottom: 10px;
-        }
-
-        .review-card .review-media {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .review-card .review-media .media-item {
-            width: 70px;
-            height: 70px;
-            border-radius: 8px;
+            font-weight: 500;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .review-card .review-media .media-item:hover {
-            transform: scale(1.05);
-            border-color: var(--primary-red);
-        }
-
-        .review-card .review-media .media-item img,
-        .review-card .review-media .media-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .review-card .review-media .media-item video {
-            background: #000;
+            min-height: 80px;
         }
 
         .review-card .review-verified {
             display: inline-block;
-            background: #dcfce7;
-            color: #15803d;
+            background: var(--success-tint);
+            color: var(--success);
             font-size: 11px;
             padding: 2px 12px;
             border-radius: 20px;
-            font-weight: 500;
-            margin-top: 6px;
+            font-weight: 600;
+            margin-top: 10px;
         }
 
         .review-card .review-verified i {
             margin-right: 4px;
         }
 
-        .review-card .review-like {
-            display: inline-flex;
+        /* ===== CAROUSEL NAVIGATION ===== */
+        .reviews-nav {
+            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            color: #94a3b8;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .reviews-nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: white;
+            color: var(--ink);
             cursor: pointer;
-            margin-top: 8px;
-            transition: var(--transition);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
 
-        .review-card .review-like:hover {
-            color: var(--primary-red);
+        .reviews-nav-btn:hover:not(:disabled) {
+            background: var(--signal);
+            color: white;
+            border-color: var(--signal);
         }
 
+        .reviews-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .reviews-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .reviews-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reviews-dot.active {
+            background: var(--signal);
+            border-color: var(--signal);
+            transform: scale(1.2);
+        }
+
+        .reviews-dot:hover:not(.active) {
+            border-color: var(--signal);
+        }
+
+        /* ===== NO REVIEWS ===== */
         .no-reviews {
             text-align: center;
             padding: 40px 20px;
             color: #94a3b8;
-            background: var(--bg-light);
-            border-radius: 12px;
-            border: 1px dashed var(--border-color);
+            background: var(--fog);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--line);
         }
 
         .no-reviews i {
             font-size: 40px;
             margin-bottom: 15px;
             display: block;
-            color: #cbd5e1;
+            color: var(--steel);
         }
 
         .no-reviews h5 {
-            color: var(--text-dark);
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
             margin-bottom: 5px;
+        }
+
+        .no-reviews p {
+            font-weight: 500;
         }
 
         /* ============================================================ */
@@ -1042,13 +1250,20 @@
             margin-top: 35px;
             padding: 20px 0;
             clear: both;
-            border-top: 2px solid var(--border-color);
+            border-top: 2px solid var(--line);
+            width: 80%;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .related-products-section .section-title {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-dark);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -1056,24 +1271,25 @@
         }
 
         .related-products-section .section-title i {
-            color: var(--primary-red);
+            color: var(--signal);
         }
 
         .related-product-card {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            transition: var(--transition);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            transition: all 0.28s ease;
             overflow: hidden;
             margin-bottom: 20px;
             height: 100%;
             position: relative;
             background: white;
             cursor: pointer;
+            box-shadow: var(--shadow-card);
         }
 
         .related-product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-card-hover);
             border-color: transparent;
         }
 
@@ -1081,7 +1297,7 @@
             width: 100%;
             height: 220px;
             overflow: hidden;
-            background: var(--bg-light);
+            background: var(--fog);
             position: relative;
         }
 
@@ -1095,28 +1311,30 @@
         }
 
         .related-product-card:hover .product-image-container img {
-            transform: scale(1.03);
+            transform: scale(1.04);
         }
 
         .related-product-card .discount-badge {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: var(--primary-red);
+            background: var(--signal);
             color: white;
             padding: 3px 12px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 0.75rem;
             font-weight: 700;
             z-index: 1;
+            letter-spacing: 0.3px;
         }
 
         .related-product-card .wishlist-btn {
             position: absolute;
             top: 10px;
             left: 10px;
-            background: white;
-            border: none;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--line);
             border-radius: 50%;
             width: 34px;
             height: 34px;
@@ -1125,24 +1343,26 @@
             justify-content: center;
             cursor: pointer;
             z-index: 2;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(20, 22, 26, 0.1);
+            transition: all 0.25s;
         }
 
         .related-product-card .wishlist-btn i {
             font-size: 0.9rem;
+            transition: all 0.25s;
         }
 
         .related-product-card .wishlist-btn i.far {
-            color: #999;
+            color: var(--steel);
         }
 
         .related-product-card .wishlist-btn i.fas {
-            color: var(--primary-red);
+            color: var(--signal);
         }
 
         .related-product-card .wishlist-btn:hover {
             transform: scale(1.1);
+            border-color: var(--signal);
         }
 
         .related-product-card .card-body {
@@ -1152,27 +1372,30 @@
 
         .related-product-card .product-brand {
             font-size: 0.7rem;
-            color: #6c757d;
-            font-weight: 500;
+            color: var(--steel);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
             margin-bottom: 2px;
         }
 
         .related-product-card .product-brand i {
             font-size: 0.6rem;
             margin-right: 4px;
-            color: #6c757d;
+            color: var(--signal);
         }
 
         .related-product-card .product-name {
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 4px;
-            color: var(--text-dark);
+            color: var(--ink);
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             min-height: 40px;
+            line-height: 1.35;
         }
 
         .related-product-card .product-price-container {
@@ -1185,21 +1408,22 @@
 
         .related-product-card .product-price-container .final-price {
             font-size: 1rem;
-            font-weight: 700;
-            color: var(--text-dark);
+            font-weight: 800;
+            color: var(--ink);
+            font-family: var(--font-body);
         }
 
         .related-product-card .product-price-container .original-price {
             font-size: 0.8rem;
-            color: #999;
+            color: #A3A9B2;
             text-decoration: line-through;
         }
 
         .related-product-card .product-price-container .discount-percent {
-            background: var(--primary-red);
-            color: white;
+            background: var(--signal-tint);
+            color: var(--signal-dark);
             padding: 1px 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 0.7rem;
             font-weight: 700;
         }
@@ -1214,8 +1438,8 @@
 
         .related-product-card .color-options-container .color-label {
             font-size: 0.6rem;
-            color: #666;
-            font-weight: 500;
+            color: var(--steel);
+            font-weight: 600;
             margin-right: 2px;
         }
 
@@ -1223,7 +1447,7 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--line);
             display: inline-block;
             cursor: pointer;
             transition: all 0.3s;
@@ -1234,20 +1458,20 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #f0f0f0;
-            border: 2px solid #e0e0e0;
+            background: var(--fog);
+            border: 2px solid var(--line);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 6px;
-            color: #666;
-            font-weight: 600;
+            color: var(--steel);
+            font-weight: 700;
             cursor: pointer;
         }
 
         .related-product-card .product-stock-low {
             font-size: 0.7rem;
-            color: var(--primary-red);
+            color: var(--signal-dark);
             margin-top: 6px;
             font-weight: 600;
         }
@@ -1255,48 +1479,58 @@
         .related-product-card .product-stock-low i {
             font-size: 0.7rem;
             margin-right: 4px;
-            color: var(--primary-red);
+            color: var(--signal);
         }
 
         .related-product-card .product-stock-out {
             font-size: 0.7rem;
-            color: #999;
+            color: var(--steel);
             margin-top: 6px;
-            font-weight: 500;
-            background: #f5f5f5;
+            font-weight: 600;
+            background: var(--fog);
             padding: 3px 8px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
+            display: inline-block;
         }
 
         .related-product-card .product-stock-out i {
             font-size: 0.7rem;
             margin-right: 4px;
-            color: #999;
+            color: var(--steel);
         }
 
         /* ============================================================ */
         /* ===== BREADCRUMB ===== */
         /* ============================================================ */
-        .breadcrumb {
+        .breadcrumb-custom {
             background: transparent;
             padding: 0;
             margin-bottom: 16px;
+            width: 80%;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .breadcrumb-item a {
-            color: #666;
+        .breadcrumb-custom .breadcrumb-item a {
+            color: var(--steel);
             text-decoration: none;
             font-size: 13px;
-        }
-
-        .breadcrumb-item a:hover {
-            color: var(--primary-red);
-        }
-
-        .breadcrumb-item.active {
-            color: var(--text-dark);
             font-weight: 500;
+        }
+
+        .breadcrumb-custom .breadcrumb-item a:hover {
+            color: var(--signal);
+        }
+
+        .breadcrumb-custom .breadcrumb-item.active {
+            color: var(--ink);
+            font-weight: 700;
             font-size: 13px;
+        }
+
+        .breadcrumb-custom .breadcrumb-item+.breadcrumb-item::before {
+            color: var(--steel);
         }
 
         /* ============================================================ */
@@ -1310,8 +1544,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(20, 22, 26, 0.6);
+            backdrop-filter: blur(2px);
             z-index: 99999;
             display: none;
             align-items: center;
@@ -1328,7 +1562,6 @@
                 opacity: 0;
                 transform: scale(0.9);
             }
-
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -1337,7 +1570,7 @@
 
         .custom-modal-box {
             background: white;
-            border-radius: 20px;
+            border-radius: var(--radius-lg);
             padding: 35px 40px;
             max-width: 420px;
             width: 90%;
@@ -1345,6 +1578,7 @@
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
             position: relative;
             animation: slideUpModal 0.4s ease;
+            font-family: var(--font-body);
         }
 
         @keyframes slideUpModal {
@@ -1352,7 +1586,6 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1362,7 +1595,7 @@
         .custom-modal-box .modal-icon {
             width: 70px;
             height: 70px;
-            background: linear-gradient(135deg, #28a745, #1e7e34);
+            background: var(--success);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -1370,21 +1603,30 @@
             margin: 0 auto 18px;
             font-size: 2.2rem;
             color: white;
-            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 10px 30px rgba(22, 163, 74, 0.3);
         }
 
         .custom-modal-box .modal-title {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-dark);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
             margin-bottom: 8px;
         }
 
         .custom-modal-box .modal-subtitle {
             font-size: 0.9rem;
-            color: var(--text-muted);
+            color: var(--steel);
             margin-bottom: 20px;
             line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .custom-modal-box .modal-subtitle span {
+            color: var(--success);
+            font-weight: 700;
         }
 
         .custom-modal-box .modal-buttons {
@@ -1395,39 +1637,45 @@
         }
 
         .custom-modal-box .btn-modal-primary {
-            background: linear-gradient(135deg, #28a745, #1e7e34);
+            background: var(--signal);
             color: white;
             border: none;
             padding: 10px 30px;
             border-radius: 50px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .custom-modal-box .btn-modal-primary:hover {
+            background: var(--signal-dark);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 68, 5, 0.3);
             color: white;
         }
 
         .custom-modal-box .btn-modal-secondary {
-            background: var(--bg-light);
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
+            background: var(--fog);
+            color: var(--steel);
+            border: 1px solid var(--line);
             padding: 10px 30px;
             border-radius: 50px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .custom-modal-box .btn-modal-secondary:hover {
-            background: #e2e8f0;
+            background: var(--line);
+            color: var(--ink);
         }
 
         .custom-modal-box .modal-close {
@@ -1437,26 +1685,27 @@
             background: none;
             border: none;
             font-size: 1.5rem;
-            color: #999;
+            color: var(--steel);
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
         }
 
         .custom-modal-box .modal-close:hover {
-            color: var(--primary-red);
+            color: var(--signal);
             transform: rotate(90deg);
         }
 
         .custom-modal-box .register-link {
             margin-top: 14px;
             font-size: 0.8rem;
-            color: #999;
+            color: var(--steel);
         }
 
         .custom-modal-box .register-link a {
-            color: #28a745;
+            color: var(--signal);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 700;
+            transition: all 0.3s;
         }
 
         .custom-modal-box .register-link a:hover {
@@ -1470,7 +1719,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(20, 22, 26, 0.5);
             z-index: 99999;
             display: none;
             justify-content: flex-end;
@@ -1485,7 +1734,6 @@
             from {
                 opacity: 0;
             }
-
             to {
                 opacity: 1;
             }
@@ -1507,7 +1755,6 @@
             from {
                 transform: translateX(100%);
             }
-
             to {
                 transform: translateX(0);
             }
@@ -1521,26 +1768,29 @@
             border: none;
             font-size: 28px;
             cursor: pointer;
-            color: #999;
-            transition: var(--transition);
+            color: var(--steel);
+            transition: all 0.3s;
         }
 
         .sizeguide-modal-box .modal-close-btn:hover {
-            color: var(--primary-red);
+            color: var(--signal);
             transform: rotate(90deg);
         }
 
         .sizeguide-modal-box h3 {
+            font-family: var(--font-display);
+            font-weight: 400;
             font-size: 20px;
-            font-weight: 700;
-            color: var(--text-dark);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
             margin-bottom: 18px;
             padding-bottom: 12px;
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 2px solid var(--line);
         }
 
         .sizeguide-modal-box h3 i {
-            color: var(--primary-red);
+            color: var(--signal);
             margin-right: 10px;
         }
 
@@ -1551,23 +1801,26 @@
         }
 
         .sizeguide-table th {
-            background: var(--primary-red);
+            background: var(--ink);
             color: white;
             padding: 10px 14px;
             text-align: left;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .sizeguide-table td {
             padding: 8px 14px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--line);
             font-size: 13px;
-            color: #333;
+            color: var(--ink-soft);
+            font-weight: 500;
         }
 
         .sizeguide-table tr:hover td {
-            background: var(--bg-light);
+            background: var(--fog);
         }
 
         /* ============================================================ */
@@ -1580,31 +1833,32 @@
             z-index: 99999;
             min-width: 280px;
             padding: 14px 20px;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             color: white;
             font-size: 14px;
-            animation: slideIn 0.3s ease;
+            animation: slideInNotif 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-family: var(--font-body);
+            font-weight: 600;
         }
 
         .notification.success {
-            background: #28a745;
+            background: var(--success);
         }
 
         .notification.error {
-            background: var(--primary-red);
+            background: var(--signal);
         }
 
         .notification.info {
-            background: #17a2b8;
+            background: var(--info);
         }
 
-        @keyframes slideIn {
+        @keyframes slideInNotif {
             from {
                 transform: translateX(100%);
                 opacity: 0;
             }
-
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -1679,6 +1933,26 @@
                 max-width: 100%;
                 padding: 25px;
             }
+
+            .reviews-section {
+                width: 100%;
+                padding: 0 10px;
+            }
+
+            .related-products-section {
+                width: 100%;
+                padding: 20px 10px;
+            }
+
+            .breadcrumb-custom {
+                width: 100%;
+                padding: 0 10px;
+            }
+
+            .review-card {
+                flex: 0 0 calc(50% - 10px);
+                min-width: 250px;
+            }
         }
 
         /* ===== MOBILE (≤767px) ===== */
@@ -1717,7 +1991,6 @@
                 justify-content: center;
             }
 
-            /* ===== RELATED PRODUCTS - 2 PER ROW ON MOBILE ===== */
             .related-product-card .product-image-container {
                 height: 160px;
             }
@@ -1746,7 +2019,6 @@
                 font-size: 5px;
             }
 
-            /* ===== 2 COLUMNS ON MOBILE ===== */
             .col-sm-6 {
                 flex: 0 0 50%;
                 max-width: 50%;
@@ -1781,18 +2053,15 @@
             }
 
             .review-card {
-                padding: 14px 16px;
+                flex: 0 0 calc(50% - 10px);
+                min-width: 220px;
+                padding: 16px 18px;
             }
 
             .review-card .review-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 2px;
-            }
-
-            .review-card .review-media .media-item {
-                width: 60px;
-                height: 60px;
             }
 
             .image-modal-nav {
@@ -1820,6 +2089,12 @@
             .reviews-section .section-title {
                 font-size: 17px;
             }
+
+            .reviews-nav-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
         }
 
         /* ===== SMALL MOBILE (≤575px) ===== */
@@ -1837,7 +2112,7 @@
             .vertical-thumb {
                 width: 50px;
                 height: 50px;
-                border-radius: 8px;
+                border-radius: var(--radius-sm);
             }
 
             .vertical-thumbnails {
@@ -1922,7 +2197,6 @@
                 font-size: 13px;
             }
 
-            /* ===== RELATED PRODUCTS - 2 PER ROW ===== */
             .related-product-card .product-image-container {
                 height: 130px;
             }
@@ -1973,14 +2247,15 @@
                 padding: 2px 6px;
             }
 
-            /* ===== 2 COLUMNS ON SMALL MOBILE ===== */
             .col-sm-6 {
                 flex: 0 0 50%;
                 max-width: 50%;
             }
 
             .review-card {
-                padding: 12px 14px;
+                flex: 0 0 100%;
+                min-width: 0;
+                padding: 14px 16px;
             }
 
             .review-card .review-user {
@@ -1993,11 +2268,8 @@
 
             .review-card .review-text {
                 font-size: 13px;
-            }
-
-            .review-card .review-media .media-item {
-                width: 55px;
-                height: 55px;
+                min-height: 60px;
+                -webkit-line-clamp: 3;
             }
 
             .reviews-section .section-title {
@@ -2069,6 +2341,17 @@
                 padding: 5px 14px;
                 bottom: 20px;
             }
+
+            .reviews-nav-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+
+            .reviews-dot {
+                width: 8px;
+                height: 8px;
+            }
         }
 
         /* ===== VERY SMALL (≤400px) ===== */
@@ -2124,7 +2407,6 @@
                 font-size: 12px;
             }
 
-            /* ===== RELATED PRODUCTS - 2 PER ROW ===== */
             .related-product-card .product-image-container {
                 height: 110px;
             }
@@ -2178,9 +2460,10 @@
                 right: 8px;
             }
 
-            .review-card .review-media .media-item {
-                width: 48px;
-                height: 48px;
+            .review-card .review-text {
+                font-size: 12px;
+                min-height: 50px;
+                -webkit-line-clamp: 3;
             }
 
             .related-product-card .color-dot {
@@ -2213,41 +2496,6 @@
                 --bs-gutter-y: 0.5rem;
             }
         }
-
-
-        .discount-text {
-            font-size: 9px;
-            display: block;
-            color: white;
-            transition: color 0.3s ease;
-        }
-
-        .size-btn:hover .discount-text {
-            color: black;
-        }
-
-        .size-btn.selected .discount-text {
-            color: white;
-        }
-
-        .size-btn:hover span {
-            color: black !important;
-        }
-
-        .discount-text{
-    font-size:9px;
-    display:block;
-    color:white;
-    transition: color .3s ease;
-}
-
-.size-btn:hover .discount-text{
-    color:#000;
-}
-
-.size-btn.selected .discount-text{
-    color:#fff;
-}
     </style>
 
     @php
@@ -2403,7 +2651,7 @@
     <!-- ============================================================ -->
     <div class="container-fluid product-detail-container">
         <!-- BREADCRUMB -->
-        <nav aria-label="breadcrumb">
+        <nav aria-label="breadcrumb" class="breadcrumb-custom">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Home</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('shop') }}">Shop</a></li>
@@ -2458,7 +2706,6 @@
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                             <i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
                         </span>
-                     {{--   <span class="rating-text">Based on 0 ratings</span> --}}
                     </div>
 
                     <!-- PRICE -->
@@ -2475,12 +2722,12 @@
                         @endif
                         <div class="tax-text">Inclusive of all taxes</div>
                         @if ($hasVariants)
-                            <div style="font-size:12px; color:#6c757d; margin-top:4px;">
+                            <div class="variant-info">
                                 <i class="fas fa-palette"></i> {{ $variants->count() }} variants available
                             </div>
                         @endif
                         @if ($hasColors)
-                            <div style="font-size:12px; color:#6c757d; margin-top:2px;">
+                            <div class="variant-info">
                                 <i class="fas fa-paint-bucket"></i> {{ $colors->count() }} colors available
                             </div>
                         @endif
@@ -2593,8 +2840,7 @@
                                             {{ $isOutOfStock ? 'disabled' : '' }}>
                                             {{ $size }}
                                             @if ($variantDiscountPercent > 0)
-                                                <span
-                                                    style="font-size:9px; display:block; color:white;">-{{ $variantDiscountText }}</span>
+                                                <span class="discount-text">-{{ $variantDiscountText }}</span>
                                             @endif
                                         </button>
                                     @endforeach
@@ -2611,7 +2857,7 @@
                                 @endif
                             </div>
                             <div id="sizeWarning" class="size-warning">Please select a size first</div>
-                            <div id="sizeStockInfo" style="font-size:12px; color:#6c757d; margin-top:6px; display:none;">
+                            <div id="sizeStockInfo" class="size-stock-info">
                                 <i class="fas fa-box"></i> <span id="sizeStockCount">0</span> items in stock
                             </div>
                         </div>
@@ -2682,8 +2928,7 @@
 
                     <!-- OFFERS -->
                     @if (isset($product->offers) && $product->offers->count() > 0)
-                        <div
-                            style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px; padding: 12px 15px; margin-bottom: 16px;">
+                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: var(--radius-sm); padding: 12px 15px; margin-bottom: 16px;">
                             <strong style="color: #856404;"><i class="fas fa-tags"></i> Special Offers</strong>
                             <ul style="margin: 6px 0 0 0; padding-left: 20px; color: #856404; font-size: 13px;">
                                 @foreach ($product->offers as $offer)
@@ -2714,7 +2959,7 @@
                                     @endphp
                                 </div>
                                 @if ($product->short_description)
-                                    <div class="alert alert-light mt-2 p-2" style="border-radius:8px;">
+                                    <div class="alert alert-light mt-2 p-2" style="border-radius:var(--radius-sm);">
                                         <strong>Highlights:</strong>
                                         <p class="mb-0">{{ $product->short_description }}</p>
                                     </div>
@@ -2897,7 +3142,7 @@
         @endif
 
         <!-- ============================================================ -->
-        <!-- ===== REVIEWS SECTION ===== -->
+        <!-- ===== REVIEWS SECTION - CAROUSEL ===== -->
         <!-- ============================================================ -->
         <div class="reviews-section" id="reviewsSection">
             <div class="section-title">
@@ -2909,7 +3154,7 @@
                     <div class="spinner-border text-danger" role="status" style="width: 30px; height: 30px;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-2 text-muted" style="font-size: 14px;">Loading reviews...</p>
+                    <p class="mt-2 text-muted" style="font-size: 14px; font-weight: 500;">Loading reviews...</p>
                 </div>
                 <div id="reviewsList"></div>
             </div>
@@ -2926,7 +3171,7 @@
         <div class="image-modal-content" id="imageModalContent">
             <img id="modalDisplayImage" src="" alt="Product Image">
             <video id="modalDisplayVideo" controls
-                style="display:none; max-width:90vw; max-height:85vh; border-radius:8px; background:#000;"></video>
+                style="display:none; max-width:90vw; max-height:85vh; border-radius:var(--radius-sm); background:#000;"></video>
         </div>
         <div class="image-modal-counter" id="imageModalCounter">1 / 1</div>
     </div>
@@ -3002,7 +3247,7 @@
             <h2 class="modal-title">Login Required</h2>
             <p class="modal-subtitle">
                 Please login to your account to continue.<br>
-                <span style="color: #28a745; font-weight: 500;">Don't have an account? Register now!</span>
+                <span>Don't have an account? Register now!</span>
             </p>
             <div class="modal-buttons">
                 <a href="{{ route('login') }}" class="btn-modal-primary">
@@ -3022,14 +3267,14 @@
     <!-- REVIEW MEDIA LIGHTBOX -->
     <div class="modal fade" id="reviewMediaLightbox" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="background: rgba(0,0,0,0.95);">
+            <div class="modal-content" style="background: rgba(20,22,26,0.95); border: none; border-radius: var(--radius-lg);">
                 <div class="modal-body text-center p-0">
                     <button type="button" class="btn-close btn-close-white position-absolute"
                         style="top: 15px; right: 15px; z-index: 10;" data-bs-dismiss="modal"></button>
                     <div id="reviewLightboxContent"
                         style="max-height: 90vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
                         <img id="reviewLightboxImage" src="" alt="Review Media"
-                            style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">
+                            style="max-width: 90vw; max-height: 85vh; border-radius: var(--radius-sm);">
                     </div>
                 </div>
             </div>
@@ -3068,6 +3313,12 @@
 
         const variantData = @json($variantDataArray);
         const colorData = @json($colorDataArray);
+
+        // ===== REVIEWS CAROUSEL VARIABLES =====
+        let reviewsData = [];
+        let currentReviewIndex = 0;
+        let reviewsPerPage = 3;
+        let totalReviewPages = 0;
 
         // ================================================================
         // ===== FULL SCREEN IMAGE MODAL =====
@@ -3216,10 +3467,7 @@
                         } else {
                             discountText = variant.discount_percent + '% off';
                         }
-  html += `
-<span class="discount-text">
-    -${discountText}
-</span>`;
+                        html += `<span class="discount-text">-${discountText}</span>`;
                     }
                     btn.innerHTML = html;
                     sizeOptions.appendChild(btn);
@@ -3260,7 +3508,7 @@
             if (stockInfo) {
                 stockInfo.style.display = 'block';
                 stockCount.textContent = selectedStock > 0 ? selectedStock : '0';
-                stockCount.style.color = selectedStock > 0 ? '#28a745' : '#dc3545';
+                stockCount.style.color = selectedStock > 0 ? 'var(--success)' : 'var(--signal)';
             }
 
             document.getElementById('sizeWarning').style.display = 'none';
@@ -3317,18 +3565,20 @@
         // ================================================================
         function updateStockDisplay(stock) {
             const stockStatus = document.getElementById('stockStatus');
-            if (stock > 0) {
-                if (stock <= 5) {
-                    stockStatus.className = 'in-stock-low';
-                    stockStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Only ' + stock + ' left in stock!';
-                    stockStatus.style.display = 'block';
+            if (stockStatus) {
+                if (stock > 0) {
+                    if (stock <= 5) {
+                        stockStatus.className = 'in-stock-low';
+                        stockStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Only ' + stock + ' left in stock!';
+                        stockStatus.style.display = 'block';
+                    } else {
+                        stockStatus.style.display = 'none';
+                    }
                 } else {
-                    stockStatus.style.display = 'none';
+                    stockStatus.className = 'out-of-stock';
+                    stockStatus.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
+                    stockStatus.style.display = 'block';
                 }
-            } else {
-                stockStatus.className = 'out-of-stock';
-                stockStatus.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
-                stockStatus.style.display = 'block';
             }
         }
 
@@ -3461,7 +3711,7 @@
                 wishlist.splice(existingIndex, 1);
                 icon.className = 'far fa-heart';
                 btn.style.background = 'white';
-                btn.style.color = '#dc3545';
+                btn.style.color = 'var(--signal)';
                 showNotification('Removed from wishlist!', 'info');
             } else {
                 wishlist.push({
@@ -3472,7 +3722,7 @@
                     added_at: new Date().toISOString()
                 });
                 icon.className = 'fas fa-heart';
-                btn.style.background = '#dc3545';
+                btn.style.background = 'var(--signal)';
                 btn.style.color = 'white';
                 showNotification('Added to wishlist!', 'success');
             }
@@ -3523,14 +3773,14 @@
             @endif
 
             if (selectedStock <= 0) {
-                alert('Selected size is out of stock!');
+                showNotification('Selected size is out of stock!', 'error');
                 return;
             }
 
             let quantity = parseInt(document.getElementById('quantity').value);
 
             if (quantity > selectedStock) {
-                alert('Only ' + selectedStock + ' items available in stock for selected size!');
+                showNotification('Only ' + selectedStock + ' items available in stock!', 'error');
                 document.getElementById('quantity').value = selectedStock;
                 return;
             }
@@ -3541,8 +3791,8 @@
 
             if (existingItem) {
                 if (existingItem.quantity + quantity > selectedStock) {
-                    alert('Only ' + selectedStock + ' items available in stock! You already have ' + existingItem.quantity +
-                        ' in cart.');
+                    showNotification('Only ' + selectedStock + ' items available! You already have ' + existingItem
+                        .quantity + ' in cart.', 'error');
                     return;
                 }
                 existingItem.quantity += quantity;
@@ -3573,10 +3823,15 @@
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
-            notification.innerHTML =
-                `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} me-2"></i> ${message}`;
+            const icon = type === 'success' ? 'fa-check-circle' :
+                type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            notification.innerHTML = `<i class="fas ${icon} me-2"></i> ${message}`;
             document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         // ================================================================
@@ -3619,12 +3874,12 @@
 
             if (isInWishlist) {
                 icon.className = 'fas fa-heart';
-                btn.style.background = '#dc3545';
+                btn.style.background = 'var(--signal)';
                 btn.style.color = 'white';
             } else {
                 icon.className = 'far fa-heart';
                 btn.style.background = 'white';
-                btn.style.color = '#dc3545';
+                btn.style.color = 'var(--signal)';
             }
         }
 
@@ -3647,6 +3902,66 @@
         }
 
         // ================================================================
+        // ===== REVIEWS CAROUSEL FUNCTIONS =====
+        // ================================================================
+        function updateReviewsPerPage() {
+            if (window.innerWidth <= 575) {
+                reviewsPerPage = 1;
+            } else if (window.innerWidth <= 991) {
+                reviewsPerPage = 2;
+            } else {
+                reviewsPerPage = 3;
+            }
+        }
+
+        function goToReviewPage(index) {
+            if (reviewsData.length === 0) return;
+
+            const totalPages = Math.ceil(reviewsData.length / reviewsPerPage);
+            if (index < 0) index = 0;
+            if (index >= totalPages) index = totalPages - 1;
+            currentReviewIndex = index;
+
+            updateReviewCarousel();
+            updateReviewDots();
+            updateReviewNavButtons();
+        }
+
+        function updateReviewCarousel() {
+            const track = document.getElementById('reviewsCarouselTrack');
+            if (!track) return;
+
+            const start = currentReviewIndex * reviewsPerPage;
+            const end = Math.min(start + reviewsPerPage, reviewsData.length);
+            const visibleReviews = reviewsData.slice(start, end);
+
+            track.innerHTML = visibleReviews.map(review => renderReviewCard(review)).join('');
+        }
+
+        function updateReviewDots() {
+            const totalPages = Math.ceil(reviewsData.length / reviewsPerPage);
+            const dotsContainer = document.getElementById('reviewsDots');
+            if (!dotsContainer) return;
+
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'reviews-dot' + (i === currentReviewIndex ? ' active' : '');
+                dot.onclick = () => goToReviewPage(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateReviewNavButtons() {
+            const totalPages = Math.ceil(reviewsData.length / reviewsPerPage);
+            const prevBtn = document.getElementById('reviewsPrevBtn');
+            const nextBtn = document.getElementById('reviewsNextBtn');
+
+            if (prevBtn) prevBtn.disabled = currentReviewIndex === 0;
+            if (nextBtn) nextBtn.disabled = currentReviewIndex >= totalPages - 1;
+        }
+
+        // ================================================================
         // ===== LOAD REVIEWS =====
         // ================================================================
         async function loadReviews() {
@@ -3663,7 +3978,7 @@
                         <div class="spinner-border text-danger" role="status" style="width: 28px; height: 28px;">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <span class="ms-3 text-muted" style="font-size: 14px;">Loading reviews...</span>
+                        <span class="ms-3 text-muted" style="font-size: 14px; font-weight: 500;">Loading reviews...</span>
                     </div>
                 `;
 
@@ -3683,14 +3998,40 @@
                 loading.style.display = 'none';
 
                 if (data.success && data.reviews && data.reviews.length > 0) {
-                    badge.textContent = data.reviews.length;
-                    container.innerHTML = data.reviews.map(review => renderReviewCard(review)).join('');
+                    reviewsData = data.reviews;
+                    badge.textContent = reviewsData.length;
+
+                    updateReviewsPerPage();
+                    currentReviewIndex = 0;
+                    const totalPages = Math.ceil(reviewsData.length / reviewsPerPage);
+
+                    let carouselHtml = `
+                        <div class="reviews-carousel-wrapper">
+                            <div class="reviews-carousel-track" id="reviewsCarouselTrack">
+                                ${reviewsData.slice(0, reviewsPerPage).map(review => renderReviewCard(review)).join('')}
+                            </div>
+                        </div>
+                        <div class="reviews-nav">
+                            <button class="reviews-nav-btn" id="reviewsPrevBtn" onclick="goToReviewPage(currentReviewIndex - 1)" ${totalPages <= 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="reviews-dots" id="reviewsDots"></div>
+                            <button class="reviews-nav-btn" id="reviewsNextBtn" onclick="goToReviewPage(currentReviewIndex + 1)" ${totalPages <= 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    `;
+
+                    container.innerHTML = carouselHtml;
+                    updateReviewDots();
+                    updateReviewNavButtons();
+
                 } else {
                     container.innerHTML = `
                         <div class="no-reviews">
                             <i class="fas fa-comment-slash"></i>
                             <h5>No reviews yet</h5>
-                            <p class="text-muted">Be the first to review this product!</p>
+                            <p>Be the first to review this product!</p>
                         </div>
                     `;
                     badge.textContent = '0';
@@ -3703,8 +4044,8 @@
                     <div class="no-reviews" style="border-color: #fee2e2; background: #fef2f2;">
                         <i class="fas fa-wifi text-warning" style="font-size: 40px; margin-bottom: 15px; display: block;"></i>
                         <h5 style="color: #dc2626; margin-bottom: 5px;">Unable to load reviews</h5>
-                        <p class="text-muted" style="color: #64748b; font-size: 14px;">Please check your connection and try again.</p>
-                        <button onclick="loadReviews()" class="btn btn-sm btn-outline-danger mt-2" style="border-radius: 20px; padding: 6px 20px; font-size: 13px;">
+                        <p style="color: var(--steel); font-size: 14px;">Please check your connection and try again.</p>
+                        <button onclick="loadReviews()" class="btn btn-sm btn-outline-danger mt-2" style="border-radius: 20px; padding: 6px 20px; font-size: 13px; border-color: var(--signal); color: var(--signal);">
                             <i class="fas fa-redo me-1"></i> Retry
                         </button>
                     </div>
@@ -3720,56 +4061,10 @@
             let starsHtml = '';
             for (let i = 1; i <= 5; i++) {
                 if (i <= review.rating) {
-                    starsHtml += '<i class="fas fa-star" style="font-size: 13px; color: #f59e0b;"></i>';
+                    starsHtml += '<i class="fas fa-star"></i>';
                 } else {
-                    starsHtml += '<i class="fas fa-star" style="font-size: 13px; color: #e2e8f0;"></i>';
+                    starsHtml += '<i class="fas fa-star star-empty"></i>';
                 }
-            }
-
-            let mediaHtml = '';
-            const isMobile = window.innerWidth < 576;
-            const maxImages = isMobile ? 3 : 6;
-            const maxVideos = isMobile ? 2 : 4;
-
-            if (review.images && review.images.length > 0) {
-                const displayImages = review.images.slice(0, maxImages);
-                mediaHtml +=
-                    '<div class="review-media" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;">';
-                displayImages.forEach(function(image) {
-                    mediaHtml += `
-                        <div class="media-item" onclick="openReviewMedia('${image}')" 
-                             style="width: ${isMobile ? '55px' : '70px'}; height: ${isMobile ? '55px' : '70px'}; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.3s;">
-                            <img src="/storage/${image}" alt="Review Image" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
-                        </div>
-                    `;
-                });
-                if (review.images.length > maxImages) {
-                    mediaHtml += `
-                        <div class="media-item" onclick="openReviewMedia('${review.images[maxImages]}')" 
-                             style="width: ${isMobile ? '55px' : '70px'}; height: ${isMobile ? '55px' : '70px'}; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: ${isMobile ? '10px' : '12px'}; font-weight: 600; color: #64748b; cursor: pointer; border: 1px solid var(--border-color);">
-                            +${review.images.length - maxImages}
-                        </div>
-                    `;
-                }
-                mediaHtml += '</div>';
-            }
-
-            if (review.videos && review.videos.length > 0) {
-                const displayVideos = review.videos.slice(0, maxVideos);
-                mediaHtml +=
-                    '<div class="review-media" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">';
-                displayVideos.forEach(function(video) {
-                    mediaHtml += `
-                        <div class="media-item" onclick="openReviewMedia('${video}', 'video')" 
-                             style="width: ${isMobile ? '55px' : '70px'}; height: ${isMobile ? '55px' : '70px'}; border-radius: 8px; background: #000; overflow: hidden; border: 1px solid var(--border-color); cursor: pointer; position: relative;">
-                            <video src="/storage/${video}" muted style="width:100%;height:100%;object-fit:cover;"></video>
-                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:white;font-size:${isMobile ? '16px' : '20px'};">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
-                        </div>
-                    `;
-                });
-                mediaHtml += '</div>';
             }
 
             const date = new Date(review.created_at);
@@ -3779,30 +4074,24 @@
                 year: 'numeric'
             });
 
-            const isMobileView = window.innerWidth < 576;
-
             return `
-                <div class="review-card" style="background: white; border-radius: 12px; padding: ${isMobileView ? '12px 14px' : '18px 20px'}; margin-bottom: 12px; border: 1px solid var(--border-color); transition: all 0.3s;">
-                    <div class="review-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
-                        <span class="review-user" style="font-weight: 600; color: var(--text-dark); font-size: ${isMobileView ? '13px' : '15px'}; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                            <i class="fas fa-user-circle" style="color: #667eea; font-size: ${isMobileView ? '14px' : '18px'};"></i> 
+                <div class="review-card">
+                    <div class="review-header">
+                        <span class="review-user">
+                            <i class="fas fa-user-circle"></i> 
                             ${escapeHtml(review.user_name || 'Anonymous')}
-                            <span class="review-verified" style="display: inline-block; background: #dcfce7; color: #15803d; font-size: ${isMobileView ? '9px' : '11px'}; padding: ${isMobileView ? '1px 8px' : '2px 12px'}; border-radius: 20px; font-weight: 500;">
-                                <i class="fas fa-check-circle"></i> Verified
-                            </span>
                         </span>
-                        <span class="review-date" style="font-size: ${isMobileView ? '10px' : '12px'}; color: #94a3b8;">${formattedDate}</span>
+                        <span class="review-date">${formattedDate}</span>
                     </div>
-                    <div class="review-stars" style="color: #f59e0b; font-size: ${isMobileView ? '12px' : '14px'}; margin-bottom: 4px; display: flex; gap: 1px;">
+                    <div class="review-stars">
                         ${starsHtml}
                     </div>
-                    <div class="review-text" style="color: #475569; font-size: ${isMobileView ? '12px' : '14px'}; line-height: 1.6; margin-bottom: 6px;">
+                    <div class="review-text">
                         ${escapeHtml(review.description)}
                     </div>
-                    ${mediaHtml}
-                    <div class="review-like" style="display: inline-flex; align-items: center; gap: 4px; font-size: ${isMobileView ? '10px' : '12px'}; color: #94a3b8; cursor: pointer; margin-top: 6px;">
-                        <i class="far fa-thumbs-up"></i> Helpful (0)
-                    </div>
+                    <span class="review-verified">
+                        <i class="fas fa-check-circle"></i> Verified
+                    </span>
                 </div>
             `;
         }
@@ -3812,29 +4101,6 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
-        }
-
-        function openReviewMedia(src, type = 'image') {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = new bootstrap.Modal(document.getElementById('reviewMediaLightbox'));
-                const content = document.getElementById('reviewLightboxContent');
-
-                if (type === 'video') {
-                    content.innerHTML = `
-                        <video controls style="max-width: 90vw; max-height: 85vh; border-radius: 8px; background: #000;">
-                            <source src="/storage/${src}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    `;
-                } else {
-                    content.innerHTML = `
-                        <img src="/storage/${src}" alt="Review Media" style="max-width: 90vw; max-height: 85vh; border-radius: 8px;">
-                    `;
-                }
-                modal.show();
-            } else {
-                window.open(`/storage/${src}`, '_blank');
-            }
         }
 
         // ================================================================
@@ -3891,6 +4157,18 @@
 
             // Load reviews
             loadReviews();
+
+            // Handle window resize for reviews carousel
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    if (reviewsData.length > 0) {
+                        updateReviewsPerPage();
+                        goToReviewPage(currentReviewIndex);
+                    }
+                }, 300);
+            });
 
             // Retry loading on network reconnect
             window.addEventListener('online', function() {
