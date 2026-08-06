@@ -438,6 +438,25 @@
         margin-left: 5px;
     }
 
+    .price-tag .variant-cost {
+        font-size: 11px;
+        color: var(--gray);
+        font-weight: 400;
+        display: block;
+        margin-top: 2px;
+    }
+
+    .variant-badge {
+        display: inline-block;
+        background: #e8f4fd;
+        color: #4a9eff;
+        font-size: 10px;
+        font-weight: 500;
+        padding: 1px 8px;
+        border-radius: 10px;
+        margin-left: 4px;
+    }
+
     /* ============================================ */
     /* ACTION BUTTONS                              */
     /* ============================================ */
@@ -1103,6 +1122,43 @@
                     </thead>
                     <tbody id="tableBody">
                         @forelse($products as $index => $product)
+                        @php
+                            // Get variant data for display
+                            $variantFinalPrice = null;
+                            $variantCostPrice = null;
+                            $variantColor = null;
+                            $variantSize = null;
+                            $variantStock = null;
+                            $variantCount = 0;
+                            $totalStock = $product->stock ?? 0;
+                            
+                            if ($product->variants && $product->variants->count() > 0) {
+                                $variantCount = $product->variants->count();
+                                $totalStock = $product->variants->sum('stock');
+                                
+                                // Get first variant (first size, first color)
+                                $firstVariant = $product->variants->first();
+                                if ($firstVariant) {
+                                    $variantFinalPrice = $firstVariant->final_price ?? null;
+                                    $variantCostPrice = $firstVariant->cost_price ?? null;
+                                    $variantColor = $firstVariant->color ?? null;
+                                    $variantSize = $firstVariant->size ?? null;
+                                    $variantStock = $firstVariant->stock ?? 0;
+                                }
+                            }
+                            
+                            // Determine display price
+                            $displayPrice = $variantFinalPrice ?? ($product->final_price ?? $product->mrp);
+                            $displayCost = $variantCostPrice ?? ($product->price ?? 0);
+                            $displayMrp = $product->mrp ?? 0;
+                            $hasVariants = $variantCount > 0;
+                            
+                            // Calculate discount if any
+                            $discountPercent = 0;
+                            if ($displayPrice && $displayMrp && $displayPrice < $displayMrp) {
+                                $discountPercent = round((($displayMrp - $displayPrice) / $displayMrp) * 100);
+                            }
+                        @endphp
                         <tr>
                             <td class="text-center sno">{{ $products->firstItem() + $index }}</td>
                             <td>
@@ -1131,30 +1187,50 @@
                                     <i class="fas fa-tag"></i> {{ $product->category->name ?? 'N/A' }}
                                     @if($product->subCategory) > {{ $product->subCategory->name }} @endif
                                 </span>
+                                @if($hasVariants)
+                                    <br>
+                                    <span class="variant-badge">
+                                        <i class="fas fa-palette"></i> {{ $variantCount }} variants
+                                    </span>
+                                    @if($variantColor)
+                                        <span class="variant-badge" style="background:#f3e5f5; color:#7b1fa2;">
+                                            <i class="fas fa-paint-bucket"></i> {{ $variantColor }}
+                                        </span>
+                                    @endif
+                                    @if($variantSize)
+                                        <span class="variant-badge" style="background:#e8f5e9; color:#2e7d32;">
+                                            <i class="fas fa-ruler"></i> {{ $variantSize }}
+                                        </span>
+                                    @endif
+                                @endif
                             </td>
                             <td>
                                 <div class="price-tag">
-                                    ₹{{ number_format($product->final_price ?? $product->mrp, 2) }}
-                                    @if($product->final_price && $product->final_price < $product->mrp)
-                                        <span class="original">₹{{ number_format($product->mrp, 2) }}</span>
-                                        <span class="discount-tag">-{{ round((($product->mrp - $product->final_price) / $product->mrp) * 100) }}%</span>
+                                    ₹{{ number_format($displayPrice, 2) }}
+                                    @if($displayPrice && $displayMrp && $displayPrice < $displayMrp)
+                                        <span class="original">₹{{ number_format($displayMrp, 2) }}</span>
+                                        <span class="discount-tag">-{{ $discountPercent }}%</span>
+                                    @endif
+                                    @if($hasVariants && $variantCostPrice !== null)
+                                        <span class="variant-cost">
+                                            <i class="fas fa-tag"></i> Cost: ₹{{ number_format($variantCostPrice, 2) }}
+                                        </span>
+                                    @else
+                                        <span class="variant-cost">
+                                            <i class="fas fa-tag"></i> Cost: ₹{{ number_format($displayCost, 2) }}
+                                        </span>
                                     @endif
                                 </div>
-                                <small class="text-muted">Cost: ₹{{ number_format($product->price, 2) }}</small>
                             </td>
                             <td>
-                                @php
-                                    $totalStock = $product->stock;
-                                    if ($product->variants) {
-                                        $totalStock += $product->variants->sum('stock');
-                                    }
-                                @endphp
                                 <span class="badge bg-{{ $totalStock > 0 ? 'success' : 'danger' }} rounded-pill px-3 py-2" style="font-size:12px;">
                                     {{ $totalStock }}
                                 </span>
-                                @if($product->variants && $product->variants->count() > 0)
+                                @if($hasVariants)
                                     <br>
-                                    <small class="text-muted">{{ $product->variants->count() }} variants</small>
+                                    <small class="text-muted">
+                                        <i class="fas fa-cubes"></i> {{ $variantCount }} variants
+                                    </small>
                                 @endif
                             </td>
                             <td class="text-center">

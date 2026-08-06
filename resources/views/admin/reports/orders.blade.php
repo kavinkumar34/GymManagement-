@@ -357,11 +357,11 @@
         <div class="report-container">
             <div class="report-header">
                 <h4><i class="fas fa-chart-pie"></i> Orders Report</h4>
-              {{--  <div>
-                    <a href="{{ route('admin.reports.export') }}" class="btn btn-success btn-sm" style="background:#22c55e; color:white; border:none; padding:7px 18px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                <div>
+                    <a href="{{ route('admin.reports.export', request()->query()) }}" class="btn btn-success btn-sm" style="background:#22c55e; color:white; border:none; padding:7px 18px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
                         <i class="fas fa-file-export"></i> Export
                     </a>
-                </div> --}}
+                </div>
             </div>
             
             <!-- ===== FILTERS ===== -->
