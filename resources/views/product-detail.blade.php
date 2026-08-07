@@ -4,10 +4,10 @@
 @section('content')
     <style>
         /* ================================================================
-           DESIGN TOKENS — FitForge Athletic System
-           Display: Anton (poster-weight, athletic)
-           Body:    Plus Jakarta Sans (clean, modern e-commerce)
-        ================================================================ */
+               DESIGN TOKENS — FitForge Athletic System
+               Display: Anton (poster-weight, athletic)
+               Body:    Plus Jakarta Sans (clean, modern e-commerce)
+            ================================================================ */
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
         :root {
@@ -29,8 +29,8 @@
             --radius-lg: 18px;
             --radius-md: 12px;
             --radius-sm: 8px;
-            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
-            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+            --shadow-card: 0 1px 2px rgba(20, 22, 26, 0.04), 0 8px 24px rgba(20, 22, 26, 0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20, 22, 26, 0.14);
         }
 
         /* ===== PREVENT HORIZONTAL SCROLL ===== */
@@ -54,13 +54,11 @@
             height: 4px;
             width: 56px;
             border-radius: 3px;
-            background: repeating-linear-gradient(
-                -45deg,
-                var(--signal) 0px,
-                var(--signal) 6px,
-                var(--ink) 6px,
-                var(--ink) 12px
-            );
+            background: repeating-linear-gradient(-45deg,
+                    var(--signal) 0px,
+                    var(--signal) 6px,
+                    var(--ink) 6px,
+                    var(--ink) 12px);
         }
 
         .section-eyebrow {
@@ -1562,6 +1560,7 @@
                 opacity: 0;
                 transform: scale(0.9);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -1586,6 +1585,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1734,6 +1734,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -1755,6 +1756,7 @@
             from {
                 transform: translateX(100%);
             }
+
             to {
                 transform: translateX(0);
             }
@@ -1859,6 +1861,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -2575,17 +2578,43 @@
         }
 
         // ===== GET PRODUCT IMAGES =====
+        // ===== GET PRODUCT IMAGES - ONLY FOR FIRST COLOR =====
         $allImages = \App\Models\ProductImage::where('product_id', $product->id)->orderBy('display_order')->get();
 
-        if ($allImages->count() == 0 && $product->image) {
-            $allImages = collect([(object) ['image_path' => $product->image, 'is_main' => 1]]);
+        // NEW: Get only images for the first color
+        $firstColorImages = collect();
+        $firstColorName = null;
+
+        if ($hasColors && $colors->count() > 0) {
+            $firstColor = $colors->first();
+            $firstColorName = $firstColor;
+            $firstColorVariant = $variants->where('color', $firstColor)->first();
+
+            if ($firstColorVariant) {
+                $firstColorImages = \App\Models\ProductImage::where('product_id', $product->id)
+                    ->where('variant_id', $firstColorVariant->id)
+                    ->orderBy('display_order')
+                    ->get();
+            }
         }
 
-        if ($allImages->count() == 0) {
-            $allImages = collect([
+        // If no color-specific images found, use all images
+        if ($firstColorImages->count() == 0) {
+            if ($allImages->count() > 0) {
+                $firstColorImages = $allImages;
+            } elseif ($product->image) {
+                $firstColorImages = collect([(object) ['image_path' => $product->image, 'is_main' => 1]]);
+            }
+        }
+
+        // If still no images, use placeholder
+        if ($firstColorImages->count() == 0) {
+            $firstColorImages = collect([
                 (object) ['image_path' => 'https://via.placeholder.com/500x500?text=No+Image', 'is_main' => 1],
             ]);
         }
+
+        $allImages = $firstColorImages;
 
         // ===== BUILD VARIANT DATA =====
         $variantDataArray = [];
@@ -2928,7 +2957,8 @@
 
                     <!-- OFFERS -->
                     @if (isset($product->offers) && $product->offers->count() > 0)
-                        <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: var(--radius-sm); padding: 12px 15px; margin-bottom: 16px;">
+                        <div
+                            style="background: #fff3cd; border: 1px solid #ffc107; border-radius: var(--radius-sm); padding: 12px 15px; margin-bottom: 16px;">
                             <strong style="color: #856404;"><i class="fas fa-tags"></i> Special Offers</strong>
                             <ul style="margin: 6px 0 0 0; padding-left: 20px; color: #856404; font-size: 13px;">
                                 @foreach ($product->offers as $offer)
@@ -3267,7 +3297,8 @@
     <!-- REVIEW MEDIA LIGHTBOX -->
     <div class="modal fade" id="reviewMediaLightbox" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="background: rgba(20,22,26,0.95); border: none; border-radius: var(--radius-lg);">
+            <div class="modal-content"
+                style="background: rgba(20,22,26,0.95); border: none; border-radius: var(--radius-lg);">
                 <div class="modal-body text-center p-0">
                     <button type="button" class="btn-close btn-close-white position-absolute"
                         style="top: 15px; right: 15px; z-index: 10;" data-bs-dismiss="modal"></button>
@@ -3404,12 +3435,20 @@
             element.classList.add('selected');
             selectedColor = color;
 
+            // Get images for this color from the data attribute
             const imagesData = JSON.parse(element.dataset.images);
+
             if (imagesData && imagesData.length > 0) {
+                // Update main image - ONLY show this color's first image
                 document.getElementById('mainImage').src = imagesData[0];
+
+                // Update modal images
                 modalImages = imagesData;
+
+                // Update thumbnails - ONLY show images for this color
                 const thumbnailsContainer = document.getElementById('verticalThumbnails');
                 thumbnailsContainer.innerHTML = '';
+
                 imagesData.forEach((imgUrl, index) => {
                     const thumb = document.createElement('div');
                     thumb.className = 'vertical-thumb' + (index === 0 ? ' active' : '');
@@ -3420,12 +3459,17 @@
                     thumb.innerHTML = `<img src="${imgUrl}" alt="Thumbnail ${index + 1}">`;
                     thumbnailsContainer.appendChild(thumb);
                 });
+
+                // Update image array and total count
                 totalImages = imagesData.length;
                 currentIndex = 0;
+
+                // Clear and refill images array
                 images.length = 0;
                 imagesData.forEach(img => images.push(img));
             }
 
+            // Update sizes for this color
             updateSizesForColor(color);
         }
 
@@ -3569,7 +3613,8 @@
                 if (stock > 0) {
                     if (stock <= 5) {
                         stockStatus.className = 'in-stock-low';
-                        stockStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Only ' + stock + ' left in stock!';
+                        stockStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Only ' + stock +
+                            ' left in stock!';
                         stockStatus.style.display = 'block';
                     } else {
                         stockStatus.style.display = 'none';
@@ -3750,73 +3795,75 @@
         // ================================================================
         // ===== ADD TO CART =====
         // ================================================================
-        function addToCartDetail() {
-            @if (!auth()->check())
-                showLoginModal('cart', {
-                    id: productId,
-                    name: productName,
-                    price: selectedPrice,
-                    image: productImage
-                });
-                return;
-            @endif
+     // ================================================================
+// ===== ADD TO CART - IMMEDIATE REDIRECT =====
+// ================================================================
+function addToCartDetail() {
+    @if (!auth()->check())
+        showLoginModal('cart', {
+            id: productId,
+            name: productName,
+            price: selectedPrice,
+            image: productImage
+        });
+        return;
+    @endif
 
-            @if ($hasSizes || $hasSizeChart)
-                if (!selectedSize) {
-                    document.getElementById('sizeWarning').style.display = 'block';
-                    document.getElementById('sizeWarning').scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    return;
-                }
-            @endif
-
-            if (selectedStock <= 0) {
-                showNotification('Selected size is out of stock!', 'error');
-                return;
-            }
-
-            let quantity = parseInt(document.getElementById('quantity').value);
-
-            if (quantity > selectedStock) {
-                showNotification('Only ' + selectedStock + ' items available in stock!', 'error');
-                document.getElementById('quantity').value = selectedStock;
-                return;
-            }
-
-            let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-            let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize && item
-                .color === selectedColor);
-
-            if (existingItem) {
-                if (existingItem.quantity + quantity > selectedStock) {
-                    showNotification('Only ' + selectedStock + ' items available! You already have ' + existingItem
-                        .quantity + ' in cart.', 'error');
-                    return;
-                }
-                existingItem.quantity += quantity;
-            } else {
-                currentCart.push({
-                    id: productId,
-                    name: productName,
-                    price: selectedPrice,
-                    original_price: selectedMrp,
-                    image: productImage,
-                    quantity: quantity,
-                    size: selectedSize,
-                    color: selectedColor,
-                    variant_id: selectedVariantId
-                });
-            }
-
-            localStorage.setItem('cart', JSON.stringify(currentCart));
-            const sizeText = selectedSize ? ' (' + selectedSize + ')' : '';
-            const colorText = selectedColor ? ' - ' + selectedColor : '';
-            showNotification(productName + sizeText + colorText + ' added to cart!', 'success');
-            updateCartCount();
+    @if ($hasSizes || $hasSizeChart)
+        if (!selectedSize) {
+            document.getElementById('sizeWarning').style.display = 'block';
+            document.getElementById('sizeWarning').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            return;
         }
+    @endif
 
+    if (selectedStock <= 0) {
+        showNotification('Selected size is out of stock!', 'error');
+        return;
+    }
+
+    let quantity = parseInt(document.getElementById('quantity').value);
+
+    if (quantity > selectedStock) {
+        showNotification('Only ' + selectedStock + ' items available in stock!', 'error');
+        document.getElementById('quantity').value = selectedStock;
+        return;
+    }
+
+    let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+    let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize && item
+        .color === selectedColor);
+
+    if (existingItem) {
+        if (existingItem.quantity + quantity > selectedStock) {
+            showNotification('Only ' + selectedStock + ' items available! You already have ' + existingItem
+                .quantity + ' in cart.', 'error');
+            return;
+        }
+        existingItem.quantity += quantity;
+    } else {
+        currentCart.push({
+            id: productId,
+            name: productName,
+            price: selectedPrice,
+            original_price: selectedMrp,
+            image: productImage,
+            quantity: quantity,
+            size: selectedSize,
+            color: selectedColor,
+            variant_id: selectedVariantId
+        });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(currentCart));
+    updateCartCount();
+
+    // ===== REDIRECT TO CART PAGE IMMEDIATELY =====
+    window.location.href = "{{ route('cart') }}";
+}
         // ================================================================
         // ===== NOTIFICATION =====
         // ================================================================

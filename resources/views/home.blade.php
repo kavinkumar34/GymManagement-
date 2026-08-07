@@ -3,10 +3,10 @@
 @section('content')
     <style>
         /* ================================================================
-           DESIGN TOKENS — FitForge Athletic System
-           Display: Anton (poster-weight, athletic)
-           Body:    Plus Jakarta Sans (clean, modern e-commerce)
-        ================================================================ */
+                   DESIGN TOKENS — FitForge Athletic System
+                   Display: Anton (poster-weight, athletic)
+                   Body:    Plus Jakarta Sans (clean, modern e-commerce)
+                ================================================================ */
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
         :root {
@@ -28,8 +28,8 @@
             --radius-lg: 18px;
             --radius-md: 12px;
             --radius-sm: 8px;
-            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
-            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+            --shadow-card: 0 1px 2px rgba(20, 22, 26, 0.04), 0 8px 24px rgba(20, 22, 26, 0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20, 22, 26, 0.14);
         }
 
         /* ===== PREVENT HORIZONTAL SCROLL ===== */
@@ -48,19 +48,17 @@
         }
 
         /* Signature element: a repeating diagonal "energy stripe" —
-           borrows from hazard tape / lifting-chalk-line vernacular of a gym floor.
-           Used sparingly as a section accent, never as a background. */
+                   borrows from hazard tape / lifting-chalk-line vernacular of a gym floor.
+                   Used sparingly as a section accent, never as a background. */
         .energy-stripe {
             height: 4px;
             width: 56px;
             border-radius: 3px;
-            background: repeating-linear-gradient(
-                -45deg,
-                var(--signal) 0px,
-                var(--signal) 6px,
-                var(--ink) 6px,
-                var(--ink) 12px
-            );
+            background: repeating-linear-gradient(-45deg,
+                    var(--signal) 0px,
+                    var(--signal) 6px,
+                    var(--ink) 6px,
+                    var(--ink) 12px);
         }
 
         .section-eyebrow {
@@ -467,7 +465,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(180deg, rgba(20,22,26,0) 40%, rgba(20,22,26,0.55) 100%);
+            background: linear-gradient(180deg, rgba(20, 22, 26, 0) 40%, rgba(20, 22, 26, 0.55) 100%);
             opacity: 0;
             transition: opacity 0.3s;
             z-index: 1;
@@ -1088,6 +1086,242 @@
                 font-size: 0.65rem;
             }
         }
+
+        /* ================================================================
+           ABOUT SECTION - STORE SECTION STYLES
+           ================================================================ */
+
+        /* ===== ABOUT SECTION CONTAINER ===== */
+        .about-section {
+            padding: 50px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .about-section:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== ABOUT IMAGE ===== */
+        .about-image {
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border: 1px solid var(--line);
+            transition: all 0.3s ease;
+        }
+
+        .about-image:hover {
+            box-shadow: var(--shadow-card-hover);
+            transform: scale(1.01);
+        }
+
+        /* ===== ABOUT CONTENT ===== */
+        .about-content h3 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--ink);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .about-content h3 i {
+            color: var(--signal);
+            margin-right: 10px;
+        }
+
+        .about-content p {
+            color: var(--steel);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-weight: 400;
+            font-size: 1rem;
+        }
+
+        .about-content strong {
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-shop-now {
+            background: var(--signal);
+            color: white;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-family: var(--font-body);
+        }
+
+        .btn-shop-now:hover {
+            background: var(--signal-dark);
+            transform: scale(1.05);
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 68, 5, 0.3);
+        }
+
+        .btn-shop-now i {
+            margin-right: 8px;
+        }
+
+        .btn-join-gym1 {
+            background: var(--ink);
+            color: white;
+            padding: 14px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-family: var(--font-body);
+        }
+
+        .btn-join-gym1:hover {
+            background: var(--signal);
+            transform: scale(1.05);
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 68, 5, 0.3);
+        }
+
+        .btn-join-gym1 i {
+            margin-right: 8px;
+        }
+
+        /* ================================================================
+           RESPONSIVE STYLES
+           ================================================================ */
+
+        /* Tablet & Small Laptop */
+        @media (max-width: 992px) {
+            .about-image {
+                height: 280px;
+            }
+
+            .about-content h3 {
+                font-size: 1.5rem;
+            }
+
+            .about-content p {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .about-section {
+                padding: 30px 0;
+            }
+
+            .about-image {
+                height: 200px;
+                margin-bottom: 20px;
+            }
+
+            .about-content h3 {
+                font-size: 1.3rem;
+            }
+
+            .about-content p {
+                font-size: 0.9rem;
+            }
+
+            .btn-shop-now,
+            .btn-join-gym1 {
+                padding: 12px 30px;
+                font-size: 0.9rem;
+            }
+
+            .btn-join-gym1 {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 576px) {
+            .about-section {
+                padding: 20px 0;
+            }
+
+            .about-image {
+                height: 160px;
+            }
+
+            .about-content h3 {
+                font-size: 1.1rem;
+            }
+
+            .about-content p {
+                font-size: 0.85rem;
+                line-height: 1.6;
+            }
+
+            .btn-shop-now,
+            .btn-join-gym1 {
+                padding: 10px 20px;
+                font-size: 0.8rem;
+                display: block;
+                width: 100%;
+                text-align: center;
+                margin-left: 0;
+            }
+
+            .btn-join-gym1 {
+                margin-top: 8px;
+            }
+        }
+
+        /* Extra Small Mobile */
+        @media (max-width: 400px) {
+            .about-content h3 {
+                font-size: 0.95rem;
+            }
+
+            .about-content p {
+                font-size: 0.75rem;
+            }
+
+            .btn-shop-now,
+            .btn-join-gym1 {
+                font-size: 0.7rem;
+                padding: 8px 15px;
+            }
+        }
+
+        /* ================================================================
+           ANIMATIONS (Optional)
+           ================================================================ */
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .about-section .row {
+            animation: fadeInUp 0.6s ease forwards;
+        }
     </style>
 
     <!-- ===== CUSTOM ALERT OVERLAY ===== -->
@@ -1125,15 +1359,38 @@
         </div>
     </div>
 
-    <!-- ===== CATEGORY SECTION ===== -->
-    <div class="container shop-section">
-        <div class="shop-section-header text-center">
-            <span class="section-eyebrow d-block">Browse the Range</span>
-            <h2 class="section-heading mb-2" style="font-size: 2rem;">Shop by Category</h2>
-            <div class="energy-stripe mx-auto"></div>
+    <!-- About Our Store -->
+    <div class="container about-section">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4">
+                <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+                    class="about-image" alt="FitForge Online Store">
+            </div>
+            <div class="col-md-6 about-content">
+                <h3><i class="fas fa-store"></i> About Our Online Store</h3>
+                <p>Welcome to <strong>FitForge Athletics</strong> - your one-stop destination for all fitness needs! We are
+                    India's fastest-growing online fitness store, offering premium quality gym equipment, authentic
+                    supplements, stylish gym wear, and fitness accessories.</p>
+                <p>Since our launch, we have served over <strong>10,000+ satisfied customers</strong> across India with fast
+                    delivery and 100% authentic products.</p>
+                <p>Whether you're a fitness enthusiast, a professional athlete, or a gym owner, we have everything you need
+                    to achieve your fitness goals.</p>
+                <a href="/shop" class="btn-shop-now mt-3">
+                    <i class="fas fa-shopping-cart"></i> Start Shopping
+                </a>
+            </div>
         </div>
-        <div class="row category-row" id="categoryContainer"></div>
     </div>
+
+ <!-- ===== CATEGORY SECTION ===== -->
+<div class="container shop-section" style="background: #f8f6f2; padding: 50px 30px; border-radius: 18px; margin-bottom: 30px;">
+    <div class="shop-section-header text-center">
+        <span class="section-eyebrow d-block">Browse the Range</span>
+        <h2 class="section-heading mb-2" style="font-size: 2rem;">Shop by Category</h2>
+        <div class="energy-stripe mx-auto"></div>
+    </div>
+    <div class="row category-row" id="categoryContainer"></div>
+</div>
 
     <!-- ===== PRODUCTS SECTION ===== -->
     <div class="container shop-section" style="padding-bottom: 24px;">
@@ -1745,8 +2002,8 @@ ${banner.link ? `</a>` : ''}
                         <div class="color-options-container">
                             <span class="color-label">${totalColors} Color${totalColors > 1 ? 's' : ''}:</span>
                             ${displayColors.map(color => `
-                                        <span class="color-dot" style="background: ${color.toLowerCase()};" title="${color}"></span>
-                                    `).join('')}
+                                                <span class="color-dot" style="background: ${color.toLowerCase()};" title="${color}"></span>
+                                            `).join('')}
                             ${remaining > 0 ? `<span class="color-dot more-colors">+${remaining}</span>` : ''}
                         </div>
                     `;

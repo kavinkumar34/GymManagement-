@@ -2390,27 +2390,27 @@
                 }
 
                 cartItemsHtml += `
-                    <div class="cart-item">
-                        <div class="cart-item-image">
-                            ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}">` : `<div class="image-placeholder">🏋️</div>`}
-                        </div>
-                        <div>
-                            <div class="product-title">${escapeHtml(item.name)}</div>
-                            ${variantDetails ? `<div class="product-variant-details">${escapeHtml(variantDetails)}</div>` : ''}
-                            ${priceHtml}
-                            <div class="quantity-control">
-                                <button class="qty-btn" onclick="updateQty(${i}, -1)">-</button>
-                                <span>${qty}</span>
-                                <button class="qty-btn" onclick="updateQty(${i}, 1)" ${qty >= stock ? 'disabled' : ''}>+</button>
-                            </div>
-                            <span class="stock-badge ${stockClass}">${stockText}</span>
-                        </div>
-                        <div>
-                            <div class="item-total">₹${itemTotal.toFixed(2)}</div>
-                            <button class="remove-item" onclick="removeItem(${i})"><i class="fas fa-trash-alt"></i> Remove</button>
-                        </div>
-                    </div>
-                `;
+    <div class="cart-item">
+        <div class="cart-item-image" onclick="window.location.href='/product/${item.id}'" style="cursor: pointer;">
+            ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(item.name)}">` : `<div class="image-placeholder">🏋️</div>`}
+        </div>
+        <div>
+            <div class="product-title" onclick="window.location.href='/product/${item.id}'" style="cursor: pointer;">${escapeHtml(item.name)}</div>
+            ${variantDetails ? `<div class="product-variant-details">${escapeHtml(variantDetails)}</div>` : ''}
+            ${priceHtml}
+            <div class="quantity-control">
+                <button class="qty-btn" onclick="updateQty(${i}, -1)">-</button>
+                <span>${qty}</span>
+                <button class="qty-btn" onclick="updateQty(${i}, 1)" ${qty >= stock ? 'disabled' : ''}>+</button>
+            </div>
+            <span class="stock-badge ${stockClass}">${stockText}</span>
+        </div>
+        <div>
+            <div class="item-total">₹${itemTotal.toFixed(2)}</div>
+            <button class="remove-item" onclick="removeItem(${i})"><i class="fas fa-trash-alt"></i> Remove</button>
+        </div>
+    </div>
+`;
             }
 
             let hasStockIssue = checkStockIssues();
@@ -2430,7 +2430,6 @@
                         </div>
                         ${cartItemsHtml}
                         <div class="cart-actions">
-                            <button class="btn-update" onclick="updateCart()"><i class="fas fa-sync-alt"></i> Update Cart</button>
                             <button class="btn-clear" onclick="clearCart()"><i class="fas fa-trash"></i> Clear cart</button>
                         </div>
                     </div>

@@ -534,9 +534,13 @@
                             </tr>
                         </table>
 
-                        <!-- Shipping Address -->
+                        <!-- ============================================================ -->
+                        <!-- SHIPPING ADDRESS - FIXED WITH CORRECT PHP SYNTAX              -->
+                        <!-- ============================================================ -->
                         @php
                             $shippingAddress = null;
+                            
+                            // METHOD 1: Try from payment_details (works for COD)
                             if ($order->payment_details) {
                                 try {
                                     $paymentDetails = is_string($order->payment_details)
@@ -550,9 +554,108 @@
                                 } catch (\Exception $e) {
                                 }
                             }
+                            
+                            // METHOD 2: Get from user_addresses table using user_id (FIX FOR ONLINE PAYMENTS)
+                            if (!$shippingAddress && $order->user_id) {
+                                try {
+                                    // Use fully qualified class name with backslash
+                                    $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)
+                                        ->where('is_default', 1)
+                                        ->first();
+                                    
+                                    if ($userAddress) {
+                                        $shippingAddress = [
+                                            'name' => $userAddress->name ?? 'N/A',
+                                            'address' => $userAddress->address ?? '',
+                                            'city' => $userAddress->city ?? '',
+                                            'state' => $userAddress->state ?? '',
+                                            'pincode' => $userAddress->pincode ?? '',
+                                            'phone' => $userAddress->phone ?? 'N/A'
+                                        ];
+                                    } else {
+                                        // If no default address, get any address
+                                        $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)->first();
+                                        if ($userAddress) {
+                                            $shippingAddress = [
+                                                'name' => $userAddress->name ?? 'N/A',
+                                                'address' => $userAddress->address ?? '',
+                                                'city' => $userAddress->city ?? '',
+                                                'state' => $userAddress->state ?? '',
+                                                'pincode' => $userAddress->pincode ?? '',
+                                                'phone' => $userAddress->phone ?? 'N/A'
+                                            ];
+                                        }
+                                    }
+                                } catch (\Exception $e) {
+                                    // If UserAddress model doesn't exist, try direct DB query
+                                    try {
+                                        $addressData = DB::table('user_addresses')
+                                            ->where('user_id', $order->user_id)
+                                            ->where('is_default', 1)
+                                            ->first();
+                                        
+                                        if ($addressData) {
+                                            $shippingAddress = [
+                                                'name' => $addressData->name ?? 'N/A',
+                                                'address' => $addressData->address ?? '',
+                                                'city' => $addressData->city ?? '',
+                                                'state' => $addressData->state ?? '',
+                                                'pincode' => $addressData->pincode ?? '',
+                                                'phone' => $addressData->phone ?? 'N/A'
+                                            ];
+                                        } else {
+                                            // Get any address
+                                            $addressData = DB::table('user_addresses')
+                                                ->where('user_id', $order->user_id)
+                                                ->first();
+                                            if ($addressData) {
+                                                $shippingAddress = [
+                                                    'name' => $addressData->name ?? 'N/A',
+                                                    'address' => $addressData->address ?? '',
+                                                    'city' => $addressData->city ?? '',
+                                                    'state' => $addressData->state ?? '',
+                                                    'pincode' => $addressData->pincode ?? '',
+                                                    'phone' => $addressData->phone ?? 'N/A'
+                                                ];
+                                            }
+                                        }
+                                    } catch (\Exception $e2) {
+                                        // Silent fail
+                                    }
+                                }
+                            }
+                            
+                            // METHOD 3: Try from session (for online payments)
+                            if (!$shippingAddress) {
+                                $sessionAddress = session('shipping_address');
+                                if ($sessionAddress) {
+                                    $shippingAddress = $sessionAddress;
+                                }
+                            }
+                            
+                            // METHOD 4: Try from order_data session (for online payments)
+                            if (!$shippingAddress) {
+                                $orderData = session('order_data');
+                                if ($orderData && isset($orderData['address'])) {
+                                    $shippingAddress = $orderData['address'];
+                                }
+                            }
+                            
+                            // METHOD 5: Try from user's default address (fallback)
+                            if (!$shippingAddress && Auth::check()) {
+                                $user = Auth::user();
+                                $shippingAddress = [
+                                    'name' => $user->name ?? 'N/A',
+                                    'address' => $user->address ?? $user->address_line1 ?? 'N/A',
+                                    'city' => $user->city ?? '',
+                                    'state' => $user->state ?? '',
+                                    'pincode' => $user->pincode ?? '',
+                                    'phone' => $user->phone ?? 'N/A'
+                                ];
+                            }
                         @endphp
 
-                        @if ($shippingAddress)
+                        @if ($shippingAddress && ($shippingAddress['address'] ?? '') != '' && ($shippingAddress['address'] ?? '') != 'N/A')
                             <div class="section-title" style="margin-top: 15px; font-size: 14px;">
                                 <i class="fas fa-truck"></i> Shipping Address
                             </div>
@@ -566,7 +669,56 @@
                                     {{ $shippingAddress['state'] ?? '' }} - {{ $shippingAddress['pincode'] ?? '' }}</p>
                                 <p><span class="address-label">Phone:</span> {{ $shippingAddress['phone'] ?? 'N/A' }}</p>
                             </div>
+                        @else
+                            <!-- Fallback: Show user's address from database -->
+                            @php
+                                $fallbackAddress = null;
+                                if (Auth::check()) {
+                                    try {
+                                        $fallbackAddress = \App\Models\UserAddress::where('user_id', Auth::id())
+                                            ->where('is_default', 1)
+                                            ->first();
+                                        if (!$fallbackAddress) {
+                                            $fallbackAddress = \App\Models\UserAddress::where('user_id', Auth::id())->first();
+                                        }
+                                    } catch (\Exception $e) {
+                                        try {
+                                            $fallbackAddress = DB::table('user_addresses')
+                                                ->where('user_id', Auth::id())
+                                                ->where('is_default', 1)
+                                                ->first();
+                                            if (!$fallbackAddress) {
+                                                $fallbackAddress = DB::table('user_addresses')
+                                                    ->where('user_id', Auth::id())
+                                                    ->first();
+                                            }
+                                        } catch (\Exception $e2) {}
+                                    }
+                                }
+                            @endphp
+                            
+                            @if ($fallbackAddress)
+                                <div class="section-title" style="margin-top: 15px; font-size: 14px;">
+                                    <i class="fas fa-truck"></i> Shipping Address
+                                </div>
+                                <div class="shipping-address-box">
+                                    <p><span class="address-label">Name:</span> {{ $fallbackAddress->name ?? 'N/A' }}</p>
+                                    <p><span class="address-label">Address:</span> {{ $fallbackAddress->address ?? '' }}</p>
+                                    <p><span class="address-label">City:</span> {{ $fallbackAddress->city ?? '' }}, {{ $fallbackAddress->state ?? '' }} - {{ $fallbackAddress->pincode ?? '' }}</p>
+                                    <p><span class="address-label">Phone:</span> {{ $fallbackAddress->phone ?? 'N/A' }}</p>
+                                </div>
+                            @else
+                                <div class="section-title" style="margin-top: 15px; font-size: 14px;">
+                                    <i class="fas fa-truck"></i> Shipping Address
+                                </div>
+                                <div class="shipping-address-box">
+                                    <p style="color: #dc3545;">⚠️ No shipping address found for this order</p>
+                                </div>
+                            @endif
                         @endif
+                        <!-- ============================================================ -->
+                        <!-- END OF SHIPPING ADDRESS - FIXED CODE                          -->
+                        <!-- ============================================================ -->
                     </div>
                 </div>
 
