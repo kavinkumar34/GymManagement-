@@ -450,12 +450,14 @@ Route::post('/api/user-addresses', function (Illuminate\Http\Request $request) {
             return response()->json(['success' => false, 'message' => 'User not logged in']);
         }
         
+        $user = auth()->user();
+        
         \Log::info('Saving address', $request->all());
         
         $address = UserAddress::create([
-            'user_id' => auth()->id(),
-            'name' => $request->name,
-            'email' => $request->email ?? auth()->user()->email,
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
             'address' => $request->address,
             'area' => $request->area,
             'city' => $request->city,
@@ -705,6 +707,45 @@ Route::get('/test-sms-working', function() {
     ]);
 });
 
+// ============ UPDATE PROFILE IMAGE ============
+Route::post('/api/update-profile-image', function (Illuminate\Http\Request $request) {
+    if (!auth()->check()) {
+        return response()->json(['success' => false, 'message' => 'Not authenticated']);
+    }
+    
+    if ($request->hasFile('profile_image')) {
+        $user = auth()->user();
+        
+        // Validate file
+        $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+        ]);
+        
+        // Delete old image if exists
+        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+            Storage::disk('public')->delete($user->profile_image);
+        }
+        
+        $image = $request->file('profile_image');
+        $filename = time() . '_' . $user->id . '.' . $image->getClientOriginalExtension();
+        $path = $image->storeAs('profile_images', $filename, 'public');
+        
+        $user->profile_image = $path;
+        $user->save();
+        
+        return response()->json([
+            'success' => true,
+            'image_url' => asset('storage/' . $path)
+        ]);
+    }
+    
+    return response()->json([
+        'success' => false,
+        'message' => 'No image uploaded'
+    ]);
+})->name('update.profile.image')->middleware('auth');
+
+// ============ UPDATE PROFILE (NAME, PHONE, ADDRESS) ============
 Route::post('/api/update-profile', function (Illuminate\Http\Request $request) {
     if (!auth()->check()) {
         return response()->json(['success' => false, 'message' => 'Not authenticated']);
@@ -716,10 +757,50 @@ Route::post('/api/update-profile', function (Illuminate\Http\Request $request) {
     
     $user = auth()->user();
     $user->name = $request->name;
+    if ($request->phone) {
+        $user->phone = $request->phone;
+    }
     $user->save();
     
-    return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
-})->name('api.update.profile');
+    // Update or create address
+    if ($request->address || $request->city || $request->state || $request->pincode) {
+        $address = \App\Models\UserAddress::where('user_id', $user->id)
+            ->where('is_default', 1)
+            ->first();
+        
+        if (!$address) {
+            $address = \App\Models\UserAddress::where('user_id', $user->id)->first();
+        }
+        
+        if ($address) {
+            $address->address = $request->address ?? $address->address;
+            $address->city = $request->city ?? $address->city;
+            $address->state = $request->state ?? $address->state;
+            $address->pincode = $request->pincode ?? $address->pincode;
+            $address->phone = $request->phone ?? $address->phone;
+            $address->name = $user->name;
+            $address->email = $user->email;
+            $address->save();
+        } elseif ($request->address) {
+            \App\Models\UserAddress::create([
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'address' => $request->address,
+                'city' => $request->city ?? '',
+                'state' => $request->state ?? '',
+                'pincode' => $request->pincode ?? '',
+                'phone' => $request->phone ?? '',
+                'is_default' => 1
+            ]);
+        }
+    }
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Profile updated successfully'
+    ]);
+})->name('api.update.profile')->middleware('auth');
 
 // ============ COUPON VALIDATION API ============
 Route::post('/api/validate-coupon', [App\Http\Controllers\CouponController::class, 'validateCoupon']);
