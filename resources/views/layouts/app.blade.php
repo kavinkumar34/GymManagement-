@@ -1836,19 +1836,20 @@
                                             class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                             </ul>
                         </div>
-               @elseif(auth()->check())
-    <div class="dropdown">
-        <a class="user-dropdown dropdown-toggle" href="#" role="button"
-            data-bs-toggle="dropdown">
-            <div class="profile-icon">
-                @if(Auth::user()->profile_image)
-                    <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-                @else
-                    <i class="fas fa-user"></i>
-                @endif
-            </div>
-            <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
-        </a>
+                    @elseif(auth()->check())
+                        <div class="dropdown">
+                            <a class="user-dropdown dropdown-toggle" href="#" role="button"
+                                data-bs-toggle="dropdown">
+                                <div class="profile-icon">
+                                    @if (Auth::user()->profile_image)
+                                        <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" alt="Profile"
+                                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                    @else
+                                        <i class="fas fa-user"></i>
+                                    @endif
+                                </div>
+                                <span class="d-none d-sm-inline">{{ Auth::user()->name }}</span>
+                            </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="#" onclick="openProfileModal(); return false;"><i
                                             class="fas fa-id-card me-2"></i> My Profile</a></li>
@@ -2041,7 +2042,7 @@
                                 <div class="profile-info-label">Email</div>
                                 <div class="profile-info-value">
                                     <span class="display-text" style="color: var(--steel);">{{ Auth::user()->email }}</span>
-                              
+
                                 </div>
                             </div>
                             <div class="profile-info-item">
@@ -2049,7 +2050,7 @@
                                 <div class="profile-info-value">
                                     <span class="display-text"
                                         style="color: var(--steel);">{{ Auth::user()->phone ?? 'Not provided' }}</span>
-                                 
+
                                 </div>
                             </div>
 
@@ -2064,35 +2065,40 @@
                             <!-- ===== LIST ALL ADDRESSES ===== -->
                             @if ($userAddresses->count() > 0)
                                 @foreach ($userAddresses as $index => $addr)
-                                  <div class="address-card"
-    style="background: {{ $addr->is_default ? 'var(--signal-tint)' : 'var(--fog)' }}; border: 1px solid {{ $addr->is_default ? 'var(--signal)' : 'var(--line)' }}; border-radius: var(--radius-sm); padding: 12px 15px; margin-bottom: 10px;">
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
-        <div style="flex: 1; min-width: 0;">
-            <span style="font-weight: 700; font-size: 13px; color: var(--ink); display: flex; align-items: center; flex-wrap: wrap; gap: 5px;">
-                <span style="word-break: break-word;">{{ $addr->address }}</span>
-                @if ($addr->is_default)
-                    <span style="background: var(--signal); color: white; font-size: 9px; padding: 1px 10px; border-radius: 20px; margin-left: 8px; white-space: nowrap;">Default</span>
-                @endif
-            </span>
-            <div style="font-size: 12px; color: var(--steel); margin-top: 3px;">
-                {{ $addr->city }}, {{ $addr->state }} - {{ $addr->pincode }}
-            </div>
-            <div style="font-size: 12px; color: var(--steel);">
-                <i class="fas fa-phone"></i> {{ $addr->phone }}
-            </div>
-        </div>
-        <div style="display: flex; gap: 5px; flex-shrink: 0; align-items: center;">
-            <button class="btn-address-edit-small" onclick="editAddress({{ $index }})"
-                style="background: var(--info-tint); color: var(--info); border: none; padding: 4px 14px; border-radius: 15px; font-size: 10px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s;">
-                <i class="fas fa-edit"></i> Edit
-            </button>
-            <button class="btn-address-delete-small" onclick="deleteAddress({{ $addr->id }})"
-                style="background: var(--signal-tint); color: var(--signal-dark); border: none; padding: 4px 14px; border-radius: 15px; font-size: 10px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s;">
-                <i class="fas fa-trash"></i> Delete
-            </button>
-        </div>
-    </div>
-</div>
+                                    <div class="address-card"
+                                        style="background: {{ $addr->is_default ? 'var(--signal-tint)' : 'var(--fog)' }}; border: 1px solid {{ $addr->is_default ? 'var(--signal)' : 'var(--line)' }}; border-radius: var(--radius-sm); padding: 12px 15px; margin-bottom: 10px;">
+                                        <div
+                                            style="display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%;">
+                                            <div style="flex: 1; min-width: 0;">
+                                                <span
+                                                    style="font-weight: 700; font-size: 13px; color: var(--ink); display: flex; align-items: center; flex-wrap: wrap; gap: 5px;">
+                                                    <span style="word-break: break-word;">{{ $addr->address }}</span>
+                                                    @if ($addr->is_default)
+                                                        <span
+                                                            style="background: var(--signal); color: white; font-size: 9px; padding: 1px 10px; border-radius: 20px; margin-left: 8px; white-space: nowrap;">Default</span>
+                                                    @endif
+                                                </span>
+                                                <div style="font-size: 12px; color: var(--steel); margin-top: 3px;">
+                                                    {{ $addr->city }}, {{ $addr->state }} - {{ $addr->pincode }}
+                                                </div>
+                                                <div style="font-size: 12px; color: var(--steel);">
+                                                    <i class="fas fa-phone"></i> {{ $addr->phone }}
+                                                </div>
+                                            </div>
+                                            <div style="display: flex; gap: 5px; flex-shrink: 0; align-items: center;">
+                                                <button class="btn-address-edit-small"
+                                                    onclick="editAddress({{ $index }})"
+                                                    style="background: var(--info-tint); color: var(--info); border: none; padding: 4px 14px; border-radius: 15px; font-size: 10px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s;">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button class="btn-address-delete-small"
+                                                    onclick="deleteAddress({{ $addr->id }})"
+                                                    style="background: var(--signal-tint); color: var(--signal-dark); border: none; padding: 4px 14px; border-radius: 15px; font-size: 10px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.3s;">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 @endforeach
                             @else
                                 <div
@@ -2124,22 +2130,25 @@
                                     <input type="text" id="newCityInput" placeholder="Enter city"
                                         style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px;">
                                 </div>
-                         <div style="margin-bottom: 8px;">
-    <label style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 3px;">State *</label>
-    <select id="newStateInput" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; background: white;">
-        <option value="">-- Select State --</option>
-        @php
-            $states = \App\Models\DeliverablePincode::where('is_active', 1)
-                ->select('state')
-                ->distinct()
-                ->orderBy('state', 'asc')
-                ->get();
-        @endphp
-        @foreach($states as $state)
-            <option value="{{ $state->state }}">{{ $state->state }}</option>
-        @endforeach
-    </select>
-</div>
+                                <div style="margin-bottom: 8px;">
+                                    <label
+                                        style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 3px;">State
+                                        *</label>
+                                    <select id="newStateInput"
+                                        style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; background: white;">
+                                        <option value="">-- Select State --</option>
+                                        @php
+                                            $states = \App\Models\DeliverablePincode::where('is_active', 1)
+                                                ->select('state')
+                                                ->distinct()
+                                                ->orderBy('state', 'asc')
+                                                ->get();
+                                        @endphp
+                                        @foreach ($states as $state)
+                                            <option value="{{ $state->state }}">{{ $state->state }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div style="margin-bottom: 8px;">
                                     <label
                                         style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 3px;">Pincode
@@ -2147,13 +2156,13 @@
                                     <input type="text" id="newPincodeInput" placeholder="Enter pincode"
                                         style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px;">
                                 </div>
-                                <div style="margin-bottom: 8px;">
+                              {{--  <div style="margin-bottom: 8px;">
                                     <label
                                         style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 3px;">Phone</label>
                                     <input type="text" id="newPhoneInput" placeholder="Enter phone"
                                         value="{{ Auth::user()->phone ?? '' }}"
                                         style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px;">
-                                </div>
+                                </div>--}}
                                 <div style="display: flex; gap: 8px; margin-top: 10px;">
                                     <button onclick="saveNewAddress()"
                                         style="background: var(--signal); color: white; border: none; padding: 7px 20px; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: 700; flex: 1;">
@@ -2185,22 +2194,25 @@
                                     <input type="text" id="editCityInput"
                                         style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px;">
                                 </div>
-                            <div style="margin-bottom: 8px;">
-    <label style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 3px;">State *</label>
-    <select id="editStateInput" style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; background: white;">
-        <option value="">-- Select State --</option>
-        @php
-            $states = \App\Models\DeliverablePincode::where('is_active', 1)
-                ->select('state')
-                ->distinct()
-                ->orderBy('state', 'asc')
-                ->get();
-        @endphp
-        @foreach($states as $state)
-            <option value="{{ $state->state }}">{{ $state->state }}</option>
-        @endforeach
-    </select>
-</div>
+                                <div style="margin-bottom: 8px;">
+                                    <label
+                                        style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 3px;">State
+                                        *</label>
+                                    <select id="editStateInput"
+                                        style="width: 100%; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; background: white;">
+                                        <option value="">-- Select State --</option>
+                                        @php
+                                            $states = \App\Models\DeliverablePincode::where('is_active', 1)
+                                                ->select('state')
+                                                ->distinct()
+                                                ->orderBy('state', 'asc')
+                                                ->get();
+                                        @endphp
+                                        @foreach ($states as $state)
+                                            <option value="{{ $state->state }}">{{ $state->state }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div style="margin-bottom: 8px;">
                                     <label
                                         style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 3px;">Pincode
@@ -2835,33 +2847,33 @@
                 }
             }
 
-        function editAddress(index) {
-    const addr = addressesData[index];
-    
-    if (addr) {
-        editAddressId = addr.id;
-        
-        const editAddress = document.getElementById('editAddressInput');
-        const editCity = document.getElementById('editCityInput');
-        const editState = document.getElementById('editStateInput');
-        const editPincode = document.getElementById('editPincodeInput');
-        
-        if (editAddress) editAddress.value = addr.address || '';
-        if (editCity) editCity.value = addr.city || '';
-        if (editPincode) editPincode.value = addr.pincode || '';
-        
-        // Set state dropdown value
-        if (editState) {
-            editState.value = addr.state || '';
-        }
-        
-        const editForm = document.getElementById('editAddressFormModal');
-        const addForm = document.getElementById('addAddressFormModal');
-        
-        if (editForm) editForm.style.display = 'block';
-        if (addForm) addForm.style.display = 'none';
-    }
-}
+            function editAddress(index) {
+                const addr = addressesData[index];
+
+                if (addr) {
+                    editAddressId = addr.id;
+
+                    const editAddress = document.getElementById('editAddressInput');
+                    const editCity = document.getElementById('editCityInput');
+                    const editState = document.getElementById('editStateInput');
+                    const editPincode = document.getElementById('editPincodeInput');
+
+                    if (editAddress) editAddress.value = addr.address || '';
+                    if (editCity) editCity.value = addr.city || '';
+                    if (editPincode) editPincode.value = addr.pincode || '';
+
+                    // Set state dropdown value
+                    if (editState) {
+                        editState.value = addr.state || '';
+                    }
+
+                    const editForm = document.getElementById('editAddressFormModal');
+                    const addForm = document.getElementById('addAddressFormModal');
+
+                    if (editForm) editForm.style.display = 'block';
+                    if (addForm) addForm.style.display = 'none';
+                }
+            }
 
             function closeEditAddressForm() {
                 const editForm = document.getElementById('editAddressFormModal');
@@ -2869,62 +2881,71 @@
                 editAddressId = null;
             }
 
-          async function saveNewAddress() {
-    const address = document.getElementById('newAddressInput');
-    const city = document.getElementById('newCityInput');
-    const state = document.getElementById('newStateInput');
-    const pincode = document.getElementById('newPincodeInput');
-    const phone = document.getElementById('newPhoneInput');
+            async function saveNewAddress() {
+                const address = document.getElementById('newAddressInput');
+                const city = document.getElementById('newCityInput');
+                const state = document.getElementById('newStateInput');
+                const pincode = document.getElementById('newPincodeInput');
+                const phone = document.getElementById('newPhoneInput');
 
-    if (!address || !city || !state || !pincode) {
-        showToast('Please fill all required fields!');
-        return;
-    }
+                if (!address || !city || !state || !pincode) {
+                    showToast('Please fill all required fields!');
+                    return;
+                }
 
-    const addressVal = address.value.trim();
-    const cityVal = city.value.trim();
-    const stateVal = state.value;
-    const pincodeVal = pincode.value.trim();
-    const phoneVal = phone ? phone.value.trim() : '';
+                const addressVal = address.value.trim();
+                const cityVal = city.value.trim();
+                const stateVal = state.value;
+                const pincodeVal = pincode.value.trim();
+const phoneVal = '{{ Auth::user()->phone ?? '' }}';
+                if (!addressVal || !cityVal || !stateVal || !pincodeVal) {
+                    showToast('Please fill all required fields!');
+                    return;
+                }
 
-    if (!addressVal || !cityVal || !stateVal || !pincodeVal) {
-        showToast('Please fill all required fields!');
-        return;
-    }
+                try {
+                    const response = await fetch('/api/user-addresses', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: '{{ Auth::user()->name ?? '' }}',
+                            email: '{{ Auth::user()->email ?? '' }}',
 
-    try {
-        const response = await fetch('/api/user-addresses', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                address: addressVal,
-                city: cityVal,
-                state: stateVal,
-                pincode: pincodeVal,
-                phone: phoneVal,
-                is_default: false
-            })
-        });
+                            address: addressVal,
+                            city: cityVal,
+                            state: stateVal,
+                            pincode: pincodeVal,
 
-        const data = await response.json();
+                            phone: phoneVal,
 
-        if (data.success) {
-            showToast('✅ Address added successfully!');
-            const addForm = document.getElementById('addAddressFormModal');
-            if (addForm) addForm.style.display = 'none';
-            setTimeout(() => location.reload(), 1000);
-        } else {
-            showToast(data.message || 'Error adding address');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showToast('Network error. Please try again.');
-    }
-}
+                            is_default: false
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showToast('✅ Address added successfully!');
+                        const addForm = document.getElementById('addAddressFormModal');
+                        if (addForm) addForm.style.display = 'none';
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast(data.message || 'Error adding address');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Network error. Please try again.');
+                }
+            }
+
+
+
+
+
             async function updateAddress() {
                 const address = document.getElementById('editAddressInput');
                 const city = document.getElementById('editCityInput');
@@ -2938,7 +2959,8 @@
 
                 const addressVal = address.value.trim();
                 const cityVal = city.value.trim();
-                const stateVal = state.value;                const pincodeVal = pincode.value.trim();
+                const stateVal = state.value;
+                const pincodeVal = pincode.value.trim();
 
                 if (!addressVal || !cityVal || !stateVal || !pincodeVal) {
                     showToast('Please fill all required fields!');
@@ -2954,6 +2976,10 @@
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
+                            name: '{{ Auth::user()->name ?? '' }}',
+                            email: '{{ Auth::user()->email ?? '' }}',
+                            phone: '{{ Auth::user()->phone ?? '' }}',
+
                             address: addressVal,
                             city: cityVal,
                             state: stateVal,
@@ -2975,6 +3001,8 @@
                     showToast('Network error. Please try again.');
                 }
             }
+
+
 
             async function deleteAddress(addressId) {
                 if (!confirm('Are you sure you want to delete this address?')) {
