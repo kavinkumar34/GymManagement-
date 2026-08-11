@@ -138,83 +138,142 @@ class AdminPaymentController extends Controller
 public function getOrderDetails($id)
 {
     try {
+
         $order = Order::with(['user', 'items'])->find($id);
-        
+
         if (!$order) {
-            return response()->json(['success' => false, 'message' => 'Order not found']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found'
+            ]);
         }
-        
-        // Get shipping address from user_addresses table
+
+
+        // ============================================================
+        // SHIPPING ADDRESS - ORDER'S SELECTED ADDRESS ONLY
+        // ============================================================
+
         $shippingAddress = null;
-        
-        // Try to get from user_addresses table first
-        $userAddress = \App\Models\UserAddress::where('user_id', $order->user_id)
-            ->orderBy('is_default', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->first();
-        
-        if ($userAddress) {
-            $shippingAddress = [
-                'name' => $userAddress->name,
-                'address' => $userAddress->address,
-                'area' => $userAddress->area ?? '',
-                'city' => $userAddress->city,
-                'state' => $userAddress->state,
-                'pincode' => $userAddress->pincode,
-                'phone' => $userAddress->phone
-            ];
-        }
-        
-        // If no address in user_addresses, try from payment_details
-        if (!$shippingAddress && $order->payment_details) {
+
+        if (!empty($order->payment_details)) {
+
             try {
-                $paymentDetails = is_string($order->payment_details) ? json_decode($order->payment_details, true) : $order->payment_details;
-                if (isset($paymentDetails['shipping_address'])) {
+
+                $paymentDetails = is_string($order->payment_details)
+                    ? json_decode($order->payment_details, true)
+                    : $order->payment_details;
+
+                if (
+                    is_array($paymentDetails) &&
+                    isset($paymentDetails['shipping_address']) &&
+                    is_array($paymentDetails['shipping_address'])
+                ) {
                     $shippingAddress = $paymentDetails['shipping_address'];
-                } elseif (isset($paymentDetails['address'])) {
+                }
+
+                elseif (
+                    is_array($paymentDetails) &&
+                    isset($paymentDetails['address']) &&
+                    is_array($paymentDetails['address'])
+                ) {
                     $shippingAddress = $paymentDetails['address'];
                 }
-            } catch (\Exception $e) {}
+
+            } catch (\Exception $e) {
+
+                $shippingAddress = null;
+            }
         }
-        
+
+
+        // ============================================================
+        // FALLBACK ONLY IF OLD ORDER HAS NO SAVED ADDRESS
+        // ============================================================
+
+        if (!$shippingAddress) {
+
+            $shippingAddress = [
+                'name' => $order->user->name ?? '',
+                'address' => '',
+                'area' => '',
+                'city' => '',
+                'state' => '',
+                'pincode' => '',
+                'phone' => $order->user->phone ?? ''
+            ];
+        }
+
+
+        // ============================================================
+        // ORDER ITEMS
+        // ============================================================
+
         $items = [];
+
         foreach ($order->items as $item) {
+
             $items[] = [
                 'id' => $item->id,
                 'product_id' => $item->product_id,
                 'product_name' => $item->product_name,
                 'quantity' => $item->quantity,
                 'price' => $item->price,
-                'product_image' => $item->product_image ?? ($item->product ? $item->product->image : null)
+                'product_image' => $item->product_image
+                    ?? ($item->product ? $item->product->image : null)
             ];
         }
-        
+
+
+        // ============================================================
+        // RESPONSE
+        // ============================================================
+
         return response()->json([
             'success' => true,
+
             'order' => [
+
                 'id' => $order->id,
+
                 'order_number' => $order->order_number,
+
                 'total_amount' => $order->total_amount,
-                    'shipping_charge' => $order->shipping_charge ?? 0,
+
+                'shipping_charge' => $order->shipping_charge ?? 0,
 
                 'payment_status' => $order->payment_status,
+
                 'order_status' => $order->order_status,
+
                 'payment_method' => $order->payment_method,
+
                 'transaction_id' => $order->transaction_id,
+
                 'payment_id' => $order->payment_id,
+
                 'payment_details' => $order->payment_details,
+
                 'order_date' => $order->order_date ?? $order->created_at,
+
                 'created_at' => $order->created_at,
-                'user' => $order->user ? [
-                    'name' => $order->user->name,
-                    'email' => $order->user->email,
-                    'phone' => $order->user->phone ?? 'N/A'
-                ] : null,
-                'items' => $items,
-                'shipping_address' => $shippingAddress
+
+                'user' => $order->user
+                    ? [
+                        'name' => $order->user->name,
+                        'email' => $order->user->email,
+                        'phone' => $order->user->phone ?? 'N/A'
+                    ]
+                    : null,
+
+                // IMPORTANT
+                'shipping_address' => $shippingAddress,
+
+                'items' => $items
             ]
         ]);
+
     } catch (\Exception $e) {
+
         return response()->json([
             'success' => false,
             'message' => $e->getMessage()

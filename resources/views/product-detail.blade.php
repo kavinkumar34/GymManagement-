@@ -3793,21 +3793,10 @@
         }
 
         // ================================================================
-        // ===== ADD TO CART =====
-        // ================================================================
-     // ================================================================
-// ===== ADD TO CART - IMMEDIATE REDIRECT =====
+// ===== ADD TO CART - IMMEDIATE REDIRECT (NO LOGIN REQUIRED) =====
 // ================================================================
 function addToCartDetail() {
-    @if (!auth()->check())
-        showLoginModal('cart', {
-            id: productId,
-            name: productName,
-            price: selectedPrice,
-            image: productImage
-        });
-        return;
-    @endif
+    // REMOVED: Login check - Anyone can add to cart
 
     @if ($hasSizes || $hasSizeChart)
         if (!selectedSize) {

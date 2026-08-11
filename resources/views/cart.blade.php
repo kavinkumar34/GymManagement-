@@ -4,10 +4,10 @@
 @section('content')
     <style>
         /* ================================================================
-           DESIGN TOKENS — FitForge Athletic System
-           Display: Anton (poster-weight, athletic)
-           Body:    Plus Jakarta Sans (clean, modern e-commerce)
-        ================================================================ */
+                               DESIGN TOKENS — FitForge Athletic System
+                               Display: Anton (poster-weight, athletic)
+                               Body:    Plus Jakarta Sans (clean, modern e-commerce)
+                            ================================================================ */
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
         :root {
@@ -29,8 +29,8 @@
             --radius-lg: 18px;
             --radius-md: 12px;
             --radius-sm: 8px;
-            --shadow-card: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.06);
-            --shadow-card-hover: 0 18px 40px rgba(20,22,26,0.14);
+            --shadow-card: 0 1px 2px rgba(20, 22, 26, 0.04), 0 8px 24px rgba(20, 22, 26, 0.06);
+            --shadow-card-hover: 0 18px 40px rgba(20, 22, 26, 0.14);
         }
 
         /* ===== PREVENT HORIZONTAL SCROLL ===== */
@@ -53,13 +53,11 @@
             height: 4px;
             width: 56px;
             border-radius: 3px;
-            background: repeating-linear-gradient(
-                -45deg,
-                var(--signal) 0px,
-                var(--signal) 6px,
-                var(--ink) 6px,
-                var(--ink) 12px
-            );
+            background: repeating-linear-gradient(-45deg,
+                    var(--signal) 0px,
+                    var(--signal) 6px,
+                    var(--ink) 6px,
+                    var(--ink) 12px);
         }
 
         .section-eyebrow {
@@ -1173,6 +1171,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -1183,6 +1182,7 @@
                 transform: translateY(30px) scale(0.95);
                 opacity: 0;
             }
+
             to {
                 transform: translateY(0) scale(1);
                 opacity: 1;
@@ -1499,34 +1499,60 @@
         let deliverableStates = [];
         let isEditingAddress = false;
         let editingAddressIndex = null;
+        const wasEditing = isEditingAddress;
         let showAddressForm = false;
         let editAddressData = null;
         let couponCode = null;
         let couponDiscount = 0;
         let codAvailable = true;
+        let checkoutSelectedAddress = null;
+        let tempAddressData = { // <-- ADD THIS LINE
+            address: '',
+            city: '',
+            pincode: '',
+            state_id: ''
+        };
 
         // ============ LOAD DELIVERABLE STATES ============
-        async function loadDeliverableStates() {
-            try {
-                const response = await fetch('/api/deliverable-pincodes');
-                const data = await response.json();
-                if (data.success && data.pincodes) {
-                    deliverableStates = data.pincodes;
-                    selectedState = null;
-                    shippingCharge = 0;
-                }
-            } catch (error) {
-                console.error('Error loading states:', error);
-                let savedStates = localStorage.getItem('deliverable_states');
-                if (savedStates) {
-                    try {
-                        deliverableStates = JSON.parse(savedStates);
-                        selectedState = null;
-                        shippingCharge = 0;
-                    } catch (e) {}
-                }
-            }
+     // ============ LOAD DELIVERABLE STATES ============
+async function loadDeliverableStates() {
+    try {
+        const response = await fetch('/api/deliverable-pincodes');
+        const data = await response.json();
+
+        if (data.success && data.pincodes) {
+            deliverableStates = data.pincodes;
+
+            // IMPORTANT:
+            // Guest user must manually select the state.
+            // Do NOT select the first state automatically.
+            selectedState = null;
+            shippingCharge = 0;
         }
+    } catch (error) {
+        console.error('Error loading states:', error);
+
+        let savedStates = localStorage.getItem('deliverable_states');
+
+        if (savedStates) {
+            try {
+                deliverableStates = JSON.parse(savedStates);
+
+                // IMPORTANT:
+                // Do NOT select any state automatically.
+                selectedState = null;
+                shippingCharge = 0;
+
+            } catch (e) {
+                selectedState = null;
+                shippingCharge = 0;
+            }
+        } else {
+            selectedState = null;
+            shippingCharge = 0;
+        }
+    }
+}
 
         // ============ USER API FUNCTIONS ============
         async function getLoggedInUser() {
@@ -1548,13 +1574,37 @@
 
         async function loadAddressesFromDatabase() {
             try {
+                  // =====================================================
+        // GUEST USER - DO NOT AUTO SELECT ADDRESS / STATE
+        // =====================================================
+        if (!loggedInUser) {
+            savedAddresses = [];
+            selectedAddress = null;
+            selectedState = null;
+            shippingCharge = 0;
+
+            console.log('Guest user: address/state auto selection disabled.');
+
+            return;
+        }
+                console.log('=== LOAD ADDRESSES FROM DATABASE ===');
+                console.log('Fetching addresses from /api/user-addresses...');
+
                 const response = await fetch('/api/user-addresses');
                 const data = await response.json();
+                console.log('Address API response:', data);
+
                 if (data.success && data.addresses && data.addresses.length > 0) {
                     savedAddresses = data.addresses;
+                    console.log('✅ Loaded addresses from DB:', savedAddresses);
+                    console.log('Number of addresses:', savedAddresses.length);
+
                     localStorage.setItem('user_addresses', JSON.stringify(savedAddresses));
+
                     if (!selectedAddress && savedAddresses.length > 0) {
                         selectedAddress = savedAddresses[0];
+                        console.log('Selected first address:', selectedAddress);
+
                         const addrState = savedAddresses[0].state;
                         const stateData = deliverableStates.find(s => s.state === addrState);
                         if (stateData) {
@@ -1563,9 +1613,12 @@
                         }
                     }
                 } else {
+                    console.log('No addresses from DB, checking localStorage...');
                     let saved = localStorage.getItem('user_addresses');
                     if (saved && JSON.parse(saved).length > 0) {
                         savedAddresses = JSON.parse(saved);
+                        console.log('✅ Loaded addresses from localStorage:', savedAddresses);
+
                         if (!selectedAddress && savedAddresses.length > 0) {
                             selectedAddress = savedAddresses[0];
                             const addrState = savedAddresses[0].state;
@@ -1576,57 +1629,165 @@
                             }
                         }
                     } else {
+                        console.log('No addresses found in localStorage either.');
                         savedAddresses = [];
                     }
                 }
+
+                console.log('Final savedAddresses after load:', savedAddresses);
+                console.log('=== END LOAD ADDRESSES ===');
+
             } catch (error) {
-                console.error('Error loading addresses:', error);
+                console.error('❌ Error loading addresses:', error);
                 let saved = localStorage.getItem('user_addresses');
                 if (saved) {
-                    savedAddresses = JSON.parse(saved);
-                    if (!selectedAddress && savedAddresses.length > 0) {
-                        selectedAddress = savedAddresses[0];
+                    try {
+                        savedAddresses = JSON.parse(saved);
+                        console.log('Loaded addresses from localStorage after error:', savedAddresses);
+                        if (!selectedAddress && savedAddresses.length > 0) {
+                            selectedAddress = savedAddresses[0];
+                        }
+                    } catch (e) {
+                        console.error('Error parsing localStorage data:', e);
+                        savedAddresses = [];
                     }
                 } else {
                     savedAddresses = [];
                 }
             }
         }
+        async function saveAddressToDatabase(address, isEdit = false, addressId = null) {
 
-        async function saveAddressToDatabase(address) {
             try {
-                const response = await fetch('/api/user-addresses', {
-                    method: 'POST',
+
+                const url = isEdit && addressId ?
+                    `/api/user-addresses/${addressId}` :
+                    `/api/user-addresses`;
+
+                const method = isEdit && addressId ?
+                    'PUT' :
+                    'POST';
+
+                console.log('=================================');
+                console.log('SAVE ADDRESS API');
+                console.log('URL:', url);
+                console.log('METHOD:', method);
+                console.log('DATA:', address);
+                console.log('=================================');
+
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify(address)
                 });
+
                 const data = await response.json();
+
+                console.log('API STATUS:', response.status);
+                console.log('API RESPONSE:', data);
+
+                if (!response.ok) {
+
+                    let errorMessage =
+                        data.message || 'Failed to save address';
+
+                    if (data.errors) {
+                        errorMessage = Object.values(data.errors)
+                            .flat()
+                            .join('\n');
+                    }
+
+                    showCustomAlert(
+                        '❌ Error',
+                        errorMessage,
+                        'warning'
+                    );
+
+                    return null;
+                }
+
                 if (data.success && data.address) {
                     return data.address;
                 }
+
+                showCustomAlert(
+                    '❌ Error',
+                    data.message || 'Address was not saved',
+                    'warning'
+                );
+
                 return null;
+
             } catch (error) {
-                console.error('Error saving address:', error);
+
+                console.error('Address API error:', error);
+
+                showCustomAlert(
+                    '❌ Error',
+                    'Unable to connect to server. Please try again.',
+                    'warning'
+                );
+
                 return null;
             }
         }
 
         async function deleteAddressFromDatabase(addressId) {
+
             try {
-                const response = await fetch(`/api/user-addresses/${addressId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
+
+                console.log('Deleting address ID:', addressId);
+
+                if (!addressId || Number(addressId) <= 0) {
+                    console.error('Invalid delete ID:', addressId);
+                    return false;
+                }
+
+                const response = await fetch(
+                    `/api/user-addresses/${Number(addressId)}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
                     }
-                });
+                );
+
                 const data = await response.json();
-                return data.success;
+
+                console.log('DELETE STATUS:', response.status);
+                console.log('DELETE RESPONSE:', data);
+
+                if (!response.ok) {
+
+                    showCustomAlert(
+                        '❌ Error',
+                        data.message || 'Failed to delete address',
+                        'warning'
+                    );
+
+                    return false;
+                }
+
+                return data.success === true;
+
             } catch (error) {
-                console.error('Error deleting address:', error);
+
+                console.error(
+                    'Delete address error:',
+                    error
+                );
+
+                showCustomAlert(
+                    '❌ Error',
+                    'Unable to connect to server',
+                    'warning'
+                );
+
                 return false;
             }
         }
@@ -1799,11 +1960,26 @@
 
         // ============ ADDRESS FUNCTIONS ============
         function selectAddress(index) {
+            if (!savedAddresses[index]) {
+                console.error('Address not found at index:', index);
+                return;
+            }
             selectedAddress = savedAddresses[index];
-            const addrState = savedAddresses[index].state;
-            const stateData = deliverableStates.find(s => s.state === addrState);
+            checkoutSelectedAddress = savedAddresses[index]; // ← ADD THIS LINE
+
+            // Try to find state by state name first
+            let addrState = savedAddresses[index].state;
+            let stateData = deliverableStates.find(s => s.state === addrState);
+
+            // If not found by name, try by state_id
+            if (!stateData && savedAddresses[index].state_id) {
+                stateData = deliverableStates.find(s => s.id == savedAddresses[index].state_id);
+            }
+
             if (stateData) {
                 selectedState = stateData;
+                // Ensure the address has the correct state name
+                selectedAddress.state = stateData.state;
                 shippingCharge = parseFloat(stateData.shipping_charge) || 0;
             } else {
                 selectedState = null;
@@ -1813,50 +1989,241 @@
             renderPage();
         }
 
-        function editAddress(index) {
-            let addr = savedAddresses[index];
+        function cartEditAddress(index) {
+
+            console.log('=== EDIT ADDRESS STARTED ===');
+            console.log('Edit index:', index);
+
+            if (
+                index === undefined ||
+                index === null ||
+                !savedAddresses[index]
+            ) {
+                console.error('Invalid address index:', index);
+
+                showCustomAlert(
+                    '❌ Error',
+                    'Address not found.',
+                    'warning'
+                );
+
+                return false;
+            }
+
+            const addr = savedAddresses[index];
+
+            console.log('Address selected for edit:', addr);
+
+            // IMPORTANT
             isEditingAddress = true;
             editingAddressIndex = index;
-            editAddressData = {
-                address: addr.address || '',
-                city: addr.city || '',
-                pincode: addr.pincode || '',
-                state: addr.state || ''
-            };
-            showAddressForm = true;
-            renderPage();
-        }
 
-        function deleteAddress(index) {
-            let address = savedAddresses[index];
-            if (address.id) {
-                deleteAddressFromDatabase(address.id);
-            }
-            savedAddresses.splice(index, 1);
-            saveAddressesToLocal();
-            if (selectedAddress && selectedAddress.id === address.id) {
-                selectedAddress = savedAddresses.length > 0 ? savedAddresses[0] : null;
-                if (selectedAddress) {
-                    const addrState = selectedAddress.state;
-                    const stateData = deliverableStates.find(s => s.state === addrState);
-                    if (stateData) {
-                        selectedState = stateData;
-                        shippingCharge = parseFloat(stateData.shipping_charge) || 0;
-                    }
-                } else {
-                    selectedState = null;
-                    shippingCharge = 0;
+            // Find state ID
+            let stateId = addr.state_id || '';
+
+            if (!stateId && addr.state) {
+
+                const stateData =
+                    deliverableStates.find(
+                        state =>
+                        String(state.state).trim().toLowerCase() ===
+                        String(addr.state).trim().toLowerCase()
+                    );
+
+                if (stateData) {
+                    stateId = String(stateData.id);
+
+                    selectedState = stateData;
+
+                    shippingCharge =
+                        parseFloat(
+                            stateData.shipping_charge
+                        ) || 0;
                 }
             }
-            showAddressForm = false;
+
+            editAddressData = {
+
+                address: addr.address || '',
+
+                city: addr.city || '',
+
+                pincode: addr.pincode || '',
+
+                state: addr.state || '',
+
+                state_id: stateId
+            };
+
+            console.log(
+                'Edit address data:',
+                editAddressData
+            );
+
+            showAddressForm = true;
+
             renderPage();
+
+            // After render, make sure fields are populated
+            setTimeout(function() {
+
+                const buildingInput =
+                    document.getElementById('newBuilding');
+
+                const cityInput =
+                    document.getElementById('newCity');
+
+                const pincodeInput =
+                    document.getElementById('newPincode');
+
+                const stateSelect =
+                    document.getElementById('newState');
+
+                if (buildingInput) {
+                    buildingInput.value =
+                        editAddressData.address;
+                }
+
+                if (cityInput) {
+                    cityInput.value =
+                        editAddressData.city;
+                }
+
+                if (pincodeInput) {
+                    pincodeInput.value =
+                        editAddressData.pincode;
+                }
+
+                if (
+                    stateSelect &&
+                    editAddressData.state_id
+                ) {
+                    stateSelect.value =
+                        editAddressData.state_id;
+
+                    updateShippingFromForm();
+                }
+
+                console.log(
+                    '=== EDIT FORM LOADED ==='
+                );
+
+            }, 50);
+
+            return false;
         }
 
-        function showAddAddressForm() {
-            showAddressForm = true;
+
+        async function cartDeleteAddress(index) {
+            console.log('=== DELETE ADDRESS ===');
+            console.log('Index:', index);
+            console.log('Saved addresses:', savedAddresses);
+
+            if (
+                index === undefined ||
+                index === null ||
+                !savedAddresses[index]
+            ) {
+                showCustomAlert(
+                    '❌ Error',
+                    'Address not found',
+                    'warning'
+                );
+                return;
+            }
+
+            const address = savedAddresses[index];
+
+            console.log('Selected address for delete:', address);
+            console.log('Address ID:', address.id);
+
+            const addressId = Number(address.id);
+
+            if (!addressId || addressId <= 0) {
+
+                console.error(
+                    'Invalid address ID:',
+                    address.id,
+                    address
+                );
+
+                showCustomAlert(
+                    '❌ Error',
+                    'Invalid address ID. Please refresh the page and try again.',
+                    'warning'
+                );
+
+                // Reload from database
+                await loadAddressesFromDatabase();
+                renderPage();
+
+                return;
+            }
+
+            const confirmed = confirm(
+                'Are you sure you want to delete this address?'
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const success = await deleteAddressFromDatabase(addressId);
+
+            if (!success) {
+                return;
+            }
+
+            // Remove from frontend
+            savedAddresses.splice(index, 1);
+
+            // If deleted address was selected
+            if (
+                selectedAddress &&
+                Number(selectedAddress.id) === addressId
+            ) {
+                selectedAddress =
+                    savedAddresses.length > 0 ?
+                    savedAddresses[0] :
+                    null;
+            }
+
+            // Update localStorage
+            saveAddressesToLocal();
+
+            showAddressForm = false;
             isEditingAddress = false;
             editingAddressIndex = null;
             editAddressData = null;
+
+            renderPage();
+
+            showCustomAlert(
+                '✅ Success',
+                'Address deleted successfully!',
+                'success'
+            );
+        }
+
+        function showAddAddressForm() {
+            console.log('=== SHOW ADD ADDRESS FORM ===');
+            // Clear any editing data
+            isEditingAddress = false;
+            editingAddressIndex = null;
+            editAddressData = null;
+            // Reset state selection
+            selectedState = null;
+            shippingCharge = 0;
+            // Reset temp data - start fresh
+            tempAddressData = {
+                address: '',
+                city: '',
+                pincode: '',
+                state_id: ''
+            };
+            console.log('Temp data after show form:', tempAddressData);
+            // Show the form
+            showAddressForm = true;
             renderPage();
         }
 
@@ -1872,87 +2239,454 @@
             const stateSelect = document.getElementById('newState');
             if (stateSelect) {
                 const stateId = stateSelect.value;
+                console.log('State selected:', stateId);
+
+                // Get current form values
+                const addressInput = document.getElementById('newBuilding');
+                const cityInput = document.getElementById('newCity');
+                const pincodeInput = document.getElementById('newPincode');
+
+                // Save ALL values to temp data - this is the source of truth
+                if (addressInput) {
+                    tempAddressData.address = addressInput.value || tempAddressData.address || '';
+                }
+                if (cityInput) {
+                    tempAddressData.city = cityInput.value || tempAddressData.city || '';
+                }
+                if (pincodeInput) {
+                    tempAddressData.pincode = pincodeInput.value || tempAddressData.pincode || '';
+                }
+                tempAddressData.state_id = stateId;
+                console.log('Temp data after update:', tempAddressData);
+
                 const stateData = deliverableStates.find(s => s.id == stateId);
                 if (stateData) {
                     selectedState = stateData;
                     shippingCharge = parseFloat(stateData.shipping_charge) || 0;
+                    const chargeDisplay = document.getElementById('newAddressShippingCharge');
+                    if (chargeDisplay) {
+                        chargeDisplay.textContent = '₹' + shippingCharge.toFixed(2);
+                    }
                 }
-                renderPage();
+                // DO NOT call renderPage() here - it will clear the form!
             }
         }
 
-        function saveNewAddress() {
-            const address = document.getElementById('newBuilding').value.trim();
-            const city = document.getElementById('newCity').value.trim();
-            const pincode = document.getElementById('newPincode').value.trim();
-            const stateSelect = document.getElementById('newState');
-            const stateId = stateSelect ? stateSelect.value : '';
-            const stateName = stateSelect ? stateSelect.options[stateSelect.selectedIndex]?.text?.split(' (')[0] || '' : '';
 
-            if (!address || !city || !pincode || !stateId) {
-                showCustomAlert('❌ Required', 'Please fill all required fields', 'warning');
+
+    // ============ GUEST SHIPPING UPDATE ============
+function updateGuestShipping() {
+    const stateSelect = document.getElementById('guestState');
+
+    if (!stateSelect) {
+        return;
+    }
+
+    const stateId = stateSelect.value;
+
+    // If user has NOT selected a state
+    if (!stateId) {
+        selectedState = null;
+        shippingCharge = 0;
+
+        renderPage();
+        return;
+    }
+
+    const stateData = deliverableStates.find(
+        s => String(s.id) === String(stateId)
+    );
+
+    if (stateData) {
+        selectedState = stateData;
+        shippingCharge = parseFloat(stateData.shipping_charge) || 0;
+    } else {
+        selectedState = null;
+        shippingCharge = 0;
+    }
+
+    renderPage();
+}
+
+        async function cartSaveNewAddress(event = null) {
+
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+            }
+
+            console.log('=== CART SAVE / UPDATE ADDRESS ===');
+
+            const addressInput =
+                document.getElementById('newBuilding');
+
+            const cityInput =
+                document.getElementById('newCity');
+
+            const pincodeInput =
+                document.getElementById('newPincode');
+
+            const stateSelect =
+                document.getElementById('newState');
+
+            if (
+                !addressInput ||
+                !cityInput ||
+                !pincodeInput ||
+                !stateSelect
+            ) {
+                showCustomAlert(
+                    '❌ Error',
+                    'Address form not loaded.',
+                    'warning'
+                );
+
                 return false;
             }
 
-            if (pincode.length < 6) {
-                showCustomAlert('❌ Invalid', 'Please enter a valid 6-digit pincode', 'warning');
+            const address =
+                addressInput.value.trim();
+
+            const city =
+                cityInput.value.trim();
+
+            const pincode =
+                pincodeInput.value.trim();
+
+            const stateId =
+                stateSelect.value.trim();
+
+            // =========================
+            // VALIDATION
+            // =========================
+
+            if (!address) {
+                showCustomAlert(
+                    '⚠️ Required',
+                    'Please enter your address.',
+                    'warning'
+                );
                 return false;
             }
 
-            const selectedStateData = deliverableStates.find(s => s.id == stateId);
-            if (selectedStateData) {
-                selectedState = selectedStateData;
-                shippingCharge = parseFloat(selectedStateData.shipping_charge) || 0;
+            if (!city) {
+                showCustomAlert(
+                    '⚠️ Required',
+                    'Please enter your city.',
+                    'warning'
+                );
+                return false;
             }
+
+            if (!stateId) {
+                showCustomAlert(
+                    '⚠️ Required',
+                    'Please select your state.',
+                    'warning'
+                );
+                return false;
+            }
+
+            if (!/^[0-9]{6}$/.test(pincode)) {
+                showCustomAlert(
+                    '⚠️ Invalid Pincode',
+                    'Please enter a valid 6-digit pincode.',
+                    'warning'
+                );
+                return false;
+            }
+
+            // =========================
+            // STATE
+            // =========================
+
+            const stateData =
+                deliverableStates.find(
+                    s =>
+                    String(s.id) ===
+                    String(stateId)
+                );
+
+            if (!stateData) {
+                showCustomAlert(
+                    '❌ Error',
+                    'Selected state is invalid.',
+                    'warning'
+                );
+                return false;
+            }
+
+            const stateName =
+                stateData.state;
+
+            // =========================
+            // ADDRESS DATA
+            // =========================
 
             const addressData = {
-                user_id: userId,
+
                 name: loggedInUser?.name || '',
-                email: userEmail,
+
+                email: loggedInUser?.email ||
+                    userEmail ||
+                    '',
+
                 address: address,
+
+                area: '',
+
                 city: city,
+
                 state: stateName,
+
                 pincode: pincode,
-                phone: loggedInUser?.phone || '',
-                is_default: savedAddresses.length === 0 ? 1 : 0
+
+                phone: loggedInUser?.phone ||
+                    '',
+
+                is_default: 0
             };
 
-            if (isEditingAddress && editingAddressIndex !== null) {
-                const existingAddress = savedAddresses[editingAddressIndex];
-                savedAddresses[editingAddressIndex] = {
-                    ...existingAddress,
-                    ...addressData
-                };
-                saveAddressesToLocal();
-                if (selectedAddress && selectedAddress.id === existingAddress.id) {
-                    selectedAddress = savedAddresses[editingAddressIndex];
+            console.log(
+                'Address data:',
+                addressData
+            );
+
+            const btn =
+                document.getElementById(
+                    'addAddressBtn'
+                );
+
+            if (btn) {
+
+                btn.disabled = true;
+
+                btn.textContent =
+                    isEditingAddress ?
+                    'Updating...' :
+                    'Saving...';
+            }
+
+            try {
+
+                let response;
+
+                // =================================
+                // EDIT EXISTING ADDRESS
+                // =================================
+
+                if (
+                    isEditingAddress &&
+                    editingAddressIndex !== null &&
+                    savedAddresses[
+                        editingAddressIndex
+                    ]
+                ) {
+
+                    const existingAddress =
+                        savedAddresses[
+                            editingAddressIndex
+                        ];
+
+                    const addressId =
+                        existingAddress.id;
+
+                    console.log(
+                        'Updating address ID:',
+                        addressId
+                    );
+
+                    response = await fetch(
+                        `/api/user-addresses/${addressId}`, {
+                            method: 'PUT',
+
+                            headers: {
+
+                                'Content-Type': 'application/json',
+
+                                'Accept': 'application/json',
+
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+
+                            body: JSON.stringify(
+                                addressData
+                            )
+                        }
+                    );
+
+                } else {
+
+                    // =================================
+                    // ADD NEW ADDRESS
+                    // =================================
+
+                    response = await fetch(
+                        '/api/user-addresses', {
+                            method: 'POST',
+
+                            headers: {
+
+                                'Content-Type': 'application/json',
+
+                                'Accept': 'application/json',
+
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+
+                            body: JSON.stringify(
+                                addressData
+                            )
+                        }
+                    );
                 }
-                showAddressForm = false;
+
+                console.log(
+                    'API status:',
+                    response.status
+                );
+
+                const result =
+                    await response.json();
+
+                console.log(
+                    'API result:',
+                    result
+                );
+
+                if (
+                    !response.ok ||
+                    !result.success
+                ) {
+
+                    throw new Error(
+                        result.message ||
+                        'Unable to save address.'
+                    );
+                }
+
+                // =================================
+                // UPDATE LOCAL ARRAY
+                // =================================
+
+                if (
+                    isEditingAddress &&
+                    editingAddressIndex !== null
+                ) {
+
+                    savedAddresses[
+                        editingAddressIndex
+                    ] = result.address;
+
+                    selectedAddress =
+                        result.address;
+                    checkoutSelectedAddress = result.address; // ← ADD THIS LINE
+
+
+                } else {
+
+                    savedAddresses.push(
+                        result.address
+                    );
+
+                    selectedAddress =
+                        result.address;
+                    checkoutSelectedAddress = result.address; // ← ADD THIS LINE
+
+                }
+
+                // =================================
+                // SHIPPING
+                // =================================
+
+                selectedState =
+                    stateData;
+
+                shippingCharge =
+                    parseFloat(
+                        stateData.shipping_charge
+                    ) || 0;
+
+                // =================================
+                // RESET EDIT MODE
+                // =================================
+
+                const wasEditing =
+                    isEditingAddress;
+
                 isEditingAddress = false;
+
                 editingAddressIndex = null;
+
                 editAddressData = null;
+
+                showAddressForm = false;
+
+                tempAddressData = {
+
+                    address: '',
+
+                    city: '',
+
+                    pincode: '',
+
+                    state_id: ''
+                };
+
+                // =================================
+                // SAVE + RENDER
+                // =================================
+
+                saveAddressesToLocal();
+
                 renderPage();
-                showCustomAlert('✅ Success', 'Address updated successfully!', 'success');
+
+                showCustomAlert(
+                    '✅ Success',
+
+                    wasEditing ?
+                    'Address updated successfully!' :
+                    'Address added successfully!',
+
+                    'success'
+                );
+
+                console.log(
+                    wasEditing ?
+                    '=== ADDRESS UPDATED ===' :
+                    '=== ADDRESS ADDED ==='
+                );
+
                 return true;
-            } else {
-                saveAddressToDatabase(addressData).then(saved => {
-                    if (saved) {
-                        savedAddresses.push(saved);
-                        saveAddressesToLocal();
-                        selectedAddress = saved;
-                        showAddressForm = false;
-                        renderPage();
-                        showCustomAlert('✅ Success', 'Address added successfully!', 'success');
-                    } else {
-                        savedAddresses.push(addressData);
-                        saveAddressesToLocal();
-                        selectedAddress = addressData;
-                        showAddressForm = false;
-                        renderPage();
-                        showCustomAlert('✅ Success', 'Address added successfully!', 'success');
-                    }
-                });
-                return true;
+
+            } catch (error) {
+
+                console.error(
+                    'Address save/update error:',
+                    error
+                );
+
+                showCustomAlert(
+                    '❌ Error',
+                    error.message ||
+                    'Unable to save address.',
+                    'warning'
+                );
+
+                return false;
+
+            } finally {
+
+                if (btn) {
+
+                    btn.disabled = false;
+
+                    btn.textContent =
+                        isEditingAddress ?
+                        'Update Address' :
+                        'Add Address';
+                }
             }
         }
 
@@ -2124,6 +2858,92 @@
 
         // ============ PLACE ORDER ============
         async function placeOrder() {
+            // Get all form data FIRST before any page refresh
+            const checkoutName = document.getElementById('checkoutName');
+            const checkoutPhone = document.getElementById('checkoutPhone');
+            const checkoutEmail = document.getElementById('checkoutEmail');
+
+            // Get guest address fields if not logged in
+            const guestAddress = document.getElementById('guestAddress');
+            const guestCity = document.getElementById('guestCity');
+            const guestState = document.getElementById('guestState');
+            const guestPincode = document.getElementById('guestPincode');
+
+            // Get logged in user address fields
+            const newBuilding = document.getElementById('newBuilding');
+            const newCity = document.getElementById('newCity');
+            const newState = document.getElementById('newState');
+            const newPincode = document.getElementById('newPincode');
+
+            // Store values in variables BEFORE any operations
+            const name = checkoutName ? checkoutName.value.trim() : '';
+            const phone = checkoutPhone ? checkoutPhone.value.trim() : '';
+            const email = checkoutEmail ? checkoutEmail.value.trim() : '';
+
+            // For guest users - get address from guest fields
+            let guestAddressVal = '';
+            let guestCityVal = '';
+            let guestStateVal = '';
+            let guestPincodeVal = '';
+            let guestStateId = '';
+
+            if (!loggedInUser) {
+                guestAddressVal = guestAddress ? guestAddress.value.trim() : '';
+                guestCityVal = guestCity ? guestCity.value.trim() : '';
+                guestStateVal = guestState ? guestState.value : '';
+                guestStateId = guestState ? guestState.value : '';
+                guestPincodeVal = guestPincode ? guestPincode.value.trim() : '';
+            }
+
+            // Validate contact info
+            if (!name || !phone || !email) {
+                showCustomAlert('⚠️ Required', 'Please fill all contact information (Name, Phone, Email)', 'warning');
+                return;
+            }
+
+            if (!/^[0-9]{10}$/.test(phone)) {
+                showCustomAlert('⚠️ Invalid Phone', 'Please enter a valid 10-digit phone number', 'warning');
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showCustomAlert('⚠️ Invalid Email', 'Please enter a valid email address', 'warning');
+                return;
+            }
+
+
+
+            // For guest users - validate address
+            if (!loggedInUser) {
+                if (!guestAddressVal || !guestCityVal || !guestStateVal || !guestPincodeVal) {
+                    showCustomAlert('⚠️ Required', 'Please fill all address fields', 'warning');
+                    return;
+                }
+                if (guestPincodeVal.length < 6) {
+                    showCustomAlert('⚠️ Invalid', 'Please enter a valid 6-digit pincode', 'warning');
+                    return;
+                }
+
+                // Get state name from selected state
+                let stateName = guestStateVal;
+                const stateData = deliverableStates.find(s => s.id == guestStateId);
+                if (stateData) {
+                    selectedState = stateData;
+                    stateName = stateData.state;
+                    shippingCharge = parseFloat(stateData.shipping_charge) || 0;
+                }
+
+                selectedAddress = {
+                    name: name,
+                    address: guestAddressVal,
+                    city: guestCityVal,
+                    state: stateName,
+                    state_id: guestStateId,
+                    pincode: guestPincodeVal,
+                    phone: phone
+                };
+            }
+
             if (checkStockIssues()) {
                 showCustomAlert('⚠️ Stock Issue', 'Some items are out of stock or quantity exceeds available stock!',
                     'warning');
@@ -2132,8 +2952,7 @@
 
             if (selectedPayment === 'cod' && !codAvailable) {
                 showCustomAlert('⚠️ COD Unavailable',
-                    'Cash on Delivery is not available for this order. Please select Online Payment.',
-                    'warning');
+                    'Cash on Delivery is not available for this order. Please select Online Payment.', 'warning');
                 return;
             }
 
@@ -2147,19 +2966,17 @@
                 return;
             }
 
-            const address = document.getElementById('newBuilding');
-            const city = document.getElementById('newCity');
-            const pincode = document.getElementById('newPincode');
-            const stateSelect = document.getElementById('newState');
-
-            if (address && address.value.trim() && city && city.value.trim() && pincode && pincode.value.trim()) {
-                const saved = saveNewAddress();
-                if (!saved) return;
-            }
-
-            if (!selectedAddress) {
-                showCustomAlert('⚠️ Address Required', 'Please add a delivery address', 'warning');
-                return;
+            // For logged in users, check address
+            if (loggedInUser) {
+                if (!selectedAddress) {
+                    showCustomAlert('⚠️ Address Required', 'Please select or add a delivery address first.', 'warning');
+                    return;
+                }
+            } else {
+                if (!selectedAddress) {
+                    showCustomAlert('⚠️ Address Required', 'Please fill your delivery address', 'warning');
+                    return;
+                }
             }
 
             let checkoutBtn = document.querySelector('.place-order-btn');
@@ -2171,9 +2988,25 @@
             const subtotal = getSubtotal();
             const totalWithShipping = getTotalWithShipping();
 
+            // ★★★ Use selectedAddress directly ★★★
+            const addressToUse = selectedAddress;
+
+            console.log('🔍 SELECTED ADDRESS:', selectedAddress);
+            console.log('🔍 CHECKOUT SELECTED ADDRESS:', checkoutSelectedAddress);
+            console.log('✅ ADDRESS TO USE:', addressToUse);
+
+            if (!addressToUse) {
+                showCustomAlert('⚠️ Address Required', 'Please select a delivery address.', 'warning');
+                if (checkoutBtn) {
+                    checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
+                    checkoutBtn.disabled = false;
+                }
+                return;
+            }
+
             const orderData = {
                 cart: cartData,
-                address: selectedAddress,
+                address: addressToUse,
                 state_id: selectedState ? selectedState.id : '',
                 shipping_charge: shippingCharge,
                 shipping_state: selectedState,
@@ -2184,6 +3017,39 @@
                 payment_method: selectedPayment
             };
 
+            // ===== ONLY ADD GUEST DATA FOR GUEST USERS =====
+            let requestBody = {
+                cart: cartData,
+                total_amount: totalWithShipping,
+                shipping_charge: shippingCharge,
+                coupon_discount: parseFloat(couponDiscount || 0),
+                coupon_code: couponCode
+            };
+
+            // Add guest data ONLY if user is not logged in
+            if (!loggedInUser) {
+                requestBody.guest_name = name;
+                requestBody.guest_phone = phone;
+                requestBody.guest_email = email;
+                orderData.guest_name = name;
+                orderData.guest_phone = phone;
+                orderData.guest_email = email;
+
+                if (addressToUse) {
+                    orderData.guest_address = addressToUse.address || '';
+                    orderData.guest_city = addressToUse.city || '';
+                    orderData.guest_state = addressToUse.state || '';
+                    orderData.guest_pincode = addressToUse.pincode || '';
+                    orderData.guest_phone = addressToUse.phone || phone;
+
+                    requestBody.guest_address = addressToUse.address || '';
+                    requestBody.guest_city = addressToUse.city || '';
+                    requestBody.guest_state = addressToUse.state || '';
+                    requestBody.guest_pincode = addressToUse.pincode || '';
+                    requestBody.guest_phone = addressToUse.phone || phone;
+                }
+            }
+
             try {
                 const saveResponse = await fetch('/api/set-checkout-cart', {
                     method: 'POST',
@@ -2191,13 +3057,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': csrfToken
                     },
-                    body: JSON.stringify({
-                        cart: cartData,
-                        total_amount: totalWithShipping,
-                        shipping_charge: shippingCharge,
-                        coupon_discount: parseFloat(couponDiscount || 0),
-                        coupon_code: couponCode
-                    })
+                    body: JSON.stringify(requestBody)
                 });
 
                 const saveData = await saveResponse.json();
@@ -2256,11 +3116,37 @@
                     orderDataInput.value = JSON.stringify(orderData);
                     form.appendChild(orderDataInput);
 
+                    // ★★★ Use addressToUse (already defined) ★★★
                     const addressInput = document.createElement('input');
                     addressInput.type = 'hidden';
                     addressInput.name = 'address';
-                    addressInput.value = JSON.stringify(selectedAddress);
+
+                    if (addressToUse) {
+                        if (addressToUse.state_id && !addressToUse.state) {
+                            const stateData = deliverableStates.find(
+                                s => String(s.id) === String(addressToUse.state_id)
+                            );
+                            if (stateData) {
+                                addressToUse.state = stateData.state;
+                            }
+                        }
+                        addressInput.value = JSON.stringify(addressToUse);
+                    } else {
+                        addressInput.value = '';
+                    }
                     form.appendChild(addressInput);
+
+                    const shippingAddressIdInput = document.createElement('input');
+                    shippingAddressIdInput.type = 'hidden';
+                    shippingAddressIdInput.name = 'shipping_address_id';
+                    shippingAddressIdInput.value = addressToUse && addressToUse.id ? addressToUse.id : '';
+                    form.appendChild(shippingAddressIdInput);
+
+                    console.log('=================================');
+                    console.log('SELECTED ADDRESS FOR ORDER');
+                    console.log('Address ID:', addressToUse ? addressToUse.id : null);
+                    console.log('Address:', addressToUse);
+                    console.log('=================================');
 
                     const stateInput = document.createElement('input');
                     stateInput.type = 'hidden';
@@ -2273,6 +3159,59 @@
                     paymentInput.name = 'payment_method';
                     paymentInput.value = selectedPayment;
                     form.appendChild(paymentInput);
+
+                    // ===== ONLY ADD GUEST DATA FOR GUEST USERS =====
+                    if (!loggedInUser) {
+                        const guestNameInput = document.createElement('input');
+                        guestNameInput.type = 'hidden';
+                        guestNameInput.name = 'guest_name';
+                        guestNameInput.value = name;
+                        form.appendChild(guestNameInput);
+
+                        const guestPhoneInput = document.createElement('input');
+                        guestPhoneInput.type = 'hidden';
+                        guestPhoneInput.name = 'guest_phone';
+                        guestPhoneInput.value = phone;
+                        form.appendChild(guestPhoneInput);
+
+                        const guestEmailInput = document.createElement('input');
+                        guestEmailInput.type = 'hidden';
+                        guestEmailInput.name = 'guest_email';
+                        guestEmailInput.value = email;
+                        form.appendChild(guestEmailInput);
+
+                        if (addressToUse) {
+                            const guestAddressInput = document.createElement('input');
+                            guestAddressInput.type = 'hidden';
+                            guestAddressInput.name = 'guest_address';
+                            guestAddressInput.value = addressToUse.address || '';
+                            form.appendChild(guestAddressInput);
+
+                            const guestCityInput = document.createElement('input');
+                            guestCityInput.type = 'hidden';
+                            guestCityInput.name = 'guest_city';
+                            guestCityInput.value = addressToUse.city || '';
+                            form.appendChild(guestCityInput);
+
+                            const guestStateInput = document.createElement('input');
+                            guestStateInput.type = 'hidden';
+                            guestStateInput.name = 'guest_state';
+                            guestStateInput.value = addressToUse.state || '';
+                            form.appendChild(guestStateInput);
+
+                            const guestPincodeInput = document.createElement('input');
+                            guestPincodeInput.type = 'hidden';
+                            guestPincodeInput.name = 'guest_pincode';
+                            guestPincodeInput.value = addressToUse.pincode || '';
+                            form.appendChild(guestPincodeInput);
+
+                            const guestPhoneAddrInput = document.createElement('input');
+                            guestPhoneAddrInput.type = 'hidden';
+                            guestPhoneAddrInput.name = 'guest_address_phone';
+                            guestPhoneAddrInput.value = addressToUse.phone || phone;
+                            form.appendChild(guestPhoneAddrInput);
+                        }
+                    }
 
                     if (selectedPayment === 'cod') {
                         const codInput = document.createElement('input');
@@ -2297,7 +3236,8 @@
                     document.body.appendChild(form);
                     form.submit();
                 } else {
-                    showCustomAlert('❌ Error', 'Error processing order. Please try again.', 'warning');
+                    showCustomAlert('❌ Error', saveData.message || 'Error processing order. Please try again.',
+                        'warning');
                     if (checkoutBtn) {
                         checkoutBtn.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';
                         checkoutBtn.disabled = false;
@@ -2314,7 +3254,6 @@
                 renderPage();
             }
         }
-
         // ============ RENDER FUNCTIONS ============
         function renderPage() {
             let container = document.getElementById('cartContainer');
@@ -2340,6 +3279,146 @@
             } else {
                 renderCheckoutPage();
             }
+        }
+
+        // =====================================================
+        // GUEST USER - LIVE CHECK EMAIL / PHONE
+        // =====================================================
+
+        function setupGuestContactValidation() {
+
+            // Only for guest users
+            if (loggedInUser) {
+                return;
+            }
+
+            const checkoutEmail = document.getElementById('checkoutEmail');
+            const checkoutPhone = document.getElementById('checkoutPhone');
+
+            const emailError = document.getElementById('checkoutEmailError');
+            const phoneError = document.getElementById('checkoutPhoneError');
+
+            if (!checkoutEmail || !checkoutPhone) {
+                return;
+            }
+
+            let emailTimer = null;
+            let phoneTimer = null;
+
+            // -----------------------------
+            // EMAIL CHECK
+            // -----------------------------
+            checkoutEmail.addEventListener('input', function() {
+
+                const email = this.value.trim();
+
+                clearTimeout(emailTimer);
+
+                // Clear old error
+                this.style.borderColor = '';
+                emailError.style.display = 'none';
+                emailError.textContent = '';
+
+                if (!email) {
+                    return;
+                }
+
+                // Basic email validation
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    return;
+                }
+
+                emailTimer = setTimeout(async function() {
+
+                    try {
+
+                        const response = await fetch(
+                            `/api/check-contact-info?email=${encodeURIComponent(email)}`
+                        );
+
+                        const data = await response.json();
+
+                        if (data.success && data.email_exists) {
+
+                            checkoutEmail.style.borderColor = '#dc3545';
+
+                            emailError.textContent =
+                                'Email already exists';
+
+                            emailError.style.display = 'block';
+
+                        } else {
+
+                            checkoutEmail.style.borderColor = '';
+                            emailError.style.display = 'none';
+                            emailError.textContent = '';
+                        }
+
+                    } catch (error) {
+
+                        console.error('Email availability check failed:', error);
+                    }
+
+                }, 400);
+            });
+
+
+            // -----------------------------
+            // PHONE CHECK
+            // -----------------------------
+            checkoutPhone.addEventListener('input', function() {
+
+                const phone = this.value.trim();
+
+                clearTimeout(phoneTimer);
+
+                // Clear old error
+                this.style.borderColor = '';
+                phoneError.style.display = 'none';
+                phoneError.textContent = '';
+
+                if (!phone) {
+                    return;
+                }
+
+                // Only check after 10 digits
+                if (!/^[0-9]{10}$/.test(phone)) {
+                    return;
+                }
+
+                phoneTimer = setTimeout(async function() {
+
+                    try {
+
+                        const response = await fetch(
+                            `/api/check-contact-info?phone=${encodeURIComponent(phone)}`
+                        );
+
+                        const data = await response.json();
+
+                        if (data.success && data.phone_exists) {
+
+                            checkoutPhone.style.borderColor = '#dc3545';
+
+                            phoneError.textContent =
+                                'Phone number already exists';
+
+                            phoneError.style.display = 'block';
+
+                        } else {
+
+                            checkoutPhone.style.borderColor = '';
+                            phoneError.style.display = 'none';
+                            phoneError.textContent = '';
+                        }
+
+                    } catch (error) {
+
+                        console.error('Phone availability check failed:', error);
+                    }
+
+                }, 400);
+            });
         }
 
         function renderCartPage() {
@@ -2464,6 +3543,30 @@
         }
 
         function renderCheckoutPage() {
+            // ===== SAVE FORM DATA BEFORE RE-RENDER =====
+            let savedName = '',
+                savedPhone = '',
+                savedEmail = '';
+            let savedGuestAddress = '',
+                savedGuestCity = '',
+                savedGuestState = '',
+                savedGuestPincode = '';
+
+            const currentName = document.getElementById('checkoutName');
+            const currentPhone = document.getElementById('checkoutPhone');
+            const currentEmail = document.getElementById('checkoutEmail');
+            const currentGuestAddress = document.getElementById('guestAddress');
+            const currentGuestCity = document.getElementById('guestCity');
+            const currentGuestState = document.getElementById('guestState');
+            const currentGuestPincode = document.getElementById('guestPincode');
+
+            if (currentName) savedName = currentName.value;
+            if (currentPhone) savedPhone = currentPhone.value;
+            if (currentEmail) savedEmail = currentEmail.value;
+            if (currentGuestAddress) savedGuestAddress = currentGuestAddress.value;
+            if (currentGuestCity) savedGuestCity = currentGuestCity.value;
+            if (currentGuestState) savedGuestState = currentGuestState.value;
+            if (currentGuestPincode) savedGuestPincode = currentGuestPincode.value;
             let subtotal = getSubtotal();
             let totalItems = getTotalItems();
             let couponDiscountAmount = parseFloat(couponDiscount || 0);
@@ -2474,47 +3577,146 @@
             let stateOptions = '';
             if (deliverableStates && deliverableStates.length > 0) {
                 stateOptions = deliverableStates.map(state => {
-                    const selected = selectedState && selectedState.id === state.id ? 'selected' : '';
+                    const selected = loggedInUser && selectedState && selectedState.id === state.id ? 'selected' :
+                        '';
                     return `
-                        <option value="${state.id}" ${selected}>
-                            ${state.state} (₹${parseFloat(state.shipping_charge || 0).toFixed(2)})
-                        </option>
-                    `;
+        <option value="${state.id}" data-state-name="${state.state}" ${selected}>
+            ${state.state} (₹${parseFloat(state.shipping_charge || 0).toFixed(2)})
+        </option>
+    `;
                 }).join('');
+
+                // Add default "Select State" option for logged-in users when adding new address
+                // The select already has <option value="">-- Select State --</option> in the HTML
             } else {
                 stateOptions = '<option value="">-- No states available --</option>';
             }
 
+            // ===== ADDRESS SECTION - HANDLE BOTH LOGGED IN AND GUEST USERS =====
             let addressesHtml = '';
-            if (savedAddresses.length === 0) {
-                addressesHtml =
-                    '<div style="text-align: center; padding: 1rem; color: var(--steel); font-size: 0.85rem;">No addresses saved.</div>';
-            }
-            savedAddresses.forEach((addr, idx) => {
-                let isSelected = selectedAddress && selectedAddress.id === addr.id;
-                addressesHtml += `
-                    <div class="address-item ${isSelected ? 'selected' : ''}" onclick="selectAddress(${idx})">
-                        <div class="address-radio-wrapper">
-                            <span class="radio-select"></span>
-                            <div class="address-content">
-                                <div class="address-name">
-                                    ${escapeHtml(addr.name)}
-                                </div>
-                                <div class="address-details">
-                                    ${escapeHtml(addr.address)}<br>
-                                    ${escapeHtml(addr.city)}, ${escapeHtml(addr.state)} - ${addr.pincode}
-                                </div>
-                                <div class="address-phone"><i class="fas fa-phone"></i> ${addr.phone}</div>
-                                <div class="address-actions">
-                                    <button class="btn-address-edit" onclick="event.stopPropagation(); editAddress(${idx})"><i class="fas fa-edit"></i> Edit</button>
-                                    <button class="btn-address-delete" onclick="event.stopPropagation(); deleteAddress(${idx})"><i class="fas fa-trash-alt"></i> Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
+            let addAddressHtml = '';
 
+            if (loggedInUser) {
+                // ===== LOGGED IN USER: Show saved addresses with Edit/Delete =====
+                if (savedAddresses.length === 0) {
+                    addressesHtml =
+                        '<div style="text-align: center; padding: 1rem; color: var(--steel); font-size: 0.85rem;">No addresses saved.</div>';
+                }
+                savedAddresses.forEach((addr, idx) => {
+                    let isSelected = selectedAddress && selectedAddress.id === addr.id;
+                    addressesHtml += `
+        <div class="address-item ${isSelected ? 'selected' : ''}" onclick="selectAddress(${idx})">
+            <div class="address-radio-wrapper">
+                <span class="radio-select"></span>
+                <div class="address-content">
+                    <div class="address-name">
+                        ${escapeHtml(addr.name)}
+                    </div>
+                    <div class="address-details">
+                        ${escapeHtml(addr.address)}<br>
+                        ${escapeHtml(addr.city)}, ${escapeHtml(addr.state)} - ${addr.pincode}
+                    </div>
+                    <div class="address-phone"><i class="fas fa-phone"></i> ${addr.phone}</div>
+                    <div class="address-actions">
+<button
+    type="button"
+    class="btn-address-edit"
+    onclick="event.preventDefault(); event.stopPropagation(); cartEditAddress(${idx}); return false;">
+    <i class="fas fa-edit"></i> Edit
+</button>
+<button
+    type="button"
+    class="btn-address-delete"
+    onclick="event.stopPropagation(); cartDeleteAddress(${idx}); return false;">
+    <i class="fas fa-trash-alt"></i> Delete
+</button>                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+                });
+
+                // Add New Address form for logged in users
+                addAddressHtml = `
+    <span class="add-address-toggle" onclick="showAddAddressForm()">+ Add New Address</span>
+    <div id="addAddressForm" class="add-address-form ${showAddressForm ? 'show' : ''}">
+        <input type="hidden" id="addressFormSubmitted" value="0">
+        <div class="form-group">
+            <label>FLAT / HOUSE NO., BUILDING, STREET <span class="required">*</span></label>
+            <input type="text" id="newBuilding" placeholder="Enter your address" value="${escapeHtml(editAddressData ? editAddressData.address : '')}" oninput="saveTempAddressData()">
+        </div>
+        <div class="form-group">
+            <label>CITY / DISTRICT <span class="required">*</span></label>
+            <input type="text" id="newCity" placeholder="City" value="${escapeHtml(editAddressData ? editAddressData.city : '')}" oninput="saveTempAddressData()">
+        </div>
+        <div class="form-group">
+            <label>STATE <span class="required">*</span></label>
+            <select id="newState" onchange="updateShippingFromForm()">
+                <option value="">-- Select State --</option>
+                ${stateOptions}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>PINCODE <span class="required">*</span></label>
+<input type="text"
+       id="newPincode"
+       placeholder="Enter 6-digit pin code"
+       maxlength="6"
+       inputmode="numeric"
+       pattern="[0-9]{6}"
+       value="${escapeHtml(editAddressData ? editAddressData.pincode : '')}"
+       oninput="saveTempAddressData()">
+             </div>          
+        <div class="shipping-charge-display">
+            <span>Shipping Charge</span>
+            <span class="charge-amount" id="newAddressShippingCharge">₹${shippingCharge.toFixed(2)}</span>
+        </div>
+<button
+    type="button"
+    class="btn-add-address"
+    onclick="cartSaveNewAddress(event)"
+    id="addAddressBtn">
+    ${isEditingAddress ? 'Update Address' : 'Add Address'}
+</button>
+
+        <button class="btn-secondary-custom" onclick="hideAddAddressForm()" style="margin-top: 0.5rem;">Cancel</button>
+    </div>
+`;
+            } else {
+                // ===== GUEST USER: Show manual address entry form =====
+                addressesHtml = `
+        <div style="background: var(--fog); border-radius: var(--radius-sm); padding: 15px; border: 1px solid var(--line);">
+            <p style="font-size: 13px; color: var(--steel); margin-bottom: 12px;">
+                <i class="fas fa-info-circle" style="color: var(--signal);"></i> 
+                Please enter your delivery address below
+            </p>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 4px;">Address *</label>
+                <input type="text" id="guestAddress" placeholder="Enter your address" style="width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px;" value="${escapeHtml(savedGuestAddress)}">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 4px;">City *</label>
+                <input type="text" id="guestCity" placeholder="Enter city" style="width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px;" value="${escapeHtml(savedGuestCity)}">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 4px;">State *</label>
+                <select id="guestState" onchange="updateGuestShipping()" style="width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px; background: white;">
+                    <option value="">-- Select State --</option>
+                    ${stateOptions}
+                </select>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--steel); text-transform: uppercase; display: block; margin-bottom: 4px;">Pincode *</label>
+                <input type="text" id="guestPincode" placeholder="Enter 6-digit pincode" maxlength="10" style="width: 100%; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 14px;" value="${escapeHtml(savedGuestPincode)}">
+            </div>
+            <div class="shipping-charge-display" style="margin-top: 5px;">
+                <span>Shipping Charge</span>
+                <span class="charge-amount" id="guestShippingCharge">₹${shippingCharge.toFixed(2)}</span>
+            </div>
+        </div>
+    `;
+                addAddressHtml = ''; // No Add New Address button for guests
+            }
             let orderItemsHtml = '';
             for (let item of cartData) {
                 let price = parseFloat(item.price) || 0;
@@ -2542,7 +3744,6 @@
                 `;
             }
 
-            let editAddress = editAddressData || {};
 
             let couponHtml = '';
             if (couponCode && couponDiscountAmount > 0) {
@@ -2625,63 +3826,62 @@
                 </div>
                 <div class="cart-grid">
                     <div>
-                        <div class="checkout-contact-section">
-                            <div class="section-title"><i class="fas fa-user-circle"></i> Contact Information</div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>FULL NAME <span class="required">*</span></label>
-                                    <input type="text" id="checkoutName" value="${escapeHtml(loggedInUser?.name || '')}" placeholder="Enter your name">
-                                </div>
-                                <div class="form-group">
-                                    <label>PHONE NUMBER <span class="required">*</span></label>
-                                    <input type="text" id="checkoutPhone" value="${escapeHtml(loggedInUser?.phone || '')}" placeholder="Enter 10-digit phone number">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>EMAIL <span class="required">*</span></label>
-                                <input type="email" id="checkoutEmail" value="${escapeHtml(userEmail)}" readonly>
-                            </div>
-                        </div>
-                        
+                 <div class="checkout-contact-section">
+    <div class="section-title"><i class="fas fa-user-circle"></i> Contact Information</div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>FULL NAME <span class="required">*</span></label>
+            <input type="text" id="checkoutName" value="${escapeHtml(loggedInUser?.name || '')}" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+<label>PHONE NUMBER <span class="required">*</span></label>
+
+<input type="text"
+       id="checkoutPhone"
+       value="${escapeHtml(loggedInUser?.phone || '')}"
+       ${loggedInUser ? 'readonly' : ''}
+       maxlength="10"
+       inputmode="numeric"
+       placeholder="Enter 10-digit phone number">
+
+${loggedInUser
+    ? '<span style="font-size: 11px; color: var(--steel); display: block; margin-top: 4px;">(Phone number cannot be changed)</span>'
+    : ''}
+
+${!loggedInUser
+    ? '<small id="phoneExistsMessage" style="display:none; color:#dc3545; font-size:12px; margin-top:5px;"></small>'
+    : ''}
+    
+    
+        </div>
+    </div>
+    <div class="form-group">
+        <label>EMAIL <span class="required">*</span></label>
+<input type="email"
+       id="checkoutEmail"
+       value="${escapeHtml(userEmail)}"
+       ${loggedInUser ? 'readonly' : ''}
+       placeholder="Enter your email address">
+
+${loggedInUser
+    ? '<span style="font-size: 11px; color: var(--steel); display: block; margin-top: 4px;">(Email cannot be changed)</span>'
+    : ''}
+
+${!loggedInUser
+    ? '<small id="emailExistsMessage" style="display:none; color:#dc3545; font-size:12px; margin-top:5px;"></small>'
+    : ''}
+    
+       </div>
+</div>
                         <div class="delivery-address-section">
-                            <div class="section-title"><i class="fas fa-map-marker-alt"></i> Delivery Address</div>
-                            
-                            <div class="address-list">
-                                ${addressesHtml}
-                            </div>
-                            
-                            <span class="add-address-toggle" onclick="showAddAddressForm()">+ Add New Address</span>
-                            
-                            <div id="addAddressForm" class="add-address-form ${showAddressForm ? 'show' : ''}">
-                                <div class="form-group">
-                                    <label>FLAT / HOUSE NO., BUILDING, STREET <span class="required">*</span></label>
-                                    <input type="text" id="newBuilding" placeholder="Enter your address" value="${escapeHtml(editAddress.address || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>CITY / DISTRICT <span class="required">*</span></label>
-                                    <input type="text" id="newCity" placeholder="City" value="${escapeHtml(editAddress.city || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>STATE <span class="required">*</span></label>
-                                    <select id="newState" onchange="updateShippingFromForm()">
-                                        <option value="">-- Select State --</option>
-                                        ${stateOptions}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>PINCODE <span class="required">*</span></label>
-                                    <input type="text" id="newPincode" placeholder="Enter 6-digit pin code" maxlength="10" value="${escapeHtml(editAddress.pincode || '')}">
-                                </div>
-                                
-                                <div class="shipping-charge-display">
-                                    <span>Shipping Charge</span>
-                                    <span class="charge-amount">₹${shippingCharge.toFixed(2)}</span>
-                                </div>
-                                
-                                <button class="btn-add-address" onclick="saveNewAddress()">${isEditingAddress ? 'Update Address' : 'Add Address'}</button>
-                                <button class="btn-secondary-custom" onclick="hideAddAddressForm()" style="margin-top: 0.5rem;">Cancel</button>
-                            </div>
-                        </div>
+    <div class="section-title"><i class="fas fa-map-marker-alt"></i> ${loggedInUser ? 'Delivery Address' : 'Delivery Address'}</div>
+    
+    <div class="address-list">
+        ${addressesHtml}
+    </div>
+    
+    ${addAddressHtml}
+</div>
                     </div>
                     
                     <div class="order-summary-section">
@@ -2716,9 +3916,13 @@
                                 <span>Grand Total</span>
                                 <span>₹${parseFloat(totalWithShipping || 0).toFixed(2)}</span>
                             </div>
-                            <button class="btn-primary-custom place-order-btn" onclick="placeOrder()" ${!selectedAddress || !selectedPayment || !selectedState ? 'disabled' : ''}>
-                                <i class="fas fa-check-circle"></i> Place Order
-                            </button>
+<button class="btn-primary-custom place-order-btn" onclick="placeOrder()" ${
+    loggedInUser
+        ? (!selectedAddress || !selectedPayment || !selectedState ? 'disabled' : '')
+        : (!selectedPayment || !selectedState ? 'disabled' : '')
+}>
+    <i class="fas fa-check-circle"></i> Place Order
+</button>
                             <div class="secure-checkout-footer">
                                 <span><i class="fas fa-lock"></i> Secure Checkout</span>
                                 <span><i class="fas fa-undo"></i> 3 Day Return Policy</span>
@@ -2730,6 +3934,76 @@
             `;
 
             document.getElementById('cartContainer').innerHTML = html;
+            setupGuestContactValidation();
+
+            // ===== RESTORE TEMP ADDRESS FORM DATA =====
+            // This restores the form data when adding a new address (not editing)
+            if (showAddressForm && !isEditingAddress) {
+                const buildingInput = document.getElementById('newBuilding');
+                const cityInput = document.getElementById('newCity');
+                const pincodeInput = document.getElementById('newPincode');
+                const stateSelect = document.getElementById('newState');
+
+                console.log('Restoring temp data:', tempAddressData);
+
+                if (buildingInput && tempAddressData.address) {
+                    buildingInput.value = tempAddressData.address;
+                    console.log('Restored address:', tempAddressData.address);
+                }
+                if (cityInput && tempAddressData.city) {
+                    cityInput.value = tempAddressData.city;
+                    console.log('Restored city:', tempAddressData.city);
+                }
+                if (pincodeInput && tempAddressData.pincode) {
+                    pincodeInput.value = tempAddressData.pincode;
+                    console.log('Restored pincode:', tempAddressData.pincode);
+                }
+                if (stateSelect && tempAddressData.state_id) {
+                    stateSelect.value = tempAddressData.state_id;
+                    console.log('Restored state_id:', tempAddressData.state_id);
+                    // Update shipping charge
+                    const stateData = deliverableStates.find(s => s.id == tempAddressData.state_id);
+                    if (stateData) {
+                        selectedState = stateData;
+                        shippingCharge = parseFloat(stateData.shipping_charge) || 0;
+                        const chargeDisplay = document.getElementById('newAddressShippingCharge');
+                        if (chargeDisplay) {
+                            chargeDisplay.textContent = '₹' + shippingCharge.toFixed(2);
+                        }
+                    }
+                }
+            }
+
+            // ===== RESTORE FORM DATA AFTER RE-RENDER =====
+            const nameInput = document.getElementById('checkoutName');
+
+            const phoneInput = document.getElementById('checkoutPhone');
+            const emailInput = document.getElementById('checkoutEmail');
+
+            if (nameInput && savedName) nameInput.value = savedName;
+            if (phoneInput && savedPhone) phoneInput.value = savedPhone;
+            if (emailInput && savedEmail) emailInput.value = savedEmail;
+
+            const guestAddressInput = document.getElementById('guestAddress');
+            const guestCityInput = document.getElementById('guestCity');
+            const guestStateInput = document.getElementById('guestState');
+            const guestPincodeInput = document.getElementById('guestPincode');
+
+            if (guestAddressInput && savedGuestAddress) guestAddressInput.value = savedGuestAddress;
+            if (guestCityInput && savedGuestCity) guestCityInput.value = savedGuestCity;
+            if (guestStateInput && savedGuestState) guestStateInput.value = savedGuestState;
+            if (guestPincodeInput && savedGuestPincode) guestPincodeInput.value = savedGuestPincode;
+
+            // Restore payment selection
+            if (selectedPayment) {
+                document.querySelectorAll('.payment-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    const onclickAttr = opt.getAttribute('onclick');
+                    if (onclickAttr && onclickAttr.includes(selectedPayment)) {
+                        opt.classList.add('selected');
+                    }
+                });
+            }
 
             if (!couponCode) {
                 const select = document.getElementById('couponSelect');
@@ -2741,17 +4015,250 @@
             const newStateSelect = document.getElementById('newState');
             if (newStateSelect && selectedState) {
                 newStateSelect.value = selectedState.id;
-            }a
-        }
+            }
 
+            // ===== PRESERVE EDIT ADDRESS FORM DATA =====
+            if (isEditingAddress && editAddressData) {
+                // Set state select value if editing
+                if (editAddressData.state_id) {
+                    const stateSelect = document.getElementById('newState');
+                    if (stateSelect) {
+                        stateSelect.value = editAddressData.state_id;
+                        // Update shipping charge display
+                        const chargeDisplay = document.getElementById('newAddressShippingCharge');
+                        if (chargeDisplay) {
+                            const stateData = deliverableStates.find(s => s.id == editAddressData.state_id);
+                            if (stateData) {
+                                chargeDisplay.textContent = '₹' + parseFloat(stateData.shipping_charge || 0).toFixed(2);
+                            }
+                        }
+                    }
+                }
+
+                // Restore form field values
+                const buildingInput = document.getElementById('newBuilding');
+                const cityInput = document.getElementById('newCity');
+                const pincodeInput = document.getElementById('newPincode');
+
+                if (buildingInput && editAddressData.address) {
+                    buildingInput.value = editAddressData.address;
+                }
+                if (cityInput && editAddressData.city) {
+                    cityInput.value = editAddressData.city;
+                }
+                if (pincodeInput && editAddressData.pincode) {
+                    pincodeInput.value = editAddressData.pincode;
+                }
+            }
+        }
         // ============ INITIALIZATION ============
         document.addEventListener('DOMContentLoaded', async function() {
+            console.log('=== INITIALIZATION STARTED ===');
+
             await loadDeliverableStates();
+            console.log('Deliverable states loaded:', deliverableStates);
+
             await getLoggedInUser();
+            console.log('Logged in user:', loggedInUser);
+            console.log('User ID:', userId);
+
             await loadProductsData();
+            console.log('Products data loaded');
+
             await loadAddressesFromDatabase();
+            console.log('Addresses loaded, savedAddresses:', savedAddresses);
+
             cartData = JSON.parse(localStorage.getItem('cart')) || [];
+            console.log('Cart data:', cartData);
+
             renderPage();
+            setupGuestContactValidation();
+            console.log('=== INITIALIZATION COMPLETE ===');
         });
+
+
+        function saveTempAddressData() {
+            const addressInput = document.getElementById('newBuilding');
+            const cityInput = document.getElementById('newCity');
+            const pincodeInput = document.getElementById('newPincode');
+            const stateSelect = document.getElementById('newState');
+
+            if (addressInput) {
+                tempAddressData.address = addressInput.value || '';
+            }
+
+            if (cityInput) {
+                tempAddressData.city = cityInput.value || '';
+            }
+
+            if (pincodeInput) {
+                tempAddressData.pincode = pincodeInput.value || '';
+            }
+
+            if (stateSelect && stateSelect.value) {
+                tempAddressData.state_id = stateSelect.value;
+            }
+
+            console.log('Temp data on input:', tempAddressData);
+        }
+
+
+
+        // =====================================================
+        // GUEST CONTACT EXISTING EMAIL / PHONE VALIDATION
+        // =====================================================
+        function setupGuestContactValidation() {
+
+            if (loggedInUser) {
+                return;
+            }
+
+            const checkoutEmail = document.getElementById('checkoutEmail');
+            const checkoutPhone = document.getElementById('checkoutPhone');
+
+            const emailMessage = document.getElementById('emailExistsMessage');
+            const phoneMessage = document.getElementById('phoneExistsMessage');
+
+            if (!checkoutEmail || !checkoutPhone) {
+                return;
+            }
+
+            let emailTimer = null;
+            let phoneTimer = null;
+
+            async function checkContactInfo(type, value) {
+
+                if (!value) {
+                    return;
+                }
+
+                try {
+
+                    const response = await fetch(
+                        `/api/check-contact-info?${type}=${encodeURIComponent(value)}`
+                    );
+
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        return;
+                    }
+
+                    if (type === 'email') {
+
+                        if (data.email_exists) {
+
+                            checkoutEmail.style.borderColor = '#dc3545';
+
+                            if (emailMessage) {
+                                emailMessage.textContent = 'Email already registered';
+                                emailMessage.style.display = 'block';
+                            }
+
+                        } else {
+
+                            checkoutEmail.style.borderColor = '';
+
+                            if (emailMessage) {
+                                emailMessage.textContent = '';
+                                emailMessage.style.display = 'none';
+                            }
+                        }
+                    }
+
+                    if (type === 'phone') {
+
+                        if (data.phone_exists) {
+
+                            checkoutPhone.style.borderColor = '#dc3545';
+
+                            if (phoneMessage) {
+                                phoneMessage.textContent = 'Phone number already registered';
+                                phoneMessage.style.display = 'block';
+                            }
+
+                        } else {
+
+                            checkoutPhone.style.borderColor = '';
+
+                            if (phoneMessage) {
+                                phoneMessage.textContent = '';
+                                phoneMessage.style.display = 'none';
+                            }
+                        }
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        `Error checking ${type}:`,
+                        error
+                    );
+                }
+            }
+
+
+            // =========================
+            // EMAIL
+            // =========================
+            checkoutEmail.addEventListener('input', function() {
+
+                clearTimeout(emailTimer);
+
+                const email = this.value.trim();
+
+                if (emailMessage) {
+                    emailMessage.style.display = 'none';
+                    emailMessage.textContent = '';
+                }
+
+                this.style.borderColor = '';
+
+                if (!email) {
+                    return;
+                }
+
+                emailTimer = setTimeout(() => {
+
+                    const emailPattern =
+                        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                    if (emailPattern.test(email)) {
+                        checkContactInfo('email', email);
+                    }
+
+                }, 400);
+            });
+
+
+            // =========================
+            // PHONE
+            // =========================
+            checkoutPhone.addEventListener('input', function() {
+
+                clearTimeout(phoneTimer);
+
+                const phone = this.value.trim();
+
+                if (phoneMessage) {
+                    phoneMessage.style.display = 'none';
+                    phoneMessage.textContent = '';
+                }
+
+                this.style.borderColor = '';
+
+                if (!phone) {
+                    return;
+                }
+
+                phoneTimer = setTimeout(() => {
+
+                    if (/^[0-9]{10}$/.test(phone)) {
+                        checkContactInfo('phone', phone);
+                    }
+
+                }, 400);
+            });
+        }
     </script>
 @endsection

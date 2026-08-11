@@ -1874,117 +1874,123 @@
         // ============================================
         // VIEW ORDER DETAILS
         // ============================================
-        function viewOrderDetails(orderId) {
-            document.getElementById('modalShippingAddress').innerHTML =
-            '<div class="address-card">Loading address...</div>';
+    function viewOrderDetails(orderId) {
+    document.getElementById('modalShippingAddress').innerHTML = '<div class="address-card">Loading address...</div>';
 
-            fetch('/admin/payments/' + orderId)
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(data) {
-                    if (data.success) {
-                        var order = data.order;
+    fetch('/admin/payments/' + orderId)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.success) {
+                var order = data.order;
 
-                        document.getElementById('modalOrderNumber').innerText = order.order_number;
-                        document.getElementById('modalOrderStatus').innerText = order.order_status;
-                        document.getElementById('modalOrderStatus').className = 'order-status-badge ' + order
-                            .order_status;
-                        document.getElementById('modalOrderDate').innerText = new Date(order.order_date || order
-                            .created_at).toLocaleString();
-                        document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
-                        document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
-                        document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
-                        document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
-                        document.getElementById('modalTotal').innerText = '₹' + parseFloat(order.total_amount).toFixed(
-                            2);
+                // ★★★ LOG THE FULL ORDER DATA ★★★
+                console.log('🔍 Full Order Data:', order);
+                console.log('🔍 Shipping Address:', order.shipping_address);
 
-                        var paymentMethod = order.payment_method || 'N/A';
-                        document.getElementById('modalPaymentMethod').innerHTML =
-                            '<span class="payment-method-badge"><i class="fas fa-credit-card"></i> ' + paymentMethod +
-                            '</span>';
+                document.getElementById('modalOrderNumber').innerText = order.order_number;
+                document.getElementById('modalOrderStatus').innerText = order.order_status;
+                document.getElementById('modalOrderStatus').className = 'order-status-badge ' + order.order_status;
+                document.getElementById('modalOrderDate').innerText = new Date(order.order_date || order.created_at).toLocaleString();
+                document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
+                document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
+                document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
+                document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
+                document.getElementById('modalTotal').innerText = '₹' + parseFloat(order.total_amount).toFixed(2);
 
-                        var paymentStatus = order.payment_status || 'PENDING';
-                        var statusHtml = '';
-                        if (paymentStatus === 'SUCCESS') {
-                            statusHtml = '<span class="payment-badge success"><span class="dot"></span> Paid</span>';
-                        } else if (paymentStatus === 'FAILED') {
-                            statusHtml = '<span class="payment-badge failed"><span class="dot"></span> Failed</span>';
-                        } else {
-                            statusHtml = '<span class="payment-badge pending"><span class="dot"></span> Pending</span>';
-                        }
-                        document.getElementById('modalPaymentStatus').innerHTML = statusHtml;
+                var paymentMethod = order.payment_method || 'N/A';
+                document.getElementById('modalPaymentMethod').innerHTML =
+                    '<span class="payment-method-badge"><i class="fas fa-credit-card"></i> ' + paymentMethod +
+                    '</span>';
 
-                        var itemsHtml = '';
-                        if (order.items && order.items.length > 0) {
-                            for (var i = 0; i < order.items.length; i++) {
-                                var item = order.items[i];
-                                itemsHtml += '<div class="order-item">' +
-                                    '<div class="order-item-image">' +
-                                    (item.product_image ? '<img src="/storage/' + item.product_image + '" alt="' + item
-                                        .product_name + '">' : '<i class="fas fa-tshirt fa-2x text-muted"></i>') +
-                                    '</div>' +
-                                    '<div class="order-item-details">' +
-                                    '<div class="order-item-name">' + (item.product_name || 'Product') + '</div>' +
-                                    '<div class="order-item-price">₹' + parseFloat(item.price).toFixed(2) + '</div>' +
-                                    '<div class="order-item-quantity">Quantity: ' + item.quantity + '</div>' +
-                                    '</div>' +
-                                    '<div class="order-item-total">₹' + parseFloat(item.price * item.quantity).toFixed(
-                                        2) + '</div>' +
-                                    '</div>';
-                            }
-                        } else {
-                            itemsHtml = '<div class="text-muted">No items found</div>';
-                        }
-                        document.getElementById('modalOrderItems').innerHTML = itemsHtml;
+                var paymentStatus = order.payment_status || 'PENDING';
+                var statusHtml = '';
+                if (paymentStatus === 'SUCCESS') {
+                    statusHtml = '<span class="payment-badge success"><span class="dot"></span> Paid</span>';
+                } else if (paymentStatus === 'FAILED') {
+                    statusHtml = '<span class="payment-badge failed"><span class="dot"></span> Failed</span>';
+                } else {
+                    statusHtml = '<span class="payment-badge pending"><span class="dot"></span> Pending</span>';
+                }
+                document.getElementById('modalPaymentStatus').innerHTML = statusHtml;
 
-                        var addressHtml = '<div class="address-card">No address information available</div>';
-                        if (order.shipping_address) {
-                            var addr = order.shipping_address;
-                            var addressParts = [];
-
-                            if (addr.name && addr.name !== 'N/A' && addr.name !== '') {
-                                addressParts.push('<strong>' + escapeHtml(addr.name) + '</strong>');
-                            }
-                            if (addr.address && addr.address !== '') {
-                                addressParts.push(escapeHtml(addr.address));
-                            }
-                            if (addr.area && addr.area !== '') {
-                                addressParts.push(escapeHtml(addr.area));
-                            }
-                            if (addr.city && addr.city !== '' && addr.state && addr.state !== '') {
-                                addressParts.push(escapeHtml(addr.city) + ', ' + escapeHtml(addr.state));
-                            } else if (addr.city && addr.city !== '') {
-                                addressParts.push(escapeHtml(addr.city));
-                            } else if (addr.state && addr.state !== '') {
-                                addressParts.push(escapeHtml(addr.state));
-                            }
-                            if (addr.pincode && addr.pincode !== '') {
-                                addressParts.push('Pincode: ' + escapeHtml(addr.pincode));
-                            }
-                            if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') {
-                                addressParts.push('Phone: ' + escapeHtml(addr.phone));
-                            }
-
-                            if (addressParts.length > 0) {
-                                addressHtml = '<div class="address-card">' + addressParts.join('<br>') + '</div>';
-                            }
-                        }
-                        document.getElementById('modalShippingAddress').innerHTML = addressHtml;
-
-                        var modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
-                        modal.show();
-                    } else {
-                        showToast('Error loading order details: ' + (data.message || 'Unknown error'), 'error');
+                var itemsHtml = '';
+                if (order.items && order.items.length > 0) {
+                    for (var i = 0; i < order.items.length; i++) {
+                        var item = order.items[i];
+                        itemsHtml += '<div class="order-item">' +
+                            '<div class="order-item-image">' +
+                            (item.product_image ? '<img src="/storage/' + item.product_image + '" alt="' + item.product_name + '">' : '<i class="fas fa-tshirt fa-2x text-muted"></i>') +
+                            '</div>' +
+                            '<div class="order-item-details">' +
+                            '<div class="order-item-name">' + (item.product_name || 'Product') + '</div>' +
+                            '<div class="order-item-price">₹' + parseFloat(item.price).toFixed(2) + '</div>' +
+                            '<div class="order-item-quantity">Quantity: ' + item.quantity + '</div>' +
+                            '</div>' +
+                            '<div class="order-item-total">₹' + parseFloat(item.price * item.quantity).toFixed(2) + '</div>' +
+                            '</div>';
                     }
-                })
-                .catch(function(error) {
-                    console.error('Error:', error);
-                    document.getElementById('modalShippingAddress').innerHTML =
-                        '<div class="address-card">Error loading address</div>';
-                    showToast('Error loading order details', 'error');
-                });
-        }
+                } else {
+                    itemsHtml = '<div class="text-muted">No items found</div>';
+                }
+                document.getElementById('modalOrderItems').innerHTML = itemsHtml;
+
+                // =========================================================
+                // ★★★ FIX: Display shipping address ★★★
+                // =========================================================
+                var addressHtml = '<div class="address-card">No address information available</div>';
+
+                if (order.shipping_address) {
+                    var addr = order.shipping_address;
+                    var addressParts = [];
+
+                    // Log for debugging
+                    console.log('🔍 Address from API:', addr);
+
+                    if (addr.name && addr.name !== 'N/A' && addr.name !== '') {
+                        addressParts.push('<strong>' + escapeHtml(addr.name) + '</strong>');
+                    }
+                    if (addr.address && addr.address !== '') {
+                        addressParts.push(escapeHtml(addr.address));
+                    }
+                    if (addr.area && addr.area !== '') {
+                        addressParts.push(escapeHtml(addr.area));
+                    }
+                    if (addr.city && addr.city !== '' && addr.state && addr.state !== '') {
+                        addressParts.push(escapeHtml(addr.city) + ', ' + escapeHtml(addr.state));
+                    } else if (addr.city && addr.city !== '') {
+                        addressParts.push(escapeHtml(addr.city));
+                    } else if (addr.state && addr.state !== '') {
+                        addressParts.push(escapeHtml(addr.state));
+                    }
+                    if (addr.pincode && addr.pincode !== '') {
+                        addressParts.push('Pincode: ' + escapeHtml(addr.pincode));
+                    }
+                    if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') {
+                        addressParts.push('Phone: ' + escapeHtml(addr.phone));
+                    }
+
+                    if (addressParts.length > 0) {
+                        addressHtml = '<div class="address-card">' + addressParts.join('<br>') + '</div>';
+                    }
+                }
+
+                document.getElementById('modalShippingAddress').innerHTML = addressHtml;
+
+                var modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                modal.show();
+            } else {
+                showToast('Error loading order details: ' + (data.message || 'Unknown error'), 'error');
+            }
+        })
+        .catch(function(error) {
+            console.error('Error:', error);
+            document.getElementById('modalShippingAddress').innerHTML =
+                '<div class="address-card">Error loading address</div>';
+            showToast('Error loading order details', 'error');
+        });
+}
 
         // ============================================
         // ESCAPE HTML

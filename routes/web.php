@@ -22,6 +22,7 @@ use App\Http\Controllers\TrackOrderController;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Api\AddressApiController;
 
 
 // ============ NEW CONTROLLERS ============
@@ -154,14 +155,14 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 // ============ PAYMENT ROUTES ============
-Route::post('/buy-now', [PaymentController::class, 'buyNow'])->name('buy.now')->middleware('auth');
+Route::post('/buy-now', [PaymentController::class, 'buyNow'])->name('buy.now');
 Route::post('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::post('/payment/failure', [PaymentController::class, 'paymentFailure'])->name('payment.failure');
-Route::get('/order/success/{id}', [PaymentController::class, 'orderSuccess'])->name('order.success')->middleware('auth');
+Route::get('/order/success/{id}', [PaymentController::class, 'orderSuccess'])->name('order.success');
 Route::get('/my-orders', [PaymentController::class, 'myOrders'])->name('my.orders')->middleware('auth');
 
 // ============ COD ORDER ROUTE ============
-Route::post('/place-cod-order', [PaymentController::class, 'placeCodOrder'])->name('place.cod.order')->middleware('auth');
+Route::post('/place-cod-order', [PaymentController::class, 'placeCodOrder'])->name('place.cod.order');
 
 // ============ TRACK ORDER & ABOUT ============
 Route::get('/track-order', [TrackOrderController::class, 'index'])->name('track.order');
@@ -391,11 +392,55 @@ Route::get('/api/subcategories/{categoryId}', function($categoryId) {
     return response()->json($subCategories);
 })->name('api.subcategories');
 
-// ============ CART SESSION ROUTE ============
+// ============ CART SESSION ROUTE (Allow both guest and logged-in users) ============
 Route::post('/api/set-checkout-cart', function (Request $request) {
-    session(['checkout_cart' => $request->cart]);
-    return response()->json(['success' => true]);
-})->middleware('auth');
+    try {
+        // Store cart in session
+        if ($request->has('cart')) {
+            session(['checkout_cart' => $request->cart]);
+        }
+        
+        // Store total amount if provided
+        if ($request->has('total_amount')) {
+            session(['checkout_total' => $request->total_amount]);
+        }
+        
+        // Store shipping charge if provided
+        if ($request->has('shipping_charge')) {
+            session(['checkout_shipping' => $request->shipping_charge]);
+        }
+        
+        // Store coupon data if provided
+        if ($request->has('coupon_code')) {
+            session(['checkout_coupon' => $request->coupon_code]);
+        }
+        if ($request->has('coupon_discount')) {
+            session(['checkout_coupon_discount' => $request->coupon_discount]);
+        }
+        
+        // Store guest data if provided (for guest users)
+        if ($request->has('guest_name')) {
+            session(['guest_name' => $request->guest_name]);
+        }
+        if ($request->has('guest_phone')) {
+            session(['guest_phone' => $request->guest_phone]);
+        }
+        if ($request->has('guest_email')) {
+            session(['guest_email' => $request->guest_email]);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Checkout data saved successfully'
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Set checkout cart error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Error saving checkout data'
+        ]);
+    }
+});
 
 // ============ PINCODE CHECK API ============
 Route::get('/api/check-pincode/{pincode}', function ($pincode) {
@@ -411,6 +456,29 @@ Route::get('/api/check-pincode/{pincode}', function ($pincode) {
         'message' => $isDeliverable ? 'Delivery available' : 'Delivery not available for this pincode'
     ]);
 })->name('check.pincode');
+// ============ CHECK GUEST CONTACT INFO API ============
+Route::get('/api/check-contact-info', function (Illuminate\Http\Request $request) {
+
+    $email = trim($request->email ?? '');
+    $phone = trim($request->phone ?? '');
+
+    $emailExists = false;
+    $phoneExists = false;
+
+    if ($email !== '') {
+        $emailExists = \App\Models\User::where('email', $email)->exists();
+    }
+
+    if ($phone !== '') {
+        $phoneExists = \App\Models\User::where('phone', $phone)->exists();
+    }
+
+    return response()->json([
+        'success' => true,
+        'email_exists' => $emailExists,
+        'phone_exists' => $phoneExists,
+    ]);
+})->name('api.check.contact.info');
 
 // ============ USER API ============
 Route::get('/api/user', function () {
@@ -430,63 +498,51 @@ Route::get('/api/user', function () {
 })->name('api.user');
 
 // ============ USER ADDRESSES API ============
-Route::get('/api/user-addresses', function () {
-    if (auth()->check()) {
-        $addresses = UserAddress::where('user_id', auth()->id())
-            ->orderBy('is_default', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        return response()->json([
-            'success' => true,
-            'addresses' => $addresses
-        ]);
-    }
-    return response()->json(['success' => false, 'addresses' => []]);
-})->name('api.user.addresses');
+// ============ USER API ============
 
-Route::post('/api/user-addresses', function (Illuminate\Http\Request $request) {
-    try {
-        if (!auth()->check()) {
-            return response()->json(['success' => false, 'message' => 'User not logged in']);
-        }
-        
-        $user = auth()->user();
-        
-        \Log::info('Saving address', $request->all());
-        
-        $address = UserAddress::create([
-            'user_id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'address' => $request->address,
-            'area' => $request->area,
-            'city' => $request->city,
-            'state' => $request->state,
-            'pincode' => $request->pincode,
-            'phone' => $request->phone,
-            'is_default' => $request->is_default ?? false
-        ]);
-        
-        return response()->json(['success' => true, 'address' => $address]);
-    } catch (\Exception $e) {
-        \Log::error('Address save error: ' . $e->getMessage());
-        return response()->json(['success' => false, 'message' => $e->getMessage()]);
-    }
-})->name('api.user.addresses.store');
+Route::get('/api/user', [AddressApiController::class, 'getUser'])
+    ->name('api.user');
 
-Route::delete('/api/user-addresses/{id}', function ($id) {
-    if (auth()->check()) {
-        $address = UserAddress::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->first();
-        if ($address) {
-            $address->delete();
-            return response()->json(['success' => true]);
-        }
-    }
-    return response()->json(['success' => false]);
-})->name('api.user.addresses.delete');
 
+// ============ USER ADDRESSES API ============
+
+Route::get('/api/user-addresses', [AddressApiController::class, 'getAddresses'])
+    ->name('api.user.addresses');
+
+Route::post('/api/user-addresses', [AddressApiController::class, 'storeAddress'])
+    ->name('api.user.addresses.store');
+
+Route::put('/api/user-addresses/{id}', [AddressApiController::class, 'updateAddress'])
+    ->name('api.user.addresses.update');
+
+Route::delete('/api/user-addresses/{id}', [AddressApiController::class, 'deleteAddress'])
+    ->name('api.user.addresses.delete');
+
+
+    // ============ CHECK GUEST CONTACT INFORMATION ============
+Route::get('/api/check-contact-info', function (Request $request) {
+
+    $email = trim($request->email ?? '');
+    $phone = trim($request->phone ?? '');
+
+    $emailExists = false;
+    $phoneExists = false;
+
+    if ($email !== '') {
+        $emailExists = \App\Models\User::where('email', $email)->exists();
+    }
+
+    if ($phone !== '') {
+        $phoneExists = \App\Models\User::where('phone', $phone)->exists();
+    }
+
+    return response()->json([
+        'success' => true,
+        'email_exists' => $emailExists,
+        'phone_exists' => $phoneExists
+    ]);
+})->name('api.check.contact.info');
+    
 // ============ DELIVERABLE PINCODES API ============
 Route::get('/api/deliverable-pincodes', function () {
     try {
