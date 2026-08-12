@@ -314,6 +314,76 @@
     .dot-delivered { background: #22c55e; }
     .dot-cancelled { background: #ef4444; }
     .dot-failed { background: #64748b; }
+
+    /* ===== PAGINATION FIX ===== */
+    .pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+        border-radius: 0.25rem;
+        margin: 0;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+
+    .pagination .page-item {
+        display: inline-block;
+    }
+
+    .pagination .page-link {
+        position: relative;
+        display: block;
+        padding: 6px 12px;
+        line-height: 1.25;
+        color: #4a9eff;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 13px;
+        transition: all 0.3s;
+    }
+
+    .pagination .page-link:hover {
+        z-index: 2;
+        color: #2b7be0;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+
+    .pagination .page-item.active .page-link {
+        z-index: 3;
+        color: #fff;
+        background-color: #4a9eff;
+        border-color: #4a9eff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        cursor: auto;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+
+    .pagination .page-item:first-child .page-link {
+        margin-left: 0;
+    }
+
+    .pagination .page-item:last-child .page-link {
+        margin-right: 0;
+    }
+
+    .pagination .page-link i {
+        font-size: 12px;
+    }
+
+    @media (max-width: 576px) {
+        .pagination .page-link {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+    }
     
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
@@ -530,6 +600,7 @@
                 <table class="table table-report">
                     <thead>
                         <tr>
+                            <th style="width:60px;">S.No</th>
                             <th>Order #</th>
                             <th>Customer</th>
                             <th>Items</th>
@@ -543,8 +614,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($orders as $order)
+                        @forelse($orders as $index => $order)
                         <tr>
+                            <td>{{ $orders->firstItem() + $index }}</td>
                             <td><strong>#{{ $order->order_number }}</strong></td>
                             <td>{{ $order->user->name ?? 'N/A' }}</td>
                             <td>
@@ -568,7 +640,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-4">
+                            <td colspan="11" class="text-center text-muted py-4">
                                 <i class="fas fa-inbox" style="font-size:24px; display:block; margin-bottom:8px;"></i>
                                 No orders found
                             </td>
@@ -584,7 +656,7 @@
                     Showing {{ $orders->firstItem() ?? 0 }} to {{ $orders->lastItem() ?? 0 }} of {{ $orders->total() }} entries
                 </div>
                 <div>
-                    {{ $orders->appends(request()->query())->links() }}
+                    {{ $orders->appends(request()->query())->links('pagination::bootstrap-4') }}
                 </div>
             </div>
         </div>

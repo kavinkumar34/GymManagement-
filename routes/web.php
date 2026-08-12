@@ -908,6 +908,11 @@ Route::get('/debug-coupon/{code}', function($code) {
     ]);
 });
 
+// routes/web.php
+Route::get('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
+Route::post('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLink'])->name('password.send');
+Route::get('reset-password/{token}/{email}', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('password.reset-form');
+Route::post('reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('password.reset');
 
 
 // ============ MEMBER/TRAINER LOGIN WITH ROLE SELECTION FOR GYM MANAGEMENET ============

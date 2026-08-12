@@ -506,6 +506,12 @@
                     </div>
                     <small class="text-muted"><i class="fas fa-sync-alt"></i> Click image to refresh</small>
                 </div>
+                <!-- Add this before the submit button -->
+<div class="text-end mb-3">
+    <a href="{{ route('password.request') }}" class="register-link" style="font-size: 13px;">
+        <i class="fas fa-key"></i> Forgot Password?
+    </a>
+</div>
                 
                 <button type="submit" class="btn-user-login">
                     <i class="fas fa-sign-in-alt"></i>Sign In
