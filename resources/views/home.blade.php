@@ -2185,21 +2185,47 @@
                         btn.style.background = color;
                         if (isLightColor) btn.style.border = '3px solid #ddd';
                         btn.innerHTML = `<span class="check-mark"><i class="fas fa-check"></i></span>`;
-                        btn.onclick = function() {
-                            document.querySelectorAll('.modal-color-btn').forEach(b => b.classList.remove(
-                            'selected'));
-                            this.classList.add('selected');
-                            modalSelectedColor = color;
-                            updateModalSizes(color);
-                            updateModalPrice(color);
-                        };
+                     btn.onclick = function() {
+
+    document.querySelectorAll('.modal-color-btn').forEach(b =>
+        b.classList.remove('selected')
+    );
+
+    this.classList.add('selected');
+
+    modalSelectedColor = color;
+
+    // Clear old selected variant
+    modalSelectedVariant = null;
+    modalSelectedSize = null;
+
+    // Load sizes for selected color
+    updateModalSizes(color);
+
+    // Update price
+    updateModalPrice(color);
+
+};
                         colorContainer.appendChild(btn);
                     });
 
                     // Select first color
-                    modalSelectedColor = colors[0];
-                    updateModalSizes(colors[0]);
-                    updateModalPrice(colors[0]);
+                  modalSelectedColor = colors[0];
+
+updateModalSizes(colors[0]);
+updateModalPrice(colors[0]);
+
+// Set first selected variant image
+const firstColorVariant = modalAllVariants.find(
+    v => v.color === colors[0] && v.stock > 0
+) || modalAllVariants.find(
+    v => v.color === colors[0]
+);
+
+if (firstColorVariant && firstColorVariant.image) {
+    document.getElementById('modalProductImage').src =
+        firstColorVariant.image;
+}
                 } else {
                     document.getElementById('modalColorSection').style.display = 'none';
                     updateModalSizes(null);
@@ -2289,6 +2315,13 @@
                         if (modalSelectedVariant) {
                             updateModalPriceDisplay(modalSelectedVariant.price, modalSelectedVariant
                             .original_price);
+                               // ==========================================
+    // SHOW SELECTED VARIANT IMAGE
+    // ==========================================
+    if (modalSelectedVariant.image) {
+        document.getElementById('modalProductImage').src =
+            modalSelectedVariant.image;
+    }
                         }
                         updateModalStockInfo(modalSelectedVariant);
                         document.getElementById('modalErrorMsg').style.display = 'none';
@@ -2416,11 +2449,24 @@
             // Get the product details
             const productId = modalProductData.id;
             const productName = modalProductData.name;
-            const price = modalSelectedVariant ? modalSelectedVariant.price : modalProductData.price;
-            const image = modalProductData.image;
-            const variantId = modalSelectedVariant ? modalSelectedVariant.id : null;
-            const size = modalSelectedSize || null;
-            const color = modalSelectedColor || null;
+const price = modalSelectedVariant
+    ? modalSelectedVariant.price
+    : modalProductData.price;
+
+const originalPrice = modalSelectedVariant
+    ? modalSelectedVariant.original_price
+    : modalProductData.original_price;
+
+const image = modalSelectedVariant && modalSelectedVariant.image
+    ? modalSelectedVariant.image
+    : modalProductData.image;
+
+const variantId = modalSelectedVariant
+    ? modalSelectedVariant.id
+    : null;
+
+const size = modalSelectedSize || null;
+const color = modalSelectedColor || null;
 
             // Check stock for variant
             if (modalSelectedVariant && quantity > modalSelectedVariant.stock) {
@@ -2448,17 +2494,17 @@
                 }
                 existingItem.quantity += quantity;
             } else {
-                currentCart.push({
-                    id: productId,
-                    name: productName,
-                    price: price,
-                    original_price: modalProductData.original_price || price,
-                    image: image,
-                    quantity: quantity,
-                    size: size,
-                    color: color,
-                    variant_id: variantId
-                });
+              currentCart.push({
+    id: productId,
+    name: productName,
+    price: price,
+    original_price: originalPrice,
+    image: image,
+    quantity: quantity,
+    size: size,
+    color: color,
+    variant_id: variantId
+});
             }
 
             localStorage.setItem('cart', JSON.stringify(currentCart));
@@ -2778,16 +2824,57 @@
                 const displayPrice = parseFloat(firstVariant.final_price) || parseFloat(firstVariant.price) || 0;
 
                 // Build variants array for modal
-                const variantsForModal = product.variants.map(v => ({
-                    id: v.id,
-                    size: v.size || null,
-                    color: v.color || null,
-                    price: parseFloat(v.final_price) || parseFloat(v.price) || 0,
-                    original_price: parseFloat(v.total_price) || parseFloat(v.mrp) || parseFloat(v.price) || 0,
-                    stock: parseInt(v.stock) || 0,
-                    discount_type: v.discount_type || 'flat',
-                    discount_value: parseFloat(v.discount_value) || 0
-                }));
+          const variantsForModal = product.variants.map(v => {
+
+    // Get images belonging ONLY to this variant
+    let variantImageObjs = [];
+
+    if (product.product_images && product.product_images.length > 0) {
+        variantImageObjs = product.product_images.filter(
+            img => String(img.variant_id) === String(v.id)
+        );
+    }
+
+    // Sort: main image first, then display order
+    variantImageObjs.sort((a, b) => {
+        if (a.is_main !== b.is_main) {
+            return Number(b.is_main) - Number(a.is_main);
+        }
+
+        return (a.display_order || 0) - (b.display_order || 0);
+    });
+
+    // Get first image of this EXACT variant
+    let variantImage = null;
+
+    if (variantImageObjs.length > 0) {
+        variantImage = '/storage/' + variantImageObjs[0].image_path;
+    }
+
+    return {
+        id: v.id,
+        size: v.size || null,
+        color: v.color || null,
+
+        price: parseFloat(v.final_price) || parseFloat(v.price) || 0,
+
+        original_price:
+            parseFloat(v.total_price) ||
+            parseFloat(v.mrp) ||
+            parseFloat(v.price) ||
+            0,
+
+        stock: parseInt(v.stock) || 0,
+
+        discount_type: v.discount_type || 'flat',
+
+        discount_value:
+            parseFloat(v.discount_value) || 0,
+
+        // IMPORTANT
+        image: variantImage
+    };
+});
 
                 return {
                     hasVariant: true,

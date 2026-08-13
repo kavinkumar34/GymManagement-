@@ -1121,23 +1121,40 @@
         /* ============================================================ */
         /* ===== TOAST / ALERT ===== */
         /* ============================================================ */
-        .custom-toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 14px 24px;
-            border-radius: var(--radius-md);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 99999;
-            font-family: var(--font-body);
-            font-weight: 600;
-            font-size: 0.9rem;
-            max-width: 350px;
-            animation: slideUp 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    /* ===== MY ORDERS TOAST - DO NOT CONFLICT WITH APP TOAST ===== */
+.my-orders-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: 350px !important;
+    padding: 14px 24px !important;
+    margin: 0 !important;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 999999 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-sizing: border-box;
+}
+
+.my-orders-toast.success {
+    background: var(--success);
+}
+
+.my-orders-toast.error {
+    background: var(--signal);
+}
+
+.my-orders-toast.info {
+    background: var(--info);
+}
 
         .custom-toast.success {
             background: var(--success);
@@ -1864,19 +1881,34 @@
         // ============================================================
         // ===== TOAST NOTIFICATION =====
         // ============================================================
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `custom-toast ${type}`;
-            const icon = type === 'success' ? 'fa-check-circle' : 
-                         type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
-            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
+    function showMyOrdersToast(message, type = 'info') {
+    const toast = document.createElement('div');
+
+    toast.className = `my-orders-toast ${type}`;
+
+    const icon = type === 'success'
+        ? 'fa-check-circle'
+        : type === 'error'
+            ? 'fa-exclamation-circle'
+            : 'fa-info-circle';
+
+    toast.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <span>${message}</span>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }, 3000);
+}
 
         // ============================================================
         // ===== SELECT REASON FOR CANCELLATION =====
@@ -1981,14 +2013,14 @@
                             select.innerHTML = '<option value="">-- Error loading products --</option>';
                             select.disabled = false;
                         }
-                        showToast('Error loading products', 'error');
+                        showMyOrdersToast('Error loading products', 'error');
                     });
 
                 const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
                 modal.show();
             } catch (error) {
                 console.error('Error in openReviewModal:', error);
-                showToast('Error opening review modal', 'error');
+                showMyOrdersToast('Error opening review modal', 'error');
             }
         }
 
@@ -2080,7 +2112,7 @@
                         errorDiv.style.display = 'block';
                         errorDiv.innerHTML = errorMessages.join('<br>');
                     } else {
-                        showToast(errorMessages.join('\n'), 'error');
+                        showMyOrdersToast(errorMessages.join('\n'), 'error');
                     }
                     return;
                 }
@@ -2090,7 +2122,7 @@
                 }
 
                 if (!submitBtn) {
-                    showToast('Error: Submit button not found.', 'error');
+                    showMyOrdersToast('Error: Submit button not found.', 'error');
                     return;
                 }
 
@@ -2126,14 +2158,14 @@
                     if (modal) {
                         modal.hide();
                     }
-                    showToast(data.message || 'Thank you! Your review has been submitted for approval.', 'success');
+                    showMyOrdersToast(data.message || 'Thank you! Your review has been submitted for approval.', 'success');
                     setTimeout(() => location.reload(), 1500);
                 } else {
                     if (errorDiv) {
                         errorDiv.style.display = 'block';
                         errorDiv.innerHTML = data.message || 'Error submitting review';
                     } else {
-                        showToast(data.message || 'Error submitting review', 'error');
+                        showMyOrdersToast(data.message || 'Error submitting review', 'error');
                     }
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
@@ -2145,7 +2177,7 @@
                     errorDiv.style.display = 'block';
                     errorDiv.innerHTML = 'Network error: ' + error.message;
                 } else {
-                    showToast('Network error: ' + error.message, 'error');
+                    showMyOrdersToast('Network error: ' + error.message, 'error');
                 }
                 const submitBtn = document.getElementById('submitReviewBtn');
                 if (submitBtn) {
@@ -2162,7 +2194,7 @@
             if (currentOrderForCancel) {
                 openCancelModal(currentOrderForCancel);
             } else {
-                showToast('No order selected for cancellation', 'error');
+                showMyOrdersToast('No order selected for cancellation', 'error');
             }
         }
 
@@ -2188,7 +2220,7 @@
             const comment = document.getElementById('cancelComment').value;
 
             if (!selectedReason) {
-                showToast('Please select a reason for cancellation', 'error');
+                showMyOrdersToast('Please select a reason for cancellation', 'error');
                 return;
             }
 
@@ -2218,14 +2250,14 @@
                     const orderModal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
                     if (cancelModal) cancelModal.hide();
                     if (orderModal) orderModal.hide();
-                    showToast('Your cancellation request has been submitted successfully!', 'success');
+                    showMyOrdersToast('Your cancellation request has been submitted successfully!', 'success');
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    showToast(data.message || 'Error submitting cancellation request', 'error');
+                    showMyOrdersToast(data.message || 'Error submitting cancellation request', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showToast('Network error. Please try again.', 'error');
+                showMyOrdersToast('Network error. Please try again.', 'error');
             } finally {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -2255,11 +2287,11 @@
                     const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
                     modal.show();
                 } else {
-                    showToast(data.message || 'Error loading order details', 'error');
+                    showMyOrdersToast(data.message || 'Error loading order details', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showToast('Error loading order details. Please try again.', 'error');
+                showMyOrdersToast('Error loading order details. Please try again.', 'error');
             } finally {
                 button.innerHTML = originalText;
                 button.disabled = false;

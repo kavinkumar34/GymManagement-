@@ -2626,17 +2626,27 @@
                 $variantDiscountPercent = round((($variantMrp - $variantPrice) / $variantMrp) * 100);
             }
 
-            $variantDataArray[] = [
-                'id' => $v->id,
-                'size' => $v->size,
-                'color' => $v->color,
-                'price' => $variantPrice,
-                'mrp' => $variantMrp,
-                'stock' => intval($v->stock ?? 0),
-                'discount_percent' => $variantDiscountPercent,
-                'discount_type' => $v->discount_type ?? 'flat',
-                'discount_value' => floatval($v->discount_value ?? 0),
-            ];
+        $variantImage = \App\Models\ProductImage::where('product_id', $product->id)
+    ->where('variant_id', $v->id)
+    ->orderBy('display_order')
+    ->first();
+
+$variantDataArray[] = [
+    'id' => $v->id,
+    'size' => $v->size,
+    'color' => $v->color,
+    'price' => $variantPrice,
+    'mrp' => $variantMrp,
+    'stock' => intval($v->stock ?? 0),
+    'discount_percent' => $variantDiscountPercent,
+    'discount_type' => $v->discount_type ?? 'flat',
+    'discount_value' => floatval($v->discount_value ?? 0),
+
+    // IMPORTANT: selected variant image
+    'image' => $variantImage
+        ? asset('storage/' . $variantImage->image_path)
+        : null,
+];
         }
 
         // ===== BUILD COLOR DATA =====
@@ -3330,10 +3340,14 @@
 
         const productId = {{ $product->id }};
         const productName = "{{ addslashes($product->name) }}";
-        const productImage = "{{ asset('storage/' . ($allImages[0]->image_path ?? $product->image)) }}";
-        let selectedSize = null;
-        let selectedColor = null;
-        let selectedVariantId = null;
+    const productImage = "{{ asset('storage/' . ($allImages[0]->image_path ?? $product->image)) }}";
+
+let selectedSize = null;
+let selectedColor = null;
+let selectedVariantId = null;
+
+// IMPORTANT: This will hold the selected variant's image
+let selectedVariantImage = productImage;
         let selectedPrice = {{ $displayPrice }};
         let selectedMrp = {{ $displayMrp }};
         let selectedStock = {{ $displayStock }};
@@ -3430,48 +3444,54 @@
         // ================================================================
         // ===== SELECT COLOR =====
         // ================================================================
-        function selectColor(element, color) {
-            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedColor = color;
+    function selectColor(element, color) {
+    document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
 
-            // Get images for this color from the data attribute
-            const imagesData = JSON.parse(element.dataset.images);
+    element.classList.add('selected');
 
-            if (imagesData && imagesData.length > 0) {
-                // Update main image - ONLY show this color's first image
-                document.getElementById('mainImage').src = imagesData[0];
+    selectedColor = color;
 
-                // Update modal images
-                modalImages = imagesData;
+    const imagesData = JSON.parse(element.dataset.images);
 
-                // Update thumbnails - ONLY show images for this color
-                const thumbnailsContainer = document.getElementById('verticalThumbnails');
-                thumbnailsContainer.innerHTML = '';
+    // IMPORTANT
+    if (imagesData && imagesData.length > 0) {
+        selectedVariantImage = imagesData[0];
 
-                imagesData.forEach((imgUrl, index) => {
-                    const thumb = document.createElement('div');
-                    thumb.className = 'vertical-thumb' + (index === 0 ? ' active' : '');
-                    thumb.dataset.index = index;
-                    thumb.onclick = function() {
-                        changeMainImage(index);
-                    };
-                    thumb.innerHTML = `<img src="${imgUrl}" alt="Thumbnail ${index + 1}">`;
-                    thumbnailsContainer.appendChild(thumb);
-                });
+        document.getElementById('mainImage').src = imagesData[0];
 
-                // Update image array and total count
-                totalImages = imagesData.length;
-                currentIndex = 0;
+        modalImages = imagesData;
 
-                // Clear and refill images array
-                images.length = 0;
-                imagesData.forEach(img => images.push(img));
-            }
+        const thumbnailsContainer = document.getElementById('verticalThumbnails');
+        thumbnailsContainer.innerHTML = '';
 
-            // Update sizes for this color
-            updateSizesForColor(color);
-        }
+        imagesData.forEach((imgUrl, index) => {
+            const thumb = document.createElement('div');
+
+            thumb.className = 'vertical-thumb' +
+                (index === 0 ? ' active' : '');
+
+            thumb.dataset.index = index;
+
+            thumb.onclick = function() {
+                changeMainImage(index);
+            };
+
+            thumb.innerHTML =
+                `<img src="${imgUrl}" alt="Thumbnail ${index + 1}">`;
+
+            thumbnailsContainer.appendChild(thumb);
+        });
+
+        totalImages = imagesData.length;
+        currentIndex = 0;
+
+        images.length = 0;
+
+        imagesData.forEach(img => images.push(img));
+    }
+
+    updateSizesForColor(color);
+}
 
         // ================================================================
         // ===== UPDATE SIZES FOR COLOR =====
@@ -3526,37 +3546,82 @@
         // ===== SELECT SIZE =====
         // ================================================================
         function selectSize(button) {
-            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
+    document.querySelectorAll('.size-btn').forEach(btn =>
+        btn.classList.remove('selected')
+    );
 
-            selectedSize = button.dataset.size;
-            selectedVariantId = button.dataset.variantId;
-            selectedPrice = parseFloat(button.dataset.price);
-            selectedMrp = parseFloat(button.dataset.mrp);
-            selectedStock = parseInt(button.dataset.stock);
-            selectedDiscount = parseInt(button.dataset.discount);
+    button.classList.add('selected');
 
-            const quantityInput = document.getElementById('quantity');
-            if (quantityInput) {
-                quantityInput.max = selectedStock > 0 ? selectedStock : 1;
-                if (parseInt(quantityInput.value) > selectedStock) {
-                    quantityInput.value = selectedStock > 0 ? selectedStock : 1;
-                }
+    selectedSize = button.dataset.size;
+    selectedVariantId = button.dataset.variantId;
+
+    selectedPrice = parseFloat(button.dataset.price);
+    selectedMrp = parseFloat(button.dataset.mrp);
+    selectedStock = parseInt(button.dataset.stock);
+    selectedDiscount = parseInt(button.dataset.discount);
+
+    // ==========================================
+    // IMPORTANT: GET EXACT SELECTED VARIANT
+    // ==========================================
+    const selectedVariant = variantData.find(
+        v => String(v.id) === String(selectedVariantId)
+    );
+
+    if (selectedVariant) {
+        if (selectedVariant.image) {
+            selectedVariantImage = selectedVariant.image;
+
+            // Show exact variant image
+            const mainImage = document.getElementById('mainImage');
+
+            if (mainImage) {
+                mainImage.src = selectedVariant.image;
             }
-
-            updatePriceDisplay(selectedPrice, selectedMrp, selectedDiscount, button);
-            updateStockDisplay(selectedStock);
-
-            const stockInfo = document.getElementById('sizeStockInfo');
-            const stockCount = document.getElementById('sizeStockCount');
-            if (stockInfo) {
-                stockInfo.style.display = 'block';
-                stockCount.textContent = selectedStock > 0 ? selectedStock : '0';
-                stockCount.style.color = selectedStock > 0 ? 'var(--success)' : 'var(--signal)';
-            }
-
-            document.getElementById('sizeWarning').style.display = 'none';
         }
+
+        // Make sure color is also available
+        if (!selectedColor && selectedVariant.color) {
+            selectedColor = selectedVariant.color;
+        }
+    }
+
+    const quantityInput = document.getElementById('quantity');
+
+    if (quantityInput) {
+        quantityInput.max = selectedStock > 0 ? selectedStock : 1;
+
+        if (parseInt(quantityInput.value) > selectedStock) {
+            quantityInput.value =
+                selectedStock > 0 ? selectedStock : 1;
+        }
+    }
+
+    updatePriceDisplay(
+        selectedPrice,
+        selectedMrp,
+        selectedDiscount,
+        button
+    );
+
+    updateStockDisplay(selectedStock);
+
+    const stockInfo = document.getElementById('sizeStockInfo');
+    const stockCount = document.getElementById('sizeStockCount');
+
+    if (stockInfo) {
+        stockInfo.style.display = 'block';
+
+        stockCount.textContent =
+            selectedStock > 0 ? selectedStock : '0';
+
+        stockCount.style.color =
+            selectedStock > 0
+                ? 'var(--success)'
+                : 'var(--signal)';
+    }
+
+    document.getElementById('sizeWarning').style.display = 'none';
+}
 
         // ================================================================
         // ===== SELECT DEFAULT SIZE =====
@@ -3821,10 +3886,35 @@ function addToCartDetail() {
         document.getElementById('quantity').value = selectedStock;
         return;
     }
+    // ==========================================
+// GET EXACT SELECTED VARIANT
+// ==========================================
+const selectedVariant = variantData.find(
+    v => String(v.id) === String(selectedVariantId)
+);
+
+// Always get correct variant values
+const cartColor =
+    selectedColor ||
+    (selectedVariant ? selectedVariant.color : '') ||
+    '';
+
+const cartSize =
+    selectedSize ||
+    (selectedVariant ? selectedVariant.size : '') ||
+    '';
+
+const cartImage =
+    (selectedVariant && selectedVariant.image)
+        ? selectedVariant.image
+        : selectedVariantImage || productImage;
 
     let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-    let existingItem = currentCart.find(item => item.id === productId && item.size === selectedSize && item
-        .color === selectedColor);
+    let existingItem = currentCart.find(
+    item => item.id === productId &&
+            item.size === cartSize &&
+            item.color === cartColor
+);
 
     if (existingItem) {
         if (existingItem.quantity + quantity > selectedStock) {
@@ -3834,17 +3924,26 @@ function addToCartDetail() {
         }
         existingItem.quantity += quantity;
     } else {
-        currentCart.push({
-            id: productId,
-            name: productName,
-            price: selectedPrice,
-            original_price: selectedMrp,
-            image: productImage,
-            quantity: quantity,
-            size: selectedSize,
-            color: selectedColor,
-            variant_id: selectedVariantId
-        });
+    currentCart.push({
+    id: productId,
+    name: productName,
+    price: selectedPrice,
+    original_price: selectedMrp,
+
+    // EXACT VARIANT IMAGE
+    image: cartImage,
+
+    quantity: quantity,
+
+    // EXACT VARIANT SIZE
+    size: cartSize,
+
+    // EXACT VARIANT COLOR
+    color: cartColor,
+
+    // EXACT VARIANT ID
+    variant_id: selectedVariantId
+});
     }
 
     localStorage.setItem('cart', JSON.stringify(currentCart));
@@ -4143,6 +4242,15 @@ function addToCartDetail() {
         // ===== DOCUMENT READY =====
         // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
+            const firstColorButton = document.querySelector('.color-btn');
+
+    if (firstColorButton) {
+        const firstColor = firstColorButton.dataset.color;
+
+        if (firstColor) {
+            selectColor(firstColorButton, firstColor);
+        }
+    }
             // First tab open
             const firstTab = document.querySelector('.info-tab-header');
             if (firstTab) {

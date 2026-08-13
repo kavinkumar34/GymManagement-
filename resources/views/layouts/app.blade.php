@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ App\Models\Setting::get('company_name', 'FitForge Athletic System') }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>{{ App\Models\Setting::get('company_name', null) ?: 'Gym Management' }}</title>    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- ================================================================
@@ -1784,15 +1783,22 @@
 
             <!-- ===== TOP ROW ===== -->
             <div class="navbar-top">
-                <!-- Brand -->
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    @php
-                        $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
-                        $companyName = \App\Models\Setting::get('company_name', 'FitForge Athletics');
-                    @endphp
-                    <i class="{{ $companyLogo }}"></i>
-                    <strong>{{ $companyName }}</strong>
-                </a>
+<!-- Brand -->
+<a class="navbar-brand" href="{{ url('/') }}">
+    @php
+        $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
+        $companyName = \App\Models\Setting::get('company_name', null);
+        $isImage = $companyLogo && (str_starts_with($companyLogo, '/storage/') || str_starts_with($companyLogo, 'storage/'));
+    @endphp
+    @if($isImage && file_exists(public_path($companyLogo)))
+        <img src="{{ asset($companyLogo) }}" alt="Logo" style="height: 35px; width: auto; margin-right: 10px;">
+    @else
+        <i class="{{ $companyLogo }}"></i>
+    @endif
+    @if($companyName)
+        <strong>{{ $companyName }}</strong>
+    @endif
+</a>
 
                 <!-- ===== NAV ICONS ===== -->
                 <div class="nav-icons">
@@ -2257,14 +2263,21 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                        <div class="footer-logo">
-                            @php
-                                $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
-                                $companyName = \App\Models\Setting::get('company_name', 'FitForge Athletics');
-                            @endphp
-                            <i class="{{ $companyLogo }} me-2"></i>
-                            <strong>{{ $companyName }}</strong>
-                        </div>
+<div class="footer-logo">
+    @php
+        $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
+        $companyName = \App\Models\Setting::get('company_name', null);
+        $isImage = $companyLogo && (str_starts_with($companyLogo, '/storage/') || str_starts_with($companyLogo, 'storage/'));
+    @endphp
+    @if($isImage && file_exists(public_path($companyLogo)))
+        <img src="{{ asset($companyLogo) }}" alt="Logo" style="height: 30px; width: auto; margin-right: 10px;">
+    @else
+        <i class="{{ $companyLogo }} me-2"></i>
+    @endif
+    @if($companyName)
+        <strong>{{ $companyName }}</strong>
+    @endif
+</div>
                         <p class="footer-about mt-3">
                             Your complete fitness management solution. We provide gym management software,
                             fitness equipment, supplements, and workout gear to help you achieve your fitness goals.
@@ -2318,8 +2331,7 @@
 
                 <div class="row bottom-bar">
                     <div class="col-12 text-center">
-                        <p class="mb-0">&copy; {{ date('Y') }} {{ $companyName }}. All rights reserved.</p>
-                    </div>
+<p class="mb-0">&copy; {{ date('Y') }} {{ $companyName ?: 'Gym Management' }}. All rights reserved.</p>                    </div>
                 </div>
             </div>
         </footer>

@@ -1594,16 +1594,111 @@
                 colors = Array.from(colorSet);
 
                 // Build variants for modal
-                const variantsForModal = product.variants.map(v => ({
-                    id: v.id,
-                    size: v.size || null,
-                    color: v.color || null,
-                    price: parseFloat(v.final_price) || parseFloat(v.price) || 0,
-                    original_price: parseFloat(v.total_price) || parseFloat(v.mrp) || parseFloat(v.price) || 0,
-                    stock: parseInt(v.stock) || 0,
-                    discount_type: v.discount_type || 'flat',
-                    discount_value: parseFloat(v.discount_value) || 0
-                }));
+           const variantsForModal = product.variants.map(v => {
+
+    // ============================================================
+    // GET EXACT IMAGE FOR THIS VARIANT
+    // ============================================================
+
+    let variantImage = null;
+
+    // First: check variant itself
+    if (v.image) {
+
+        variantImage = v.image;
+
+    } else if (
+        v.images &&
+        Array.isArray(v.images) &&
+        v.images.length > 0
+    ) {
+
+        variantImage = v.images[0];
+
+    } else if (
+        product.product_images &&
+        product.product_images.length > 0
+    ) {
+
+        // Find image belonging to this exact variant
+        const variantImages =
+            product.product_images
+                .filter(img =>
+                    String(img.variant_id) ===
+                    String(v.id)
+                )
+                .sort((a, b) => {
+
+                    if (a.is_main !== b.is_main) {
+                        return Number(b.is_main) -
+                               Number(a.is_main);
+                    }
+
+                    return (
+                        Number(a.display_order || 0) -
+                        Number(b.display_order || 0)
+                    );
+                });
+
+
+        if (variantImages.length > 0) {
+
+            variantImage =
+                variantImages[0].image_path;
+        }
+    }
+
+
+    // ============================================================
+    // MAKE IMAGE URL
+    // ============================================================
+
+    if (variantImage) {
+
+        if (
+            !variantImage.startsWith('http') &&
+            !variantImage.startsWith('/') &&
+            !variantImage.startsWith('data:')
+        ) {
+
+            variantImage =
+                '/storage/' + variantImage;
+        }
+    }
+
+
+    return {
+
+        id: v.id,
+
+        size: v.size || null,
+
+        color: v.color || null,
+
+        price:
+            parseFloat(v.final_price) ||
+            parseFloat(v.price) ||
+            0,
+
+        original_price:
+            parseFloat(v.total_price) ||
+            parseFloat(v.mrp) ||
+            parseFloat(v.price) ||
+            0,
+
+        stock:
+            parseInt(v.stock) || 0,
+
+        discount_type:
+            v.discount_type || 'flat',
+
+        discount_value:
+            parseFloat(v.discount_value) || 0,
+
+        // IMPORTANT
+        image: variantImage
+    };
+});
 
                 return {
                     hasVariant: true,
@@ -1794,75 +1889,251 @@
         // ===== QUICK ADD TO CART MODAL (For Variant Products) =====
         // ================================================================
 
-        function openQuickCartModal(productData) {
-            modalProductData = productData;
-            modalAllVariants = productData.variants || [];
-            modalProductId = productData.id;
-            modalSelectedColor = null;
-            modalSelectedSize = null;
-            modalSelectedVariant = null;
+    function openQuickCartModal(productData) {
 
-            document.getElementById('modalProductImage').src = productData.image;
-            document.getElementById('modalProductBrand').textContent = productData.brand || '';
-            document.getElementById('modalProductName').textContent = productData.name;
-            document.getElementById('modalViewDetailsLink').href = `/product/${productData.id}`;
+    modalProductData = productData;
+    modalAllVariants = productData.variants || [];
+    modalProductId = productData.id;
 
-            if (modalAllVariants.length > 0) {
-                document.getElementById('modalVariantSection').style.display = 'block';
+    modalSelectedColor = null;
+    modalSelectedSize = null;
+    modalSelectedVariant = null;
 
-                const colorSet = new Set();
-                modalAllVariants.forEach(v => {
-                    if (v.color && v.color.trim() !== '') colorSet.add(v.color);
-                });
-                const colors = Array.from(colorSet);
+    // Product basic details
+    document.getElementById('modalProductImage').src =
+        productData.image || '';
 
-                const colorContainer = document.getElementById('modalColorOptions');
-                if (colors.length > 0) {
-                    document.getElementById('modalColorSection').style.display = 'block';
-                    colorContainer.innerHTML = '';
-                    colors.forEach((color, index) => {
-                        const isLightColor = ['white', 'yellow', 'pink', 'lightblue', 'lightgreen', 'cream',
-                            'beige', 'ivory', 'gold'
-                        ].includes(color.toLowerCase());
-                        const btn = document.createElement('div');
-                        btn.className = 'modal-color-btn' + (index === 0 ? ' selected' : '');
-                        btn.dataset.color = color;
-                        btn.style.background = color;
-                        if (isLightColor) btn.style.border = '3px solid #ddd';
-                        btn.innerHTML = `<span class="check-mark"><i class="fas fa-check"></i></span>`;
-                        btn.onclick = function() {
-                            document.querySelectorAll('.modal-color-btn').forEach(b => b.classList.remove(
-                            'selected'));
-                            this.classList.add('selected');
-                            modalSelectedColor = color;
-                            updateModalSizes(color);
-                            updateModalPrice(color);
-                        };
-                        colorContainer.appendChild(btn);
-                    });
+    document.getElementById('modalProductBrand').textContent =
+        productData.brand || '';
 
-                    modalSelectedColor = colors[0];
-                    updateModalSizes(colors[0]);
-                    updateModalPrice(colors[0]);
-                } else {
-                    document.getElementById('modalColorSection').style.display = 'none';
-                    updateModalSizes(null);
-                    updateModalPrice(null);
-                }
+    document.getElementById('modalProductName').textContent =
+        productData.name || '';
 
-            } else {
-                document.getElementById('modalVariantSection').style.display = 'none';
-                modalSelectedVariant = null;
-                updateModalPriceDisplay(productData.price, productData.original_price);
-                updateModalStockInfo(null);
+    document.getElementById('modalViewDetailsLink').href =
+        `/product/${productData.id}`;
+
+
+    // ============================================================
+    // VARIANT PRODUCT
+    // ============================================================
+
+    if (modalAllVariants.length > 0) {
+
+        document.getElementById('modalVariantSection').style.display =
+            'block';
+
+
+        // --------------------------------------------------------
+        // GET UNIQUE COLORS
+        // --------------------------------------------------------
+
+        const colorSet = new Set();
+
+        modalAllVariants.forEach(v => {
+
+            if (
+                v.color &&
+                String(v.color).trim() !== ''
+            ) {
+                colorSet.add(v.color);
             }
 
-            document.getElementById('modalQtyInput').value = 1;
-            document.getElementById('modalErrorMsg').style.display = 'none';
+        });
 
-            document.getElementById('quickCartModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+        const colors = Array.from(colorSet);
+
+        const colorContainer =
+            document.getElementById('modalColorOptions');
+
+        colorContainer.innerHTML = '';
+
+
+        if (colors.length > 0) {
+
+            document.getElementById('modalColorSection').style.display =
+                'block';
+
+
+            colors.forEach((color, index) => {
+
+                const isLightColor = [
+                    'white',
+                    'yellow',
+                    'pink',
+                    'lightblue',
+                    'lightgreen',
+                    'cream',
+                    'beige',
+                    'ivory',
+                    'gold'
+                ].includes(
+                    String(color).toLowerCase()
+                );
+
+
+                const btn = document.createElement('div');
+
+                btn.className =
+                    'modal-color-btn' +
+                    (index === 0 ? ' selected' : '');
+
+                btn.dataset.color = color;
+
+                btn.style.background = color;
+
+                if (isLightColor) {
+                    btn.style.border = '3px solid #ddd';
+                }
+
+
+                btn.innerHTML = `
+                    <span class="check-mark">
+                        <i class="fas fa-check"></i>
+                    </span>
+                `;
+
+
+                // =================================================
+                // COLOR CLICK
+                // =================================================
+
+                btn.onclick = function () {
+
+                    document
+                        .querySelectorAll('.modal-color-btn')
+                        .forEach(b =>
+                            b.classList.remove('selected')
+                        );
+
+                    this.classList.add('selected');
+
+                    modalSelectedColor = color;
+
+                    modalSelectedSize = null;
+                    modalSelectedVariant = null;
+
+
+                    // Update sizes
+                    updateModalSizes(color);
+
+
+                    // =================================================
+                    // IMPORTANT:
+                    // SHOW FIRST AVAILABLE VARIANT IMAGE
+                    // FOR SELECTED COLOR
+                    // =================================================
+
+                    const colorVariants =
+                        modalAllVariants.filter(
+                            v =>
+                                String(v.color) ===
+                                String(color)
+                        );
+
+
+                    const firstAvailableVariant =
+                        colorVariants.find(
+                            v => Number(v.stock) > 0
+                        ) ||
+                        colorVariants[0];
+
+
+                    if (
+                        firstAvailableVariant &&
+                        firstAvailableVariant.image
+                    ) {
+
+                        document.getElementById(
+                            'modalProductImage'
+                        ).src =
+                            firstAvailableVariant.image;
+                    }
+
+
+                    // Update price
+                    if (firstAvailableVariant) {
+
+                        updateModalPriceDisplay(
+                            firstAvailableVariant.price,
+                            firstAvailableVariant.original_price
+                        );
+
+                    }
+
+
+                    document.getElementById(
+                        'modalErrorMsg'
+                    ).style.display = 'none';
+                };
+
+
+                colorContainer.appendChild(btn);
+
+            });
+
+
+            // ========================================================
+            // SELECT FIRST COLOR AUTOMATICALLY
+            // ========================================================
+
+            const firstColorButton =
+                colorContainer.querySelector(
+                    '.modal-color-btn'
+                );
+
+            if (firstColorButton) {
+                firstColorButton.click();
+            }
+
+        } else {
+
+            document.getElementById(
+                'modalColorSection'
+            ).style.display = 'none';
+
+            updateModalSizes(null);
         }
+
+
+    } else {
+
+        // ============================================================
+        // NON VARIANT PRODUCT
+        // ============================================================
+
+        document.getElementById(
+            'modalVariantSection'
+        ).style.display = 'none';
+
+        modalSelectedVariant = null;
+
+
+        updateModalPriceDisplay(
+            productData.price,
+            productData.original_price
+        );
+
+        updateModalStockInfo(null);
+    }
+
+
+    // Reset quantity
+    document.getElementById(
+        'modalQtyInput'
+    ).value = 1;
+
+    document.getElementById(
+        'modalErrorMsg'
+    ).style.display = 'none';
+
+
+    // Open modal
+    document.getElementById(
+        'quickCartModal'
+    ).classList.add('active');
+
+    document.body.style.overflow = 'hidden';
+}
 
         function updateModalPrice(color) {
             let filteredVariants = modalAllVariants;
@@ -1889,72 +2160,280 @@
             }
         }
 
-        function updateModalSizes(color) {
-            const sizeContainer = document.getElementById('modalSizeOptions');
-            let filteredVariants = modalAllVariants;
+  function updateModalSizes(color) {
 
-            if (color) {
-                filteredVariants = modalAllVariants.filter(v => v.color === color);
-            }
+    const sizeContainer =
+        document.getElementById('modalSizeOptions');
 
-            const sizes = filteredVariants.map(v => v.size).filter(s => s && s.trim() !== '');
+    sizeContainer.innerHTML = '';
 
-            if (sizes.length > 0) {
-                document.getElementById('modalSizeSection').style.display = 'block';
-                sizeContainer.innerHTML = '';
-                sizes.forEach((size, index) => {
-                    const variant = filteredVariants.find(v => v.size === size);
-                    const isOutOfStock = (variant && variant.stock <= 0) || false;
+    let filteredVariants = modalAllVariants;
 
-                    const btn = document.createElement('button');
-                    btn.className = 'modal-size-btn' + (index === 0 && !isOutOfStock ? ' selected' : '') + (isOutOfStock ?
-                        ' out-of-stock' : '');
-                    btn.dataset.size = size;
-                    btn.dataset.variantId = variant ? variant.id : null;
-                    btn.dataset.stock = variant ? variant.stock : 0;
-                    btn.dataset.price = variant ? variant.price : modalProductData.price;
-                    btn.dataset.originalPrice = variant ? variant.original_price : modalProductData.original_price;
-                    btn.textContent = size;
-                    btn.disabled = isOutOfStock;
 
-                    btn.onclick = function() {
-                        if (this.disabled) return;
-                        document.querySelectorAll('.modal-size-btn').forEach(b => b.classList.remove(
-                        'selected'));
-                        this.classList.add('selected');
-                        modalSelectedSize = this.dataset.size;
-                        const vid = this.dataset.variantId;
-                        modalSelectedVariant = modalAllVariants.find(v => v.id == vid) || null;
-                        if (modalSelectedVariant) {
-                            updateModalPriceDisplay(modalSelectedVariant.price, modalSelectedVariant
-                            .original_price);
-                        }
-                        updateModalStockInfo(modalSelectedVariant);
-                        document.getElementById('modalErrorMsg').style.display = 'none';
-                    };
+    if (color) {
 
-                    sizeContainer.appendChild(btn);
-                });
+        filteredVariants =
+            modalAllVariants.filter(
+                v =>
+                    String(v.color) ===
+                    String(color)
+            );
+    }
 
-                const firstSizeBtn = sizeContainer.querySelector('.modal-size-btn:not(.out-of-stock)');
-                if (firstSizeBtn) {
-                    firstSizeBtn.click();
-                } else {
-                    modalSelectedSize = null;
-                    modalSelectedVariant = null;
-                    updateModalStockInfo(null);
+
+    // Remove empty sizes
+    const sizes = [
+        ...new Set(
+            filteredVariants
+                .map(v => v.size)
+                .filter(
+                    s =>
+                        s &&
+                        String(s).trim() !== ''
+                )
+        )
+    ];
+
+
+    // ============================================================
+    // HAS SIZE
+    // ============================================================
+
+    if (sizes.length > 0) {
+
+        document.getElementById(
+            'modalSizeSection'
+        ).style.display = 'block';
+
+
+        sizes.forEach((size, index) => {
+
+            const variant =
+                filteredVariants.find(
+                    v =>
+                        String(v.size) ===
+                        String(size)
+                );
+
+
+            const isOutOfStock =
+                !variant ||
+                Number(variant.stock) <= 0;
+
+
+            const btn =
+                document.createElement('button');
+
+            btn.className =
+                'modal-size-btn' +
+                (
+                    index === 0 &&
+                    !isOutOfStock
+                        ? ' selected'
+                        : ''
+                ) +
+                (
+                    isOutOfStock
+                        ? ' out-of-stock'
+                        : ''
+                );
+
+
+            btn.dataset.size = size;
+
+            btn.dataset.variantId =
+                variant
+                    ? variant.id
+                    : '';
+
+            btn.dataset.stock =
+                variant
+                    ? variant.stock
+                    : 0;
+
+
+            btn.textContent = size;
+
+            btn.disabled = isOutOfStock;
+
+
+            // =====================================================
+            // SIZE CLICK
+            // =====================================================
+
+            btn.onclick = function () {
+
+                if (this.disabled) {
+                    return;
                 }
-            } else {
-                document.getElementById('modalSizeSection').style.display = 'none';
-                modalSelectedSize = null;
-                modalSelectedVariant = null;
-                const firstVariant = filteredVariants.find(v => v.stock > 0) || filteredVariants[0];
-                if (firstVariant) {
-                    updateModalPriceDisplay(firstVariant.price, firstVariant.original_price);
+
+
+                document
+                    .querySelectorAll('.modal-size-btn')
+                    .forEach(b =>
+                        b.classList.remove('selected')
+                    );
+
+
+                this.classList.add('selected');
+
+
+                modalSelectedSize =
+                    this.dataset.size;
+
+
+                const variantId =
+                    this.dataset.variantId;
+
+
+                // IMPORTANT:
+                // EXACT COLOR + SIZE = EXACT VARIANT
+                modalSelectedVariant =
+                    modalAllVariants.find(
+                        v =>
+                            String(v.id) ===
+                            String(variantId)
+                    ) || null;
+
+
+                if (modalSelectedVariant) {
+                   // =========================================================
+    // EXACT VARIANT IMAGE
+    // =========================================================
+
+    if (modalSelectedVariant.image) {
+
+        document.getElementById(
+            'modalProductImage'
+        ).src =
+            modalSelectedVariant.image;
+    }
+
+                    // ------------------------------------------------
+                    // PRICE
+                    // ------------------------------------------------
+
+                    updateModalPriceDisplay(
+                        modalSelectedVariant.price,
+                        modalSelectedVariant.original_price
+                    );
+
+
+                    // ------------------------------------------------
+                    // EXACT VARIANT IMAGE
+                    // ------------------------------------------------
+
+                    if (
+                        modalSelectedVariant.image
+                    ) {
+
+                        document.getElementById(
+                            'modalProductImage'
+                        ).src =
+                            modalSelectedVariant.image;
+                    }
+
+
+                    // ------------------------------------------------
+                    // STOCK
+                    // ------------------------------------------------
+
+                    updateModalStockInfo(
+                        modalSelectedVariant
+                    );
                 }
-                updateModalStockInfo(null);
-            }
+
+
+                document.getElementById(
+                    'modalErrorMsg'
+                ).style.display = 'none';
+            };
+
+
+            sizeContainer.appendChild(btn);
+        });
+
+
+        // ============================================================
+        // AUTO SELECT FIRST AVAILABLE SIZE
+        // ============================================================
+
+        const firstAvailableSize =
+            sizeContainer.querySelector(
+                '.modal-size-btn:not(.out-of-stock)'
+            );
+
+
+        if (firstAvailableSize) {
+
+            firstAvailableSize.click();
+
+        } else {
+
+            modalSelectedSize = null;
+
+            modalSelectedVariant = null;
+
+            updateModalStockInfo(null);
         }
+
+
+    } else {
+
+        // ============================================================
+        // NO SIZE
+        // ============================================================
+
+        document.getElementById(
+            'modalSizeSection'
+        ).style.display = 'none';
+
+
+        // If color has variants but no size
+        const firstVariant =
+            filteredVariants.find(
+                v => Number(v.stock) > 0
+            ) ||
+            filteredVariants[0];
+
+
+        if (firstVariant) {
+
+            modalSelectedVariant =
+                firstVariant;
+
+
+            modalSelectedColor =
+                firstVariant.color || null;
+
+
+            modalSelectedSize = null;
+
+
+            // Image
+            if (firstVariant.image) {
+
+                document.getElementById(
+                    'modalProductImage'
+                ).src =
+                    firstVariant.image;
+            }
+
+
+            // Price
+            updateModalPriceDisplay(
+                firstVariant.price,
+                firstVariant.original_price
+            );
+
+
+            // Stock
+            updateModalStockInfo(
+                firstVariant
+            );
+        }
+    }
+}
 
         function updateModalStockInfo(variant) {
             const stockInfo = document.getElementById('modalStockInfo');
@@ -2021,88 +2500,292 @@
             if (val >= 1) input.value = val;
         }
 
-        function modalAddToCart() {
-            const errorMsg = document.getElementById('modalErrorMsg');
+     function modalAddToCart() {
 
-            if (modalAllVariants.length > 0) {
-                if (!modalSelectedSize) {
-                    errorMsg.textContent = 'Please select a size';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-                if (!modalSelectedVariant) {
-                    errorMsg.textContent = 'Selected variant is not available';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-                if (modalSelectedVariant.stock <= 0) {
-                    errorMsg.textContent = 'Selected size is out of stock!';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-            }
+    const errorMsg =
+        document.getElementById(
+            'modalErrorMsg'
+        );
 
-            errorMsg.style.display = 'none';
 
-            const quantity = parseInt(document.getElementById('modalQtyInput').value);
+    // ============================================================
+    // VALIDATE VARIANT
+    // ============================================================
 
-            const productId = modalProductData.id;
-            const productName = modalProductData.name;
-            const price = modalSelectedVariant ? modalSelectedVariant.price : modalProductData.price;
-            const image = modalProductData.image;
-            const variantId = modalSelectedVariant ? modalSelectedVariant.id : null;
-            const size = modalSelectedSize || null;
-            const color = modalSelectedColor || null;
+    if (modalAllVariants.length > 0) {
 
-            if (modalSelectedVariant && quantity > modalSelectedVariant.stock) {
-                errorMsg.textContent = 'Only ' + modalSelectedVariant.stock + ' items available!';
-                errorMsg.style.display = 'block';
-                return;
-            }
+        if (
+            modalSelectedColor &&
+            !modalSelectedSize &&
+            modalAllVariants.some(
+                v =>
+                    v.color === modalSelectedColor &&
+                    v.size
+            )
+        ) {
 
-            let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+            errorMsg.textContent =
+                'Please select a size';
 
-            let existingItem = currentCart.find(item =>
-                item.id === productId &&
-                item.variant_id === variantId &&
-                item.size === size &&
-                item.color === color
-            );
+            errorMsg.style.display = 'block';
 
-            if (existingItem) {
-                const maxStock = modalSelectedVariant ? modalSelectedVariant.stock : 999;
-                if (existingItem.quantity + quantity > maxStock) {
-                    errorMsg.textContent = 'Only ' + maxStock + ' items available!';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-                existingItem.quantity += quantity;
-            } else {
-                currentCart.push({
-                    id: productId,
-                    name: productName,
-                    price: price,
-                    original_price: modalProductData.original_price || price,
-                    image: image,
-                    quantity: quantity,
-                    size: size,
-                    color: color,
-                    variant_id: variantId
-                });
-            }
-
-            localStorage.setItem('cart', JSON.stringify(currentCart));
-            cart = currentCart;
-            updateCartCount();
-
-            closeQuickCartModal();
-
-            showToast(productName + ' added to cart!', 'success');
-
-            setTimeout(() => {
-                window.location.href = "{{ route('cart') }}";
-            }, 500);
+            return;
         }
+
+
+        if (!modalSelectedVariant) {
+
+            errorMsg.textContent =
+                'Please select a valid variant';
+
+            errorMsg.style.display = 'block';
+
+            return;
+        }
+
+
+        if (
+            Number(
+                modalSelectedVariant.stock
+            ) <= 0
+        ) {
+
+            errorMsg.textContent =
+                'Selected variant is out of stock!';
+
+            errorMsg.style.display = 'block';
+
+            return;
+        }
+    }
+
+
+    errorMsg.style.display = 'none';
+
+
+    const quantity =
+        parseInt(
+            document.getElementById(
+                'modalQtyInput'
+            ).value
+        ) || 1;
+
+
+    // ============================================================
+    // PRODUCT DETAILS
+    // ============================================================
+
+    const productId =
+        modalProductData.id;
+
+    const productName =
+        modalProductData.name;
+
+
+    // ============================================================
+    // EXACT SELECTED VARIANT DATA
+    // ============================================================
+
+    const price =
+        modalSelectedVariant
+            ? Number(
+                modalSelectedVariant.price
+              )
+            : Number(
+                modalProductData.price
+              );
+
+
+    const originalPrice =
+        modalSelectedVariant
+            ? Number(
+                modalSelectedVariant.original_price
+              )
+            : Number(
+                modalProductData.original_price ||
+                modalProductData.price
+              );
+
+
+    const variantId =
+        modalSelectedVariant
+            ? modalSelectedVariant.id
+            : null;
+
+
+    const size =
+        modalSelectedSize || null;
+
+
+    const color =
+        modalSelectedColor ||
+        (
+            modalSelectedVariant
+                ? modalSelectedVariant.color
+                : null
+        );
+
+
+    // ============================================================
+    // IMPORTANT:
+    // EXACT SELECTED VARIANT IMAGE
+    // ============================================================
+
+    const image =
+        modalSelectedVariant &&
+        modalSelectedVariant.image
+            ? modalSelectedVariant.image
+            : modalProductData.image;
+
+
+    // ============================================================
+    // STOCK CHECK
+    // ============================================================
+
+    if (
+        modalSelectedVariant &&
+        quantity >
+            Number(modalSelectedVariant.stock)
+    ) {
+
+        errorMsg.textContent =
+            'Only ' +
+            modalSelectedVariant.stock +
+            ' items available!';
+
+        errorMsg.style.display = 'block';
+
+        return;
+    }
+
+
+    // ============================================================
+    // CART
+    // ============================================================
+
+    let currentCart =
+        JSON.parse(
+            localStorage.getItem('cart')
+        ) || [];
+
+
+    // IMPORTANT:
+    // Same product but different variant = different cart item
+    const existingItem =
+        currentCart.find(item =>
+            String(item.id) === String(productId) &&
+            String(item.variant_id || '') ===
+                String(variantId || '') &&
+            String(item.size || '') ===
+                String(size || '') &&
+            String(item.color || '') ===
+                String(color || '')
+        );
+
+
+    // ============================================================
+    // EXISTING SAME VARIANT
+    // ============================================================
+
+    if (existingItem) {
+
+        const maxStock =
+            modalSelectedVariant
+                ? Number(
+                    modalSelectedVariant.stock
+                  )
+                : 999;
+
+
+        if (
+            existingItem.quantity +
+            quantity >
+            maxStock
+        ) {
+
+            errorMsg.textContent =
+                'Only ' +
+                maxStock +
+                ' items available!';
+
+            errorMsg.style.display = 'block';
+
+            return;
+        }
+
+
+        existingItem.quantity += quantity;
+
+
+        // IMPORTANT:
+        // Keep exact selected variant values updated
+        existingItem.price =
+            price;
+
+        existingItem.original_price =
+            originalPrice;
+
+        existingItem.image =
+            image;
+
+        existingItem.variant_id =
+            variantId;
+
+        existingItem.size =
+            size;
+
+        existingItem.color =
+            color;
+
+
+    } else {
+
+        // ========================================================
+        // NEW VARIANT CART ITEM
+        // ========================================================
+
+        currentCart.push({
+
+            id: productId,
+
+            name: productName,
+
+            price: price,
+
+            original_price: originalPrice,
+
+            image: image,
+
+            quantity: quantity,
+
+            size: size,
+
+            color: color,
+
+            variant_id: variantId
+        });
+    }
+
+
+// Save cart
+localStorage.setItem(
+    'cart',
+    JSON.stringify(currentCart)
+);
+
+cart = currentCart;
+
+updateCartCount();
+
+
+// ============================================================
+// DIRECTLY GO TO CART PAGE
+// ============================================================
+
+window.location.href = "{{ route('cart') }}";
+
+return;
+}
 
         function closeQuickCartModal() {
             document.getElementById('quickCartModal').classList.remove('active');

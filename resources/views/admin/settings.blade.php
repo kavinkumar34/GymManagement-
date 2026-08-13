@@ -27,9 +27,6 @@
         min-height: 100vh;
     }
 
-    /* ============================================ */
-    /* CARD STYLES                                 */
-    /* ============================================ */
     .settings-card {
         background: #ffffff;
         border-radius: var(--radius-lg);
@@ -75,9 +72,6 @@
         padding: 20px 24px;
     }
 
-    /* ============================================ */
-    /* SECTION TITLE                               */
-    /* ============================================ */
     .section-title {
         font-size: 14px;
         font-weight: 600;
@@ -97,18 +91,11 @@
         font-size: 14px;
     }
 
-    /* ============================================ */
-    /* FORM STYLES                                 */
-    /* ============================================ */
     .form-label {
         font-size: 12px;
         font-weight: 500;
         color: var(--dark);
         margin-bottom: 4px;
-    }
-
-    .form-label .text-danger {
-        color: var(--danger) !important;
     }
 
     .form-control {
@@ -160,27 +147,120 @@
     }
 
     /* ============================================ */
-    /* ICON PREVIEW                                */
+    /* LOGO UPLOAD SECTION                         */
     /* ============================================ */
-    .icon-preview {
+    .logo-upload-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        padding: 10px 0;
+    }
+
+    .logo-preview-box {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius);
+        border: 2px dashed var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: var(--light-gray);
+        flex-shrink: 0;
+        transition: all 0.3s;
+        position: relative;
+    }
+
+    .logo-preview-box:hover {
+        border-color: var(--primary);
+    }
+
+    .logo-preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 8px;
+    }
+
+    .logo-preview-box .no-logo {
+        font-size: 32px;
+        color: var(--gray);
+        opacity: 0.5;
+    }
+
+    .logo-preview-box .logo-preview-icon {
+        font-size: 40px;
+        color: var(--gray);
+    }
+
+    .logo-upload-controls {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .logo-upload-controls .file-input-wrapper {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .logo-upload-controls .file-input-wrapper .custom-file-upload {
+        background: var(--primary);
+        color: white;
+        padding: 8px 18px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.3s;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 4px 14px;
-        background: #e3f2fd;
-        border-radius: 50px;
+        border: none;
+    }
+
+    .logo-upload-controls .file-input-wrapper .custom-file-upload:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+    }
+
+    .logo-upload-controls .file-input-wrapper .btn-remove-logo {
+        background: var(--danger);
+        color: white;
+        padding: 8px 18px;
+        border-radius: var(--radius);
+        cursor: pointer;
         font-size: 13px;
-        color: #1565c0;
-        margin-top: 4px;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
     }
 
-    .icon-preview i {
-        font-size: 18px;
+    .logo-upload-controls .file-input-wrapper .btn-remove-logo:hover {
+        background: #c62828;
+        transform: translateY(-2px);
     }
 
-    /* ============================================ */
-    /* BUTTON STYLES                               */
-    /* ============================================ */
+    .logo-upload-controls .file-input-wrapper input[type="file"] {
+        display: none;
+    }
+
+    .logo-upload-controls .file-name {
+        font-size: 12px;
+        color: var(--gray);
+        margin-top: 5px;
+    }
+
+    .logo-upload-controls .file-name i {
+        margin-right: 4px;
+    }
+
     .btn-save {
         background: #4caf50;
         color: #fff;
@@ -233,9 +313,7 @@
         margin-top: 10px;
     }
 
-    /* ============================================ */
-    /* CUSTOM TOAST NOTIFICATIONS                  */
-    /* ============================================ */
+    /* Toast Styles */
     .custom-toast-container {
         position: fixed;
         top: 30px;
@@ -349,9 +427,6 @@
         100% { width: 0%; }
     }
 
-    /* ============================================ */
-    /* RESPONSIVE                                  */
-    /* ============================================ */
     @media (max-width: 768px) {
         .admin-main-content {
             padding: 12px 15px;
@@ -389,6 +464,22 @@
         .custom-toast {
             padding: 14px 16px;
             font-size: 13px;
+        }
+
+        .logo-upload-wrapper {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-upload-controls .file-input-wrapper {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .logo-upload-controls .file-input-wrapper .custom-file-upload,
+        .logo-upload-controls .file-input-wrapper .btn-remove-logo {
+            width: 100%;
+            justify-content: center;
         }
     }
 
@@ -446,12 +537,19 @@
         .custom-toast .toast-message {
             font-size: 12px;
         }
+
+        .logo-preview-box {
+            width: 60px;
+            height: 60px;
+        }
+
+        .logo-preview-box .no-logo {
+            font-size: 24px;
+        }
     }
 </style>
 
-<!-- ============================================ -->
-<!-- TOAST CONTAINER                             -->
-<!-- ============================================ -->
+<!-- TOAST CONTAINER -->
 <div class="custom-toast-container" id="toastContainer">
     @if(session('success'))
         <div class="custom-toast success show" id="settingsToast">
@@ -478,12 +576,9 @@
     @endif
 </div>
 
-<!-- ============================================ -->
-<!-- MAIN CONTENT                                -->
-<!-- ============================================ -->
+<!-- MAIN CONTENT -->
 <div class="admin-main-content">
     <div class="settings-card">
-        <!-- Card Header -->
         <div class="card-header">
             <div>
                 <h4><i class="fas fa-cog"></i> Company Settings</h4>
@@ -494,47 +589,62 @@
             </span>
         </div>
 
-        <!-- Card Body -->
         <div class="card-body">
-            <form method="POST" action="{{ route('admin.settings.update') }}">
+            <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
                 @csrf
 
-                <!-- ========================================== -->
-                <!-- SETTINGS SECTION                          -->
-                <!-- ========================================== -->
                 <div class="section-title">
                     <i class="fas fa-paint-brush"></i> Branding Settings
                 </div>
 
                 <div class="row compact-row">
-                    <!-- Company Name -->
+                    <!-- Company Name - OPTIONAL -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                        <label class="form-label">Company Name <span class="text-muted" style="font-size:10px; font-weight:400;">(Optional)</span></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-building"></i></span>
-                            <input type="text" name="company_name" class="form-control" value="{{ $settings['company_name'] ?? '' }}" required>
+                            <input type="text" name="company_name" class="form-control" value="{{ $settings['company_name'] ?? '' }}" placeholder="Enter company name">
                         </div>
-                        <small class="text-muted-sm">This name appears in the navbar</small>
+                        <small class="text-muted-sm">Leave empty to use default name</small>
                     </div>
 
-                    <!-- Company Logo Icon -->
+                    <!-- Company Logo - Image Upload (stores in company_logo field) -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Company Logo Icon</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-code"></i></span>
-                            <input type="text" name="company_logo" class="form-control" value="{{ $settings['company_logo'] ?? 'fas fa-dumbbell' }}" placeholder="fas fa-dumbbell">
-                        </div>
-                        <small class="text-muted-sm">Font Awesome icon class (e.g., fas fa-dumbbell, fas fa-heart)</small>
-                        <div class="icon-preview">
-                            <i class="{{ $settings['company_logo'] ?? 'fas fa-dumbbell' }}"></i>
-                            <span>Preview</span>
+                        <label class="form-label">Company Logo <span class="text-muted" style="font-size:10px; font-weight:400;">(Optional)</span></label>
+                        <div class="logo-upload-wrapper">
+                            <!-- Logo Preview -->
+                            <div class="logo-preview-box" id="logoPreviewBox">
+                                @php
+                                    $logoValue = $settings['company_logo'] ?? 'fas fa-dumbbell';
+                                    $isImage = $logoValue && !str_starts_with($logoValue, 'fa-') && !str_starts_with($logoValue, 'fas fa-') && !str_starts_with($logoValue, 'far fa-') && !str_starts_with($logoValue, 'fab fa-');
+                                @endphp
+                                @if($isImage && file_exists(public_path($logoValue)))
+                                    <img src="{{ asset($logoValue) }}" alt="Company Logo" id="logoPreviewImg" style="display:block; width:100%; height:100%; object-fit:contain;">
+                                    <i class="fas fa-image logo-preview-icon" id="logoPreviewIcon" style="display:none;"></i>
+                                @else
+                                    <i class="{{ $logoValue }} logo-preview-icon" id="logoPreviewIcon"></i>
+                                    <img src="" alt="Company Logo" id="logoPreviewImg" style="display:none;">
+                                @endif
+                            </div>
+
+                            <div class="logo-upload-controls">
+                                <div class="file-input-wrapper">
+                                    <label class="custom-file-upload" for="logoUpload">
+                                        <i class="fas fa-upload"></i> Choose Logo
+                                    </label>
+                                    <input type="file" id="logoUpload" name="company_logo" accept="image/*" onchange="previewLogo(this)">
+                                    <button type="button" class="btn-remove-logo" onclick="removeLogo()">
+                                        <i class="fas fa-times"></i> Remove
+                                    </button>
+                                </div>
+                                <div class="file-name" id="logoFileName">
+                                    <i class="fas fa-info-circle"></i> PNG, JPG, JPEG (Max 2MB)
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ========================================== -->
-                <!-- FORM ACTIONS                              -->
-                <!-- ========================================== -->
                 <div class="form-actions">
                     <button type="submit" class="btn-save">
                         <i class="fas fa-save"></i> Save Settings
@@ -548,9 +658,6 @@
 
             <hr class="mt-4">
 
-            <!-- ========================================== -->
-            <!-- FOOTER INFO                                -->
-            <!-- ========================================== -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; font-size:13px; color:var(--gray);">
                 <div>
                     <i class="fas fa-info-circle" style="color:var(--primary);"></i>
@@ -566,13 +673,8 @@
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- SCRIPTS                                     -->
-<!-- ============================================ -->
 <script>
-// ============================================
 // AUTO-HIDE TOAST AFTER 3 SECONDS
-// ============================================
 document.addEventListener('DOMContentLoaded', function() {
     const toast = document.getElementById('settingsToast');
     if (toast) {
@@ -585,24 +687,120 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ============================================
-// LIVE ICON PREVIEW
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    const iconInput = document.querySelector('input[name="company_logo"]');
-    const previewIcon = document.querySelector('.icon-preview i');
+// LOGO PREVIEW
+function previewLogo(input) {
+    const file = input.files[0];
+    if (!file) return;
 
-    if (iconInput && previewIcon) {
-        iconInput.addEventListener('input', function() {
-            const value = this.value.trim();
-            if (value) {
-                previewIcon.className = value;
-            } else {
-                previewIcon.className = 'fas fa-dumbbell';
-            }
-        });
+    const previewImg = document.getElementById('logoPreviewImg');
+    const previewIcon = document.getElementById('logoPreviewIcon');
+    const fileName = document.getElementById('logoFileName');
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        showToast('Please upload a valid image file (PNG, JPG, JPEG, GIF, WEBP)', 'error');
+        input.value = '';
+        return;
     }
-});
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('Image size should be less than 2MB', 'error');
+        input.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // Hide icon, show image
+        if (previewIcon) previewIcon.style.display = 'none';
+        if (previewImg) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+        }
+        // Show file name
+        if (fileName) {
+            fileName.innerHTML = '<i class="fas fa-check-circle" style="color:#4caf50;"></i> ' + file.name;
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+// REMOVE LOGO
+function removeLogo() {
+    if (!confirm('Are you sure you want to remove the logo?')) {
+        return;
+    }
+
+    const previewImg = document.getElementById('logoPreviewImg');
+    const previewIcon = document.getElementById('logoPreviewIcon');
+    const fileInput = document.getElementById('logoUpload');
+    const fileName = document.getElementById('logoFileName');
+
+    // Add hidden input to tell backend to remove logo
+    let removeInput = document.querySelector('input[name="remove_logo"]');
+    if (!removeInput) {
+        removeInput = document.createElement('input');
+        removeInput.type = 'hidden';
+        removeInput.name = 'remove_logo';
+        removeInput.value = '1';
+        document.querySelector('form').appendChild(removeInput);
+    } else {
+        removeInput.value = '1';
+    }
+
+    // Clear file input
+    if (fileInput) fileInput.value = '';
+
+    // Reset preview - show icon, hide image
+    if (previewImg) {
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+    }
+    if (previewIcon) {
+        previewIcon.style.display = 'block';
+        previewIcon.className = 'fas fa-dumbbell logo-preview-icon';
+    }
+
+    // Reset file name
+    if (fileName) {
+        fileName.innerHTML = '<i class="fas fa-info-circle"></i> PNG, JPG, JPEG (Max 2MB)';
+    }
+
+    // Submit the form to save the removal
+    document.querySelector('form').submit();
+}
+
+// CUSTOM TOAST FUNCTION
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast ' + type + ' show';
+
+    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    const title = type === 'success' ? 'Success!' : 'Error!';
+
+    toast.innerHTML = `
+        <i class="fas ${icon} toast-icon"></i>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <p class="toast-message">${message}</p>
+        </div>
+        <button class="toast-close" onclick="this.closest('.custom-toast').remove();">&times;</button>
+        <div class="toast-progress"></div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(function() {
+        toast.classList.remove('show');
+        setTimeout(function() {
+            toast.remove();
+        }, 500);
+    }, 3000);
+}
 </script>
 
 @endsection

@@ -1887,6 +1887,51 @@ async function loadDeliverableStates() {
                 renderPage();
             }
         }
+        function getCartItemImage(item) {
+
+    // 1. New cart item already has exact variant image
+    if (item.image) {
+        return item.image;
+    }
+
+    const product = productData[item.id];
+
+    if (!product) {
+        return productImages[item.id] || '';
+    }
+
+    let variant = null;
+
+    // 2. Find by variant_id
+    if (item.variant_id && product.variants) {
+        variant = product.variants.find(
+            v => String(v.id) === String(item.variant_id)
+        );
+    }
+
+    // 3. Fallback: find by size + color
+    if (!variant && product.variants) {
+        variant = product.variants.find(v =>
+            String(v.size || '') === String(item.size || '') &&
+            String(v.color || '') === String(item.color || '')
+        );
+    }
+
+    // 4. Find exact variant image
+    if (variant && product.product_images) {
+
+        const variantImage = product.product_images.find(
+            img => String(img.variant_id) === String(variant.id)
+        );
+
+        if (variantImage) {
+            return '/storage/' + variantImage.image_path;
+        }
+    }
+
+    // 5. Final fallback
+    return productImages[item.id] || '';
+}
 
         function getVariantBySizeColor(productId, size, color) {
             const product = productData[productId];
@@ -3447,7 +3492,7 @@ function updateGuestShipping() {
 
                 let stockText = stock > 0 ? (stock <= 5 ? `Only ${stock} left` : 'In Stock') : 'Out of Stock';
                 let stockClass = stock > 0 ? (stock <= 5 ? 'stock-low' : 'stock-available') : 'stock-out';
-                let imageUrl = productImages[item.id] || '';
+let imageUrl = getCartItemImage(item);
                 let variantDetails = '';
                 if (item.size) variantDetails += `Size: ${item.size}`;
                 if (item.size && item.color) variantDetails += ' | ';
@@ -3721,7 +3766,7 @@ function updateGuestShipping() {
             for (let item of cartData) {
                 let price = parseFloat(item.price) || 0;
                 let originalPrice = parseFloat(item.original_price) || price;
-                let imageUrl = productImages[item.id] || '';
+let imageUrl = getCartItemImage(item);
                 let color = item.color || '';
                 let size = item.size || '';
                 let detailsHtml = '';

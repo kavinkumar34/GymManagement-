@@ -2102,75 +2102,101 @@
         // ===== QUICK ADD TO CART MODAL FUNCTIONS =====
         // ================================================================
 
-        function openQuickCartModal(productData) {
-            modalProductData = productData;
-            modalAllVariants = productData.variants || [];
-            modalProductId = productData.id;
-            modalSelectedColor = null;
-            modalSelectedSize = null;
-            modalSelectedVariant = null;
+ // ================================================================
+// ===== OPEN QUICK CART MODAL - FIXED =====
+// ================================================================
 
-            document.getElementById('modalProductImage').src = productData.image;
-            document.getElementById('modalProductBrand').textContent = productData.brand || '';
-            document.getElementById('modalProductName').textContent = productData.name;
-            document.getElementById('modalViewDetailsLink').href = `/product/${productData.id}`;
+function openQuickCartModal(productData) {
+    modalProductData = productData;
+    modalAllVariants = productData.variants || [];
+    modalProductId = productData.id;
+    modalSelectedColor = null;
+    modalSelectedSize = null;
+    modalSelectedVariant = null;
 
-            if (modalAllVariants.length > 0) {
-                document.getElementById('modalVariantSection').style.display = 'block';
+    // Set product info
+    document.getElementById('modalProductImage').src = productData.image;
+    document.getElementById('modalProductBrand').textContent = productData.brand || '';
+    document.getElementById('modalProductName').textContent = productData.name;
+    document.getElementById('modalViewDetailsLink').href = `/product/${productData.id}`;
 
-                const colorSet = new Set();
-                modalAllVariants.forEach(v => {
-                    if (v.color && v.color.trim() !== '') colorSet.add(v.color);
-                });
-                const colors = Array.from(colorSet);
+    if (modalAllVariants.length > 0) {
+        document.getElementById('modalVariantSection').style.display = 'block';
 
-                const colorContainer = document.getElementById('modalColorOptions');
-                if (colors.length > 0) {
-                    document.getElementById('modalColorSection').style.display = 'block';
-                    colorContainer.innerHTML = '';
-                    colors.forEach((color, index) => {
-                        const isLightColor = ['white', 'yellow', 'pink', 'lightblue', 'lightgreen', 'cream',
-                            'beige', 'ivory', 'gold'
-                        ].includes(color.toLowerCase());
-                        const btn = document.createElement('div');
-                        btn.className = 'modal-color-btn' + (index === 0 ? ' selected' : '');
-                        btn.dataset.color = color;
-                        btn.style.background = color;
-                        if (isLightColor) btn.style.border = '3px solid #ddd';
-                        btn.innerHTML = `<span class="check-mark"><i class="fas fa-check"></i></span>`;
-                        btn.onclick = function() {
-                            document.querySelectorAll('.modal-color-btn').forEach(b => b.classList.remove(
-                            'selected'));
-                            this.classList.add('selected');
-                            modalSelectedColor = color;
-                            updateModalSizes(color);
-                            updateModalPrice(color);
-                        };
-                        colorContainer.appendChild(btn);
-                    });
+        const colorSet = new Set();
+        modalAllVariants.forEach(v => {
+            if (v.color && v.color.trim() !== '') colorSet.add(v.color);
+        });
+        const colors = Array.from(colorSet);
 
-                    modalSelectedColor = colors[0];
-                    updateModalSizes(colors[0]);
-                    updateModalPrice(colors[0]);
-                } else {
-                    document.getElementById('modalColorSection').style.display = 'none';
-                    updateModalSizes(null);
-                    updateModalPrice(null);
-                }
+        const colorContainer = document.getElementById('modalColorOptions');
+        if (colors.length > 0) {
+            document.getElementById('modalColorSection').style.display = 'block';
+            colorContainer.innerHTML = '';
+            colors.forEach((color, index) => {
+                const isLightColor = ['white', 'yellow', 'pink', 'lightblue', 'lightgreen', 'cream',
+                    'beige', 'ivory', 'gold'
+                ].includes(color.toLowerCase());
+                const btn = document.createElement('div');
+                btn.className = 'modal-color-btn' + (index === 0 ? ' selected' : '');
+                btn.dataset.color = color;
+                btn.style.background = color;
+                if (isLightColor) btn.style.border = '3px solid #ddd';
+                btn.innerHTML = `<span class="check-mark"><i class="fas fa-check"></i></span>`;
 
-            } else {
-                document.getElementById('modalVariantSection').style.display = 'none';
-                modalSelectedVariant = null;
-                updateModalPriceDisplay(productData.price, productData.original_price);
-                updateModalStockInfo(null);
+                btn.onclick = function() {
+                    document.querySelectorAll('.modal-color-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    modalSelectedColor = color;
+
+                    modalSelectedVariant = null;
+                    modalSelectedSize = null;
+
+                    updateModalSizes(color);
+                    updateModalPrice(color);
+
+                    // ✅ FIX: Show the first variant image for this color
+                    const colorVariants = modalAllVariants.filter(v => v.color === color);
+                    const firstColorVariant = colorVariants.find(v => v.stock > 0) || colorVariants[0];
+                    if (firstColorVariant && firstColorVariant.image) {
+                        document.getElementById('modalProductImage').src = firstColorVariant.image;
+                    }
+                };
+
+                colorContainer.appendChild(btn);
+            });
+
+            modalSelectedColor = colors[0];
+
+            // ✅ FIX: Show the first variant image for the first color
+            const firstColorVariants = modalAllVariants.filter(v => v.color === colors[0]);
+            const firstVariantForColor = firstColorVariants.find(v => v.stock > 0) || firstColorVariants[0];
+            if (firstVariantForColor && firstVariantForColor.image) {
+                document.getElementById('modalProductImage').src = firstVariantForColor.image;
             }
 
-            document.getElementById('modalQtyInput').value = 1;
-            document.getElementById('modalErrorMsg').style.display = 'none';
+            updateModalSizes(colors[0]);
+            updateModalPrice(colors[0]);
 
-            document.getElementById('quickCartModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+        } else {
+            document.getElementById('modalColorSection').style.display = 'none';
+            updateModalSizes(null);
+            updateModalPrice(null);
         }
+
+    } else {
+        document.getElementById('modalVariantSection').style.display = 'none';
+        modalSelectedVariant = null;
+        updateModalPriceDisplay(productData.price, productData.original_price);
+        updateModalStockInfo(null);
+    }
+
+    document.getElementById('modalQtyInput').value = 1;
+    document.getElementById('modalErrorMsg').style.display = 'none';
+
+    document.getElementById('quickCartModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
 
         function updateModalPrice(color) {
             let filteredVariants = modalAllVariants;
@@ -2197,73 +2223,92 @@
             }
         }
 
-        function updateModalSizes(color) {
-            const sizeContainer = document.getElementById('modalSizeOptions');
-            let filteredVariants = modalAllVariants;
+  // ================================================================
+// ===== UPDATE MODAL SIZES - FIXED =====
+// ================================================================
 
-            if (color) {
-                filteredVariants = modalAllVariants.filter(v => v.color === color);
+function updateModalSizes(color) {
+    const sizeContainer = document.getElementById('modalSizeOptions');
+    let filteredVariants = modalAllVariants;
+
+    if (color) {
+        filteredVariants = modalAllVariants.filter(v => v.color === color);
+    }
+
+    const sizes = filteredVariants.map(v => v.size).filter(s => s && s.trim() !== '');
+
+    if (sizes.length > 0) {
+        document.getElementById('modalSizeSection').style.display = 'block';
+        sizeContainer.innerHTML = '';
+        
+        let firstAvailableSizeBtn = null;
+        
+        sizes.forEach((size, index) => {
+            const variant = filteredVariants.find(v => v.size === size);
+            const isOutOfStock = (variant && variant.stock <= 0) || false;
+
+            const btn = document.createElement('button');
+            btn.className = 'modal-size-btn' + (isOutOfStock ? ' out-of-stock' : '');
+            btn.dataset.size = size;
+            btn.dataset.variantId = variant ? variant.id : null;
+            btn.dataset.stock = variant ? variant.stock : 0;
+            btn.dataset.price = variant ? variant.price : modalProductData.price;
+            btn.dataset.originalPrice = variant ? variant.original_price : modalProductData.original_price;
+            // ✅ FIX: Store the variant's image
+            btn.dataset.image = variant ? variant.image : modalProductData.image;
+            btn.textContent = size;
+            btn.disabled = isOutOfStock;
+
+            btn.onclick = function() {
+                if (this.disabled) return;
+                document.querySelectorAll('.modal-size-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                modalSelectedSize = this.dataset.size;
+                const vid = this.dataset.variantId;
+                modalSelectedVariant = modalAllVariants.find(v => v.id == vid) || null;
+
+                if (modalSelectedVariant) {
+                    updateModalPriceDisplay(modalSelectedVariant.price, modalSelectedVariant.original_price);
+                    // ✅ FIX: Show the selected variant's image
+                    if (modalSelectedVariant.image) {
+                        document.getElementById('modalProductImage').src = modalSelectedVariant.image;
+                    }
+                }
+                updateModalStockInfo(modalSelectedVariant);
+                document.getElementById('modalErrorMsg').style.display = 'none';
+            };
+
+            sizeContainer.appendChild(btn);
+            
+            if (!isOutOfStock && !firstAvailableSizeBtn) {
+                firstAvailableSizeBtn = btn;
             }
+        });
 
-            const sizes = filteredVariants.map(v => v.size).filter(s => s && s.trim() !== '');
-
-            if (sizes.length > 0) {
-                document.getElementById('modalSizeSection').style.display = 'block';
-                sizeContainer.innerHTML = '';
-                sizes.forEach((size, index) => {
-                    const variant = filteredVariants.find(v => v.size === size);
-                    const isOutOfStock = (variant && variant.stock <= 0) || false;
-
-                    const btn = document.createElement('button');
-                    btn.className = 'modal-size-btn' + (index === 0 && !isOutOfStock ? ' selected' : '') + (isOutOfStock ?
-                        ' out-of-stock' : '');
-                    btn.dataset.size = size;
-                    btn.dataset.variantId = variant ? variant.id : null;
-                    btn.dataset.stock = variant ? variant.stock : 0;
-                    btn.dataset.price = variant ? variant.price : modalProductData.price;
-                    btn.dataset.originalPrice = variant ? variant.original_price : modalProductData.original_price;
-                    btn.textContent = size;
-                    btn.disabled = isOutOfStock;
-
-                    btn.onclick = function() {
-                        if (this.disabled) return;
-                        document.querySelectorAll('.modal-size-btn').forEach(b => b.classList.remove(
-                        'selected'));
-                        this.classList.add('selected');
-                        modalSelectedSize = this.dataset.size;
-                        const vid = this.dataset.variantId;
-                        modalSelectedVariant = modalAllVariants.find(v => v.id == vid) || null;
-                        if (modalSelectedVariant) {
-                            updateModalPriceDisplay(modalSelectedVariant.price, modalSelectedVariant
-                            .original_price);
-                        }
-                        updateModalStockInfo(modalSelectedVariant);
-                        document.getElementById('modalErrorMsg').style.display = 'none';
-                    };
-
-                    sizeContainer.appendChild(btn);
-                });
-
-                const firstSizeBtn = sizeContainer.querySelector('.modal-size-btn:not(.out-of-stock)');
-                if (firstSizeBtn) {
-                    firstSizeBtn.click();
-                } else {
-                    modalSelectedSize = null;
-                    modalSelectedVariant = null;
-                    updateModalStockInfo(null);
-                }
-            } else {
-                document.getElementById('modalSizeSection').style.display = 'none';
-                modalSelectedSize = null;
-                modalSelectedVariant = null;
-                const firstVariant = filteredVariants.find(v => v.stock > 0) || filteredVariants[0];
-                if (firstVariant) {
-                    updateModalPriceDisplay(firstVariant.price, firstVariant.original_price);
-                }
-                updateModalStockInfo(null);
+        if (firstAvailableSizeBtn) {
+            firstAvailableSizeBtn.click();
+        } else {
+            modalSelectedSize = null;
+            modalSelectedVariant = null;
+            updateModalStockInfo(null);
+            document.getElementById('modalErrorMsg').textContent = 'No sizes available for this color';
+            document.getElementById('modalErrorMsg').style.display = 'block';
+        }
+    } else {
+        document.getElementById('modalSizeSection').style.display = 'none';
+        modalSelectedSize = null;
+        modalSelectedVariant = null;
+        const firstVariant = filteredVariants.find(v => v.stock > 0) || filteredVariants[0];
+        if (firstVariant) {
+            updateModalPriceDisplay(firstVariant.price, firstVariant.original_price);
+            // ✅ FIX: Show the first variant's image
+            if (firstVariant.image) {
+                document.getElementById('modalProductImage').src = firstVariant.image;
             }
         }
-
+        updateModalStockInfo(null);
+    }
+}
         function updateModalStockInfo(variant) {
             const stockInfo = document.getElementById('modalStockInfo');
             const stockText = document.getElementById('modalStockText');
@@ -2329,89 +2374,108 @@
             if (val >= 1) input.value = val;
         }
 
-        function modalAddToCart() {
-            const errorMsg = document.getElementById('modalErrorMsg');
+    // ================================================================
+// ===== MODAL ADD TO CART - FIXED =====
+// ================================================================
 
-            if (modalAllVariants.length > 0) {
-                if (!modalSelectedSize) {
-                    errorMsg.textContent = 'Please select a size';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-                if (!modalSelectedVariant) {
-                    errorMsg.textContent = 'Selected variant is not available';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-                if (modalSelectedVariant.stock <= 0) {
-                    errorMsg.textContent = 'Selected size is out of stock!';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-            }
+function modalAddToCart() {
+    const errorMsg = document.getElementById('modalErrorMsg');
 
-            errorMsg.style.display = 'none';
-
-            const quantity = parseInt(document.getElementById('modalQtyInput').value);
-
-            const productId = modalProductData.id;
-            const productName = modalProductData.name;
-            const price = modalSelectedVariant ? modalSelectedVariant.price : modalProductData.price;
-            const image = modalProductData.image;
-            const variantId = modalSelectedVariant ? modalSelectedVariant.id : null;
-            const size = modalSelectedSize || null;
-            const color = modalSelectedColor || null;
-
-            if (modalSelectedVariant && quantity > modalSelectedVariant.stock) {
-                errorMsg.textContent = 'Only ' + modalSelectedVariant.stock + ' items available!';
-                errorMsg.style.display = 'block';
-                return;
-            }
-
-            let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-
-            let existingItem = currentCart.find(item =>
-                item.id === productId &&
-                item.variant_id === variantId &&
-                item.size === size &&
-                item.color === color
-            );
-
-            if (existingItem) {
-                const maxStock = modalSelectedVariant ? modalSelectedVariant.stock : 999;
-                if (existingItem.quantity + quantity > maxStock) {
-                    errorMsg.textContent = 'Only ' + maxStock + ' items available!';
-                    errorMsg.style.display = 'block';
-                    return;
-                }
-                existingItem.quantity += quantity;
-            } else {
-                currentCart.push({
-                    id: productId,
-                    name: productName,
-                    price: price,
-                    original_price: modalProductData.original_price || price,
-                    image: image,
-                    quantity: quantity,
-                    size: size,
-                    color: color,
-                    variant_id: variantId
-                });
-            }
-
-            localStorage.setItem('cart', JSON.stringify(currentCart));
-            cart = currentCart;
-            updateNavbarCartCount();
-
-            closeQuickCartModal();
-
-            showToast(productName + ' added to cart!', 'success');
-
-            setTimeout(() => {
-                window.location.href = "{{ route('cart') }}";
-            }, 500);
+    if (modalAllVariants.length > 0) {
+        if (!modalSelectedSize) {
+            errorMsg.textContent = 'Please select a size';
+            errorMsg.style.display = 'block';
+            return;
         }
+        if (!modalSelectedVariant) {
+            errorMsg.textContent = 'Selected variant is not available';
+            errorMsg.style.display = 'block';
+            return;
+        }
+        if (modalSelectedVariant.stock <= 0) {
+            errorMsg.textContent = 'Selected size is out of stock!';
+            errorMsg.style.display = 'block';
+            return;
+        }
+    }
 
+    errorMsg.style.display = 'none';
+
+    const quantity = parseInt(document.getElementById('modalQtyInput').value);
+
+    const productId = modalProductData.id;
+    const productName = modalProductData.name;
+
+    // ✅ FIX: Use the correct price and image from selected variant
+    const price = modalSelectedVariant
+        ? modalSelectedVariant.price
+        : modalProductData.price;
+
+    const originalPrice = modalSelectedVariant
+        ? modalSelectedVariant.original_price
+        : modalProductData.original_price;
+
+    // ✅ FIX: Use the selected variant's image
+    const image = modalSelectedVariant && modalSelectedVariant.image
+        ? modalSelectedVariant.image
+        : modalProductData.image;
+
+    const variantId = modalSelectedVariant
+        ? modalSelectedVariant.id
+        : null;
+
+    const size = modalSelectedSize || null;
+    const color = modalSelectedColor || null;
+
+    if (modalSelectedVariant && quantity > modalSelectedVariant.stock) {
+        errorMsg.textContent = 'Only ' + modalSelectedVariant.stock + ' items available!';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    let existingItem = currentCart.find(item =>
+        item.id === productId &&
+        item.variant_id === variantId &&
+        item.size === size &&
+        item.color === color
+    );
+
+    if (existingItem) {
+        const maxStock = modalSelectedVariant ? modalSelectedVariant.stock : 999;
+        if (existingItem.quantity + quantity > maxStock) {
+            errorMsg.textContent = 'Only ' + maxStock + ' items available!';
+            errorMsg.style.display = 'block';
+            return;
+        }
+        existingItem.quantity += quantity;
+    } else {
+        currentCart.push({
+            id: productId,
+            name: productName,
+            price: price,
+            original_price: originalPrice,
+            image: image, // ✅ FIX: Store the selected variant's image
+            quantity: quantity,
+            size: size,
+            color: color,
+            variant_id: variantId
+        });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(currentCart));
+    cart = currentCart;
+    updateNavbarCartCount();
+
+    closeQuickCartModal();
+
+    showToast(productName + ' added to cart!', 'success');
+
+    setTimeout(() => {
+        window.location.href = "{{ route('cart') }}";
+    }, 500);
+}
         function closeQuickCartModal() {
             document.getElementById('quickCartModal').classList.remove('active');
             document.body.style.overflow = '';
@@ -2817,95 +2881,156 @@
         // ===== GET VARIANT DATA WITH COLORS =====
         // ================================================================
 
-        function getVariantData(product) {
-            if (product.variants && product.variants.length > 0) {
-                const firstVariant = product.variants[0];
+    // ================================================================
+// ===== GET VARIANT DATA WITH COLORS AND IMAGES - FIXED =====
+// ================================================================
 
-                let variantImages = [];
-                if (product.product_images && product.product_images.length > 0) {
-                    const variantImageObjs = product.product_images.filter(img => img.variant_id == firstVariant.id);
-                    if (variantImageObjs.length > 0) {
-                        const sortedImages = [...variantImageObjs].sort((a, b) => {
-                            if (a.is_main !== b.is_main) return b.is_main - a.is_main;
-                            return (a.display_order || 0) - (b.display_order || 0);
-                        });
-                        variantImages = sortedImages.map(img => '/storage/' + img.image_path);
-                    }
-                }
+function getVariantData(product) {
+    if (product.variants && product.variants.length > 0) {
+        const firstVariant = product.variants[0];
 
-                if (variantImages.length === 0 && product.image) {
-                    variantImages.push('/storage/' + product.image);
-                }
+        let mainImage = null;
+        if (product.product_images && product.product_images.length > 0) {
+            const sortedImages = [...product.product_images].sort((a, b) => {
+                if (a.is_main !== b.is_main) return b.is_main - a.is_main;
+                return (a.display_order || 0) - (b.display_order || 0);
+            });
+            if (sortedImages.length > 0) {
+                mainImage = '/storage/' + sortedImages[0].image_path;
+            }
+        }
+        if (!mainImage && product.image) {
+            mainImage = '/storage/' + product.image;
+        }
 
-                let totalStock = 0;
-                product.variants.forEach(v => {
-                    totalStock += parseInt(v.stock) || 0;
+        let variantImages = [];
+        if (product.product_images && product.product_images.length > 0) {
+            const variantImageObjs = product.product_images.filter(img => img.variant_id == firstVariant.id);
+            if (variantImageObjs.length > 0) {
+                const sortedImages = [...variantImageObjs].sort((a, b) => {
+                    if (a.is_main !== b.is_main) return b.is_main - a.is_main;
+                    return (a.display_order || 0) - (b.display_order || 0);
                 });
+                variantImages = sortedImages.map(img => '/storage/' + img.image_path);
+            }
+        }
 
-                let colors = [];
-                if (product.variants && product.variants.length > 0) {
-                    const colorSet = new Set();
-                    product.variants.forEach(variant => {
-                        if (variant.color && variant.color.trim() !== '') {
-                            colorSet.add(variant.color);
-                        }
-                    });
-                    colors = Array.from(colorSet);
+        if (variantImages.length === 0 && product.image) {
+            variantImages.push('/storage/' + product.image);
+        }
+
+        if (variantImages.length === 0 && mainImage) {
+            variantImages.push(mainImage);
+        }
+
+        let totalStock = 0;
+        product.variants.forEach(v => {
+            totalStock += parseInt(v.stock) || 0;
+        });
+
+        let colors = [];
+        if (product.variants && product.variants.length > 0) {
+            const colorSet = new Set();
+            product.variants.forEach(variant => {
+                if (variant.color && variant.color.trim() !== '') {
+                    colorSet.add(variant.color);
                 }
+            });
+            colors = Array.from(colorSet);
+        }
 
-                const originalPrice = parseFloat(firstVariant.total_price) || parseFloat(firstVariant.mrp) || parseFloat(
-                    firstVariant.price) || 0;
-                const displayPrice = parseFloat(firstVariant.final_price) || parseFloat(firstVariant.price) || 0;
+        const originalPrice = parseFloat(firstVariant.total_price) || parseFloat(firstVariant.mrp) || parseFloat(
+            firstVariant.price) || 0;
+        const displayPrice = parseFloat(firstVariant.final_price) || parseFloat(firstVariant.price) || 0;
 
-                // Build variants for modal
-                const variantsForModal = product.variants.map(v => ({
-                    id: v.id,
-                    size: v.size || null,
-                    color: v.color || null,
-                    price: parseFloat(v.final_price) || parseFloat(v.price) || 0,
-                    original_price: parseFloat(v.total_price) || parseFloat(v.mrp) || parseFloat(v.price) || 0,
-                    stock: parseInt(v.stock) || 0,
-                    discount_type: v.discount_type || 'flat',
-                    discount_value: parseFloat(v.discount_value) || 0
-                }));
+        // ✅ FIX: Build variants with CORRECT images for EACH variant
+        const variantsForModal = product.variants.map(v => {
+            // Get images belonging ONLY to this variant
+            let variantImagesForModal = [];
 
-                return {
-                    hasVariant: true,
-                    image: variantImages[0] || null,
-                    allImages: variantImages,
-                    price: displayPrice,
-                    originalPrice: originalPrice,
-                    discountType: firstVariant.discount_type || 'flat',
-                    discountValue: parseFloat(firstVariant.discount_value) || 0,
-                    stock: parseInt(firstVariant.stock) || 0,
-                    totalStock: totalStock,
-                    variantId: firstVariant.id,
-                    colors: colors,
-                    variantCount: product.variants.length,
-                    variants: variantsForModal
-                };
+            if (product.product_images && product.product_images.length > 0) {
+                variantImagesForModal = product.product_images.filter(
+                    img => String(img.variant_id) === String(v.id)
+                );
             }
 
-            const originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || parseFloat(product.price) ||
-                0;
-            const displayPrice = parseFloat(product.final_price) || parseFloat(product.price) || 0;
+            variantImagesForModal.sort((a, b) => {
+                if (a.is_main !== b.is_main) return Number(b.is_main) - Number(a.is_main);
+                return (a.display_order || 0) - (b.display_order || 0);
+            });
+
+            let variantImage = null;
+            if (variantImagesForModal.length > 0) {
+                variantImage = '/storage/' + variantImagesForModal[0].image_path;
+            } else {
+                // Fallback to product main image
+                variantImage = mainImage;
+            }
 
             return {
-                hasVariant: false,
-                image: null,
-                allImages: [],
-                price: displayPrice,
-                originalPrice: originalPrice,
-                discountType: product.discount_type || 'flat',
-                discountValue: parseFloat(product.discount_value) || 0,
-                stock: parseInt(product.stock) || 0,
-                totalStock: parseInt(product.stock) || 0,
-                variantId: null,
-                colors: [],
-                variantCount: 0,
-                variants: []
+                id: v.id,
+                size: v.size || null,
+                color: v.color || null,
+                price: parseFloat(v.final_price) || parseFloat(v.price) || 0,
+                original_price: parseFloat(v.total_price) || parseFloat(v.mrp) || parseFloat(v.price) || 0,
+                stock: parseInt(v.stock) || 0,
+                discount_type: v.discount_type || 'flat',
+                discount_value: parseFloat(v.discount_value) || 0,
+                image: variantImage // ✅ Each variant has its own image
             };
+        });
+
+        return {
+            hasVariant: true,
+            image: variantImages[0] || mainImage,
+            allImages: variantImages,
+            price: displayPrice,
+            originalPrice: originalPrice,
+            discountType: firstVariant.discount_type || 'flat',
+            discountValue: parseFloat(firstVariant.discount_value) || 0,
+            stock: parseInt(firstVariant.stock) || 0,
+            totalStock: totalStock,
+            variantId: firstVariant.id,
+            colors: colors,
+            variantCount: product.variants.length,
+            variants: variantsForModal
+        };
+    }
+
+    const originalPrice = parseFloat(product.total_price) || parseFloat(product.mrp) || parseFloat(product.price) ||
+        0;
+    const displayPrice = parseFloat(product.final_price) || parseFloat(product.price) || 0;
+
+    let mainImage = null;
+    if (product.product_images && product.product_images.length > 0) {
+        const sortedImages = [...product.product_images].sort((a, b) => {
+            if (a.is_main !== b.is_main) return b.is_main - a.is_main;
+            return (a.display_order || 0) - (b.display_order || 0);
+        });
+        if (sortedImages.length > 0) {
+            mainImage = '/storage/' + sortedImages[0].image_path;
         }
+    }
+    if (!mainImage && product.image) {
+        mainImage = '/storage/' + product.image;
+    }
+
+    return {
+        hasVariant: false,
+        image: mainImage,
+        allImages: [],
+        price: displayPrice,
+        originalPrice: originalPrice,
+        discountType: product.discount_type || 'flat',
+        discountValue: parseFloat(product.discount_value) || 0,
+        stock: parseInt(product.stock) || 0,
+        totalStock: parseInt(product.stock) || 0,
+        variantId: null,
+        colors: [],
+        variantCount: 0,
+        variants: []
+    };
+}
 
         // ================================================================
         // ===== CALCULATE DISCOUNT =====
