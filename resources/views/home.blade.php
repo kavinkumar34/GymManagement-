@@ -85,33 +85,33 @@
             background: var(--ink);
         }
 
-        .banner-full-width .carousel,
-        .banner-full-width .carousel-inner,
-        .banner-full-width .carousel-item {
-            width: 100%;
-            height: 500px;
-        }
+     .banner-full-width .carousel,
+.banner-full-width .carousel-inner,
+.banner-full-width .carousel-item {
+    width: 100%;
+    height: 550px;
+}
 
-        .banner-full-width .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: fill;
-            display: block;
-        }
+.banner-full-width .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+}
 
-        .banner-placeholder {
-            width: 100%;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1D2026 0%, #14161A 100%);
-            color: #F4F2EC;
-            font-family: var(--font-body);
-            font-weight: 600;
-            font-size: 1.1rem;
-            letter-spacing: 0.3px;
-        }
+.banner-placeholder {
+    width: 100%;
+    height: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1D2026 0%, #14161A 100%);
+    color: #F4F2EC;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1.1rem;
+    letter-spacing: 0.3px;
+}
 
         .banner-placeholder i {
             font-size: 2.2rem;
@@ -856,7 +856,6 @@
 
         .about-section {
             padding: 50px 0;
-            border-bottom: 1px solid var(--line);
         }
 
         .about-section:last-child {
@@ -1771,6 +1770,19 @@
         .about-section .row {
             animation: fadeInUp 0.6s ease forwards;
         }
+
+        /* ===== FULL WIDTH CATEGORY BACKGROUND ===== */
+.category-section-full {
+    width: 100%;
+    background: #f8f6f2;
+    padding: 50px 0;
+    margin-bottom: 30px;
+}
+
+.category-section-full .shop-section {
+    padding-top: 0;
+    padding-bottom: 0;
+}
     </style>
 
     <!-- ===== CUSTOM ALERT OVERLAY ===== -->
@@ -1876,7 +1888,7 @@
             </div>
             <div class="col-md-6 about-content">
                 <h3><i class="fas fa-store"></i> About Our Online Store</h3>
-                <p>Welcome to <strong>FitForge Athletics</strong> - your one-stop destination for all fitness needs! We are
+                <p>Welcome to <strong>Gym E Commerce</strong> - your one-stop destination for all fitness needs! We are
                     India's fastest-growing online fitness store, offering premium quality gym equipment, authentic
                     supplements, stylish gym wear, and fitness accessories.</p>
                 <p>Since our launch, we have served over <strong>10,000+ satisfied customers</strong> across India with fast
@@ -1890,15 +1902,18 @@
         </div>
     </div>
 
-    <!-- ===== CATEGORY SECTION ===== -->
-    <div class="container shop-section" style="background: #f8f6f2; padding: 50px 30px; border-radius: 18px; margin-bottom: 30px;">
+<!-- ===== CATEGORY SECTION ===== -->
+<div class="category-section-full">
+    <div class="container shop-section">
         <div class="shop-section-header text-center">
             <span class="section-eyebrow d-block">Browse the Range</span>
             <h2 class="section-heading mb-2" style="font-size: 2rem;">Shop by Category</h2>
             <div class="energy-stripe mx-auto"></div>
         </div>
+
         <div class="row category-row" id="categoryContainer"></div>
     </div>
+</div>
 
     <!-- ===== PRODUCTS SECTION ===== -->
     <div class="container shop-section" style="padding-bottom: 24px;">
@@ -2003,10 +2018,10 @@
 
                     bannerHtml += `
                         <div class="carousel-item ${isActive}">
-                            ${banner.link ? `<a href="${banner.link}" target="_self" style="display:block;width:100%;height:500px;">` : ''}
-                            <img src="${imageUrl}"
-                                 alt="Banner"
-                                 style="display:block;width:100%;height:500px;object-fit:fill;">
+                       ${banner.link ? `<a href="${banner.link}" target="_self" style="display:block;width:100%;height:550px;">` : ''}
+<img src="${imageUrl}"
+     alt="Banner"
+     style="display:block;width:100%;height:550px;object-fit:fill;">
                             ${banner.link ? `</a>` : ''}
                         </div>
                     `;

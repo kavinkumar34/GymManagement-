@@ -182,19 +182,36 @@
             cursor: pointer;
         }
 
-        .main-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            padding: 0;
-            display: block;
-            transition: transform 0.3s ease;
-        }
+    /* ===== MAIN PRODUCT IMAGE ===== */
+.main-image-area {
+    flex: 1;
+    width: 100%;
+    height: 550px;
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    cursor: pointer;
+}
 
-        .main-image-area:hover .main-image {
-            transform: scale(1.05);
-        }
+.main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 15px;
+    display: block;
+    transition: transform 0.25s ease;
+}
+
+/* Small zoom only — image won't get cropped */
+.main-image-area:hover .main-image {
+    transform: scale(1.02);
+}
 
         .vertical-thumbnails {
             display: flex;
@@ -226,11 +243,39 @@
             flex-shrink: 0;
         }
 
-        .vertical-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+     .vertical-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vertical-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    padding: 4px;
+    display: block;
+}
+
+.vertical-thumb.active {
+    border-color: var(--signal);
+    box-shadow: 0 0 8px rgba(255, 68, 5, 0.3);
+}
+
+.vertical-thumb:hover {
+    transform: scale(1.03);
+    border-color: var(--signal);
+}
 
         .vertical-thumb.active {
             border-color: var(--signal);
@@ -536,6 +581,8 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+                margin-left: 5px;
+
         }
 
         .color-btn {
@@ -564,21 +611,77 @@
             transform: scale(1.1);
         }
 
-        .color-btn .color-name-tooltip {
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            color: var(--steel);
-            white-space: nowrap;
-            display: none;
-            font-weight: 600;
-        }
+    /* ===== COLOR OPTIONS ===== */
+.color-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-left: 5px;
+    padding-bottom: 24px;
+    position: relative;
+}
 
-        .color-btn:hover .color-name-tooltip {
-            display: block;
-        }
+/* ===== COLOR BUTTON ===== */
+.color-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid var(--line);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+}
+
+.color-btn:hover {
+    transform: scale(1.08);
+    border-color: var(--steel);
+}
+
+.color-btn.selected {
+    border-color: var(--signal);
+    box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.25);
+    transform: scale(1.08);
+}
+
+/* ===== COLOR NAME ===== */
+.color-btn .color-name-tooltip {
+    position: absolute;
+    top: calc(100% + 7px);
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    line-height: 1;
+    color: var(--steel);
+    white-space: nowrap;
+    display: none;
+    font-weight: 600;
+    z-index: 20;
+    pointer-events: none;
+    background: var(--canvas);
+    padding: 2px 4px;
+}
+
+.color-btn:hover .color-name-tooltip {
+    display: block;
+}
+
+.color-btn .check-mark {
+    display: none;
+    color: white;
+    font-size: 14px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.color-btn.selected .check-mark {
+    display: block;
+}
 
         .color-btn .check-mark {
             display: none;
@@ -702,13 +805,25 @@
             transition: color 0.3s ease;
         }
 
-        .size-btn:hover .discount-text {
-            color: var(--ink) !important;
-        }
+      /* Normal - white */
+.size-btn .discount-text {
+    color: white !important;
+}
 
-        .size-btn.selected .discount-text {
-            color: white !important;
-        }
+/* Hover - black */
+.size-btn:hover .discount-text {
+    color: #000000 !important;
+}
+
+/* Selected - normal white */
+.size-btn.selected .discount-text {
+    color: white !important;
+}
+
+/* Selected + Hover - black */
+.size-btn.selected:hover .discount-text {
+    color: #000000 !important;
+}
 
         /* ============================================================ */
         /* ===== QUANTITY SECTION ===== */
