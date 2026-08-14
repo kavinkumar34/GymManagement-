@@ -91,7 +91,6 @@
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-box"></i> <span>Products</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu-custom">
                 <li>
@@ -147,7 +146,6 @@
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-star"></i> <span>Reviews</span>
-                <span class="dropdown-arrow">▼</span>
                 @if ($pendingReviewsCount > 0)
                     <span class="badge bg-warning ms-2">{{ $pendingReviewsCount }}</span>
                 @endif
@@ -205,7 +203,6 @@
 <li class="nav-item has-dropdown">
     <a class="nav-link dropdown-toggle" href="javascript:void(0)">
         <i class="fas fa-chart-pie"></i> <span>Reports</span>
-        <span class="dropdown-arrow">▼</span>
     </a>
     <ul class="dropdown-menu-custom">
         <li>
@@ -288,7 +285,6 @@
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-ticket-alt"></i> <span>Coupons</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu-custom">
                 <li>
@@ -327,7 +323,6 @@
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-users"></i> <span>Members</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu-custom">
                 <li>
@@ -348,7 +343,6 @@
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-chalkboard-user"></i> <span>Trainers</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu-custom">
                 <li>
@@ -371,7 +365,6 @@
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-id-card"></i>
                 <span>Membership</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
 
             <ul class="dropdown-menu-custom">
@@ -397,7 +390,6 @@
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-id-card"></i>
                 <span>Package</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
 
             <ul class="dropdown-menu-custom">
@@ -421,7 +413,6 @@
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-user-tag"></i>
                 <span>Assign Trainer</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu-custom">
                 <li>
@@ -441,7 +432,6 @@
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-user-tag"></i>
                 <span>Payments</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu-custom">
                 <li>
@@ -466,7 +456,6 @@
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-user-tag"></i>
                 <span>Attendance</span>
-                <span class="dropdown-arrow">▼</span>
             </a>
             <ul class="dropdown-menu-custom">
                 <li>
