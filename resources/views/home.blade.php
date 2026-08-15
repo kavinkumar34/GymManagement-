@@ -827,7 +827,7 @@
         /* ===== SECTION WRAPPERS / HEADERS ===== */
         /* ============================================================ */
         .shop-section {
-            padding-top: 48px;
+            padding-top: 8px;
         }
 
         .shop-section-header {
@@ -855,7 +855,7 @@
            ================================================================ */
 
         .about-section {
-            padding: 50px 0;
+            padding: 30px 0;
         }
 
         .about-section:last-child {
@@ -1775,7 +1775,7 @@
 .category-section-full {
     width: 100%;
     background: #f8f6f2;
-    padding: 50px 0;
+    padding: 20px 0;
     margin-bottom: 30px;
 }
 
@@ -1920,7 +1920,7 @@
         <div class="shop-section-header d-flex justify-content-between align-items-end mb-4">
             <div>
                 <span class="section-eyebrow d-block">Handpicked For You</span>
-                <h2 class="section-heading" style="font-size: 2rem;">Best Selling Products</h2>
+                <h2 class="section-heading" style="font-size: 2rem;">New Arrivals Products</h2>
             </div>
             <a href="/shop" class="view-all-link">View All &rarr;</a>
         </div>
