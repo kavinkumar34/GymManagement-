@@ -1474,6 +1474,7 @@
                                 <th class="text-center" style="width:90px;">Shipping</th>
                                 <th class="text-center" style="width:110px;">Order Status</th>
                                 <th class="text-center" style="width:100px;">Payment Status</th>
+                                <th class="text-center" style="width:100px;">Refund Status</th>
                                 <th class="text-center" style="width:140px;">Actions</th>
                             </tr>
                         </thead>
@@ -1531,6 +1532,29 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td class="text-center" id="refund-cell-{{ $order->id }}">
+                                        @if($order->order_status == 'Cancelled')
+                                            @if($order->payment_status == 'SUCCESS')
+                                                @if($order->refund_status == 'completed')
+                                                    <span class="payment-badge success" id="refund-badge-{{ $order->id }}">
+                                                        <span class="dot"></span> Completed
+                                                    </span>
+                                                @elseif($order->refund_status == 'processing')
+                                                    <span class="payment-badge pending" id="refund-badge-{{ $order->id }}">
+                                                        <span class="dot"></span> Processing
+                                                    </span>
+                                                @else
+                                                    <span class="payment-badge failed" id="refund-badge-{{ $order->id }}">
+                                                        <span class="dot"></span> Pending
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span style="font-size:11px; color:#94a3b8;">—</span>
+                                            @endif
+                                        @else
+                                            <span style="font-size:11px; color:#94a3b8;">—</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <div class="action-btns">
                                             <button class="btn-action view"
@@ -1539,7 +1563,8 @@
                                             </button>
                                             <div class="dropdown">
                                                 <button class="status-dropdown-btn dropdown-toggle" type="button"
-                                                    data-bs-toggle="dropdown" id="status-btn-{{ $order->id }}">
+                                                    data-bs-toggle="dropdown" id="status-btn-{{ $order->id }}"
+                                                    @if($order->order_status == 'Cancelled') disabled style="opacity:0.5; cursor:not-allowed;" @endif>
                                                     <i class="fas fa-sync-alt"></i> Status
                                                 </button>
                                                 <ul class="dropdown-menu" id="status-menu-{{ $order->id }}">
@@ -1572,7 +1597,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="10">
+                                    <td colspan="11">
                                         <div class="empty-state">
                                             <i class="fas fa-shopping-cart"></i>
                                             <h5>No Orders Found</h5>
@@ -1670,6 +1695,48 @@
                         <div class="section-title"><i class="fas fa-box"></i> Order Items</div>
                         <div id="modalOrderItems"></div>
                     </div>
+
+                    <!-- ===== CANCELLATION DETAILS SECTION ===== -->
+                    <div class="detail-section" id="cancellationDetailsSection" style="display:none;">
+                        <div class="section-title"><i class="fas fa-times-circle" style="color:#ef5350;"></i> Cancellation Details</div>
+                        <div class="info-row">
+                            <span class="info-label">Cancellation Reason:</span>
+                            <span class="info-value" id="adminModalCancelReason">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Cancellation Comment:</span>
+                            <span class="info-value" id="adminModalCancelComment">-</span>
+                        </div>
+                    </div>
+
+                    <!-- ===== REFUND MANAGEMENT SECTION ===== -->
+                    <div class="detail-section" id="refundManagementSection" style="display:none;">
+                        <div class="section-title"><i class="fas fa-undo-alt" style="color:#f59e0b;"></i> Refund Management</div>
+                        <div class="info-row">
+                            <span class="info-label">Refund Status:</span>
+                            <span class="info-value" id="adminModalRefundStatus">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Refund Amount:</span>
+                            <span class="info-value" id="adminModalRefundAmount">-</span>
+                        </div>
+                        <div id="refundAction" style="display:none; margin-top:12px; padding-top:12px; border-top:1px solid #f0f0f0;">
+                            <div class="info-row">
+                                <span class="info-label">Update Refund:</span>
+                                <span class="info-value">
+                                    <select id="refundStatusSelect" class="form-control" style="width:200px; display:inline-block; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0; font-size:13px;">
+                                        <option value="pending">⏳ Pending</option>
+                                        <option value="processing">🔄 Processing</option>
+                                        <option value="completed">✅ Completed</option>
+                                    </select>
+                                    <button onclick="updateRefundStatus()" class="btn btn-primary btn-sm" style="background:#4a9eff; color:white; border:none; padding:4px 16px; border-radius:6px; font-weight:500; margin-left:8px;">
+                                        <i class="fas fa-save"></i> Update
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
@@ -1874,123 +1941,239 @@
         // ============================================
         // VIEW ORDER DETAILS
         // ============================================
-    function viewOrderDetails(orderId) {
-    document.getElementById('modalShippingAddress').innerHTML = '<div class="address-card">Loading address...</div>';
+        function viewOrderDetails(orderId) {
+            document.getElementById('modalShippingAddress').innerHTML = '<div class="address-card">Loading address...</div>';
 
-    fetch('/admin/payments/' + orderId)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            if (data.success) {
-                var order = data.order;
+            fetch('/admin/payments/' + orderId)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        var order = data.order;
 
-                // ★★★ LOG THE FULL ORDER DATA ★★★
-                console.log('🔍 Full Order Data:', order);
-                console.log('🔍 Shipping Address:', order.shipping_address);
+                        console.log('🔍 Full Order Data:', order);
+                        console.log('🔍 Shipping Address:', order.shipping_address);
 
-                document.getElementById('modalOrderNumber').innerText = order.order_number;
-                document.getElementById('modalOrderStatus').innerText = order.order_status;
-                document.getElementById('modalOrderStatus').className = 'order-status-badge ' + order.order_status;
-                document.getElementById('modalOrderDate').innerText = new Date(order.order_date || order.created_at).toLocaleString();
-                document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
-                document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
-                document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
-                document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
-                document.getElementById('modalTotal').innerText = '₹' + parseFloat(order.total_amount).toFixed(2);
+                        document.getElementById('modalOrderNumber').innerText = order.order_number;
+                        document.getElementById('modalOrderStatus').innerText = order.order_status;
+                        document.getElementById('modalOrderStatus').className = 'order-status-badge ' + order.order_status;
+                        document.getElementById('modalOrderDate').innerText = new Date(order.order_date || order.created_at).toLocaleString();
+                        document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
+                        document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
+                        document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
+                        document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
+                        document.getElementById('modalTotal').innerText = '₹' + parseFloat(order.total_amount).toFixed(2);
 
-                var paymentMethod = order.payment_method || 'N/A';
-                document.getElementById('modalPaymentMethod').innerHTML =
-                    '<span class="payment-method-badge"><i class="fas fa-credit-card"></i> ' + paymentMethod +
-                    '</span>';
+                        var paymentMethod = order.payment_method || 'N/A';
+                        document.getElementById('modalPaymentMethod').innerHTML =
+                            '<span class="payment-method-badge"><i class="fas fa-credit-card"></i> ' + paymentMethod +
+                            '</span>';
 
-                var paymentStatus = order.payment_status || 'PENDING';
-                var statusHtml = '';
-                if (paymentStatus === 'SUCCESS') {
-                    statusHtml = '<span class="payment-badge success"><span class="dot"></span> Paid</span>';
-                } else if (paymentStatus === 'FAILED') {
-                    statusHtml = '<span class="payment-badge failed"><span class="dot"></span> Failed</span>';
-                } else {
-                    statusHtml = '<span class="payment-badge pending"><span class="dot"></span> Pending</span>';
-                }
-                document.getElementById('modalPaymentStatus').innerHTML = statusHtml;
+                        var paymentStatus = order.payment_status || 'PENDING';
+                        var statusHtml = '';
+                        if (paymentStatus === 'SUCCESS') {
+                            statusHtml = '<span class="payment-badge success"><span class="dot"></span> Paid</span>';
+                        } else if (paymentStatus === 'FAILED') {
+                            statusHtml = '<span class="payment-badge failed"><span class="dot"></span> Failed</span>';
+                        } else {
+                            statusHtml = '<span class="payment-badge pending"><span class="dot"></span> Pending</span>';
+                        }
+                        document.getElementById('modalPaymentStatus').innerHTML = statusHtml;
 
-                var itemsHtml = '';
-                if (order.items && order.items.length > 0) {
-                    for (var i = 0; i < order.items.length; i++) {
-                        var item = order.items[i];
-                        itemsHtml += '<div class="order-item">' +
-                            '<div class="order-item-image">' +
-                            (item.product_image ? '<img src="/storage/' + item.product_image + '" alt="' + item.product_name + '">' : '<i class="fas fa-tshirt fa-2x text-muted"></i>') +
-                            '</div>' +
-                            '<div class="order-item-details">' +
-                            '<div class="order-item-name">' + (item.product_name || 'Product') + '</div>' +
-                            '<div class="order-item-price">₹' + parseFloat(item.price).toFixed(2) + '</div>' +
-                            '<div class="order-item-quantity">Quantity: ' + item.quantity + '</div>' +
-                            '</div>' +
-                            '<div class="order-item-total">₹' + parseFloat(item.price * item.quantity).toFixed(2) + '</div>' +
-                            '</div>';
+                        var itemsHtml = '';
+                        if (order.items && order.items.length > 0) {
+                            for (var i = 0; i < order.items.length; i++) {
+                                var item = order.items[i];
+                                itemsHtml += '<div class="order-item">' +
+                                    '<div class="order-item-image">' +
+                                    (item.product_image ? '<img src="/storage/' + item.product_image + '" alt="' + item.product_name + '">' : '<i class="fas fa-tshirt fa-2x text-muted"></i>') +
+                                    '</div>' +
+                                    '<div class="order-item-details">' +
+                                    '<div class="order-item-name">' + (item.product_name || 'Product') + '</div>' +
+                                    '<div class="order-item-price">₹' + parseFloat(item.price).toFixed(2) + '</div>' +
+                                    '<div class="order-item-quantity">Quantity: ' + item.quantity + '</div>' +
+                                    '</div>' +
+                                    '<div class="order-item-total">₹' + parseFloat(item.price * item.quantity).toFixed(2) + '</div>' +
+                                    '</div>';
+                            }
+                        } else {
+                            itemsHtml = '<div class="text-muted">No items found</div>';
+                        }
+                        document.getElementById('modalOrderItems').innerHTML = itemsHtml;
+
+                        // =========================================================
+                        // ★★★ CANCELLATION DETAILS ★★★
+                        // =========================================================
+                        const cancelSection = document.getElementById('cancellationDetailsSection');
+                        if (order.order_status === 'Cancelled' && order.cancellation) {
+                            cancelSection.style.display = 'block';
+                            document.getElementById('adminModalCancelReason').innerText = order.cancellation.cancellation_reason || 'N/A';
+                            document.getElementById('adminModalCancelComment').innerText = order.cancellation.cancellation_comment || 'No comment provided';
+                        } else {
+                            cancelSection.style.display = 'none';
+                        }
+
+                        // =========================================================
+                        // ★★★ REFUND MANAGEMENT ★★★
+                        // =========================================================
+                        const refundSection = document.getElementById('refundManagementSection');
+                        const refundStatusEl = document.getElementById('adminModalRefundStatus');
+                        const refundAmountEl = document.getElementById('adminModalRefundAmount');
+                        const refundActionEl = document.getElementById('refundAction');
+                        const refundSelect = document.getElementById('refundStatusSelect');
+
+                        if (order.order_status === 'Cancelled' && order.payment_status === 'SUCCESS') {
+                            refundSection.style.display = 'block';
+                            
+                            const statusLabels = {
+                                'pending': '⏳ Pending',
+                                'processing': '🔄 Processing',
+                                'completed': '✅ Completed'
+                            };
+                            const statusClass = order.refund_status === 'completed' ? 'success' : 
+                                               order.refund_status === 'processing' ? 'pending' : 'failed';
+                            
+                            refundStatusEl.innerHTML = `<span class="payment-badge ${statusClass}"><span class="dot"></span> ${statusLabels[order.refund_status] || 'Pending'}</span>`;
+                            refundAmountEl.innerText = '₹' + parseFloat(order.refund_amount || order.total_amount).toFixed(2);
+                            
+                            // Show update dropdown
+                            refundActionEl.style.display = 'block';
+                            if (refundSelect) {
+                                refundSelect.value = order.refund_status || 'pending';
+                                refundSelect.dataset.orderId = order.id;
+                            }
+                        } else {
+                            refundSection.style.display = 'none';
+                        }
+
+                        // =========================================================
+                        // ★★★ DISPLAY SHIPPING ADDRESS ★★★
+                        // =========================================================
+                        var addressHtml = '<div class="address-card">No address information available</div>';
+
+                        if (order.shipping_address) {
+                            var addr = order.shipping_address;
+                            var addressParts = [];
+
+                            console.log('🔍 Address from API:', addr);
+
+                            if (addr.name && addr.name !== 'N/A' && addr.name !== '') {
+                                addressParts.push('<strong>' + escapeHtml(addr.name) + '</strong>');
+                            }
+                            if (addr.address && addr.address !== '') {
+                                addressParts.push(escapeHtml(addr.address));
+                            }
+                            if (addr.area && addr.area !== '') {
+                                addressParts.push(escapeHtml(addr.area));
+                            }
+                            if (addr.city && addr.city !== '' && addr.state && addr.state !== '') {
+                                addressParts.push(escapeHtml(addr.city) + ', ' + escapeHtml(addr.state));
+                            } else if (addr.city && addr.city !== '') {
+                                addressParts.push(escapeHtml(addr.city));
+                            } else if (addr.state && addr.state !== '') {
+                                addressParts.push(escapeHtml(addr.state));
+                            }
+                            if (addr.pincode && addr.pincode !== '') {
+                                addressParts.push('Pincode: ' + escapeHtml(addr.pincode));
+                            }
+                            if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') {
+                                addressParts.push('Phone: ' + escapeHtml(addr.phone));
+                            }
+
+                            if (addressParts.length > 0) {
+                                addressHtml = '<div class="address-card">' + addressParts.join('<br>') + '</div>';
+                            }
+                        }
+
+                        document.getElementById('modalShippingAddress').innerHTML = addressHtml;
+
+                        var modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                        modal.show();
+                    } else {
+                        showToast('Error loading order details: ' + (data.message || 'Unknown error'), 'error');
                     }
-                } else {
-                    itemsHtml = '<div class="text-muted">No items found</div>';
-                }
-                document.getElementById('modalOrderItems').innerHTML = itemsHtml;
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    document.getElementById('modalShippingAddress').innerHTML =
+                        '<div class="address-card">Error loading address</div>';
+                    showToast('Error loading order details', 'error');
+                });
+        }
 
-                // =========================================================
-                // ★★★ FIX: Display shipping address ★★★
-                // =========================================================
-                var addressHtml = '<div class="address-card">No address information available</div>';
-
-                if (order.shipping_address) {
-                    var addr = order.shipping_address;
-                    var addressParts = [];
-
-                    // Log for debugging
-                    console.log('🔍 Address from API:', addr);
-
-                    if (addr.name && addr.name !== 'N/A' && addr.name !== '') {
-                        addressParts.push('<strong>' + escapeHtml(addr.name) + '</strong>');
-                    }
-                    if (addr.address && addr.address !== '') {
-                        addressParts.push(escapeHtml(addr.address));
-                    }
-                    if (addr.area && addr.area !== '') {
-                        addressParts.push(escapeHtml(addr.area));
-                    }
-                    if (addr.city && addr.city !== '' && addr.state && addr.state !== '') {
-                        addressParts.push(escapeHtml(addr.city) + ', ' + escapeHtml(addr.state));
-                    } else if (addr.city && addr.city !== '') {
-                        addressParts.push(escapeHtml(addr.city));
-                    } else if (addr.state && addr.state !== '') {
-                        addressParts.push(escapeHtml(addr.state));
-                    }
-                    if (addr.pincode && addr.pincode !== '') {
-                        addressParts.push('Pincode: ' + escapeHtml(addr.pincode));
-                    }
-                    if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') {
-                        addressParts.push('Phone: ' + escapeHtml(addr.phone));
-                    }
-
-                    if (addressParts.length > 0) {
-                        addressHtml = '<div class="address-card">' + addressParts.join('<br>') + '</div>';
-                    }
-                }
-
-                document.getElementById('modalShippingAddress').innerHTML = addressHtml;
-
-                var modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
-                modal.show();
-            } else {
-                showToast('Error loading order details: ' + (data.message || 'Unknown error'), 'error');
+        // ============================================
+        // UPDATE REFUND STATUS
+        // ============================================
+        function updateRefundStatus() {
+            const select = document.getElementById('refundStatusSelect');
+            const orderId = select.dataset.orderId;
+            const status = select.value;
+            
+            if (!orderId) {
+                showToast('No order selected', 'error');
+                return;
             }
-        })
-        .catch(function(error) {
-            console.error('Error:', error);
-            document.getElementById('modalShippingAddress').innerHTML =
-                '<div class="address-card">Error loading address</div>';
-            showToast('Error loading order details', 'error');
-        });
-}
+            
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            btn.disabled = true;
+            
+            fetch('/admin/payments/' + orderId + '/refund-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ refund_status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Refund status updated to "' + status + '"!', 'success');
+                    
+                    const statusLabels = {
+                        'pending': 'Pending',
+                        'processing': 'Processing',
+                        'completed': 'Completed'
+                    };
+                    const statusClass = status === 'completed' ? 'success' : 
+                                       status === 'processing' ? 'pending' : 'failed';
+                    
+                    // Update table row
+                    const refundCell = document.getElementById('refund-cell-' + orderId);
+                    if (refundCell) {
+                        refundCell.innerHTML = `<span class="payment-badge ${statusClass}"><span class="dot"></span> ${statusLabels[status]}</span>`;
+                    }
+                    
+                    // Update modal
+                    const refundBadge = document.getElementById('adminModalRefundStatus');
+                    if (refundBadge) {
+                        refundBadge.innerHTML = `<span class="payment-badge ${statusClass}"><span class="dot"></span> ${statusLabels[status]}</span>`;
+                    }
+                    
+                    // Close modal and reload
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
+                        if (modal) modal.hide();
+                        location.reload();
+                    }, 1000);
+                    
+                } else {
+                    showToast(data.message || 'Error updating refund status', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Network error. Please try again.', 'error');
+            })
+            .finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
 
         // ============================================
         // ESCAPE HTML

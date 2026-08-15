@@ -1153,3 +1153,13 @@ Route::prefix('admin')->name('admin.')->group(function() {
     Route::get('/reports/orders', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.orders');
     Route::get('/reports/export', [App\Http\Controllers\Admin\AdminReportController::class, 'export'])->name('reports.export');
 });
+
+// Admin refund status update
+Route::prefix('admin')->name('admin.')->group(function() {
+    // ... existing routes ...
+    Route::post('/payments/{orderId}/refund-status', [AdminPaymentController::class, 'updateRefundStatus'])
+        ->name('payments.refund-status');
+});
+
+// Cancel order route (user)
+Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');

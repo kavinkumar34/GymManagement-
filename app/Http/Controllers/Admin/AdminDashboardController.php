@@ -15,131 +15,89 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        // ===== STATISTICS =====
-        $totalOrders = Order::count();
+        // ==========================================
+        // STATISTICS - EXCLUDING CANCELLED ORDERS
+        // ==========================================
+        
+        // ★★★ FIX: Total Orders (excluding cancelled) ★★★
+        $totalOrders = Order::where('order_status', '!=', 'Cancelled')->count();
         
         // ==========================================
-        // TOTAL REVENUE
+        // ★★★ TOTAL REVENUE (EXCLUDING CANCELLED) ★★★
         // Revenue = (order_items.final_price - products.price) * quantity + shipping_charge
         // ==========================================
         $totalRevenue = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('orders.payment_status', 'SUCCESS')
+            ->where('orders.order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
             ->sum(DB::raw('(order_items.final_price - products.price) * order_items.quantity + orders.shipping_charge')) ?? 0;
         
+        // Total Products (no change needed)
         $totalProducts = Product::count();
         
         // Total Members - All users from users table
         $totalMembers = User::count();
         
+        // Pending Orders (excluding cancelled)
         $pendingOrders = Order::where('order_status', 'Pending')->count();
         
         // ==========================================
-        // MONTHLY REVENUE
+        // ★★★ MONTHLY REVENUE (EXCLUDING CANCELLED) ★★★
         // Revenue = (order_items.final_price - products.price) * quantity + shipping_charge
-        // For your data: (236 - 100) × 2 + 100 = 136 × 2 + 100 = 272 + 100 = 372
         // ==========================================
         $monthlyRevenue = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('orders.payment_status', 'SUCCESS')
+            ->where('orders.order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
             ->whereMonth('orders.created_at', now()->month)
             ->whereYear('orders.created_at', now()->year)
             ->sum(DB::raw('(order_items.final_price - products.price) * order_items.quantity + orders.shipping_charge')) ?? 0;
         
         // ==========================================
-        // REVENUE BREAKDOWN BY ORDER (for verification)
+        // MONTHLY PRODUCT REVENUE (EXCLUDING CANCELLED)
         // ==========================================
-        $revenueByOrder = Order::where('payment_status', 'SUCCESS')
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->get()
-            ->map(function($order) {
-                // Get order items with product details
-                $orderItems = OrderItem::where('order_id', $order->id)
-                    ->join('products', 'order_items.product_id', '=', 'products.id')
-                    ->select(
-                        'order_items.*',
-                        'products.price as product_price',
-                        DB::raw('(order_items.final_price - products.price) * order_items.quantity as product_revenue')
-                    )
-                    ->get();
-                
-                $totalProductRevenue = $orderItems->sum('product_revenue');
-                $totalFinalPrice = $orderItems->sum(function($item) {
-                    return $item->final_price * $item->quantity;
-                });
-                $totalProductPrice = $orderItems->sum(function($item) {
-                    return $item->product_price * $item->quantity;
-                });
-                
-                // Total revenue including shipping
-                $totalRevenue = $totalProductRevenue + ($order->shipping_charge ?? 0);
-                
-                return (object) [
-                    'order_id' => $order->id,
-                    'order_number' => $order->order_number,
-                    'total_amount' => $order->total_amount,
-                    'shipping_charge' => $order->shipping_charge ?? 0,
-                    'total_final_price' => $totalFinalPrice,
-                    'total_product_price' => $totalProductPrice,
-                    'product_revenue' => $totalProductRevenue,
-                    'total_revenue' => $totalRevenue,
-                    'items' => $orderItems
-                ];
-            });
-        
-        // ==========================================
-        // MONTHLY REVENUE DETAIL (for display in debug)
-        // ==========================================
-        $monthlyRevenueDetails = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('orders.payment_status', 'SUCCESS')
-            ->whereMonth('orders.created_at', now()->month)
-            ->whereYear('orders.created_at', now()->year)
-            ->select(
-                'products.name as product_name',
-                DB::raw('SUM(order_items.quantity) as total_quantity'),
-                DB::raw('SUM(order_items.final_price * order_items.quantity) as total_final_price'),
-                DB::raw('SUM(products.price * order_items.quantity) as total_product_price'),
-                DB::raw('SUM((order_items.final_price - products.price) * order_items.quantity) as product_revenue'),
-                DB::raw('SUM((order_items.final_price - products.price) * order_items.quantity) + SUM(orders.shipping_charge) as total_revenue_with_shipping')
-            )
-            ->groupBy('products.id', 'products.name')
-            ->get();
-        
-        // ==========================================
-        // MONTHLY REVENUE WITH SHIPPING DETAILS
-        // ==========================================
-        $monthlyShippingTotal = Order::where('payment_status', 'SUCCESS')
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->sum('shipping_charge') ?? 0;
-        
         $monthlyProductRevenue = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('orders.payment_status', 'SUCCESS')
+            ->where('orders.order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
             ->whereMonth('orders.created_at', now()->month)
             ->whereYear('orders.created_at', now()->year)
             ->sum(DB::raw('(order_items.final_price - products.price) * order_items.quantity')) ?? 0;
         
-        // ===== RECENT ORDERS (last 5) =====
+        // ==========================================
+        // MONTHLY SHIPPING TOTAL (EXCLUDING CANCELLED)
+        // ==========================================
+        $monthlyShippingTotal = Order::where('payment_status', 'SUCCESS')
+            ->where('order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('shipping_charge') ?? 0;
+        
+        // ==========================================
+        // ★★★ RECENT ORDERS (EXCLUDING CANCELLED) ★★★
+        // ==========================================
         $recentOrders = Order::with('user')
+            ->where('order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
         
-        // ===== RECENT MEMBERS (from users table - last 5) =====
+        // ==========================================
+        // RECENT MEMBERS (from users table - last 5)
+        // ==========================================
         $recentMembers = User::orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
         
-        // ===== RECENT CONTACT MESSAGES (last 5) =====
+        // ==========================================
+        // RECENT CONTACT MESSAGES (last 5)
+        // ==========================================
         $recentMessages = Contact::orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
         
         // ==========================================
-        // TOP SELLING PRODUCTS
+        // ★★★ TOP SELLING PRODUCTS (EXCLUDING CANCELLED) ★★★
         // ==========================================
         $topProducts = OrderItem::select(
                 'product_id',
@@ -148,6 +106,7 @@ class AdminDashboardController extends Controller
             )
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->where('orders.payment_status', 'SUCCESS')
+            ->where('orders.order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
             ->groupBy('product_id')
             ->orderBy('total_sold', 'desc')
             ->limit(5)
@@ -162,7 +121,7 @@ class AdminDashboardController extends Controller
             });
         
         // ==========================================
-        // MONTHLY REVENUE DATA (last 12 months)
+        // ★★★ MONTHLY REVENUE DATA (EXCLUDING CANCELLED) ★★★
         // ==========================================
         $monthlyLabels = [];
         $monthlyRevenueData = [];
@@ -173,6 +132,7 @@ class AdminDashboardController extends Controller
             $revenue = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->join('products', 'order_items.product_id', '=', 'products.id')
                 ->where('orders.payment_status', 'SUCCESS')
+                ->where('orders.order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
                 ->whereYear('orders.created_at', $month->year)
                 ->whereMonth('orders.created_at', $month->month)
                 ->sum(DB::raw('(order_items.final_price - products.price) * order_items.quantity + orders.shipping_charge')) ?? 0;
@@ -180,7 +140,9 @@ class AdminDashboardController extends Controller
             $monthlyRevenueData[] = $revenue;
         }
         
-        // ===== ORDER STATUS DISTRIBUTION =====
+        // ==========================================
+        // ORDER STATUS DISTRIBUTION (All statuses)
+        // ==========================================
         $statusLabels = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Failed'];
         $statusData = [
             Order::where('order_status', 'Pending')->count(),
@@ -192,11 +154,12 @@ class AdminDashboardController extends Controller
         ];
         
         // ==========================================
-        // GROWTH PERCENTAGES
+        // GROWTH PERCENTAGES (EXCLUDING CANCELLED)
         // ==========================================
         
         // Orders Growth
-        $lastMonthOrders = Order::whereMonth('created_at', now()->subMonth()->month)
+        $lastMonthOrders = Order::where('order_status', '!=', 'Cancelled')
+            ->whereMonth('created_at', now()->subMonth()->month)
             ->whereYear('created_at', now()->subMonth()->year)
             ->count();
         $ordersGrowth = $lastMonthOrders > 0 
@@ -207,6 +170,7 @@ class AdminDashboardController extends Controller
         $lastMonthRevenue = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->where('orders.payment_status', 'SUCCESS')
+            ->where('orders.order_status', '!=', 'Cancelled')
             ->whereMonth('orders.created_at', now()->subMonth()->month)
             ->whereYear('orders.created_at', now()->subMonth()->year)
             ->sum(DB::raw('(order_items.final_price - products.price) * order_items.quantity + orders.shipping_charge')) ?? 0;
@@ -229,6 +193,61 @@ class AdminDashboardController extends Controller
         $membersGrowth = $lastMonthMembers > 0 
             ? round((($totalMembers - $lastMonthMembers) / $lastMonthMembers) * 100, 1) 
             : 0;
+        
+        // ==========================================
+        // REVENUE BREAKDOWN BY ORDER (for verification)
+        // ==========================================
+        $revenueByOrder = Order::where('payment_status', 'SUCCESS')
+            ->where('order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->get()
+            ->map(function($order) {
+                // Get order items with product details
+                $orderItems = OrderItem::where('order_id', $order->id)
+                    ->join('products', 'order_items.product_id', '=', 'products.id')
+                    ->select(
+                        'order_items.*',
+                        'products.price as product_price',
+                        DB::raw('(order_items.final_price - products.price) * order_items.quantity as product_revenue')
+                    )
+                    ->get();
+                
+                $totalProductRevenue = $orderItems->sum('product_revenue');
+                
+                // Total revenue including shipping
+                $totalRevenue = $totalProductRevenue + ($order->shipping_charge ?? 0);
+                
+                return (object) [
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'total_amount' => $order->total_amount,
+                    'shipping_charge' => $order->shipping_charge ?? 0,
+                    'product_revenue' => $totalProductRevenue,
+                    'total_revenue' => $totalRevenue,
+                    'items' => $orderItems
+                ];
+            });
+        
+        // ==========================================
+        // MONTHLY REVENUE DETAIL (for display in debug)
+        // ==========================================
+        $monthlyRevenueDetails = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->where('orders.payment_status', 'SUCCESS')
+            ->where('orders.order_status', '!=', 'Cancelled')  // ★★★ ADDED ★★★
+            ->whereMonth('orders.created_at', now()->month)
+            ->whereYear('orders.created_at', now()->year)
+            ->select(
+                'products.name as product_name',
+                DB::raw('SUM(order_items.quantity) as total_quantity'),
+                DB::raw('SUM(order_items.final_price * order_items.quantity) as total_final_price'),
+                DB::raw('SUM(products.price * order_items.quantity) as total_product_price'),
+                DB::raw('SUM((order_items.final_price - products.price) * order_items.quantity) as product_revenue'),
+                DB::raw('SUM((order_items.final_price - products.price) * order_items.quantity) + SUM(orders.shipping_charge) as total_revenue_with_shipping')
+            )
+            ->groupBy('products.id', 'products.name')
+            ->get();
         
         return view('admin.dashboard', compact(
             'totalOrders', 'totalRevenue', 'totalProducts', 

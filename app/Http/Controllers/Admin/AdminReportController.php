@@ -23,7 +23,7 @@ class AdminReportController extends Controller
         $endDate = $request->get('end_date');
         $status = $request->get('status');
         
-        // Build query for orders
+        // Build query for orders - Exclude cancelled from revenue calculations
         $ordersQuery = Order::with('user');
         
         // Apply filters
@@ -87,24 +87,26 @@ class AdminReportController extends Controller
         }
         
         // ==========================================
-        // TOTAL STATISTICS
+        // TOTAL STATISTICS (EXCLUDING CANCELLED)
         // ==========================================
         
-        // Total Orders Count
-        $totalOrdersCount = Order::count();
+        // Total Orders Count (excluding cancelled)
+        $totalOrdersCount = Order::where('order_status', '!=', 'Cancelled')->count();
         
-        // Total Product Revenue (from order_items final_price × quantity)
+        // Total Product Revenue (from order_items final_price × quantity) - excluding cancelled
         $totalProductRevenue = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.order_status', '!=', 'Cancelled')
             ->where('orders.payment_status', 'SUCCESS')
             ->sum(DB::raw('order_items.final_price * order_items.quantity')) ?? 0;
         
-        // Total Actual Price
+        // Total Actual Price - excluding cancelled
         $totalActualPrice = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
             ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
             ->leftJoin('product_variants', function($join) {
                 $join->on('order_items.variant_id', '=', 'product_variants.id')
                      ->on('order_items.product_id', '=', 'product_variants.product_id');
             })
+            ->where('orders.order_status', '!=', 'Cancelled')
             ->where('orders.payment_status', 'SUCCESS')
             ->select(DB::raw('SUM(
                 CASE 
@@ -120,14 +122,16 @@ class AdminReportController extends Controller
         // Total Profit
         $totalProfit = $totalProductRevenue - $totalActualPrice;
         
-        // Total Shipping
-        $totalShipping = Order::where('payment_status', 'SUCCESS')->sum('shipping_charge') ?? 0;
+        // Total Shipping (excluding cancelled)
+        $totalShipping = Order::where('order_status', '!=', 'Cancelled')
+            ->where('payment_status', 'SUCCESS')
+            ->sum('shipping_charge') ?? 0;
         
         // Total with Shipping
-        $totalWithShipping = $totalProductRevenue + $totalShipping;
+        $totalWithShipping = $totalProfit + $totalShipping;
         
         // ==========================================
-        // MONTHLY REVENUE DATA (for chart)
+        // MONTHLY REVENUE DATA (for chart) - EXCLUDING CANCELLED
         // ==========================================
         $monthlyLabels = [];
         $monthlyRevenueData = [];
@@ -137,8 +141,9 @@ class AdminReportController extends Controller
             $month = now()->subMonths($i);
             $monthlyLabels[] = $month->format('M Y');
             
-            // Monthly Product Revenue
+            // Monthly Product Revenue - excluding cancelled
             $revenue = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
+                ->where('orders.order_status', '!=', 'Cancelled')
                 ->where('orders.payment_status', 'SUCCESS')
                 ->whereYear('orders.created_at', $month->year)
                 ->whereMonth('orders.created_at', $month->month)
@@ -146,13 +151,14 @@ class AdminReportController extends Controller
             
             $monthlyRevenueData[] = $revenue;
             
-            // Monthly Actual Price
+            // Monthly Actual Price - excluding cancelled
             $actualPrice = OrderItem::join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
                 ->leftJoin('product_variants', function($join) {
                     $join->on('order_items.variant_id', '=', 'product_variants.id')
                          ->on('order_items.product_id', '=', 'product_variants.product_id');
                 })
+                ->where('orders.order_status', '!=', 'Cancelled')
                 ->where('orders.payment_status', 'SUCCESS')
                 ->whereYear('orders.created_at', $month->year)
                 ->whereMonth('orders.created_at', $month->month)
@@ -172,7 +178,7 @@ class AdminReportController extends Controller
         }
         
         // ==========================================
-        // STATUS COUNTS
+        // STATUS COUNTS (including cancelled separately)
         // ==========================================
         $statusCounts = [
             'Pending' => Order::where('order_status', 'Pending')->count(),
@@ -184,7 +190,7 @@ class AdminReportController extends Controller
         ];
         
         // ==========================================
-        // TOP SELLING PRODUCTS
+        // TOP SELLING PRODUCTS (excluding cancelled)
         // ==========================================
         $topProducts = OrderItem::select(
                 'order_items.product_id',
@@ -192,6 +198,7 @@ class AdminReportController extends Controller
                 DB::raw('SUM(order_items.final_price * order_items.quantity) as total_revenue')
             )
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.order_status', '!=', 'Cancelled')
             ->where('orders.payment_status', 'SUCCESS')
             ->groupBy('order_items.product_id')
             ->orderBy('total_sold', 'desc')
@@ -336,7 +343,6 @@ class AdminReportController extends Controller
                 // Format date as text to prevent Excel from converting it
                 $dateFormatted = '';
                 if ($order->created_at) {
-                    // Use TEXT format to ensure Excel displays it correctly
                     $dateFormatted = '="' . date('d-m-Y', strtotime($order->created_at)) . '"';
                 }
                 

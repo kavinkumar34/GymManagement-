@@ -345,6 +345,20 @@
             color: var(--signal-dark);
         }
 
+        /* ===== REFUND BADGE ===== */
+        .payment-badge.refund-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .payment-badge.refund-processing {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .payment-badge.refund-completed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
         /* ===== ORDER ACTIONS ===== */
         .order-actions {
             display: flex;
@@ -1121,40 +1135,39 @@
         /* ============================================================ */
         /* ===== TOAST / ALERT ===== */
         /* ============================================================ */
-    /* ===== MY ORDERS TOAST - DO NOT CONFLICT WITH APP TOAST ===== */
-.my-orders-toast {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-width: 350px !important;
-    padding: 14px 24px !important;
-    margin: 0 !important;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    z-index: 999999 !important;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 600;
-    box-sizing: border-box;
-}
+        .my-orders-toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: auto !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-width: 350px !important;
+            padding: 14px 24px !important;
+            margin: 0 !important;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 999999 !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-sizing: border-box;
+        }
 
-.my-orders-toast.success {
-    background: var(--success);
-}
+        .my-orders-toast.success {
+            background: var(--success);
+        }
 
-.my-orders-toast.error {
-    background: var(--signal);
-}
+        .my-orders-toast.error {
+            background: var(--signal);
+        }
 
-.my-orders-toast.info {
-    background: var(--info);
-}
+        .my-orders-toast.info {
+            background: var(--info);
+        }
 
         .custom-toast.success {
             background: var(--success);
@@ -1602,6 +1615,13 @@
                                                     <span class="payment-badge payment-pending"><i
                                                             class="fas fa-clock"></i> Payment Pending</span>
                                                 @endif
+                                                @if($order->order_status == 'Cancelled')
+                                                    @if($order->refund_status != 'none')
+                                                        <span class="payment-badge refund-{{ $order->refund_status }}" style="margin-left:5px;">
+                                                            <i class="fas fa-undo-alt"></i> Refund: {{ ucfirst($order->refund_status) }}
+                                                        </span>
+                                                    @endif
+                                                @endif
                                             </div>
                                         </div>
 
@@ -1791,10 +1811,33 @@
                         <div class="section-title"><i class="fas fa-credit-card"></i> Payment Summary</div>
                         <div class="payment-summary" id="modalPaymentSummary"></div>
                        <div class="action-buttons" id="modalActions">
-                          {{--   <button class="btn-cancel-order" id="cancelOrderBtn"
-                                onclick="openCancelModalFromDetails()">Cancel Order</button> --}}
+                          <button class="btn-cancel-order" id="cancelOrderBtn"
+                                onclick="openCancelModalFromDetails()">Cancel Order</button> 
                             <button class="btn-contact-support" onclick="contactSupport()">Contact Support</button>
                         </div> 
+                    </div>
+
+                    <!-- ===== CANCELLATION & REFUND SECTION ===== -->
+                    <div class="detail-section" id="cancellationSection" style="display:none;">
+                        <div class="section-title"><i class="fas fa-times-circle" style="color:var(--danger);"></i> Cancellation & Refund</div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Cancellation Reason</span>
+                                <span class="info-value" id="modalCancelReason">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Cancellation Comment</span>
+                                <span class="info-value" id="modalCancelComment">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Refund Status</span>
+                                <span class="info-value" id="modalRefundStatus">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Refund Amount</span>
+                                <span class="info-value" id="modalRefundAmount">-</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1881,34 +1924,28 @@
         // ============================================================
         // ===== TOAST NOTIFICATION =====
         // ============================================================
-    function showMyOrdersToast(message, type = 'info') {
-    const toast = document.createElement('div');
-
-    toast.className = `my-orders-toast ${type}`;
-
-    const icon = type === 'success'
-        ? 'fa-check-circle'
-        : type === 'error'
-            ? 'fa-exclamation-circle'
-            : 'fa-info-circle';
-
-    toast.innerHTML = `
-        <i class="fas ${icon}"></i>
-        <span>${message}</span>
-    `;
-
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        toast.style.transition = 'all 0.3s ease';
-
-        setTimeout(() => {
-            toast.remove();
-        }, 300);
-    }, 3000);
-}
+        function showMyOrdersToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `my-orders-toast ${type}`;
+            const icon = type === 'success'
+                ? 'fa-check-circle'
+                : type === 'error'
+                    ? 'fa-exclamation-circle'
+                    : 'fa-info-circle';
+            toast.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
 
         // ============================================================
         // ===== SELECT REASON FOR CANCELLATION =====
@@ -1930,47 +1967,38 @@
         function openReviewModal(orderId) {
             try {
                 currentOrderId = orderId;
-
                 const orderIdInput = document.getElementById('review_order_id');
                 if (orderIdInput) {
                     orderIdInput.value = orderId;
                 }
-
                 const descriptionTextarea = document.getElementById('review_description');
                 if (descriptionTextarea) {
                     descriptionTextarea.value = '';
                 }
-
                 const filesPreview = document.getElementById('review_files_preview');
                 if (filesPreview) {
                     filesPreview.innerHTML = '';
                 }
-
                 const errorDiv = document.getElementById('review_error_message');
                 if (errorDiv) {
                     errorDiv.style.display = 'none';
                 }
-
                 reviewFiles = [];
                 orderItemsData = [];
-
                 const productError = document.getElementById('product_select_error');
                 if (productError) {
                     productError.style.display = 'none';
                 }
-
                 document.querySelectorAll('#reviewStars input').forEach(input => input.checked = false);
                 const star1 = document.getElementById('review_star1');
                 if (star1) {
                     star1.checked = true;
                 }
-
                 const select = document.getElementById('review_product_select');
                 if (select) {
                     select.innerHTML = '<option value="">-- Loading products... --</option>';
                     select.disabled = true;
                 }
-
                 fetch(`/api/order-details/${orderId}`)
                     .then(res => {
                         if (!res.ok) {
@@ -1983,10 +2011,8 @@
                             select.innerHTML = '<option value="">-- Select Product --</option>';
                             select.disabled = false;
                         }
-
                         if (data.success && data.order && data.order.items && data.order.items.length > 0) {
                             orderItemsData = data.order.items;
-
                             data.order.items.forEach((item) => {
                                 const option = document.createElement('option');
                                 option.value = parseInt(item.product_id);
@@ -1996,7 +2022,6 @@
                                     select.appendChild(option);
                                 }
                             });
-
                             if (data.order.items.length === 1 && select) {
                                 select.value = parseInt(data.order.items[0].product_id);
                             }
@@ -2015,7 +2040,6 @@
                         }
                         showMyOrdersToast('Error loading products', 'error');
                     });
-
                 const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
                 modal.show();
             } catch (error) {
@@ -2030,9 +2054,7 @@
         function previewReviewFiles(input) {
             const preview = document.getElementById('review_files_preview');
             if (!preview) return;
-
             const files = Array.from(input.files);
-
             files.forEach((file) => {
                 reviewFiles.push(file);
                 const reader = new FileReader();
@@ -2479,6 +2501,41 @@
                 } else {
                     cancelBtn.style.display = 'inline-block';
                 }
+            }
+
+            // ===== CANCELLATION & REFUND INFO =====
+            const cancellationSection = document.getElementById('cancellationSection');
+            if (order.order_status === 'Cancelled') {
+                cancellationSection.style.display = 'block';
+                
+                if (order.cancellation) {
+                    document.getElementById('modalCancelReason').innerText = order.cancellation.cancellation_reason || 'N/A';
+                    document.getElementById('modalCancelComment').innerText = order.cancellation.cancellation_comment || 'No comment provided';
+                } else {
+                    document.getElementById('modalCancelReason').innerText = order.cancellation_reason || 'N/A';
+                    document.getElementById('modalCancelComment').innerText = order.cancellation_comment || 'No comment provided';
+                }
+                
+                const refundStatus = order.refund_status || 'none';
+                const refundLabels = {
+                    'pending': '⏳ Pending',
+                    'processing': '🔄 Processing',
+                    'completed': '✅ Completed',
+                    'none': 'N/A'
+                };
+                const refundClasses = {
+                    'pending': 'payment-badge payment-pending',
+                    'processing': 'payment-badge payment-pending',
+                    'completed': 'payment-badge payment-paid',
+                    'none': 'payment-badge'
+                };
+                document.getElementById('modalRefundStatus').innerHTML = 
+                    `<span class="${refundClasses[refundStatus] || 'payment-badge'}">${refundLabels[refundStatus] || 'N/A'}</span>`;
+                
+                const refundAmount = parseFloat(order.refund_amount || 0);
+                document.getElementById('modalRefundAmount').innerText = refundAmount > 0 ? '₹' + formatNumber(refundAmount) : 'N/A';
+            } else {
+                cancellationSection.style.display = 'none';
             }
         }
 

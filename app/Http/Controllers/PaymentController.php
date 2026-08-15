@@ -11,7 +11,9 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\UserAddress;
 use App\Models\Coupon;
+use App\Models\OrderCancellation;
 use App\Mail\OrderConfirmationMail;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -178,33 +180,34 @@ class PaymentController extends Controller
             $product->decrement('stock', $quantity);
         }
         
-      // ===== SAVE GUEST ADDRESS TO DATABASE =====
-$addressData = $request->input('address');
-if ($addressData) {
-    if (is_string($addressData)) {
-        $addressData = json_decode($addressData, true);
-    }
-    if (is_array($addressData) && !empty($addressData['address'])) {
-        $this->saveGuestAddress($user, $addressData);
-    }
-}
-
-// Also check for guest address fields directly from request
-if ($request->guest_address && $request->guest_city && $request->guest_state) {
-    $guestAddressData = [
-        'name' => $request->guest_name ?? $user->name,
-        'email' => $request->guest_email ?? $user->email,
-        'address' => $request->guest_address,
-        'city' => $request->guest_city,
-        'state' => $request->guest_state,
-        'pincode' => $request->guest_pincode,
-        'phone' => $request->guest_address_phone ?? $request->guest_phone ?? $user->phone
-    ];
-    $this->saveGuestAddress($user, $guestAddressData);
-}
+        // ===== SAVE GUEST ADDRESS TO DATABASE =====
+        $addressData = $request->input('address');
+        if ($addressData) {
+            if (is_string($addressData)) {
+                $addressData = json_decode($addressData, true);
+            }
+            if (is_array($addressData) && !empty($addressData['address'])) {
+                $this->saveGuestAddress($user, $addressData);
+            }
+        }
+        
+        // Also check for guest address fields directly from request
+        if ($request->guest_address && $request->guest_city && $request->guest_state) {
+            $guestAddressData = [
+                'name' => $request->guest_name ?? $user->name,
+                'email' => $request->guest_email ?? $user->email,
+                'address' => $request->guest_address,
+                'city' => $request->guest_city,
+                'state' => $request->guest_state,
+                'pincode' => $request->guest_pincode,
+                'phone' => $request->guest_address_phone ?? $request->guest_phone ?? $user->phone
+            ];
+            $this->saveGuestAddress($user, $guestAddressData);
+        }
         
         return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
     }
+    
     private function processCartCheckout($request, $user, $checkoutCart)
     {
         // ===== HANDLE GUEST USER AUTO-REGISTRATION (if user is null) =====
@@ -354,238 +357,240 @@ if ($request->guest_address && $request->guest_city && $request->guest_state) {
             $this->recordCouponUsage($order, $couponCode, $couponDiscount);
         }
         
-          session()->forget('checkout_cart');
+        session()->forget('checkout_cart');
         
-     // ===== SAVE GUEST ADDRESS TO DATABASE =====
-$addressData = $request->input('address');
-if ($addressData) {
-    if (is_string($addressData)) {
-        $addressData = json_decode($addressData, true);
-    }
-    if (is_array($addressData) && !empty($addressData['address'])) {
-        $this->saveGuestAddress($user, $addressData);
-    }
-}
-
-// Also check for guest address fields directly from request
-if ($request->guest_address && $request->guest_city && $request->guest_state) {
-    $guestAddressData = [
-        'name' => $request->guest_name ?? $user->name,
-        'email' => $request->guest_email ?? $user->email,
-        'address' => $request->guest_address,
-        'city' => $request->guest_city,
-        'state' => $request->guest_state,
-        'pincode' => $request->guest_pincode,
-        'phone' => $request->guest_address_phone ?? $request->guest_phone ?? $user->phone
-    ];
-    $this->saveGuestAddress($user, $guestAddressData);
-}
+        // ===== SAVE GUEST ADDRESS TO DATABASE =====
+        $addressData = $request->input('address');
+        if ($addressData) {
+            if (is_string($addressData)) {
+                $addressData = json_decode($addressData, true);
+            }
+            if (is_array($addressData) && !empty($addressData['address'])) {
+                $this->saveGuestAddress($user, $addressData);
+            }
+        }
+        
+        // Also check for guest address fields directly from request
+        if ($request->guest_address && $request->guest_city && $request->guest_state) {
+            $guestAddressData = [
+                'name' => $request->guest_name ?? $user->name,
+                'email' => $request->guest_email ?? $user->email,
+                'address' => $request->guest_address,
+                'city' => $request->guest_city,
+                'state' => $request->guest_state,
+                'pincode' => $request->guest_pincode,
+                'phone' => $request->guest_address_phone ?? $request->guest_phone ?? $user->phone
+            ];
+            $this->saveGuestAddress($user, $guestAddressData);
+        }
         
         return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
     }
     
-private function createOrder(
-    $txnid,
-    $userId,
-    $totalAmount,
-    $shippingCharge = 0,
-    $request = null
-) {
-    $paymentDetails = [];
+    private function createOrder(
+        $txnid,
+        $userId,
+        $totalAmount,
+        $shippingCharge = 0,
+        $request = null
+    ) {
+        $paymentDetails = [];
 
-    if ($request) {
-
-        // Guest data
-        if ($request->guest_name) {
-            $paymentDetails['guest_name'] = $request->guest_name;
-        }
-        if ($request->guest_phone) {
-            $paymentDetails['guest_phone'] = $request->guest_phone;
-        }
-        if ($request->guest_email) {
-            $paymentDetails['guest_email'] = $request->guest_email;
-        }
-
-        // Shipping state
-        if ($request->shipping_state) {
-            $shippingState = $request->shipping_state;
-            if (is_string($shippingState)) {
-                $shippingState = json_decode($shippingState, true);
+        if ($request) {
+            // Guest data
+            if ($request->guest_name) {
+                $paymentDetails['guest_name'] = $request->guest_name;
             }
-            $paymentDetails['shipping_state'] = $shippingState;
-        }
+            if ($request->guest_phone) {
+                $paymentDetails['guest_phone'] = $request->guest_phone;
+            }
+            if ($request->guest_email) {
+                $paymentDetails['guest_email'] = $request->guest_email;
+            }
 
-        // =========================================================
-        // ★★★ GET THE EXACT SELECTED ADDRESS ★★★
-        // =========================================================
-        $selectedAddress = null;
-        $selectedAddressId = null;
+            // Shipping state
+            if ($request->shipping_state) {
+                $shippingState = $request->shipping_state;
+                if (is_string($shippingState)) {
+                    $shippingState = json_decode($shippingState, true);
+                }
+                $paymentDetails['shipping_state'] = $shippingState;
+            }
 
-        // 1. ★★★ FIRST TRY: Get from 'address' field ★★★
-        $addressInput = $request->input('address');
-        if ($addressInput) {
-            if (is_string($addressInput)) {
-                $decoded = json_decode($addressInput, true);
-                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                    $selectedAddress = $decoded;
-                    if (!empty($selectedAddress['id'])) {
-                        $selectedAddressId = $selectedAddress['id'];
+            // =========================================================
+            // ★★★ GET THE EXACT SELECTED ADDRESS ★★★
+            // =========================================================
+            $selectedAddress = null;
+            $selectedAddressId = null;
+
+            // 1. ★★★ FIRST TRY: Get from 'address' field ★★★
+            $addressInput = $request->input('address');
+            if ($addressInput) {
+                if (is_string($addressInput)) {
+                    $decoded = json_decode($addressInput, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                        $selectedAddress = $decoded;
+                        if (!empty($selectedAddress['id'])) {
+                            $selectedAddressId = $selectedAddress['id'];
+                        }
                     }
-                }
-            } elseif (is_array($addressInput)) {
-                $selectedAddress = $addressInput;
-                if (!empty($selectedAddress['id'])) {
-                    $selectedAddressId = $selectedAddress['id'];
-                }
-            }
-        }
-
-        // 2. ★★★ SECOND TRY: Get from shipping_address_id ★★★
-        if (!$selectedAddressId) {
-            $selectedAddressId = $request->input('shipping_address_id');
-        }
-
-        // 3. ★★★ THIRD TRY: Get from address_id ★★★
-        if (!$selectedAddressId) {
-            $selectedAddressId = $request->input('address_id');
-        }
-
-        // 4. ★★★ FOURTH TRY: Get from selected_address_id ★★★
-        if (!$selectedAddressId) {
-            $selectedAddressId = $request->input('selected_address_id');
-        }
-
-        // 5. ★★★ FIFTH TRY: Get from order_data ★★★
-        if (!$selectedAddress || empty($selectedAddress['address'])) {
-            $orderData = $request->input('order_data');
-            if ($orderData) {
-                if (is_string($orderData)) {
-                    $orderData = json_decode($orderData, true);
-                }
-                if (is_array($orderData) && !empty($orderData['address'])) {
-                    $selectedAddress = $orderData['address'];
+                } elseif (is_array($addressInput)) {
+                    $selectedAddress = $addressInput;
                     if (!empty($selectedAddress['id'])) {
                         $selectedAddressId = $selectedAddress['id'];
                     }
                 }
             }
-        }
 
-        // =========================================================
-        // ★★★ DEBUG: LOG WHAT WE FOUND ★★★
-        // =========================================================
-        \Log::info('🔍 Address lookup result:', [
-            'order' => $txnid,
-            'selectedAddressId' => $selectedAddressId,
-            'selectedAddress' => $selectedAddress,
-            'address_from_request' => $request->input('address'),
-            'shipping_address_id_from_request' => $request->input('shipping_address_id'),
-        ]);
-
-        // =========================================================
-        // ★★★ GET FRESH ADDRESS FROM DATABASE ★★★
-        // =========================================================
-        if ($selectedAddressId && Auth::check()) {
-            $dbAddress = UserAddress::where('id', $selectedAddressId)
-                ->where('user_id', $userId)
-                ->first();
-
-            if ($dbAddress) {
-                $selectedAddress = [
-                    'id' => $dbAddress->id,
-                    'user_id' => $dbAddress->user_id,
-                    'name' => $dbAddress->name,
-                    'email' => $dbAddress->email,
-                    'address' => $dbAddress->address,
-                    'area' => $dbAddress->area ?? '',
-                    'city' => $dbAddress->city,
-                    'state' => $dbAddress->state,
-                    'pincode' => $dbAddress->pincode,
-                    'phone' => $dbAddress->phone,
-                ];
-                \Log::info('✅ Found address in DB for ID: ' . $selectedAddressId);
-            } else {
-                \Log::warning('⚠️ Address not found in DB for ID: ' . $selectedAddressId);
-                $selectedAddress = null;
-            }
-        }
-
-        // =========================================================
-        // ★★★ SAVE THE EXACT ADDRESS TO payment_details ★★★
-        // =========================================================
-        if (is_array($selectedAddress) && !empty($selectedAddress['address'])) {
-            // Make sure all required fields exist
-            if (!isset($selectedAddress['name']) || empty($selectedAddress['name'])) {
-                $selectedAddress['name'] = Auth::check() ? Auth::user()->name : ($request->guest_name ?? 'Guest');
-            }
-            if (!isset($selectedAddress['phone']) || empty($selectedAddress['phone'])) {
-                $selectedAddress['phone'] = Auth::check() ? (Auth::user()->phone ?? '') : ($request->guest_phone ?? '');
-            }
-            if (!isset($selectedAddress['email']) || empty($selectedAddress['email'])) {
-                $selectedAddress['email'] = Auth::check() ? Auth::user()->email : ($request->guest_email ?? '');
+            // 2. ★★★ SECOND TRY: Get from shipping_address_id ★★★
+            if (!$selectedAddressId) {
+                $selectedAddressId = $request->input('shipping_address_id');
             }
 
-            // SAVE THE EXACT ADDRESS USED FOR THIS ORDER
-            $paymentDetails['shipping_address'] = $selectedAddress;
-
-            if (!empty($selectedAddress['id'])) {
-                $paymentDetails['shipping_address_id'] = $selectedAddress['id'];
+            // 3. ★★★ THIRD TRY: Get from address_id ★★★
+            if (!$selectedAddressId) {
+                $selectedAddressId = $request->input('address_id');
             }
 
-            \Log::info('✅ Order address saved:', [
+            // 4. ★★★ FOURTH TRY: Get from selected_address_id ★★★
+            if (!$selectedAddressId) {
+                $selectedAddressId = $request->input('selected_address_id');
+            }
+
+            // 5. ★★★ FIFTH TRY: Get from order_data ★★★
+            if (!$selectedAddress || empty($selectedAddress['address'])) {
+                $orderData = $request->input('order_data');
+                if ($orderData) {
+                    if (is_string($orderData)) {
+                        $orderData = json_decode($orderData, true);
+                    }
+                    if (is_array($orderData) && !empty($orderData['address'])) {
+                        $selectedAddress = $orderData['address'];
+                        if (!empty($selectedAddress['id'])) {
+                            $selectedAddressId = $selectedAddress['id'];
+                        }
+                    }
+                }
+            }
+
+            // =========================================================
+            // ★★★ DEBUG: LOG WHAT WE FOUND ★★★
+            // =========================================================
+            \Log::info('🔍 Address lookup result:', [
                 'order' => $txnid,
-                'address_id' => $selectedAddress['id'] ?? 'N/A',
-                'address' => $selectedAddress['address'],
-                'city' => $selectedAddress['city'] ?? '',
-                'state' => $selectedAddress['state'] ?? ''
+                'selectedAddressId' => $selectedAddressId,
+                'selectedAddress' => $selectedAddress,
+                'address_from_request' => $request->input('address'),
+                'shipping_address_id_from_request' => $request->input('shipping_address_id'),
             ]);
-        } else {
-            // ===== FALLBACK: If NO address found, use user's default address =====
-            \Log::warning('⚠️ No valid address found, using default for order: ' . $txnid);
-            
-            if (Auth::check()) {
-                $defaultAddress = UserAddress::where('user_id', $userId)
-                    ->where('is_default', 1)
+
+            // =========================================================
+            // ★★★ GET FRESH ADDRESS FROM DATABASE ★★★
+            // =========================================================
+            if ($selectedAddressId && Auth::check()) {
+                $dbAddress = UserAddress::where('id', $selectedAddressId)
+                    ->where('user_id', $userId)
                     ->first();
 
-                if (!$defaultAddress) {
-                    $defaultAddress = UserAddress::where('user_id', $userId)
-                        ->orderBy('created_at', 'desc')
-                        ->first();
+                if ($dbAddress) {
+                    $selectedAddress = [
+                        'id' => $dbAddress->id,
+                        'user_id' => $dbAddress->user_id,
+                        'name' => $dbAddress->name,
+                        'email' => $dbAddress->email,
+                        'address' => $dbAddress->address,
+                        'area' => $dbAddress->area ?? '',
+                        'city' => $dbAddress->city,
+                        'state' => $dbAddress->state,
+                        'pincode' => $dbAddress->pincode,
+                        'phone' => $dbAddress->phone,
+                    ];
+                    \Log::info('✅ Found address in DB for ID: ' . $selectedAddressId);
+                } else {
+                    \Log::warning('⚠️ Address not found in DB for ID: ' . $selectedAddressId);
+                    $selectedAddress = null;
+                }
+            }
+
+            // =========================================================
+            // ★★★ SAVE THE EXACT ADDRESS TO payment_details ★★★
+            // =========================================================
+            if (is_array($selectedAddress) && !empty($selectedAddress['address'])) {
+                // Make sure all required fields exist
+                if (!isset($selectedAddress['name']) || empty($selectedAddress['name'])) {
+                    $selectedAddress['name'] = Auth::check() ? Auth::user()->name : ($request->guest_name ?? 'Guest');
+                }
+                if (!isset($selectedAddress['phone']) || empty($selectedAddress['phone'])) {
+                    $selectedAddress['phone'] = Auth::check() ? (Auth::user()->phone ?? '') : ($request->guest_phone ?? '');
+                }
+                if (!isset($selectedAddress['email']) || empty($selectedAddress['email'])) {
+                    $selectedAddress['email'] = Auth::check() ? Auth::user()->email : ($request->guest_email ?? '');
                 }
 
-                if ($defaultAddress) {
-                    $paymentDetails['shipping_address'] = [
-                        'id' => $defaultAddress->id,
-                        'user_id' => $defaultAddress->user_id,
-                        'name' => $defaultAddress->name,
-                        'email' => $defaultAddress->email,
-                        'address' => $defaultAddress->address,
-                        'area' => $defaultAddress->area ?? '',
-                        'city' => $defaultAddress->city,
-                        'state' => $defaultAddress->state,
-                        'pincode' => $defaultAddress->pincode,
-                        'phone' => $defaultAddress->phone,
-                    ];
-                    $paymentDetails['shipping_address_id'] = $defaultAddress->id;
+                // SAVE THE EXACT ADDRESS USED FOR THIS ORDER
+                $paymentDetails['shipping_address'] = $selectedAddress;
+
+                if (!empty($selectedAddress['id'])) {
+                    $paymentDetails['shipping_address_id'] = $selectedAddress['id'];
+                }
+
+                \Log::info('✅ Order address saved:', [
+                    'order' => $txnid,
+                    'address_id' => $selectedAddress['id'] ?? 'N/A',
+                    'address' => $selectedAddress['address'],
+                    'city' => $selectedAddress['city'] ?? '',
+                    'state' => $selectedAddress['state'] ?? ''
+                ]);
+            } else {
+                // ===== FALLBACK: If NO address found, use user's default address =====
+                \Log::warning('⚠️ No valid address found, using default for order: ' . $txnid);
+                
+                if (Auth::check()) {
+                    $defaultAddress = UserAddress::where('user_id', $userId)
+                        ->where('is_default', 1)
+                        ->first();
+
+                    if (!$defaultAddress) {
+                        $defaultAddress = UserAddress::where('user_id', $userId)
+                            ->orderBy('created_at', 'desc')
+                            ->first();
+                    }
+
+                    if ($defaultAddress) {
+                        $paymentDetails['shipping_address'] = [
+                            'id' => $defaultAddress->id,
+                            'user_id' => $defaultAddress->user_id,
+                            'name' => $defaultAddress->name,
+                            'email' => $defaultAddress->email,
+                            'address' => $defaultAddress->address,
+                            'area' => $defaultAddress->area ?? '',
+                            'city' => $defaultAddress->city,
+                            'state' => $defaultAddress->state,
+                            'pincode' => $defaultAddress->pincode,
+                            'phone' => $defaultAddress->phone,
+                        ];
+                        $paymentDetails['shipping_address_id'] = $defaultAddress->id;
+                    }
                 }
             }
         }
-    }
 
-    return Order::create([
-        'order_number' => $txnid,
-        'user_id' => $userId,
-        'total_amount' => $totalAmount,
-        'shipping_charge' => $shippingCharge,
-        'payment_status' => 'PENDING',
-        'order_status' => 'Pending',
-        'payment_method' => 'PayU',
-        'transaction_id' => $txnid,
-        'order_date' => now(),
-        'payment_details' => !empty($paymentDetails) ? json_encode($paymentDetails) : null
-    ]);
-} 
+        return Order::create([
+            'order_number' => $txnid,
+            'user_id' => $userId,
+            'total_amount' => $totalAmount,
+            'shipping_charge' => $shippingCharge,
+            'payment_status' => 'PENDING',
+            'order_status' => 'Pending',
+            'refund_status' => 'none',
+            'refund_amount' => 0,
+            'payment_method' => 'PayU',
+            'transaction_id' => $txnid,
+            'order_date' => now(),
+            'payment_details' => !empty($paymentDetails) ? json_encode($paymentDetails) : null
+        ]);
+    }
+    
     private function redirectToPayU($user, $txnid, $totalAmount, $productInfo, $orderId)
     {
         $hashString = $this->merchantKey . '|' . $txnid . '|' . $totalAmount . '|' . $productInfo . '|' . 
@@ -614,116 +619,116 @@ private function createOrder(
         ]);
     }
 
-   public function paymentSuccess(Request $request)
-{
-    Log::info('PayU Success Callback', $request->all());
+    public function paymentSuccess(Request $request)
+    {
+        Log::info('PayU Success Callback', $request->all());
 
-    $txnid = $request->input('txnid');
-    $status = $request->input('status');
-    $mihpayid = $request->input('mihpayid');
-    
-    if (!$txnid) {
-        Log::error('No transaction ID in callback');
-        return redirect()->route('home')->with('error', 'Invalid payment response');
-    }
-    
-    $order = Order::where('order_number', $txnid)->first();
+        $txnid = $request->input('txnid');
+        $status = $request->input('status');
+        $mihpayid = $request->input('mihpayid');
+        
+        if (!$txnid) {
+            Log::error('No transaction ID in callback');
+            return redirect()->route('home')->with('error', 'Invalid payment response');
+        }
+        
+        $order = Order::where('order_number', $txnid)->first();
 
-    if (!$order) {
-        Log::error('Order not found for txnid: ' . $txnid);
-        return redirect()->route('home')->with('error', 'Order not found');
-    }
-
-    if ($order->payment_status == 'SUCCESS') {
-        return redirect()->route('order.success', $order->id)->with('success', 'Payment already confirmed!');
-    }
-
-    if (!Auth::check() && $order->user_id) {
-        Auth::loginUsingId($order->user_id);
-    }
-
-    if ($status == 'success' || $mihpayid) {
-
-        // ★★★ Get existing payment details ★★★
-        $existingPaymentDetails = [];
-
-        if (!empty($order->payment_details)) {
-            $existingPaymentDetails = is_string($order->payment_details)
-                ? json_decode($order->payment_details, true)
-                : $order->payment_details;
-
-            if (!is_array($existingPaymentDetails)) {
-                $existingPaymentDetails = [];
-            }
+        if (!$order) {
+            Log::error('Order not found for txnid: ' . $txnid);
+            return redirect()->route('home')->with('error', 'Order not found');
         }
 
-        // ★★★ CRITICAL: Save the shipping_address before it gets overwritten ★★★
-        $shippingAddress = null;
-        $shippingAddressId = null;
-        
-        if (isset($existingPaymentDetails['shipping_address']) && !empty($existingPaymentDetails['shipping_address'])) {
-            $shippingAddress = $existingPaymentDetails['shipping_address'];
-            $shippingAddressId = $existingPaymentDetails['shipping_address_id'] ?? null;
+        if ($order->payment_status == 'SUCCESS') {
+            return redirect()->route('order.success', $order->id)->with('success', 'Payment already confirmed!');
+        }
+
+        if (!Auth::check() && $order->user_id) {
+            Auth::loginUsingId($order->user_id);
+        }
+
+        if ($status == 'success' || $mihpayid) {
+
+            // ★★★ Get existing payment details ★★★
+            $existingPaymentDetails = [];
+
+            if (!empty($order->payment_details)) {
+                $existingPaymentDetails = is_string($order->payment_details)
+                    ? json_decode($order->payment_details, true)
+                    : $order->payment_details;
+
+                if (!is_array($existingPaymentDetails)) {
+                    $existingPaymentDetails = [];
+                }
+            }
+
+            // ★★★ CRITICAL: Save the shipping_address before it gets overwritten ★★★
+            $shippingAddress = null;
+            $shippingAddressId = null;
             
-            Log::info('✅ Preserving shipping address for order: ' . $txnid, [
-                'shipping_address_id' => $shippingAddressId,
-                'shipping_address' => $shippingAddress
+            if (isset($existingPaymentDetails['shipping_address']) && !empty($existingPaymentDetails['shipping_address'])) {
+                $shippingAddress = $existingPaymentDetails['shipping_address'];
+                $shippingAddressId = $existingPaymentDetails['shipping_address_id'] ?? null;
+                
+                Log::info('✅ Preserving shipping address for order: ' . $txnid, [
+                    'shipping_address_id' => $shippingAddressId,
+                    'shipping_address' => $shippingAddress
+                ]);
+            }
+
+            // ★★★ Add PayU response details ★★★
+            $existingPaymentDetails['payu_response'] = $request->all();
+
+            // ★★★ CRITICAL: Restore shipping_address if it was present ★★★
+            if ($shippingAddress) {
+                $existingPaymentDetails['shipping_address'] = $shippingAddress;
+                if ($shippingAddressId) {
+                    $existingPaymentDetails['shipping_address_id'] = $shippingAddressId;
+                }
+            }
+
+            $order->update([
+                'payment_status' => 'SUCCESS',
+                'order_status' => 'Confirmed',
+                'payment_id' => $mihpayid,
+                'payment_details' => json_encode($existingPaymentDetails)
             ]);
-        }
 
-        // ★★★ Add PayU response details ★★★
-        $existingPaymentDetails['payu_response'] = $request->all();
+            Log::info('✅ Payment successful - Address preserved for order: ' . $txnid, [
+                'shipping_address_id' => $existingPaymentDetails['shipping_address_id'] ?? null
+            ]);
 
-        // ★★★ CRITICAL: Restore shipping_address if it was present ★★★
-        if ($shippingAddress) {
-            $existingPaymentDetails['shipping_address'] = $shippingAddress;
-            if ($shippingAddressId) {
-                $existingPaymentDetails['shipping_address_id'] = $shippingAddressId;
-            }
-        }
-
-        $order->update([
-            'payment_status' => 'SUCCESS',
-            'order_status' => 'Confirmed',
-            'payment_id' => $mihpayid,
-            'payment_details' => json_encode($existingPaymentDetails)
-        ]);
-
-        Log::info('✅ Payment successful - Address preserved for order: ' . $txnid, [
-            'shipping_address_id' => $existingPaymentDetails['shipping_address_id'] ?? null
-        ]);
-
-        session()->forget('pending_order_id');
-        session()->forget('checkout_cart');
-        
-        $this->sendOrderConfirmationEmail($order);
-        
-        return redirect()->route('order.success', ['id' => $order->id, 'clear_cart' => 1])->with('success', 'Payment successful!');
-    } else {
-        // ===== RESTORE STOCK ON PAYMENT FAILURE =====
-        foreach ($order->items as $item) {
-            if ($item->variant_id) {
-                $variant = \App\Models\ProductVariant::find($item->variant_id);
-                if ($variant) {
-                    $variant->increment('stock', $item->quantity);
-                }
-            } else {
-                $product = Product::find($item->product_id);
-                if ($product) {
-                    $product->increment('stock', $item->quantity);
+            session()->forget('pending_order_id');
+            session()->forget('checkout_cart');
+            
+            $this->sendOrderConfirmationEmail($order);
+            
+            return redirect()->route('order.success', ['id' => $order->id, 'clear_cart' => 1])->with('success', 'Payment successful!');
+        } else {
+            // ===== RESTORE STOCK ON PAYMENT FAILURE =====
+            foreach ($order->items as $item) {
+                if ($item->variant_id) {
+                    $variant = \App\Models\ProductVariant::find($item->variant_id);
+                    if ($variant) {
+                        $variant->increment('stock', $item->quantity);
+                    }
+                } else {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock', $item->quantity);
+                    }
                 }
             }
+            
+            $order->update([
+                'payment_status' => 'FAILED',
+                'order_status' => 'Failed'
+            ]);
+            
+            Log::warning('Payment failed for order: ' . $txnid);
+            return redirect()->route('cart')->with('error', 'Payment failed. Please try again.');
         }
-        
-        $order->update([
-            'payment_status' => 'FAILED',
-            'order_status' => 'Failed'
-        ]);
-        
-        Log::warning('Payment failed for order: ' . $txnid);
-        return redirect()->route('cart')->with('error', 'Payment failed. Please try again.');
     }
-}
 
     public function paymentFailure(Request $request)
     {
@@ -764,24 +769,24 @@ private function createOrder(
         return redirect()->route('cart')->with('error', 'Payment failed or was cancelled. Please try again.');
     }
 
-public function orderSuccess($id)
-{
-    $order = Order::with('items')->findOrFail($id);
-    
-    // Auto-login if user is not logged in but order belongs to a user
-    if (!Auth::check() && $order->user_id) {
-        Auth::loginUsingId($order->user_id);
-    }
-    
-    // Check if logged-in user owns this order
-    if (Auth::check() && $order->user_id != Auth::id()) {
-        abort(403);
-    }
+    public function orderSuccess($id)
+    {
+        $order = Order::with('items')->findOrFail($id);
+        
+        // Auto-login if user is not logged in but order belongs to a user
+        if (!Auth::check() && $order->user_id) {
+            Auth::loginUsingId($order->user_id);
+        }
+        
+        // Check if logged-in user owns this order
+        if (Auth::check() && $order->user_id != Auth::id()) {
+            abort(403);
+        }
 
-    $clearCart = request()->has('clear_cart');
-    
-    return view('payment.order-success', compact('order', 'clearCart'));
-}
+        $clearCart = request()->has('clear_cart');
+        
+        return view('payment.order-success', compact('order', 'clearCart'));
+    }
     
     public function myOrders(Request $request)
     {
@@ -931,23 +936,25 @@ public function orderSuccess($id)
             $paymentDetailsData['guest_email'] = $request->guest_email;
         }
         
-     $order = Order::create([
-    'order_number' => $txnid,
-    'user_id' => $user->id,
-    'total_amount' => $totalAmount,
-    'shipping_charge' => $shippingCharge,
-    'payment_status' => 'PENDING',
-    'order_status' => 'Pending',
-    'payment_method' => 'COD',
-    'transaction_id' => $txnid,
-    'order_date' => now(),
-    'payment_details' => json_encode($paymentDetailsData)
-]);
+        $order = Order::create([
+            'order_number' => $txnid,
+            'user_id' => $user->id,
+            'total_amount' => $totalAmount,
+            'shipping_charge' => $shippingCharge,
+            'payment_status' => 'PENDING',
+            'order_status' => 'Pending',
+            'refund_status' => 'none',
+            'refund_amount' => 0,
+            'payment_method' => 'COD',
+            'transaction_id' => $txnid,
+            'order_date' => now(),
+            'payment_details' => json_encode($paymentDetailsData)
+        ]);
 
-// ===== SAVE GUEST ADDRESS TO DATABASE =====
-if ($address && is_array($address)) {
-    $this->saveGuestAddress($user, $address);
-}
+        // ===== SAVE GUEST ADDRESS TO DATABASE =====
+        if ($address && is_array($address)) {
+            $this->saveGuestAddress($user, $address);
+        }
         
         foreach ($productItems as $item) {
             $productImage = \App\Models\ProductImage::where('product_id', $item['product']->id)
@@ -1063,6 +1070,9 @@ if ($address && is_array($address)) {
         }
     }
     
+    /**
+     * Cancel Order with Refund Status
+     */
     public function cancelOrder(Request $request)
     {
         if (!Auth::check()) {
@@ -1087,284 +1097,284 @@ if ($address && is_array($address)) {
             return response()->json(['success' => false, 'message' => 'This order cannot be cancelled as it is already ' . $order->order_status]);
         }
         
-        \App\Models\OrderCancellation::create([
-            'order_id' => $order->id,
-            'user_id' => Auth::id(),
-            'cancellation_reason' => $request->cancellation_reason,
-            'cancellation_comment' => $request->cancellation_comment
-        ]);
-        
-        $order->order_status = 'Cancelled';
-        $order->save();
-        
-        foreach ($order->items as $item) {
-            $product = Product::find($item->product_id);
-            if ($product) {
-                $product->increment('stock', $item->quantity);
-            }
-        }
-        
-        return response()->json(['success' => true, 'message' => 'Order cancelled successfully']);
-    }
-public function getOrderDetails($id)
-{
-    try {
-        $order = Order::with(['user', 'items'])->find($id);
-
-        if (!$order) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Order not found'
-            ], 404);
-        }
-
-        $shippingAddress = null;
-
-        // =========================================================
-        // ★★★ STEP 1: Get address from payment_details ★★★
-        // =========================================================
-        if (!empty($order->payment_details)) {
-            $paymentDetails = $order->payment_details;
+        try {
+            DB::beginTransaction();
             
-            if (is_string($paymentDetails)) {
-                $paymentDetails = json_decode($paymentDetails, true);
+            // Create cancellation record
+            OrderCancellation::create([
+                'order_id' => $order->id,
+                'user_id' => Auth::id(),
+                'cancellation_reason' => $request->cancellation_reason,
+                'cancellation_comment' => $request->cancellation_comment
+            ]);
+            
+            // Update order status
+            $order->order_status = 'Cancelled';
+            
+            // Set refund status if payment was successful
+            if ($order->payment_status == 'SUCCESS') {
+                $order->refund_status = 'pending';
+                $order->refund_amount = $order->total_amount;
+            } else {
+                $order->refund_status = 'none';
+                $order->refund_amount = 0;
             }
-
-            if (is_array($paymentDetails)) {
-                // Priority 1: Check shipping_address
-                if (isset($paymentDetails['shipping_address']) &&
-                    is_array($paymentDetails['shipping_address']) &&
-                    !empty($paymentDetails['shipping_address']['address'])) {
-                    $shippingAddress = $paymentDetails['shipping_address'];
-                } 
-                // Priority 2: Check address (backup)
-                elseif (isset($paymentDetails['address']) &&
-                    is_array($paymentDetails['address']) &&
-                    !empty($paymentDetails['address']['address'])) {
-                    $shippingAddress = $paymentDetails['address'];
+            
+            $order->save();
+            
+            // Restore stock
+            foreach ($order->items as $item) {
+                if ($item->variant_id) {
+                    $variant = \App\Models\ProductVariant::find($item->variant_id);
+                    if ($variant) {
+                        $variant->increment('stock', $item->quantity);
+                    }
+                } else {
+                    $product = Product::find($item->product_id);
+                    if ($product) {
+                        $product->increment('stock', $item->quantity);
+                    }
                 }
             }
-        }
-
-        // =========================================================
-        // ★★★ STEP 2: CRITICAL FIX - If shipping_address has id, get fresh from DB ★★★
-        // =========================================================
-        if ($shippingAddress && !empty($shippingAddress['id']) && $order->user_id) {
-            $dbAddress = UserAddress::where('id', $shippingAddress['id'])
-                ->where('user_id', $order->user_id)
-                ->first();
             
-            if ($dbAddress) {
-                // Use fresh data from database
+            DB::commit();
+            
+            return response()->json([
+                'success' => true, 
+                'message' => 'Order cancelled successfully',
+                'refund_status' => $order->refund_status,
+                'refund_amount' => $order->refund_amount
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to cancel order: ' . $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Get Order Details with Cancellation & Refund Info
+     */
+    public function getOrderDetails($id)
+    {
+        try {
+            $order = Order::with(['user', 'items', 'cancellation'])->find($id);
+
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found'
+                ], 404);
+            }
+
+            // Check if user owns this order
+            if (Auth::check() && $order->user_id != Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 403);
+            }
+
+            $shippingAddress = null;
+
+            // =========================================================
+            // ★★★ Get address from payment_details ★★★
+            // =========================================================
+            if (!empty($order->payment_details)) {
+                $paymentDetails = $order->payment_details;
+                
+                if (is_string($paymentDetails)) {
+                    $paymentDetails = json_decode($paymentDetails, true);
+                }
+
+                if (is_array($paymentDetails)) {
+                    // Priority 1: Check shipping_address
+                    if (isset($paymentDetails['shipping_address']) &&
+                        is_array($paymentDetails['shipping_address']) &&
+                        !empty($paymentDetails['shipping_address']['address'])) {
+                        $shippingAddress = $paymentDetails['shipping_address'];
+                    } 
+                    // Priority 2: Check address (backup)
+                    elseif (isset($paymentDetails['address']) &&
+                        is_array($paymentDetails['address']) &&
+                        !empty($paymentDetails['address']['address'])) {
+                        $shippingAddress = $paymentDetails['address'];
+                    }
+                }
+            }
+
+            // =========================================================
+            // ★★★ FALLBACK - ONLY FOR OLD ORDERS ★★★
+            // =========================================================
+            if (!$shippingAddress || empty($shippingAddress['address'])) {
                 $shippingAddress = [
-                    'id' => $dbAddress->id,
-                    'user_id' => $dbAddress->user_id,
-                    'name' => $dbAddress->name,
-                    'email' => $dbAddress->email,
-                    'address' => $dbAddress->address,
-                    'area' => $dbAddress->area ?? '',
-                    'city' => $dbAddress->city,
-                    'state' => $dbAddress->state,
-                    'pincode' => $dbAddress->pincode,
-                    'phone' => $dbAddress->phone,
+                    'id' => null,
+                    'user_id' => $order->user_id,
+                    'name' => $order->user->name ?? '',
+                    'email' => $order->user->email ?? '',
+                    'address' => '',
+                    'area' => '',
+                    'city' => '',
+                    'state' => '',
+                    'pincode' => '',
+                    'phone' => $order->user->phone ?? ''
                 ];
             }
-        }
 
-        // =========================================================
-        // ★★★ STEP 3: Log what we found ★★★
-        // =========================================================
-        \Log::info('🔍 Order address check:', [
-            'order_id' => $order->id,
-            'order_number' => $order->order_number,
-            'shipping_address_id' => $shippingAddress['id'] ?? null,
-            'shipping_address' => $shippingAddress,
-        ]);
+            // =========================================================
+            // ★★★ ORDER ITEMS ★★★
+            // =========================================================
+            $items = [];
 
-        // =========================================================
-        // ★★★ STEP 4: FALLBACK - ONLY FOR OLD ORDERS ★★★
-        // =========================================================
-      /*
-|--------------------------------------------------------------------------
-| SHIPPING ADDRESS
-|--------------------------------------------------------------------------
-| Use ONLY the address selected when this order was placed.
-| Do NOT fetch the user's latest/default address.
-|--------------------------------------------------------------------------
-*/
-
-$shippingAddress = null;
-
-if (!empty($order->payment_details)) {
-
-    $paymentDetails = $order->payment_details;
-
-    if (is_string($paymentDetails)) {
-        $paymentDetails = json_decode($paymentDetails, true);
-    }
-
-    if (is_array($paymentDetails)) {
-
-        if (
-            isset($paymentDetails['shipping_address']) &&
-            is_array($paymentDetails['shipping_address']) &&
-            !empty($paymentDetails['shipping_address']['address'])
-        ) {
-
-            $shippingAddress = $paymentDetails['shipping_address'];
-        }
-
-        // Old order format support
-        elseif (
-            isset($paymentDetails['address']) &&
-            is_array($paymentDetails['address']) &&
-            !empty($paymentDetails['address']['address'])
-        ) {
-
-            $shippingAddress = $paymentDetails['address'];
-        }
-    }
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| No saved order address
-|--------------------------------------------------------------------------
-*/
-
-if (
-    !$shippingAddress ||
-    empty($shippingAddress['address'])
-) {
-
-    $shippingAddress = [
-        'id' => null,
-        'user_id' => $order->user_id,
-        'name' => '',
-        'email' => '',
-        'address' => '',
-        'area' => '',
-        'city' => '',
-        'state' => '',
-        'pincode' => '',
-        'phone' => '',
-    ];
-}
-        // =========================================================
-        // ★★★ SHIPPING CHARGE ★★★
-        // =========================================================
-        $shippingCharge = $order->shipping_charge ?? 0;
-
-        // =========================================================
-        // ★★★ ORDER ITEMS ★★★
-        // =========================================================
-        $items = [];
-
-        foreach ($order->items as $item) {
-            $productImage = \App\Models\ProductImage::where('product_id', $item->product_id)
-                ->where(function ($q) use ($item) {
-                    if ($item->variant_id) {
-                        $q->where('variant_id', $item->variant_id);
-                    } else {
-                        $q->whereNull('variant_id');
-                    }
-                })
-                ->orderByDesc('is_main')
-                ->orderBy('display_order')
-                ->value('image_path');
-
-            if (!$productImage) {
+            foreach ($order->items as $item) {
                 $productImage = \App\Models\ProductImage::where('product_id', $item->product_id)
+                    ->where(function ($q) use ($item) {
+                        if ($item->variant_id) {
+                            $q->where('variant_id', $item->variant_id);
+                        } else {
+                            $q->whereNull('variant_id');
+                        }
+                    })
                     ->orderByDesc('is_main')
                     ->orderBy('display_order')
                     ->value('image_path');
+
+                if (!$productImage) {
+                    $productImage = \App\Models\ProductImage::where('product_id', $item->product_id)
+                        ->orderByDesc('is_main')
+                        ->orderBy('display_order')
+                        ->value('image_path');
+                }
+
+                $items[] = [
+                    'id' => $item->id,
+                    'product_id' => $item->product_id,
+                    'product_name' => $item->product_name,
+                    'quantity' => $item->quantity,
+                    'price' => $item->price,
+                    'final_price' => $item->final_price ?? $item->price,
+                    'size' => $item->size,
+                    'color' => $item->color,
+                    'variant_id' => $item->variant_id,
+                    'product_image' => $productImage
+                ];
             }
 
-            $items[] = [
-                'id' => $item->id,
-                'product_id' => $item->product_id,
-                'product_name' => $item->product_name,
-                'quantity' => $item->quantity,
-                'price' => $item->price,
-                'final_price' => $item->final_price ?? $item->price,
-                'size' => $item->size,
-                'color' => $item->color,
-                'product_image' => $productImage
+            // =========================================================
+            // ★★★ Calculate Additional Fields ★★★
+            // =========================================================
+            $orderData = $order->toArray();
+            
+            // Add calculated fields
+            $orderData['product_revenue'] = $order->items->sum(function($item) {
+                return ($item->final_price ?? $item->price) * $item->quantity;
+            });
+            
+            $orderData['actual_price'] = $order->items->sum(function($item) {
+                $product = Product::find($item->product_id);
+                return ($product->price ?? $item->price) * $item->quantity;
+            });
+            
+            $orderData['profit'] = $orderData['product_revenue'] - $orderData['actual_price'];
+            $orderData['total_with_shipping'] = $orderData['profit'] + ($order->shipping_charge ?? 0);
+            
+            // Refund status labels
+            $refundLabels = [
+                'pending' => 'Pending',
+                'processing' => 'Processing',
+                'completed' => 'Completed',
+                'none' => 'N/A'
             ];
-        }
+            $orderData['refund_status_label'] = $refundLabels[$order->refund_status] ?? 'N/A';
+            
+            // Add cancellation details if exists
+            if ($order->cancellation) {
+                $orderData['cancellation'] = $order->cancellation;
+            }
 
-        // =========================================================
-        // ★★★ RETURN ORDER DETAILS ★★★
-        // =========================================================
-        return response()->json([
-            'success' => true,
-            'order' => [
-                'id' => $order->id,
-                'order_number' => $order->order_number,
-                'total_amount' => $order->total_amount,
-                'shipping_charge' => $shippingCharge,
-                'payment_status' => $order->payment_status,
-                'order_status' => $order->order_status,
-                'payment_method' => $order->payment_method,
-                'transaction_id' => $order->transaction_id,
-                'payment_id' => $order->payment_id,
-                'payment_details' => $order->payment_details,
-                'order_date' => $order->order_date ?? $order->created_at,
-                'created_at' => $order->created_at,
-                'user' => $order->user ? [
-                    'name' => $order->user->name,
-                    'email' => $order->user->email,
-                    'phone' => $order->user->phone ?? 'N/A'
-                ] : null,
-                'items' => $items,
-                'shipping_address' => $shippingAddress
-            ]
-        ]);
-
-    } catch (\Exception $e) {
-        \Log::error('Admin getOrderDetails error: ' . $e->getMessage(), [
-            'order_id' => $id,
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
-    }
-}
-    /**
- * Save guest address to user_addresses table
- */
-private function saveGuestAddress($user, $addressData)
-{
-    try {
-        // Check if address already exists
-        $existingAddress = UserAddress::where('user_id', $user->id)
-            ->where('address', $addressData['address'])
-            ->where('city', $addressData['city'])
-            ->where('state', $addressData['state'])
-            ->first();
-        
-        if (!$existingAddress) {
-            UserAddress::create([
-                'user_id' => $user->id,
-                'name' => $addressData['name'] ?? $user->name,
-                'email' => $addressData['email'] ?? $user->email,
-                'address' => $addressData['address'],
-                'city' => $addressData['city'],
-                'state' => $addressData['state'],
-                'pincode' => $addressData['pincode'],
-                'phone' => $addressData['phone'] ?? $user->phone,
-                'is_default' => true
+            // =========================================================
+            // ★★★ RETURN ORDER DETAILS ★★★
+            // =========================================================
+            return response()->json([
+                'success' => true,
+                'order' => [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'total_amount' => $order->total_amount,
+                    'shipping_charge' => $order->shipping_charge ?? 0,
+                    'payment_status' => $order->payment_status,
+                    'order_status' => $order->order_status,
+                    'refund_status' => $order->refund_status,
+                    'refund_amount' => $order->refund_amount,
+                    'refund_status_label' => $orderData['refund_status_label'],
+                    'payment_method' => $order->payment_method,
+                    'transaction_id' => $order->transaction_id,
+                    'payment_id' => $order->payment_id,
+                    'payment_details' => $order->payment_details,
+                    'order_date' => $order->order_date ?? $order->created_at,
+                    'created_at' => $order->created_at,
+                    'user' => $order->user ? [
+                        'name' => $order->user->name,
+                        'email' => $order->user->email,
+                        'phone' => $order->user->phone ?? 'N/A'
+                    ] : null,
+                    'items' => $items,
+                    'shipping_address' => $shippingAddress,
+                    'cancellation' => $order->cancellation,
+                    'product_revenue' => $orderData['product_revenue'],
+                    'actual_price' => $orderData['actual_price'],
+                    'profit' => $orderData['profit'],
+                    'total_with_shipping' => $orderData['total_with_shipping']
+                ]
             ]);
-            Log::info('✅ Guest address saved for user: ' . $user->id);
+
+        } catch (\Exception $e) {
+            \Log::error('getOrderDetails error: ' . $e->getMessage(), [
+                'order_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
         }
-    } catch (\Exception $e) {
-        Log::error('❌ Failed to save guest address: ' . $e->getMessage());
     }
-}
+    
+    /**
+     * Save guest address to user_addresses table
+     */
+    private function saveGuestAddress($user, $addressData)
+    {
+        try {
+            // Check if address already exists
+            $existingAddress = UserAddress::where('user_id', $user->id)
+                ->where('address', $addressData['address'])
+                ->where('city', $addressData['city'])
+                ->where('state', $addressData['state'])
+                ->first();
+            
+            if (!$existingAddress) {
+                UserAddress::create([
+                    'user_id' => $user->id,
+                    'name' => $addressData['name'] ?? $user->name,
+                    'email' => $addressData['email'] ?? $user->email,
+                    'address' => $addressData['address'],
+                    'city' => $addressData['city'],
+                    'state' => $addressData['state'],
+                    'pincode' => $addressData['pincode'],
+                    'phone' => $addressData['phone'] ?? $user->phone,
+                    'is_default' => true
+                ]);
+                Log::info('✅ Guest address saved for user: ' . $user->id);
+            }
+        } catch (\Exception $e) {
+            Log::error('❌ Failed to save guest address: ' . $e->getMessage());
+        }
+    }
 
     private function sendOrderConfirmationEmail($order)
     {
@@ -1431,5 +1441,5 @@ private function saveGuestAddress($user, $addressData)
             Log::error('❌ Failed to send order confirmation email: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
         }
-    }   
+    }
 }
