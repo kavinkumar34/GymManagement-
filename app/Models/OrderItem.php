@@ -19,7 +19,10 @@ class OrderItem extends Model
         'total',
         'size',
         'color',
-        'product_image'
+        'product_image',
+            'return_status'  // ← ADD THIS
+
+        
     ];
     
     public function order()

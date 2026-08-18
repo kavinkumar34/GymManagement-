@@ -103,4 +103,8 @@ class Order extends Model
         ];
         return $badges[$this->refund_status] ?? '';
     }
+    public function returnRequests()
+{
+    return $this->hasMany(ReturnExchange::class);
+}
 }   

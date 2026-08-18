@@ -48,7 +48,6 @@
             background: var(--canvas);
         }
 
-        /* Signature element: a repeating diagonal "energy stripe" */
         .energy-stripe {
             height: 4px;
             width: 56px;
@@ -263,7 +262,6 @@
             gap: 4px;
         }
 
-        /* ===== PRODUCT IMAGE IN CARD ===== */
         .order-product-image {
             margin-bottom: 8px;
         }
@@ -317,7 +315,6 @@
             margin-right: 4px;
         }
 
-        /* ===== PAYMENT BADGE ===== */
         .payment-badge {
             display: inline-flex;
             align-items: center;
@@ -345,7 +342,6 @@
             color: var(--signal-dark);
         }
 
-        /* ===== REFUND BADGE ===== */
         .payment-badge.refund-pending {
             background: #fef3c7;
             color: #92400e;
@@ -359,7 +355,62 @@
             color: #15803d;
         }
 
-        /* ===== ORDER ACTIONS ===== */
+        .btn-return-exchange {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.78rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-body);
+            letter-spacing: 0.2px;
+        }
+
+        .btn-return-exchange:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .return-modal .modal-dialog {
+            max-width: 550px;
+        }
+        .return-modal .modal-content {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: none;
+        }
+        .return-modal .modal-header {
+            background: #8b5cf6;
+            color: white;
+            border-bottom: none;
+            padding: 18px 24px;
+        }
+        .return-modal .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+        .return-modal .modal-body {
+            padding: 24px;
+        }
+        .return-modal .modal-footer {
+            border-top: 1px solid var(--line);
+            padding: 16px 24px;
+        }
+        .return-eligible {
+            color: var(--success);
+            font-weight: 600;
+        }
+        .return-not-eligible {
+            color: var(--signal);
+            font-weight: 600;
+        }
+
         .order-actions {
             display: flex;
             gap: 10px;
@@ -426,9 +477,6 @@
             box-shadow: none;
         }
 
-        /* ============================================================ */
-        /* ===== FILTER SECTION ===== */
-        /* ============================================================ */
         .filter-section {
             background: white;
             border-radius: var(--radius-lg);
@@ -511,11 +559,6 @@
             color: var(--ink);
         }
 
-        /* ============================================================ */
-        /* ===== MODAL STYLES ===== */
-        /* ============================================================ */
-
-        /* Review Modal */
         .review-modal .modal-dialog {
             max-width: 500px;
         }
@@ -652,7 +695,6 @@
             justify-content: center;
         }
 
-        /* ===== CANCEL MODAL ===== */
         .cancel-modal .modal-content {
             border-radius: var(--radius-lg);
             overflow: hidden;
@@ -730,7 +772,6 @@
             box-shadow: 0 0 0 3px rgba(255, 68, 5, 0.1);
         }
 
-        /* ===== ORDER DETAILS MODAL ===== */
         .order-details-modal .modal-dialog {
             max-width: 900px;
         }
@@ -885,7 +926,6 @@
             border: 1px solid var(--line);
         }
 
-        /* ===== ORDER ITEMS IN MODAL ===== */
         .order-item-list {
             display: flex;
             flex-direction: column;
@@ -978,7 +1018,6 @@
             font-size: 0.95rem;
         }
 
-        /* ===== PAYMENT SUMMARY ===== */
         .payment-summary {
             background: var(--fog);
             padding: 16px;
@@ -1009,7 +1048,6 @@
             color: var(--ink);
         }
 
-        /* ===== ACTION BUTTONS ===== */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -1063,9 +1101,6 @@
             color: white;
         }
 
-        /* ============================================================ */
-        /* ===== MODAL Z-INDEX FIX ===== */
-        /* ============================================================ */
         .modal {
             z-index: 99999 !important;
         }
@@ -1083,9 +1118,6 @@
             z-index: 9999 !important;
         }
 
-        /* ============================================================ */
-        /* ===== EMPTY STATE ===== */
-        /* ============================================================ */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -1132,9 +1164,6 @@
             color: white;
         }
 
-        /* ============================================================ */
-        /* ===== TOAST / ALERT ===== */
-        /* ============================================================ */
         .my-orders-toast {
             position: fixed;
             bottom: 30px;
@@ -1293,7 +1322,8 @@
             }
 
             .btn-view-details,
-            .btn-review {
+            .btn-review,
+            .btn-return-exchange {
                 font-size: 0.7rem;
                 padding: 6px 14px;
             }
@@ -1378,7 +1408,8 @@
             }
 
             .btn-view-details,
-            .btn-review {
+            .btn-review,
+            .btn-return-exchange {
                 font-size: 0.6rem;
                 padding: 5px 10px;
             }
@@ -1428,7 +1459,6 @@
     </style>
 
     <div class="container mt-4 pt-2 pb-5 mb-4">
-        <!-- ===== PAGE HEADER ===== -->
         <div class="page-header-custom">
             <h2><i class="fas fa-shopping-bag"></i> My Orders</h2>
             <div class="header-stats">
@@ -1444,7 +1474,6 @@
             </div>
         </div>
 
-        <!-- ===== SEARCH & FILTER SECTION ===== -->
         <div class="filter-section">
             <form method="GET" action="{{ route('my.orders') }}" id="orderFilterForm">
                 <div class="row g-3 align-items-end">
@@ -1505,7 +1534,6 @@
             </form>
         </div>
 
-        <!-- ===== ORDERS LIST ===== -->
         <div class="card border-0 shadow-sm" style="border-radius: var(--radius-lg); overflow: hidden;">
             <div class="card-body" style="padding: 0;">
                 @if (session('success'))
@@ -1557,7 +1585,6 @@
                                     </div>
                                     <div class="order-body">
                                         <div class="order-info">
-                                            <!-- ===== PRODUCT IMAGE ===== -->
                                             <div class="order-product-image">
                                                 @php
                                                     $firstItem = $order->items->first();
@@ -1625,6 +1652,173 @@
                                             </div>
                                         </div>
 
+                                      <!-- ===== RETURN / EXCHANGE STATUS ===== -->
+@if(strtolower($order->order_status) === 'delivered')
+
+    @php
+        $deliveredAt = $order->order_date ?? $order->created_at;
+
+        $firstItem = $order->items->first();
+
+        $returnDays = $firstItem && $firstItem->product
+            ? ($firstItem->product->return_days ?? 30)
+            : 30;
+
+        /*
+         * Carbon 3:
+         * Use absolute diff to avoid negative days.
+         */
+        $daysSince = \Carbon\Carbon::parse($deliveredAt)
+            ->diffInDays(now(), true);
+
+        $isEligible = $daysSince <= $returnDays;
+
+        /*
+         * Get latest Return / Exchange request for this order.
+         */
+        $latestReturnRequest = \App\Models\ReturnExchange::where(
+                'order_id',
+                $order->id
+            )
+            ->latest('id')
+            ->first();
+
+        $requestStatus = $latestReturnRequest?->status;
+        $requestType = $latestReturnRequest?->request_type;
+
+    @endphp
+
+
+    {{-- ================= PENDING ================= --}}
+    @if($requestStatus === 'pending')
+
+        <button
+            class="btn-review reviewed"
+            disabled
+            style="
+                background:#f59e0b;
+                color:white;
+                border:none;
+                padding:8px 20px;
+                border-radius:40px;
+                font-weight:600;
+                opacity:0.9;
+                cursor:not-allowed;
+                display:inline-flex;
+                align-items:center;
+                gap:6px;
+                font-size:0.78rem;
+            "
+        >
+            <i class="fas fa-clock"></i>
+
+            {{ $requestType === 'return'
+                ? 'Return Request Pending'
+                : 'Exchange Request Pending'
+            }}
+        </button>
+
+
+    {{-- ================= PROCESSING ================= --}}
+    @elseif($requestStatus === 'processing')
+
+        <button
+            class="btn-review reviewed"
+            disabled
+            style="
+                background:#2563eb;
+                color:white;
+                border:none;
+                padding:8px 20px;
+                border-radius:40px;
+                font-weight:600;
+                opacity:0.95;
+                cursor:not-allowed;
+                display:inline-flex;
+                align-items:center;
+                gap:6px;
+                font-size:0.78rem;
+            "
+        >
+            <i class="fas fa-sync-alt fa-spin"></i>
+
+            {{ $requestType === 'return'
+                ? 'Return Request Processing'
+                : 'Exchange Request Processing'
+            }}
+        </button>
+
+
+    {{-- ================= COMPLETED ================= --}}
+    @elseif($requestStatus === 'completed')
+
+        <button
+            class="btn-review reviewed"
+            disabled
+            style="
+                background:#16a34a;
+                color:white;
+                border:none;
+                padding:8px 20px;
+                border-radius:40px;
+                font-weight:600;
+                opacity:1;
+                cursor:not-allowed;
+                display:inline-flex;
+                align-items:center;
+                gap:6px;
+                font-size:0.78rem;
+            "
+        >
+            <i class="fas fa-check-circle"></i>
+
+            {{ $requestType === 'return'
+                ? 'Return Request Completed'
+                : 'Exchange Request Completed'
+            }}
+        </button>
+
+
+    {{-- ================= NO REQUEST ================= --}}
+    @elseif($isEligible)
+
+        <button
+            class="btn-return-exchange"
+            onclick="openReturnExchangeModal({{ $order->id }})"
+        >
+            <i class="fas fa-undo-alt"></i>
+            Return/Exchange
+        </button>
+
+
+    {{-- ================= EXPIRED ================= --}}
+    @else
+
+        <button
+            class="btn-review reviewed"
+            disabled
+            style="
+                background:#94a3b8;
+                color:white;
+                border:none;
+                padding:8px 20px;
+                border-radius:40px;
+                font-weight:600;
+                opacity:0.8;
+                cursor:not-allowed;
+                display:inline-flex;
+                align-items:center;
+                gap:6px;
+                font-size:0.78rem;
+            "
+        >
+            <i class="fas fa-times-circle"></i>
+            Return Expired
+        </button>
+
+    @endif
+
+@endif
                                         <div class="order-actions">
                                             <button class="btn-view-details"
                                                 onclick="viewOrderDetails({{ $order->id }}, this)">
@@ -1676,9 +1870,7 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
     <!-- ===== REVIEW MODAL ===== -->
-    <!-- ============================================================ -->
     <div class="modal fade review-modal" id="reviewModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -1744,9 +1936,7 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
     <!-- ===== ORDER DETAILS MODAL ===== -->
-    <!-- ============================================================ -->
     <div class="modal fade order-details-modal" id="orderDetailsModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -1839,6 +2029,291 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- ===== RETURN/EXCHANGE REQUEST STATUS SECTION ===== -->
+                <!-- ===== RETURN / EXCHANGE REQUEST DETAILS ===== -->
+<div class="detail-section"
+     id="returnRequestSection"
+     style="display:none;">
+
+    <div class="section-title">
+
+        <i class="fas fa-undo-alt"
+           style="color:#8b5cf6;"></i>
+
+        Return / Exchange Request
+
+    </div>
+
+
+    <div class="info-grid">
+
+        <!-- REQUEST TYPE -->
+        <div class="info-item">
+
+            <span class="info-label">
+                Request Type
+            </span>
+
+            <span class="info-value"
+                  id="modalReturnType">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- STATUS -->
+        <div class="info-item">
+
+            <span class="info-label">
+                Status
+            </span>
+
+            <span class="info-value"
+                  id="modalReturnStatus">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- REASON -->
+        <div class="info-item">
+
+            <span class="info-label">
+                Reason
+            </span>
+
+            <span class="info-value"
+                  id="modalReturnReason">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- COMMENT -->
+        <div class="info-item">
+
+            <span class="info-label">
+                Comment
+            </span>
+
+            <span class="info-value"
+                  id="modalReturnComment">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- EXCHANGE PRODUCT -->
+        <div class="info-item"
+             id="modalExchangeProductWrapper"
+             style="display:none;">
+
+            <span class="info-label">
+                Exchange Product
+            </span>
+
+            <span class="info-value"
+                  id="modalExchangeProduct">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- EXCHANGE SIZE -->
+        <div class="info-item"
+             id="modalExchangeSizeWrapper"
+             style="display:none;">
+
+            <span class="info-label">
+                Exchange Size
+            </span>
+
+            <span class="info-value"
+                  id="modalExchangeSize">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- EXCHANGE COLOR -->
+        <div class="info-item"
+             id="modalExchangeColorWrapper"
+             style="display:none;">
+
+            <span class="info-label">
+                Exchange Color
+            </span>
+
+            <span class="info-value"
+                  id="modalExchangeColor">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- EXCHANGE QUANTITY -->
+        <div class="info-item"
+             id="modalExchangeQuantityWrapper"
+             style="display:none;">
+
+            <span class="info-label">
+                Exchange Quantity
+            </span>
+
+            <span class="info-value"
+                  id="modalExchangeQuantity">
+                -
+            </span>
+
+        </div>
+
+
+        <!-- RETURN QUANTITY -->
+        <div class="info-item"
+             id="modalReturnQuantityWrapper"
+             style="display:none;">
+
+            <span class="info-label">
+                Return Quantity
+            </span>
+
+            <span class="info-value"
+                  id="modalReturnQuantity">
+                -
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- BANK DETAILS — RETURN ONLY -->
+    <div id="modalReturnBankDetails"
+         style="
+            display:none;
+            margin-top:15px;
+            padding:15px;
+            background:#f8fafc;
+            border:1px solid var(--line);
+            border-radius:10px;
+         ">
+
+        <div style="
+            font-size:0.7rem;
+            font-weight:700;
+            text-transform:uppercase;
+            color:#dc2626;
+            margin-bottom:12px;
+        ">
+
+            <i class="fas fa-university me-1"></i>
+            Refund Bank Details
+
+        </div>
+
+
+        <div class="info-grid">
+
+            <!-- BANK NAME -->
+            <div class="info-item">
+
+                <span class="info-label">
+                    Bank Name
+                </span>
+
+                <span class="info-value"
+                      id="modalBankName">
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- ACCOUNT NUMBER -->
+            <div class="info-item">
+
+                <span class="info-label">
+                    Account Number
+                </span>
+
+                <span class="info-value"
+                      id="modalAccountNumber">
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- IFSC -->
+            <div class="info-item">
+
+                <span class="info-label">
+                    IFSC Code
+                </span>
+
+                <span class="info-value"
+                      id="modalIfscCode">
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUBMITTED / PROCESSED -->
+    <div style="
+        margin-top:15px;
+        padding-top:12px;
+        border-top:1px solid var(--line);
+    ">
+
+        <div class="info-grid">
+
+            <div class="info-item">
+
+                <span class="info-label">
+                    Submitted
+                </span>
+
+                <span class="info-value"
+                      id="modalReturnSubmitted">
+                    -
+                </span>
+
+            </div>
+
+
+            <div class="info-item"
+                 id="modalReturnProcessedWrapper"
+                 style="display:none;">
+
+                <span class="info-label">
+                    Processed
+                </span>
+
+                <span class="info-value"
+                      id="modalReturnProcessed">
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: var(--radius-sm); font-weight: 600;">Close</button>
@@ -1847,9 +2322,187 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
+    <!-- ===== RETURN/EXCHANGE MODAL ===== -->
+    <div class="modal fade return-modal" id="returnExchangeModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-undo-alt me-2"></i> Return / Exchange Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="return_order_id" value="">
+                    
+                    <div id="returnEligibilityInfo" class="mb-3"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Product <span class="text-danger">*</span></label>
+                        <select id="return_product_select" class="form-control" required>
+                            <option value="">-- Select Product --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Request Type <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="return_request_type" id="return_type_return" value="return" checked>
+                                <label class="form-check-label fw-bold" for="return_type_return" style="color:#dc2626;">
+                                    <i class="fas fa-undo-alt"></i> Return
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="return_request_type" id="return_type_exchange" value="exchange">
+                                <label class="form-check-label fw-bold" for="return_type_exchange" style="color:#2563eb;">
+                                    <i class="fas fa-exchange-alt"></i> Exchange
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Reason <span class="text-danger">*</span></label>
+                        <select id="return_reason_select" class="form-control" required>
+                            <option value="">-- Select Reason --</option>
+                            <option value="Damaged product">Damaged product</option>
+                            <option value="Wrong product received">Wrong product received</option>
+                            <option value="Size/Fit issue">Size/Fit issue</option>
+                            <option value="Product quality not good">Product quality not good</option>
+                            <option value="Color mismatch">Color mismatch</option>
+                            <option value="Defective product">Defective product</option>
+                            <option value="Changed my mind">Changed my mind</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Comment</label>
+                        <textarea id="return_comment" class="form-control" rows="3" placeholder="Describe your issue in detail..."></textarea>
+                    </div>
+
+                    <!-- ===== BANK DETAILS FOR RETURN (Only for Return) ===== -->
+                    <div id="bankDetailsSection" style="display:none; background: #f0f4f8; padding: 16px; border-radius: 10px; margin-bottom: 16px;">
+                        <h6 class="fw-bold" style="color:#dc2626;"><i class="fas fa-university me-2"></i> Bank Details for Refund</h6>
+                        <div class="row g-2">
+                            <div class="col-md-12">
+                                <label class="form-label" style="font-size:12px; font-weight:600;">Bank Name <span class="text-danger">*</span></label>
+                                <input type="text" id="bank_name" class="form-control" placeholder="Enter your bank name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:12px; font-weight:600;">Account Number <span class="text-danger">*</span></label>
+                                <input type="text" id="account_number" class="form-control" placeholder="Enter account number">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-size:12px; font-weight:600;">IFSC Code <span class="text-danger">*</span></label>
+                                <input type="text" id="ifsc_code" class="form-control" placeholder="Enter IFSC code">
+                            </div>
+                        </div>
+                        <small class="text-muted">Bank details are required for processing refund.</small>
+                    </div>
+
+                    <!-- ===== EXCHANGE SECTION (Hidden by default) ===== -->
+                <!-- ===== EXCHANGE SECTION ===== -->
+<!-- ===== EXCHANGE SECTION ===== -->
+<div id="exchangeSection"
+    style="display:none; background:#f0f4f8; padding:16px; border-radius:10px; margin-bottom:16px;">
+
+    <h6 class="fw-bold" style="color:#2563eb;">
+        <i class="fas fa-exchange-alt me-2"></i>
+        Exchange Details
+    </h6>
+
+    <!-- ===== EXCHANGE PRODUCT ===== -->
+    <div class="mb-3">
+
+        <label class="form-label"
+            style="font-size:12px; font-weight:600;">
+            Select Exchange Product
+            <span class="text-danger">*</span>
+        </label>
+
+        <select id="exchange_product_select"
+            class="form-control"
+            onchange="loadExchangeVariants(this.value)">
+
+            <option value="">
+                -- Select Exchange Product --
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ===== PURCHASED SIZE ===== -->
+    <div id="purchasedSizeWrapper"
+        class="mb-3"
+        style="display:none;">
+
+        <label class="form-label"
+            style="font-size:12px; font-weight:600;">
+            Purchased Size
+        </label>
+
+        <div id="purchased_size_display"
+            class="form-control"
+            style="
+                background:#e9ecef;
+                font-weight:600;
+                color:#495057;
+            ">
+            -
+        </div>
+
+    </div>
+
+
+    <!-- ===== AVAILABLE SIZE ===== -->
+    <div id="availableSizeWrapper"
+        class="mb-3"
+        style="display:none;">
+
+        <label class="form-label"
+            style="font-size:12px; font-weight:600;">
+            Available Size
+            <span class="text-danger">*</span>
+        </label>
+
+        <select id="exchange_size_select"
+            class="form-control">
+
+            <option value="">
+                -- Select Available Size --
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <small class="text-muted">
+        Only available sizes are shown.
+    </small>
+
+</div>
+
+                    <div id="return_error_message" class="alert alert-danger" style="display:none; border-radius:10px;"></div>
+
+                    <div class="alert alert-info" style="border-radius:10px; font-size:14px;">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Return Policy:</strong> You can request return/exchange within <strong id="return_days_display">30</strong> days of delivery.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn" id="submitReturnBtn" onclick="submitReturnRequest()" style="background: #8b5cf6; color: white; border:none; padding:10px 30px; border-radius:8px; font-weight:600;">
+                        <i class="fas fa-paper-plane"></i> Submit Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== CANCEL ORDER MODAL ===== -->
-    <!-- ============================================================ -->
     <div class="modal fade cancel-modal" id="cancelModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -1913,598 +2566,2039 @@
     <!-- ===== JAVASCRIPT ===== -->
     <!-- ============================================================ -->
     <script>
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
-            '{{ csrf_token() }}';
-        let currentCancelOrderId = null;
-        let currentOrderForCancel = null;
-        let currentOrderId = null;
-        let reviewFiles = [];
-        let orderItemsData = [];
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+        '{{ csrf_token() }}';
+    let currentCancelOrderId = null;
+    let currentOrderForCancel = null;
+    let currentOrderId = null;
+    let reviewFiles = [];
+    let orderItemsData = [];
+    let selectedProductForExchange = null;
+    let availableExchangeProducts = [];
+    let currentReturnItems = [];
 
-        // ============================================================
-        // ===== TOAST NOTIFICATION =====
-        // ============================================================
-        function showMyOrdersToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `my-orders-toast ${type}`;
-            const icon = type === 'success'
-                ? 'fa-check-circle'
-                : type === 'error'
-                    ? 'fa-exclamation-circle'
-                    : 'fa-info-circle';
-            toast.innerHTML = `
-                <i class="fas ${icon}"></i>
-                <span>${message}</span>
-            `;
-            document.body.appendChild(toast);
+    // ============================================================
+    // ===== TOAST NOTIFICATION =====
+    // ============================================================
+    function showMyOrdersToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `my-orders-toast ${type}`;
+        const icon = type === 'success'
+            ? 'fa-check-circle'
+            : type === 'error'
+                ? 'fa-exclamation-circle'
+                : 'fa-info-circle';
+        toast.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+            toast.style.transition = 'all 0.3s ease';
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(10px)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 3000);
-        }
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
 
-        // ============================================================
-        // ===== SELECT REASON FOR CANCELLATION =====
-        // ============================================================
-        function selectReason(element, reason) {
-            document.querySelectorAll('.reason-option').forEach(opt => {
-                opt.classList.remove('selected');
-                const radio = opt.querySelector('input[type="radio"]');
-                if (radio) radio.checked = false;
-            });
-            element.classList.add('selected');
-            const radio = element.querySelector('input[type="radio"]');
-            if (radio) radio.checked = true;
-        }
+    // ============================================================
+    // ===== SELECT REASON FOR CANCELLATION =====
+    // ============================================================
+    function selectReason(element, reason) {
+        document.querySelectorAll('.reason-option').forEach(opt => {
+            opt.classList.remove('selected');
+            const radio = opt.querySelector('input[type="radio"]');
+            if (radio) radio.checked = false;
+        });
+        element.classList.add('selected');
+        const radio = element.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+    }
 
-        // ============================================================
-        // ===== OPEN REVIEW MODAL =====
-        // ============================================================
-        function openReviewModal(orderId) {
-            try {
-                currentOrderId = orderId;
-                const orderIdInput = document.getElementById('review_order_id');
-                if (orderIdInput) {
-                    orderIdInput.value = orderId;
+    // ============================================================
+    // ===== OPEN REVIEW MODAL =====
+    // ============================================================
+    function openReviewModal(orderId) {
+        try {
+            currentOrderId = orderId;
+            const orderIdInput = document.getElementById('review_order_id');
+            if (orderIdInput) {
+                orderIdInput.value = orderId;
+            }
+            const descriptionTextarea = document.getElementById('review_description');
+            if (descriptionTextarea) {
+                descriptionTextarea.value = '';
+            }
+            const filesPreview = document.getElementById('review_files_preview');
+            if (filesPreview) {
+                filesPreview.innerHTML = '';
+            }
+            const errorDiv = document.getElementById('review_error_message');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+            reviewFiles = [];
+            orderItemsData = [];
+            const productError = document.getElementById('product_select_error');
+            if (productError) {
+                productError.style.display = 'none';
+            }
+            document.querySelectorAll('#reviewStars input').forEach(input => input.checked = false);
+            const star1 = document.getElementById('review_star1');
+            if (star1) {
+                star1.checked = true;
+            }
+            const select = document.getElementById('review_product_select');
+            if (select) {
+                select.innerHTML = '<option value="">-- Loading products... --</option>';
+                select.disabled = true;
+            }
+            fetch(`/api/order-details/${orderId}`)
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (select) {
+                        select.innerHTML = '<option value="">-- Select Product --</option>';
+                        select.disabled = false;
+                    }
+                    if (data.success && data.order && data.order.items && data.order.items.length > 0) {
+                        orderItemsData = data.order.items;
+                        data.order.items.forEach((item) => {
+                            const option = document.createElement('option');
+                            option.value = parseInt(item.product_id);
+                            option.textContent = item.product_name + ' (₹' + parseFloat(item.price)
+                                .toFixed(2) + ')';
+                            if (select) {
+                                select.appendChild(option);
+                            }
+                        });
+                        if (data.order.items.length === 1 && select) {
+                            select.value = parseInt(data.order.items[0].product_id);
+                        }
+                    } else {
+                        if (select) {
+                            select.innerHTML = '<option value="">-- No products found --</option>';
+                            select.disabled = true;
+                        }
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading products:', err);
+                    if (select) {
+                        select.innerHTML = '<option value="">-- Error loading products --</option>';
+                        select.disabled = false;
+                    }
+                    showMyOrdersToast('Error loading products', 'error');
+                });
+            const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+            modal.show();
+        } catch (error) {
+            console.error('Error in openReviewModal:', error);
+            showMyOrdersToast('Error opening review modal', 'error');
+        }
+    }
+
+    // ============================================================
+    // ===== PREVIEW REVIEW FILES =====
+    // ============================================================
+    function previewReviewFiles(input) {
+        const preview = document.getElementById('review_files_preview');
+        if (!preview) return;
+        const files = Array.from(input.files);
+        files.forEach((file) => {
+            reviewFiles.push(file);
+            const reader = new FileReader();
+            const fileIndex = reviewFiles.length - 1;
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'file-preview-item';
+                if (file.type.startsWith('image/')) {
+                    div.innerHTML =
+                        `<img src="${e.target.result}" alt="Preview"><button class="remove-file" onclick="removeReviewFile(this, ${fileIndex})">×</button>`;
+                } else if (file.type.startsWith('video/')) {
+                    div.innerHTML =
+                        `<video src="${e.target.result}"></video><button class="remove-file" onclick="removeReviewFile(this, ${fileIndex})">×</button>`;
                 }
-                const descriptionTextarea = document.getElementById('review_description');
-                if (descriptionTextarea) {
-                    descriptionTextarea.value = '';
+                preview.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // ============================================================
+    // ===== REMOVE REVIEW FILE =====
+    // ============================================================
+    function removeReviewFile(button, index) {
+        button.closest('.file-preview-item').remove();
+        reviewFiles.splice(index, 1);
+    }
+
+    // ============================================================
+    // ===== SUBMIT REVIEW =====
+    // ============================================================
+    async function submitReview() {
+        try {
+            const orderId = document.getElementById('review_order_id').value;
+            const productSelect = document.getElementById('review_product_select');
+            const productId = productSelect ? productSelect.value : null;
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const description = document.getElementById('review_description').value;
+            const errorDiv = document.getElementById('review_error_message');
+            const submitBtn = document.getElementById('submitReviewBtn');
+
+            let hasError = false;
+            let errorMessages = [];
+
+            if (!productId || productId === '' || productId === '0' || productId === 'null') {
+                const productError = document.getElementById('product_select_error');
+                if (productError) {
+                    productError.style.display = 'block';
                 }
-                const filesPreview = document.getElementById('review_files_preview');
-                if (filesPreview) {
-                    filesPreview.innerHTML = '';
+                if (productSelect) {
+                    productSelect.style.borderColor = 'red';
                 }
-                const errorDiv = document.getElementById('review_error_message');
-                if (errorDiv) {
-                    errorDiv.style.display = 'none';
-                }
-                reviewFiles = [];
-                orderItemsData = [];
+                hasError = true;
+                errorMessages.push('Please select a product');
+            } else {
                 const productError = document.getElementById('product_select_error');
                 if (productError) {
                     productError.style.display = 'none';
                 }
-                document.querySelectorAll('#reviewStars input').forEach(input => input.checked = false);
-                const star1 = document.getElementById('review_star1');
-                if (star1) {
-                    star1.checked = true;
+                if (productSelect) {
+                    productSelect.style.borderColor = '';
                 }
-                const select = document.getElementById('review_product_select');
-                if (select) {
-                    select.innerHTML = '<option value="">-- Loading products... --</option>';
-                    select.disabled = true;
-                }
-                fetch(`/api/order-details/${orderId}`)
-                    .then(res => {
-                        if (!res.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return res.json();
-                    })
-                    .then(data => {
-                        if (select) {
-                            select.innerHTML = '<option value="">-- Select Product --</option>';
-                            select.disabled = false;
-                        }
-                        if (data.success && data.order && data.order.items && data.order.items.length > 0) {
-                            orderItemsData = data.order.items;
-                            data.order.items.forEach((item) => {
-                                const option = document.createElement('option');
-                                option.value = parseInt(item.product_id);
-                                option.textContent = item.product_name + ' (₹' + parseFloat(item.price)
-                                    .toFixed(2) + ')';
-                                if (select) {
-                                    select.appendChild(option);
-                                }
-                            });
-                            if (data.order.items.length === 1 && select) {
-                                select.value = parseInt(data.order.items[0].product_id);
-                            }
-                        } else {
-                            if (select) {
-                                select.innerHTML = '<option value="">-- No products found --</option>';
-                                select.disabled = true;
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Error loading products:', err);
-                        if (select) {
-                            select.innerHTML = '<option value="">-- Error loading products --</option>';
-                            select.disabled = false;
-                        }
-                        showMyOrdersToast('Error loading products', 'error');
-                    });
-                const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
-                modal.show();
-            } catch (error) {
-                console.error('Error in openReviewModal:', error);
-                showMyOrdersToast('Error opening review modal', 'error');
             }
-        }
 
-        // ============================================================
-        // ===== PREVIEW REVIEW FILES =====
-        // ============================================================
-        function previewReviewFiles(input) {
-            const preview = document.getElementById('review_files_preview');
-            if (!preview) return;
-            const files = Array.from(input.files);
-            files.forEach((file) => {
-                reviewFiles.push(file);
-                const reader = new FileReader();
-                const fileIndex = reviewFiles.length - 1;
-                reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'file-preview-item';
-                    if (file.type.startsWith('image/')) {
-                        div.innerHTML =
-                            `<img src="${e.target.result}" alt="Preview"><button class="remove-file" onclick="removeReviewFile(this, ${fileIndex})">×</button>`;
-                    } else if (file.type.startsWith('video/')) {
-                        div.innerHTML =
-                            `<video src="${e.target.result}"></video><button class="remove-file" onclick="removeReviewFile(this, ${fileIndex})">×</button>`;
-                    }
-                    preview.appendChild(div);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
+            if (!rating) {
+                errorMessages.push('Please select a rating');
+                hasError = true;
+            }
 
-        // ============================================================
-        // ===== REMOVE REVIEW FILE =====
-        // ============================================================
-        function removeReviewFile(button, index) {
-            button.closest('.file-preview-item').remove();
-            reviewFiles.splice(index, 1);
-        }
+            if (!description || description.trim() === '') {
+                errorMessages.push('Please write a review description');
+                hasError = true;
+            }
 
-        // ============================================================
-        // ===== SUBMIT REVIEW =====
-        // ============================================================
-        async function submitReview() {
-            try {
-                const orderId = document.getElementById('review_order_id').value;
-                const productSelect = document.getElementById('review_product_select');
-                const productId = productSelect ? productSelect.value : null;
-                const rating = document.querySelector('input[name="rating"]:checked');
-                const description = document.getElementById('review_description').value;
-                const errorDiv = document.getElementById('review_error_message');
-                const submitBtn = document.getElementById('submitReviewBtn');
-
-                let hasError = false;
-                let errorMessages = [];
-
-                if (!productId || productId === '' || productId === '0' || productId === 'null') {
-                    const productError = document.getElementById('product_select_error');
-                    if (productError) {
-                        productError.style.display = 'block';
-                    }
-                    if (productSelect) {
-                        productSelect.style.borderColor = 'red';
-                    }
-                    hasError = true;
-                    errorMessages.push('Please select a product');
-                } else {
-                    const productError = document.getElementById('product_select_error');
-                    if (productError) {
-                        productError.style.display = 'none';
-                    }
-                    if (productSelect) {
-                        productSelect.style.borderColor = '';
-                    }
-                }
-
-                if (!rating) {
-                    errorMessages.push('Please select a rating');
-                    hasError = true;
-                }
-
-                if (!description || description.trim() === '') {
-                    errorMessages.push('Please write a review description');
-                    hasError = true;
-                }
-
-                if (hasError) {
-                    if (errorDiv) {
-                        errorDiv.style.display = 'block';
-                        errorDiv.innerHTML = errorMessages.join('<br>');
-                    } else {
-                        showMyOrdersToast(errorMessages.join('\n'), 'error');
-                    }
-                    return;
-                }
-
-                if (errorDiv) {
-                    errorDiv.style.display = 'none';
-                }
-
-                if (!submitBtn) {
-                    showMyOrdersToast('Error: Submit button not found.', 'error');
-                    return;
-                }
-
-                const originalText = submitBtn.innerHTML;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-                submitBtn.disabled = true;
-
-                const formData = new FormData();
-                formData.append('order_id', orderId);
-                formData.append('product_id', parseInt(productId));
-                formData.append('rating', parseInt(rating.value));
-                formData.append('description', description);
-
-                if (reviewFiles && reviewFiles.length > 0) {
-                    reviewFiles.forEach(function(file) {
-                        formData.append('review_files[]', file);
-                    });
-                }
-
-                const response = await fetch('/submit-product-review', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-                    showMyOrdersToast(data.message || 'Thank you! Your review has been submitted for approval.', 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    if (errorDiv) {
-                        errorDiv.style.display = 'block';
-                        errorDiv.innerHTML = data.message || 'Error submitting review';
-                    } else {
-                        showMyOrdersToast(data.message || 'Error submitting review', 'error');
-                    }
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                }
-            } catch (error) {
-                console.error('Error in submitReview:', error);
-                const errorDiv = document.getElementById('review_error_message');
+            if (hasError) {
                 if (errorDiv) {
                     errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = 'Network error: ' + error.message;
+                    errorDiv.innerHTML = errorMessages.join('<br>');
                 } else {
-                    showMyOrdersToast('Network error: ' + error.message, 'error');
+                    showMyOrdersToast(errorMessages.join('\n'), 'error');
                 }
-                const submitBtn = document.getElementById('submitReviewBtn');
-                if (submitBtn) {
-                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
-                    submitBtn.disabled = false;
-                }
-            }
-        }
-
-        // ============================================================
-        // ===== OPEN CANCEL MODAL =====
-        // ============================================================
-        function openCancelModalFromDetails() {
-            if (currentOrderForCancel) {
-                openCancelModal(currentOrderForCancel);
-            } else {
-                showMyOrdersToast('No order selected for cancellation', 'error');
-            }
-        }
-
-        function openCancelModal(orderId) {
-            currentCancelOrderId = orderId;
-            document.getElementById('cancelOrderId').value = orderId;
-            document.querySelectorAll('.reason-option').forEach(opt => {
-                opt.classList.remove('selected');
-                const radio = opt.querySelector('input[type="radio"]');
-                if (radio) radio.checked = false;
-            });
-            document.getElementById('cancelComment').value = '';
-            const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
-            modal.show();
-        }
-
-        // ============================================================
-        // ===== SUBMIT CANCELLATION =====
-        // ============================================================
-        async function submitCancellation() {
-            const orderId = document.getElementById('cancelOrderId').value;
-            const selectedReason = document.querySelector('input[name="cancel_reason"]:checked');
-            const comment = document.getElementById('cancelComment').value;
-
-            if (!selectedReason) {
-                showMyOrdersToast('Please select a reason for cancellation', 'error');
                 return;
             }
 
-            const submitBtn = document.querySelector('#cancelModal .btn-danger');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+
+            if (!submitBtn) {
+                showMyOrdersToast('Error: Submit button not found.', 'error');
+                return;
+            }
+
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
             submitBtn.disabled = true;
 
-            try {
-                const response = await fetch('/cancel-order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        order_id: orderId,
-                        cancellation_reason: selectedReason.value,
-                        cancellation_comment: comment
-                    })
-                });
+            const formData = new FormData();
+            formData.append('order_id', orderId);
+            formData.append('product_id', parseInt(productId));
+            formData.append('rating', parseInt(rating.value));
+            formData.append('description', description);
 
-                const data = await response.json();
-                if (data.success) {
-                    const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
-                    const orderModal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
-                    if (cancelModal) cancelModal.hide();
-                    if (orderModal) orderModal.hide();
-                    showMyOrdersToast('Your cancellation request has been submitted successfully!', 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showMyOrdersToast(data.message || 'Error submitting cancellation request', 'error');
+            if (reviewFiles && reviewFiles.length > 0) {
+                reviewFiles.forEach(function(file) {
+                    formData.append('review_files[]', file);
+                });
+            }
+
+            const response = await fetch('/submit-product-review', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('reviewModal'));
+                if (modal) {
+                    modal.hide();
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                showMyOrdersToast('Network error. Please try again.', 'error');
-            } finally {
+                showMyOrdersToast(data.message || 'Thank you! Your review has been submitted for approval.', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                if (errorDiv) {
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerHTML = data.message || 'Error submitting review';
+                } else {
+                    showMyOrdersToast(data.message || 'Error submitting review', 'error');
+                }
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
+        } catch (error) {
+            console.error('Error in submitReview:', error);
+            const errorDiv = document.getElementById('review_error_message');
+            if (errorDiv) {
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = 'Network error: ' + error.message;
+            } else {
+                showMyOrdersToast('Network error: ' + error.message, 'error');
+            }
+            const submitBtn = document.getElementById('submitReviewBtn');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';
+                submitBtn.disabled = false;
+            }
+        }
+    }
+
+    // ============================================================
+    // ===== OPEN CANCEL MODAL =====
+    // ============================================================
+    function openCancelModalFromDetails() {
+        if (currentOrderForCancel) {
+            openCancelModal(currentOrderForCancel);
+        } else {
+            showMyOrdersToast('No order selected for cancellation', 'error');
+        }
+    }
+
+    function openCancelModal(orderId) {
+        currentCancelOrderId = orderId;
+        document.getElementById('cancelOrderId').value = orderId;
+        document.querySelectorAll('.reason-option').forEach(opt => {
+            opt.classList.remove('selected');
+            const radio = opt.querySelector('input[type="radio"]');
+            if (radio) radio.checked = false;
+        });
+        document.getElementById('cancelComment').value = '';
+        const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+        modal.show();
+    }
+
+    // ============================================================
+    // ===== SUBMIT CANCELLATION =====
+    // ============================================================
+    async function submitCancellation() {
+        const orderId = document.getElementById('cancelOrderId').value;
+        const selectedReason = document.querySelector('input[name="cancel_reason"]:checked');
+        const comment = document.getElementById('cancelComment').value;
+
+        if (!selectedReason) {
+            showMyOrdersToast('Please select a reason for cancellation', 'error');
+            return;
         }
 
-        // ============================================================
-        // ===== VIEW ORDER DETAILS =====
-        // ============================================================
-        async function viewOrderDetails(orderId, button) {
-            const originalText = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-            button.disabled = true;
+        const submitBtn = document.querySelector('#cancelModal .btn-danger');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        submitBtn.disabled = true;
 
-            try {
-                const response = await fetch(`/api/order-details/${orderId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
+        try {
+            const response = await fetch('/cancel-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    cancellation_reason: selectedReason.value,
+                    cancellation_comment: comment
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
+                const orderModal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
+                if (cancelModal) cancelModal.hide();
+                if (orderModal) orderModal.hide();
+                showMyOrdersToast('Your cancellation request has been submitted successfully!', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showMyOrdersToast(data.message || 'Error submitting cancellation request', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMyOrdersToast('Network error. Please try again.', 'error');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    // ============================================================
+    // ===== OPEN RETURN/EXCHANGE MODAL =====
+    // ============================================================
+    function openReturnExchangeModal(orderId) {
+        const modalElement = document.getElementById('returnExchangeModal');
+        if (!modalElement) {
+            console.error('Return/Exchange modal not found!');
+            showMyOrdersToast('Modal not loaded. Please refresh the page.', 'error');
+            return;
+        }
+
+        const returnOrderId = document.getElementById('return_order_id');
+        const returnProductSelect = document.getElementById('return_product_select');
+        const returnErrorMessage = document.getElementById('return_error_message');
+        const returnEligibilityInfo = document.getElementById('returnEligibilityInfo');
+        const returnDaysDisplay = document.getElementById('return_days_display');
+        const exchangeSection = document.getElementById('exchangeSection');
+
+        if (returnOrderId) returnOrderId.value = orderId;
+        if (returnProductSelect) {
+            returnProductSelect.innerHTML = '<option value="">-- Loading products --</option>';
+        }
+        if (returnErrorMessage) {
+            returnErrorMessage.style.display = 'none';
+        }
+        if (returnEligibilityInfo) {
+            returnEligibilityInfo.innerHTML = '<span class="text-muted">Checking eligibility...</span>';
+        }
+        if (exchangeSection) {
+            exchangeSection.style.display = 'none';
+        }
+
+        availableExchangeProducts = [];
+
+        fetch(`/return-exchange/check/${orderId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentReturnItems =
+    data.items || [];
+                    if (returnEligibilityInfo) {
+                        if (data.is_eligible) {
+                            returnEligibilityInfo.innerHTML = `<span class="return-eligible"><i class="fas fa-check-circle"></i> Eligible for Return/Exchange (${data.days_since_delivery} days since delivery)</span>`;
+                        } else {
+                            returnEligibilityInfo.innerHTML = `<span class="return-not-eligible"><i class="fas fa-times-circle"></i> ${data.message || 'Not eligible'}</span>`;
+                        }
                     }
-                });
-                const data = await response.json();
-                if (data.success && data.order) {
-                    currentOrderForCancel = orderId;
-                    renderModalWithOrderData(data.order);
-                    const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
-                    modal.show();
-                } else {
-                    showMyOrdersToast(data.message || 'Error loading order details', 'error');
+
+if (returnProductSelect) {
+
+    returnProductSelect.innerHTML =
+        '<option value="">-- Select Product --</option>';
+
+    if (data.items && data.items.length > 0) {
+
+        data.items.forEach(item => {
+
+            const option = document.createElement('option');
+
+            option.value = item.id;
+
+            option.dataset.hasVariant =
+                (
+                    item.has_variant ||
+                    !!item.variant_id
+                ) ? '1' : '0';
+
+            let productText = item.product_name;
+
+            if (
+                item.has_variant ||
+                item.variant_id
+            ) {
+
+                if (item.color) {
+                    productText +=
+                        ' | Color: ' + item.color;
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                showMyOrdersToast('Error loading order details. Please try again.', 'error');
-            } finally {
-                button.innerHTML = originalText;
-                button.disabled = false;
+
+                if (item.size) {
+                    productText +=
+                        ' | Size: ' + item.size;
+                }
+            }
+
+            productText +=
+                ' | Qty: ' + item.quantity;
+
+            option.textContent = productText;
+
+            if (!item.is_eligible) {
+                option.disabled = true;
+                option.textContent +=
+                    ' - Not eligible';
+            }
+
+            returnProductSelect.appendChild(option);
+        });
+    }
+}
+                }
+
+if (
+    returnDaysDisplay &&
+    data.items &&
+    data.items.length > 0
+) {
+    returnDaysDisplay.textContent =
+        data.items[0].return_days || 30;
+}
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                if (returnEligibilityInfo) {
+                    returnEligibilityInfo.innerHTML = '<span class="text-danger">Error loading eligibility</span>';
+                }
+            });
+
+            // ============================================================
+// ===== SHOW PURCHASED SIZE WHEN RETURN PRODUCT SELECTED =====
+// ============================================================
+
+// ============================================================
+// ===== SHOW PURCHASED SIZE WHEN RETURN PRODUCT SELECTED =====
+// ============================================================
+// ============================================================
+// ===== PRODUCT SELECTION CHANGE ==============================
+// ===== RETURN + EXCHANGE AVAILABLE FOR ALL PRODUCTS ==========
+// ===== EXCHANGE DETAILS ONLY FOR VARIANT PRODUCTS =============
+// ============================================================
+
+if (returnProductSelect) {
+
+    returnProductSelect.onchange = function () {
+
+        const selectedItem = currentReturnItems.find(
+            item =>
+                String(item.id) ===
+                String(this.value)
+        );
+
+        const isVariantProduct =
+            selectedItem &&
+            (
+                selectedItem.has_variant === true ||
+                selectedItem.has_variant === 1 ||
+                selectedItem.has_variant === '1' ||
+                !!selectedItem.variant_id
+            );
+
+        const exchangeRadio =
+            document.getElementById('return_type_exchange');
+
+        const exchangeSection =
+            document.getElementById('exchangeSection');
+
+        const purchasedSizeWrapper =
+            document.getElementById('purchasedSizeWrapper');
+
+        const availableSizeWrapper =
+            document.getElementById('availableSizeWrapper');
+
+        const purchasedSizeDisplay =
+            document.getElementById('purchased_size_display');
+
+        const exchangeProductSelect =
+            document.getElementById('exchange_product_select');
+
+        const exchangeSizeSelect =
+            document.getElementById('exchange_size_select');
+
+        // ========================================================
+        // NO PRODUCT SELECTED
+        // ========================================================
+
+        if (!selectedItem) {
+
+            if (exchangeSection) {
+                exchangeSection.style.display = 'none';
+            }
+
+            if (purchasedSizeWrapper) {
+                purchasedSizeWrapper.style.display = 'none';
+            }
+
+            if (availableSizeWrapper) {
+                availableSizeWrapper.style.display = 'none';
+            }
+
+            if (purchasedSizeDisplay) {
+                purchasedSizeDisplay.textContent = '-';
+            }
+
+            if (exchangeProductSelect) {
+                exchangeProductSelect.innerHTML =
+                    '<option value="">-- Select Exchange Product --</option>';
+            }
+
+            if (exchangeSizeSelect) {
+                exchangeSizeSelect.innerHTML =
+                    '<option value="">-- Select Available Size --</option>';
+            }
+
+            return;
+        }
+
+
+        // ========================================================
+        // EXCHANGE RADIO MUST BE AVAILABLE FOR ALL PRODUCTS
+        // ========================================================
+
+        const exchangeRadioContainer =
+            exchangeRadio
+                ? exchangeRadio.closest('.form-check')
+                : null;
+
+        if (exchangeRadioContainer) {
+            exchangeRadioContainer.style.display = 'block';
+        }
+
+
+        // ========================================================
+        // NORMAL PRODUCT
+        // ========================================================
+
+        if (!isVariantProduct) {
+
+            // Normal product:
+            // Exchange is allowed,
+            // but Exchange Details must NOT be shown.
+
+            if (exchangeSection) {
+                exchangeSection.style.display = 'none';
+            }
+
+            if (purchasedSizeWrapper) {
+                purchasedSizeWrapper.style.display = 'none';
+            }
+
+            if (availableSizeWrapper) {
+                availableSizeWrapper.style.display = 'none';
+            }
+
+            if (purchasedSizeDisplay) {
+                purchasedSizeDisplay.textContent = '-';
+            }
+
+            if (exchangeProductSelect) {
+                exchangeProductSelect.innerHTML =
+                    '<option value="' +
+                    selectedItem.product_id +
+                    '">' +
+                    (selectedItem.product_name || 'Purchased Product') +
+                    '</option>';
+
+                exchangeProductSelect.value =
+                    selectedItem.product_id;
+            }
+
+            if (exchangeSizeSelect) {
+                exchangeSizeSelect.innerHTML =
+                    '<option value="">Not required</option>';
+            }
+
+            return;
+        }
+
+
+        // ========================================================
+        // VARIANT PRODUCT
+        // ========================================================
+
+        if (purchasedSizeWrapper) {
+            purchasedSizeWrapper.style.display = 'block';
+        }
+
+        if (purchasedSizeDisplay) {
+            purchasedSizeDisplay.textContent =
+                selectedItem.size || 'N/A';
+        }
+
+
+        // ========================================================
+        // IF EXCHANGE IS ALREADY SELECTED
+        // SHOW EXCHANGE DETAILS
+        // ========================================================
+
+        const selectedType =
+            document.querySelector(
+                'input[name="return_request_type"]:checked'
+            );
+
+        if (
+            selectedType &&
+            selectedType.value === 'exchange'
+        ) {
+
+            if (exchangeSection) {
+                exchangeSection.style.display = 'block';
+            }
+
+            if (availableSizeWrapper) {
+                availableSizeWrapper.style.display = 'block';
+            }
+
+            // Automatically use purchased product
+            loadExchangeProducts(selectedItem);
+        }
+    };
+}
+        // Show/hide sections when request type changes
+     
+// ============================================================
+// ===== RETURN / EXCHANGE TYPE CHANGE ==========================
+// ============================================================
+
+document
+    .querySelectorAll(
+        'input[name="return_request_type"]'
+    )
+    .forEach(radio => {
+
+        radio.addEventListener(
+            'change',
+            function () {
+
+                const exchangeSection =
+                    document.getElementById(
+                        'exchangeSection'
+                    );
+
+                const bankSection =
+                    document.getElementById(
+                        'bankDetailsSection'
+                    );
+
+                const availableSizeWrapper =
+                    document.getElementById(
+                        'availableSizeWrapper'
+                    );
+
+                const purchasedSizeWrapper =
+                    document.getElementById(
+                        'purchasedSizeWrapper'
+                    );
+
+                const productSelect =
+                    document.getElementById(
+                        'return_product_select'
+                    );
+
+                const selectedItem =
+                    currentReturnItems.find(
+                        item =>
+                            String(item.id) ===
+                            String(productSelect?.value)
+                    );
+
+                const isVariantProduct =
+                    selectedItem &&
+                    (
+                        selectedItem.has_variant === true ||
+                        selectedItem.has_variant === 1 ||
+                        selectedItem.has_variant === '1' ||
+                        !!selectedItem.variant_id
+                    );
+
+
+                // ==================================================
+                // RETURN
+                // ==================================================
+
+                if (this.value === 'return') {
+
+                    if (exchangeSection) {
+                        exchangeSection.style.display =
+                            'none';
+                    }
+
+                    if (availableSizeWrapper) {
+                        availableSizeWrapper.style.display =
+                            'none';
+                    }
+
+                    if (bankSection) {
+                        bankSection.style.display =
+                            'block';
+                    }
+
+                    return;
+                }
+
+
+                // ==================================================
+                // EXCHANGE
+                // ==================================================
+
+                if (this.value === 'exchange') {
+
+                    // Bank details are not needed for Exchange
+                    if (bankSection) {
+                        bankSection.style.display =
+                            'none';
+                    }
+
+
+                    // ==============================================
+                    // VARIANT PRODUCT
+                    // ==============================================
+
+                    if (isVariantProduct) {
+
+                        if (exchangeSection) {
+                            exchangeSection.style.display =
+                                'block';
+                        }
+
+                        if (purchasedSizeWrapper) {
+                            purchasedSizeWrapper.style.display =
+                                'block';
+                        }
+
+                        if (availableSizeWrapper) {
+                            availableSizeWrapper.style.display =
+                                'block';
+                        }
+
+                        // Show purchased size
+                        const purchasedSizeDisplay =
+                            document.getElementById(
+                                'purchased_size_display'
+                            );
+
+                        if (purchasedSizeDisplay) {
+                            purchasedSizeDisplay.textContent =
+                                selectedItem.size || 'N/A';
+                        }
+
+                        // Automatically load purchased product
+                        loadExchangeProducts(
+                            selectedItem
+                        );
+
+                    }
+
+                    // ==============================================
+                    // NORMAL PRODUCT
+                    // ==============================================
+
+                    else {
+
+                        // Exchange is allowed,
+                        // but Exchange Details are NOT required.
+
+                        if (exchangeSection) {
+                            exchangeSection.style.display =
+                                'none';
+                        }
+
+                        if (purchasedSizeWrapper) {
+                            purchasedSizeWrapper.style.display =
+                                'none';
+                        }
+
+                        if (availableSizeWrapper) {
+                            availableSizeWrapper.style.display =
+                                'none';
+                        }
+                    }
+                }
+            }
+        );
+    });      
+
+        const selectedType = document.querySelector('input[name="return_request_type"]:checked');
+        if (selectedType) {
+            const bankSection = document.getElementById('bankDetailsSection');
+            if (bankSection) {
+                bankSection.style.display = selectedType.value === 'return' ? 'block' : 'none';
             }
         }
 
-        // ============================================================
-        // ===== RENDER MODAL WITH ORDER DATA =====
-        // ============================================================
-        function renderModalWithOrderData(order) {
-            // Status steps
-            const statusSteps = ['Pending', 'Confirmed', 'Shipped', 'Delivered'];
-            const currentStatus = order.order_status;
-            const currentIndex = statusSteps.indexOf(currentStatus);
-            let stepsHtml = '';
-            statusSteps.forEach((step, index) => {
-                let stepClass = '';
-                let stepIcon = '';
-                if (index < currentIndex) {
-                    stepClass = 'completed';
-                    stepIcon = '<i class="fas fa-check"></i>';
-                } else if (index === currentIndex) {
-                    stepClass = 'active';
-                    stepIcon = '<i class="fas fa-circle"></i>';
-                } else {
-                    stepIcon = '<i class="far fa-circle"></i>';
-                }
-                stepsHtml +=
-                    `<div class="status-step ${stepClass}"><div class="step-icon">${stepIcon}</div><div class="step-label">${step.toUpperCase()}</div></div>`;
-            });
-            document.getElementById('statusSteps').innerHTML = stepsHtml;
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
 
-            // Order Info
-            document.getElementById('modalOrderNumber').innerText = order.order_number;
-            document.getElementById('modalOrderDate').innerText = new Date(order.created_at).toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
-            document.getElementById('modalOrderStatus').innerHTML =
-                `<span class="order-status ${order.order_status}"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> ${order.order_status.toUpperCase()}</span>`;
+    // ============================================================
+    // ===== LOAD EXCHANGE PRODUCTS =====
+    // ============================================================
+ // ============================================================
+// ===== LOAD EXCHANGE PRODUCTS ===============================
+// ===== ONLY VARIANT-BASED PRODUCTS ==========================
+// ============================================================
 
-            // Customer Details
-            document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
-            document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
-            document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
+// ============================================================
+// ===== LOAD PURCHASED PRODUCT FOR EXCHANGE ====================
+// ===== VARIANT PRODUCT ONLY ==================================
+// ============================================================
 
-            // Shipping Address
-            let shippingHtml = '<div class="address-block">No address information available</div>';
-            if (order.shipping_address) {
-                let addr = order.shipping_address;
-                let addressLines = [];
-                if (addr.name && addr.name !== 'N/A' && addr.name !== '') addressLines.push('<strong>' + escapeHtml(addr
-                    .name) + '</strong>');
-                if (addr.address && addr.address !== '') addressLines.push(escapeHtml(addr.address));
-                if (addr.area && addr.area !== '') addressLines.push(escapeHtml(addr.area));
-                if (addr.city && addr.city !== '' && addr.state && addr.state !== '') addressLines.push(escapeHtml(addr
-                    .city) + ', ' + escapeHtml(addr.state));
-                else if (addr.city && addr.city !== '') addressLines.push(escapeHtml(addr.city));
-                else if (addr.state && addr.state !== '') addressLines.push(escapeHtml(addr.state));
-                if (addr.pincode && addr.pincode !== '') addressLines.push('Pincode: ' + escapeHtml(addr.pincode));
-                if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') addressLines.push('Phone: ' + escapeHtml(addr
-                    .phone));
-                if (addressLines.length > 0) shippingHtml = '<div class="address-block">' + addressLines.join('<br>') +
-                    '</div>';
+function loadExchangeProducts(selectedItem = null) {
+
+    const exchangeProductSelect =
+        document.getElementById(
+            'exchange_product_select'
+        );
+
+    if (!exchangeProductSelect) {
+        return;
+    }
+
+
+    // If selected item wasn't passed,
+    // get it from the purchased product dropdown.
+
+    if (!selectedItem) {
+
+        const productSelect =
+            document.getElementById(
+                'return_product_select'
+            );
+
+        selectedItem =
+            currentReturnItems.find(
+                item =>
+                    String(item.id) ===
+                    String(productSelect?.value)
+            );
+    }
+
+
+    if (!selectedItem) {
+
+        exchangeProductSelect.innerHTML =
+            '<option value="">-- Select Exchange Product --</option>';
+
+        return;
+    }
+
+
+    // ==========================================================
+    // SHOW PURCHASED PRODUCT AS EXCHANGE PRODUCT
+    // ==========================================================
+
+    exchangeProductSelect.innerHTML = '';
+
+
+    const option =
+        document.createElement('option');
+
+    option.value =
+        selectedItem.product_id;
+
+    option.textContent =
+        selectedItem.product_name || 'Purchased Product';
+
+    option.selected = true;
+
+
+    exchangeProductSelect.appendChild(option);
+
+
+    // ==========================================================
+    // IMPORTANT:
+    // Automatically load available sizes
+    // ==========================================================
+
+    loadExchangeVariants(
+        selectedItem.product_id
+    );
+}
+
+    // ============================================================
+    // ===== LOAD VARIANT SIZES FOR EXCHANGE - ONLY FOR SELECTED PRODUCT =====
+    // ============================================================
+  // ============================================================
+// ===== LOAD AVAILABLE SIZES =================================
+// ============================================================
+
+// ============================================================
+// ===== LOAD AVAILABLE SIZES ==================================
+// ===== VARIANT PRODUCTS ONLY =================================
+// ============================================================
+
+// ============================================================
+// ===== LOAD AVAILABLE SIZES FOR EXCHANGE =====================
+// ===== USE /api/products BECAUSE IT RETURNS VARIANTS =========
+// ============================================================
+
+function loadExchangeVariants(productId) {
+
+    const sizeSelect =
+        document.getElementById('exchange_size_select');
+
+    const purchasedSizeDisplay =
+        document.getElementById('purchased_size_display');
+
+    const purchasedSizeWrapper =
+        document.getElementById('purchasedSizeWrapper');
+
+    const availableSizeWrapper =
+        document.getElementById('availableSizeWrapper');
+
+
+    if (!sizeSelect) {
+        return;
+    }
+
+
+    // ==========================================================
+    // RESET
+    // ==========================================================
+
+    sizeSelect.innerHTML =
+        '<option value="">-- Loading available sizes... --</option>';
+
+
+    // ==========================================================
+    // GET PURCHASED ITEM
+    // ==========================================================
+
+    const productSelect =
+        document.getElementById('return_product_select');
+
+    const selectedItem =
+        currentReturnItems.find(
+            item =>
+                String(item.id) ===
+                String(productSelect?.value)
+        );
+
+
+    // ==========================================================
+    // SHOW PURCHASED SIZE
+    // ==========================================================
+
+    if (
+        selectedItem &&
+        selectedItem.size
+    ) {
+
+        if (purchasedSizeWrapper) {
+            purchasedSizeWrapper.style.display = 'block';
+        }
+
+        if (purchasedSizeDisplay) {
+            purchasedSizeDisplay.textContent =
+                selectedItem.size;
+        }
+    }
+
+
+    if (!productId) {
+
+        sizeSelect.innerHTML =
+            '<option value="">-- Select Available Size --</option>';
+
+        return;
+    }
+
+
+    // ==========================================================
+    // GET ALL PRODUCTS
+    // /api/products ALREADY RETURNS VARIANTS + STOCK
+    // ==========================================================
+
+    fetch('/api/products')
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    'Failed to load products'
+                );
             }
-            document.getElementById('modalShippingAddress').innerHTML = shippingHtml;
 
-            // ===== ORDER ITEMS WITH IMAGES =====
-            let itemsHtml = '';
-            let subtotal = 0;
+            return response.json();
+        })
 
-            if (order.items && order.items.length > 0) {
-                order.items.forEach(function(item) {
-                    var itemTotal = parseFloat(item.price) * parseInt(item.quantity);
-                    subtotal += itemTotal;
+        .then(products => {
 
-                    let imageUrl = null;
+            console.log(
+                'Exchange product API response:',
+                products
+            );
 
-                    if (item.product_image && item.product_image !== '' && item.product_image !== null) {
-                        imageUrl = item.product_image;
-                    } else if (item.product_images && item.product_images.length > 0) {
-                        const mainImg = item.product_images.find(img => img.is_main == 1);
-                        imageUrl = mainImg ? mainImg.image_path : item.product_images[0].image_path;
-                    } else if (item.image && item.image !== '' && item.image !== null) {
-                        imageUrl = item.image;
-                    } else if (item.product && item.product.images && item.product.images.length > 0) {
-                        const mainImg = item.product.images.find(img => img.is_main == 1);
-                        imageUrl = mainImg ? mainImg.image_path : item.product.images[0].image_path;
+
+            // ==================================================
+            // FIND SELECTED PRODUCT
+            // ==================================================
+
+            const product =
+                Array.isArray(products)
+                    ? products.find(
+                        p =>
+                            String(p.id) ===
+                            String(productId)
+                    )
+                    : null;
+
+
+            if (!product) {
+
+                sizeSelect.innerHTML =
+                    '<option value="">-- Product not found --</option>';
+
+                return;
+            }
+
+
+            console.log(
+                'Selected exchange product:',
+                product
+            );
+
+
+            // ==================================================
+            // GET VARIANTS
+            // ==================================================
+
+            const variants =
+                Array.isArray(product.variants)
+                    ? product.variants
+                    : [];
+
+
+            console.log(
+                'Product variants:',
+                variants
+            );
+
+
+            // ==================================================
+            // ONLY STOCK AVAILABLE VARIANTS
+            // ==================================================
+
+            const availableVariants =
+                variants.filter(
+                    variant => {
+
+                        const stock =
+                            parseInt(
+                                variant.stock || 0,
+                                10
+                            );
+
+                        return stock > 0;
                     }
+                );
 
-                    let imageHtml = '';
-                    if (imageUrl) {
-                        let fullUrl = imageUrl;
-                        if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/storage/')) {
-                            fullUrl = '/storage/' + imageUrl;
-                        }
-                        if (imageUrl.startsWith('storage/')) {
-                            fullUrl = '/' + imageUrl;
-                        }
-                        imageHtml =
-                            `<img src="${fullUrl}" alt="${escapeHtml(item.product_name)}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'><i class=\\'fas fa-box\\'></i></div>'">`;
-                    } else {
-                        imageHtml = `<div class="no-image"><i class="fas fa-box"></i></div>`;
+
+            // ==================================================
+            // GET UNIQUE AVAILABLE SIZES
+            // ==================================================
+
+            const availableSizes =
+                [
+                    ...new Set(
+                        availableVariants
+                            .map(
+                                variant =>
+                                    variant.size
+                            )
+                            .filter(
+                                size =>
+                                    size !== null &&
+                                    size !== undefined &&
+                                    String(size).trim() !== ''
+                            )
+                            .map(
+                                size =>
+                                    String(size).trim()
+                            )
+                    )
+                ];
+
+
+            console.log(
+                'Available exchange sizes:',
+                availableSizes
+            );
+
+
+            // ==================================================
+            // RESET DROPDOWN
+            // ==================================================
+
+            sizeSelect.innerHTML =
+                '<option value="">-- Select Available Size --</option>';
+
+
+            // ==================================================
+            // ADD AVAILABLE SIZES
+            // ==================================================
+
+            availableSizes.forEach(
+                size => {
+
+                    const option =
+                        document.createElement('option');
+
+                    option.value =
+                        size;
+
+                    option.textContent =
+                        size;
+
+                    sizeSelect.appendChild(
+                        option
+                    );
+                }
+            );
+
+
+            // ==================================================
+            // NO AVAILABLE SIZE
+            // ==================================================
+
+            if (
+                availableSizes.length === 0
+            ) {
+
+                sizeSelect.innerHTML =
+                    '<option value="">-- No sizes available --</option>';
+
+                if (availableSizeWrapper) {
+                    availableSizeWrapper.style.display =
+                        'block';
+                }
+
+                return;
+            }
+
+
+            // ==================================================
+            // SHOW AVAILABLE SIZE
+            // ==================================================
+
+            if (availableSizeWrapper) {
+                availableSizeWrapper.style.display =
+                    'block';
+            }
+        })
+
+        .catch(error => {
+
+            console.error(
+                'Error loading exchange sizes:',
+                error
+            );
+
+            sizeSelect.innerHTML =
+                '<option value="">-- Error loading sizes --</option>';
+        });
+}
+
+    // ============================================================
+    // ===== SUBMIT RETURN REQUEST - WITH EXCHANGE DATA =====
+    // ============================================================
+function submitReturnRequest() {
+
+    const returnOrderId =
+        document.getElementById('return_order_id');
+
+    const productSelect =
+        document.getElementById('return_product_select');
+
+    const reasonSelect =
+        document.getElementById('return_reason_select');
+
+    const commentArea =
+        document.getElementById('return_comment');
+
+    const errorDiv =
+        document.getElementById('return_error_message');
+
+    const submitBtn =
+        document.getElementById('submitReturnBtn');
+
+
+    // ============================================================
+    // BASIC ELEMENT CHECK
+    // ============================================================
+
+    if (
+        !returnOrderId ||
+        !productSelect ||
+        !reasonSelect ||
+        !submitBtn
+    ) {
+
+        showMyOrdersToast(
+            'Return/Exchange form is not loaded properly. Please refresh.',
+            'error'
+        );
+
+        return;
+    }
+
+
+    const orderId =
+        returnOrderId.value;
+
+    const orderItemId =
+        productSelect.value;
+
+    const requestType =
+        document.querySelector(
+            'input[name="return_request_type"]:checked'
+        );
+
+    const reason =
+        reasonSelect.value;
+
+    const comment =
+        commentArea
+            ? commentArea.value.trim()
+            : '';
+
+
+    let errors = [];
+
+
+    // ============================================================
+    // BASIC VALIDATION
+    // ============================================================
+
+    if (!orderId) {
+        errors.push('Order ID is missing');
+    }
+
+    if (!orderItemId) {
+        errors.push('Please select a product');
+    }
+
+    if (!requestType) {
+        errors.push('Please select request type');
+    }
+
+    if (!reason) {
+        errors.push('Please select a reason');
+    }
+
+
+    // ============================================================
+    // GET SELECTED ITEM
+    // ============================================================
+
+    const selectedItem =
+        currentReturnItems.find(
+            item =>
+                String(item.id) ===
+                String(orderItemId)
+        );
+
+
+    if (orderItemId && !selectedItem) {
+        errors.push('Selected product is invalid');
+    }
+
+
+    // ============================================================
+    // CHECK VARIANT PRODUCT
+    // ============================================================
+
+    const isVariantProduct =
+        selectedItem &&
+        (
+            selectedItem.has_variant === true ||
+            selectedItem.has_variant === 1 ||
+            selectedItem.has_variant === '1' ||
+            !!selectedItem.variant_id
+        );
+
+
+    // ============================================================
+    // RETURN VALIDATION
+    // ============================================================
+
+    if (
+        requestType &&
+        requestType.value === 'return'
+    ) {
+
+        const bankName =
+            document.getElementById('bank_name');
+
+        const accountNumber =
+            document.getElementById('account_number');
+
+        const ifscCode =
+            document.getElementById('ifsc_code');
+
+
+        if (
+            !bankName ||
+            !bankName.value.trim()
+        ) {
+            errors.push('Please enter Bank Name');
+        }
+
+
+        if (
+            !accountNumber ||
+            !accountNumber.value.trim()
+        ) {
+            errors.push('Please enter Account Number');
+        }
+
+
+        if (
+            !ifscCode ||
+            !ifscCode.value.trim()
+        ) {
+            errors.push('Please enter IFSC Code');
+        }
+    }
+
+
+    // ============================================================
+    // EXCHANGE VALIDATION
+    // ============================================================
+
+    if (
+        requestType &&
+        requestType.value === 'exchange' &&
+        isVariantProduct
+    ) {
+
+        const exchangeProduct =
+            document.getElementById(
+                'exchange_product_select'
+            );
+
+        const exchangeSize =
+            document.getElementById(
+                'exchange_size_select'
+            );
+
+
+        if (
+            !exchangeProduct ||
+            !exchangeProduct.value
+        ) {
+
+            errors.push(
+                'Please select an exchange product'
+            );
+        }
+
+
+        if (
+            !exchangeSize ||
+            !exchangeSize.value
+        ) {
+
+            errors.push(
+                'Please select an available size'
+            );
+        }
+    }
+
+
+    // ============================================================
+    // SHOW VALIDATION ERRORS
+    // ============================================================
+
+    if (errors.length > 0) {
+
+        if (errorDiv) {
+
+            errorDiv.style.display =
+                'block';
+
+            errorDiv.innerHTML =
+                errors.join('<br>');
+        }
+
+        return;
+    }
+
+
+    if (errorDiv) {
+
+        errorDiv.style.display =
+            'none';
+
+        errorDiv.innerHTML =
+            '';
+    }
+
+
+    // ============================================================
+    // FORM DATA
+    // ============================================================
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        'order_id',
+        orderId
+    );
+
+    formData.append(
+        'order_item_id',
+        orderItemId
+    );
+
+    formData.append(
+        'request_type',
+        requestType.value
+    );
+
+    formData.append(
+        'reason',
+        reason
+    );
+
+    formData.append(
+        'comment',
+        comment
+    );
+
+    formData.append(
+        'return_quantity',
+        '1'
+    );
+
+
+    // ============================================================
+    // RETURN DATA
+    // ============================================================
+
+    if (
+        requestType.value === 'return'
+    ) {
+
+        const bankName =
+            document.getElementById('bank_name');
+
+        const accountNumber =
+            document.getElementById('account_number');
+
+        const ifscCode =
+            document.getElementById('ifsc_code');
+
+
+        formData.append(
+            'bank_name',
+            bankName.value.trim()
+        );
+
+        formData.append(
+            'account_number',
+            accountNumber.value.trim()
+        );
+
+        formData.append(
+            'ifsc_code',
+            ifscCode.value.trim()
+        );
+    }
+
+
+    // ============================================================
+    // EXCHANGE DATA
+    // ============================================================
+
+    if (
+        requestType.value === 'exchange'
+    ) {
+
+        // ========================================================
+        // VARIANT PRODUCT
+        // ========================================================
+
+        if (isVariantProduct) {
+
+            const exchangeProduct =
+                document.getElementById(
+                    'exchange_product_select'
+                );
+
+            const exchangeSize =
+                document.getElementById(
+                    'exchange_size_select'
+                );
+
+
+            formData.append(
+                'exchange_product_id',
+                exchangeProduct.value
+            );
+
+            formData.append(
+                'exchange_size',
+                exchangeSize.value
+            );
+
+        }
+
+        // ========================================================
+        // NORMAL PRODUCT
+        // ========================================================
+
+        else {
+
+            formData.append(
+                'exchange_product_id',
+                selectedItem.product_id
+            );
+        }
+
+
+        formData.append(
+            'exchange_quantity',
+            '1'
+        );
+    }
+
+
+    // ============================================================
+    // DEBUG
+    // ============================================================
+
+    console.log(
+        'Request Type:',
+        requestType.value
+    );
+
+    console.log(
+        'Variant Product:',
+        isVariantProduct
+    );
+
+    console.log(
+        'Selected Item:',
+        selectedItem
+    );
+
+
+    // ============================================================
+    // SUBMIT BUTTON
+    // ============================================================
+
+    const originalText =
+        submitBtn.innerHTML;
+
+
+    submitBtn.innerHTML =
+        '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+    submitBtn.disabled =
+        true;
+
+
+    // ============================================================
+    // SUBMIT REQUEST
+    // ============================================================
+
+    fetch(
+        '/return-exchange/submit',
+        {
+
+            method: 'POST',
+
+            headers: {
+
+                'X-CSRF-TOKEN':
+                    csrfToken,
+
+                'Accept':
+                    'application/json'
+            },
+
+            body:
+                formData
+        }
+    )
+
+    .then(async response => {
+
+        const text =
+            await response.text();
+
+
+        console.log(
+            'Submit response status:',
+            response.status
+        );
+
+        console.log(
+            'Submit raw response:',
+            text
+        );
+
+
+        let data;
+
+
+        try {
+
+            data =
+                JSON.parse(text);
+
+        } catch (error) {
+
+            throw new Error(
+                `Server returned ${response.status}: ${text.substring(0, 500)}`
+            );
+        }
+
+
+        return {
+
+            ok:
+                response.ok,
+
+            data:
+                data
+        };
+    })
+
+
+    .then(result => {
+
+        const data =
+            result.data;
+
+
+        console.log(
+            'Submit response JSON:',
+            data
+        );
+
+
+        if (
+            result.ok &&
+            data.success
+        ) {
+
+            const modalElement =
+                document.getElementById(
+                    'returnExchangeModal'
+                );
+
+
+            const modal =
+                bootstrap.Modal.getInstance(
+                    modalElement
+                );
+
+
+            if (modal) {
+                modal.hide();
+            }
+
+
+            showMyOrdersToast(
+                data.message ||
+                'Request submitted successfully!',
+                'success'
+            );
+
+
+            setTimeout(
+                () => {
+                    location.reload();
+                },
+                1500
+            );
+
+
+            return;
+        }
+
+
+        // ========================================================
+        // BACKEND VALIDATION ERROR
+        // ========================================================
+
+        let message =
+            data.message ||
+            data.error ||
+            'Unable to submit request';
+
+
+        if (data.errors) {
+
+            message =
+                Object.values(data.errors)
+                    .flat()
+                    .join('<br>');
+        }
+
+
+        if (errorDiv) {
+
+            errorDiv.style.display =
+                'block';
+
+            errorDiv.innerHTML =
+                message;
+        }
+    })
+
+
+    .catch(error => {
+
+        console.error(
+            'Return/Exchange submit error:',
+            error
+        );
+
+
+        if (errorDiv) {
+
+            errorDiv.style.display =
+                'block';
+
+            errorDiv.innerHTML =
+                error.message ||
+                'Network error. Please try again.';
+        }
+    })
+
+
+    .finally(() => {
+
+        submitBtn.innerHTML =
+            originalText;
+
+        submitBtn.disabled =
+            false;
+    });
+}
+
+    // ============================================================
+    // ===== VIEW ORDER DETAILS =====
+    // ============================================================
+    async function viewOrderDetails(orderId, button) {
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        button.disabled = true;
+
+        try {
+            const response = await fetch(`/api/order-details/${orderId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            const data = await response.json();
+            if (data.success && data.order) {
+                currentOrderForCancel = orderId;
+                renderModalWithOrderData(data.order);
+                const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                modal.show();
+            } else {
+                showMyOrdersToast(data.message || 'Error loading order details', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMyOrdersToast('Error loading order details. Please try again.', 'error');
+        } finally {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    }
+
+    // ============================================================
+    // ===== RENDER MODAL WITH ORDER DATA =====
+    // ============================================================
+    function renderModalWithOrderData(order) {
+        // Status steps
+        const statusSteps = ['Pending', 'Confirmed', 'Shipped', 'Delivered'];
+        const currentStatus = order.order_status;
+        const currentIndex = statusSteps.indexOf(currentStatus);
+        let stepsHtml = '';
+        statusSteps.forEach((step, index) => {
+            let stepClass = '';
+            let stepIcon = '';
+            if (index < currentIndex) {
+                stepClass = 'completed';
+                stepIcon = '<i class="fas fa-check"></i>';
+            } else if (index === currentIndex) {
+                stepClass = 'active';
+                stepIcon = '<i class="fas fa-circle"></i>';
+            } else {
+                stepIcon = '<i class="far fa-circle"></i>';
+            }
+            stepsHtml +=
+                `<div class="status-step ${stepClass}"><div class="step-icon">${stepIcon}</div><div class="step-label">${step.toUpperCase()}</div></div>`;
+        });
+        document.getElementById('statusSteps').innerHTML = stepsHtml;
+
+        // Order Info
+        document.getElementById('modalOrderNumber').innerText = order.order_number;
+        document.getElementById('modalOrderDate').innerText = new Date(order.created_at).toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('modalTransactionId').innerText = order.transaction_id || 'N/A';
+        document.getElementById('modalOrderStatus').innerHTML =
+            `<span class="order-status ${order.order_status}"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> ${order.order_status.toUpperCase()}</span>`;
+
+        // Customer Details
+        document.getElementById('modalCustomerName').innerText = order.user?.name || 'N/A';
+        document.getElementById('modalCustomerEmail').innerText = order.user?.email || 'N/A';
+        document.getElementById('modalCustomerPhone').innerText = order.user?.phone || 'N/A';
+
+        // Shipping Address
+        let shippingHtml = '<div class="address-block">No address information available</div>';
+        if (order.shipping_address) {
+            let addr = order.shipping_address;
+            let addressLines = [];
+            if (addr.name && addr.name !== 'N/A' && addr.name !== '') addressLines.push('<strong>' + escapeHtml(addr
+                .name) + '</strong>');
+            if (addr.address && addr.address !== '') addressLines.push(escapeHtml(addr.address));
+            if (addr.area && addr.area !== '') addressLines.push(escapeHtml(addr.area));
+            if (addr.city && addr.city !== '' && addr.state && addr.state !== '') addressLines.push(escapeHtml(addr
+                .city) + ', ' + escapeHtml(addr.state));
+            else if (addr.city && addr.city !== '') addressLines.push(escapeHtml(addr.city));
+            else if (addr.state && addr.state !== '') addressLines.push(escapeHtml(addr.state));
+            if (addr.pincode && addr.pincode !== '') addressLines.push('Pincode: ' + escapeHtml(addr.pincode));
+            if (addr.phone && addr.phone !== 'N/A' && addr.phone !== '') addressLines.push('Phone: ' + escapeHtml(addr
+                .phone));
+            if (addressLines.length > 0) shippingHtml = '<div class="address-block">' + addressLines.join('<br>') +
+                '</div>';
+        }
+        document.getElementById('modalShippingAddress').innerHTML = shippingHtml;
+
+        // ===== ORDER ITEMS WITH IMAGES =====
+        let itemsHtml = '';
+        let subtotal = 0;
+
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(function(item) {
+                var itemTotal = parseFloat(item.price) * parseInt(item.quantity);
+                subtotal += itemTotal;
+
+                let imageUrl = null;
+
+                if (item.product_image && item.product_image !== '' && item.product_image !== null) {
+                    imageUrl = item.product_image;
+                } else if (item.product_images && item.product_images.length > 0) {
+                    const mainImg = item.product_images.find(img => img.is_main == 1);
+                    imageUrl = mainImg ? mainImg.image_path : item.product_images[0].image_path;
+                } else if (item.image && item.image !== '' && item.image !== null) {
+                    imageUrl = item.image;
+                } else if (item.product && item.product.images && item.product.images.length > 0) {
+                    const mainImg = item.product.images.find(img => img.is_main == 1);
+                    imageUrl = mainImg ? mainImg.image_path : item.product.images[0].image_path;
+                }
+
+                let imageHtml = '';
+                if (imageUrl) {
+                    let fullUrl = imageUrl;
+                    if (!imageUrl.startsWith('http') && !imageUrl.startsWith('/storage/')) {
+                        fullUrl = '/storage/' + imageUrl;
                     }
+                    if (imageUrl.startsWith('storage/')) {
+                        fullUrl = '/' + imageUrl;
+                    }
+                    imageHtml =
+                        `<img src="${fullUrl}" alt="${escapeHtml(item.product_name)}" onerror="this.parentElement.innerHTML='<div class=\\'no-image\\'><i class=\\'fas fa-box\\'></i></div>'">`;
+                } else {
+                    imageHtml = `<div class="no-image"><i class="fas fa-box"></i></div>`;
+                }
 
-                    itemsHtml += `
-                        <div class="order-item-card">
-                            <div class="order-item-image">
-                                ${imageHtml}
-                            </div>
-                            <div class="order-item-details">
-                                <div class="order-item-name">${escapeHtml(item.product_name)}</div>
-                                <div class="order-item-price"><i class="fas fa-rupee-sign"></i> ${formatNumber(item.price)}</div>
-                                <div class="order-item-quantity"><i class="fas fa-cube"></i> Quantity: ${item.quantity}</div>
-                                ${item.variant_name ? `<div class="order-item-variant">Variant: ${escapeHtml(item.variant_name)}</div>` : ''}
-                                ${item.size ? `<div class="order-item-variant">Size: ${escapeHtml(item.size)}</div>` : ''}
-                                ${item.color ? `<div class="order-item-variant">Color: ${escapeHtml(item.color)}</div>` : ''}
-                            </div>
-                            <div class="order-item-total">₹${formatNumber(itemTotal)}</div>
+                itemsHtml += `
+                    <div class="order-item-card">
+                        <div class="order-item-image">
+                            ${imageHtml}
                         </div>
-                    `;
-                });
+                        <div class="order-item-details">
+                            <div class="order-item-name">${escapeHtml(item.product_name)}</div>
+                            <div class="order-item-price"><i class="fas fa-rupee-sign"></i> ${formatNumber(item.price)}</div>
+                            <div class="order-item-quantity"><i class="fas fa-cube"></i> Quantity: ${item.quantity}</div>
+                            ${item.variant_name ? `<div class="order-item-variant">Variant: ${escapeHtml(item.variant_name)}</div>` : ''}
+                            ${item.size ? `<div class="order-item-variant">Size: ${escapeHtml(item.size)}</div>` : ''}
+                            ${item.color ? `<div class="order-item-variant">Color: ${escapeHtml(item.color)}</div>` : ''}
+                        </div>
+                        <div class="order-item-total">₹${formatNumber(itemTotal)}</div>
+                    </div>
+                `;
+            });
+        } else {
+            itemsHtml = '<div class="text-muted">No items found</div>';
+        }
+        document.getElementById('modalOrderItems').innerHTML = itemsHtml;
+
+        // ===== PAYMENT SUMMARY WITH SHIPPING =====
+        const shippingCost = parseFloat(order.shipping_charge) || 0;
+        const total = parseFloat(order.total_amount) || 0;
+        const paymentMethod = order.payment_method || 'Unknown';
+        const paymentStatus = order.payment_status;
+        const paymentStatusText = paymentStatus === 'SUCCESS' ? 'PAID' : (paymentStatus === 'FAILED' ? 'FAILED' :
+            'PENDING');
+        const paymentStatusClass = paymentStatus === 'SUCCESS' ? 'payment-paid' : (paymentStatus === 'FAILED' ?
+            'payment-failed' : 'payment-pending');
+
+        let paymentMethodDisplay = 'Unknown';
+        if (paymentMethod === 'cod') {
+            paymentMethodDisplay = 'Cash on Delivery';
+        } else if (paymentMethod === 'online' || paymentMethod === 'card' || paymentMethod === 'PayU' ||
+            paymentMethod === 'payu') {
+            paymentMethodDisplay = 'Online Payment (Card)';
+        } else if (paymentMethod) {
+            paymentMethodDisplay = paymentMethod;
+        }
+
+        let shippingDisplay = '';
+        if (shippingCost > 0) {
+            shippingDisplay = '₹' + formatNumber(shippingCost);
+        } else {
+            shippingDisplay = '<span class="shipping-free">FREE</span>';
+        }
+
+        const summaryHtml = `
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹${formatNumber(subtotal)}</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span>${shippingDisplay}</span>
+            </div>
+            <div class="summary-total">
+                <span>Total</span>
+                <span>₹${formatNumber(total)}</span>
+            </div>
+            <div class="summary-row mt-2" style="border-top: 1px solid var(--line); padding-top: 12px;">
+                <span>${paymentMethodDisplay}</span>
+                <span class="payment-badge ${paymentStatusClass}">${paymentStatusText}</span>
+            </div>
+        `;
+        document.getElementById('modalPaymentSummary').innerHTML = summaryHtml;
+
+        // ===== SHOW/HIDE CANCEL BUTTON =====
+        const cancelBtn = document.getElementById('cancelOrderBtn');
+        if (cancelBtn) {
+            const cancelableStatuses = ['Pending', 'Confirmed'];
+            if (!cancelableStatuses.includes(order.order_status)) {
+                cancelBtn.style.display = 'none';
             } else {
-                itemsHtml = '<div class="text-muted">No items found</div>';
+                cancelBtn.style.display = 'inline-block';
             }
-            document.getElementById('modalOrderItems').innerHTML = itemsHtml;
+        }
 
-            // ===== PAYMENT SUMMARY WITH SHIPPING =====
-            const shippingCost = parseFloat(order.shipping_charge) || 0;
-            const total = parseFloat(order.total_amount) || 0;
-            const paymentMethod = order.payment_method || 'Unknown';
-            const paymentStatus = order.payment_status;
-            const paymentStatusText = paymentStatus === 'SUCCESS' ? 'PAID' : (paymentStatus === 'FAILED' ? 'FAILED' :
-                'PENDING');
-            const paymentStatusClass = paymentStatus === 'SUCCESS' ? 'payment-paid' : (paymentStatus === 'FAILED' ?
-                'payment-failed' : 'payment-pending');
-
-            let paymentMethodDisplay = 'Unknown';
-            if (paymentMethod === 'cod') {
-                paymentMethodDisplay = 'Cash on Delivery';
-            } else if (paymentMethod === 'online' || paymentMethod === 'card' || paymentMethod === 'PayU' ||
-                paymentMethod === 'payu') {
-                paymentMethodDisplay = 'Online Payment (Card)';
-            } else if (paymentMethod) {
-                paymentMethodDisplay = paymentMethod;
-            }
-
-            let shippingDisplay = '';
-            if (shippingCost > 0) {
-                shippingDisplay = '₹' + formatNumber(shippingCost);
-            } else {
-                shippingDisplay = '<span class="shipping-free">FREE</span>';
-            }
-
-            const summaryHtml = `
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span>₹${formatNumber(subtotal)}</span>
-                </div>
-                <div class="summary-row">
-                    <span>Shipping</span>
-                    <span>${shippingDisplay}</span>
-                </div>
-                <div class="summary-total">
-                    <span>Total</span>
-                    <span>₹${formatNumber(total)}</span>
-                </div>
-                <div class="summary-row mt-2" style="border-top: 1px solid var(--line); padding-top: 12px;">
-                    <span>${paymentMethodDisplay}</span>
-                    <span class="payment-badge ${paymentStatusClass}">${paymentStatusText}</span>
-                </div>
-            `;
-            document.getElementById('modalPaymentSummary').innerHTML = summaryHtml;
-
-            // ===== SHOW/HIDE CANCEL BUTTON =====
-            const cancelBtn = document.getElementById('cancelOrderBtn');
-            if (cancelBtn) {
-                const cancelableStatuses = ['Pending', 'Confirmed'];
-                if (!cancelableStatuses.includes(order.order_status)) {
-                    cancelBtn.style.display = 'none';
-                } else {
-                    cancelBtn.style.display = 'inline-block';
-                }
-            }
-
-            // ===== CANCELLATION & REFUND INFO =====
-            const cancellationSection = document.getElementById('cancellationSection');
+        // ===== CANCELLATION & REFUND INFO =====
+        const cancellationSection = document.getElementById('cancellationSection');
+        if (cancellationSection) {
             if (order.order_status === 'Cancelled') {
                 cancellationSection.style.display = 'block';
                 
@@ -2539,29 +4633,414 @@
             }
         }
 
-        // ============================================================
-        // ===== CONTACT SUPPORT =====
-        // ============================================================
-        function contactSupport() {
-            window.location.href = '{{ route('contact') }}';
+  // ============================================================
+// ===== RETURN / EXCHANGE REQUEST DETAILS ====================
+// ============================================================
+
+const returnRequestSection =
+    document.getElementById(
+        'returnRequestSection'
+    );
+
+if (returnRequestSection) {
+
+    const returnRequest =
+        order.return_request;
+
+
+    // ========================================================
+    // NO RETURN / EXCHANGE REQUEST
+    // ========================================================
+
+    if (!returnRequest) {
+
+        returnRequestSection.style.display =
+            'none';
+
+    }
+
+    else {
+
+        returnRequestSection.style.display =
+            'block';
+
+
+        // ====================================================
+        // BASIC DETAILS
+        // ====================================================
+
+        const requestType =
+            returnRequest.request_type ||
+            'N/A';
+
+        const status =
+            returnRequest.status ||
+            'pending';
+
+
+        // ====================================================
+        // STATUS LABEL
+        // ====================================================
+
+        const statusLabels = {
+
+            pending:
+                requestType === 'return'
+                    ? '⏳ Return Request Pending'
+                    : '⏳ Exchange Request Pending',
+
+            processing:
+                requestType === 'return'
+                    ? '🔄 Return Request Processing'
+                    : '🔄 Exchange Request Processing',
+
+            completed:
+                requestType === 'return'
+                    ? '✅ Return Request Completed'
+                    : '✅ Exchange Request Completed'
+
+        };
+
+
+        const statusClasses = {
+
+            pending:
+                'payment-badge payment-pending',
+
+            processing:
+                'payment-badge payment-pending',
+
+            completed:
+                'payment-badge payment-paid'
+
+        };
+
+
+        // ====================================================
+        // REQUEST TYPE
+        // ====================================================
+
+        document.getElementById(
+            'modalReturnType'
+        ).innerText =
+            requestType === 'return'
+                ? 'Return'
+                : 'Exchange';
+
+
+        // ====================================================
+        // STATUS
+        // ====================================================
+
+        document.getElementById(
+            'modalReturnStatus'
+        ).innerHTML =
+
+            `<span class="${
+                statusClasses[status] ||
+                'payment-badge'
+            }">
+
+                ${
+                    statusLabels[status] ||
+                    status
+                }
+
+            </span>`;
+
+
+        // ====================================================
+        // REASON
+        // ====================================================
+
+        document.getElementById(
+            'modalReturnReason'
+        ).innerText =
+            returnRequest.reason ||
+            'N/A';
+
+
+        // ====================================================
+        // COMMENT
+        // ====================================================
+
+        document.getElementById(
+            'modalReturnComment'
+        ).innerText =
+            returnRequest.comment ||
+            'No comment';
+
+
+        // ====================================================
+        // RESET ALL OPTIONAL SECTIONS
+        // ====================================================
+
+        document.getElementById(
+            'modalExchangeProductWrapper'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'modalExchangeSizeWrapper'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'modalExchangeColorWrapper'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'modalExchangeQuantityWrapper'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'modalReturnQuantityWrapper'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'modalReturnBankDetails'
+        ).style.display = 'none';
+
+
+        // ====================================================
+        // RETURN REQUEST
+        // ====================================================
+
+        if (requestType === 'return') {
+
+            const returnQuantity =
+                returnRequest.return_quantity ||
+                1;
+
+
+            document.getElementById(
+                'modalReturnQuantity'
+            ).innerText =
+                returnQuantity;
+
+
+            document.getElementById(
+                'modalReturnQuantityWrapper'
+            ).style.display =
+                'flex';
+
+
+            // ==================================================
+            // BANK DETAILS
+            // ==================================================
+
+            const hasBankDetails =
+                returnRequest.bank_name ||
+                returnRequest.account_number ||
+                returnRequest.ifsc_code;
+
+
+            if (hasBankDetails) {
+
+                document.getElementById(
+                    'modalBankName'
+                ).innerText =
+                    returnRequest.bank_name ||
+                    'N/A';
+
+
+                document.getElementById(
+                    'modalAccountNumber'
+                ).innerText =
+                    returnRequest.account_number ||
+                    'N/A';
+
+
+                document.getElementById(
+                    'modalIfscCode'
+                ).innerText =
+                    returnRequest.ifsc_code ||
+                    'N/A';
+
+
+                document.getElementById(
+                    'modalReturnBankDetails'
+                ).style.display =
+                    'block';
+            }
+
         }
 
-        // ============================================================
-        // ===== HELPER FUNCTIONS =====
-        // ============================================================
-        function formatNumber(num) {
-            if (num === undefined || num === null || isNaN(num)) return '0.00';
-            return parseFloat(num).toLocaleString('en-IN', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+
+        // ====================================================
+        // EXCHANGE REQUEST
+        // ====================================================
+
+        if (requestType === 'exchange') {
+
+            // -----------------------------------------------
+            // EXCHANGE PRODUCT
+            // -----------------------------------------------
+
+            if (
+                returnRequest.exchange_product_id ||
+                returnRequest.exchange_product?.name
+            ) {
+
+                document.getElementById(
+                    'modalExchangeProduct'
+                ).innerText =
+
+                    returnRequest.exchange_product?.name ||
+                    returnRequest.exchange_product_name ||
+                    'N/A';
+
+
+                document.getElementById(
+                    'modalExchangeProductWrapper'
+                ).style.display =
+                    'flex';
+            }
+
+
+            // -----------------------------------------------
+            // EXCHANGE SIZE
+            // ONLY SHOW WHEN VARIANT EXISTS
+            // -----------------------------------------------
+
+            if (
+                returnRequest.exchange_variant_id &&
+                returnRequest.exchange_size
+            ) {
+
+                document.getElementById(
+                    'modalExchangeSize'
+                ).innerText =
+                    returnRequest.exchange_size;
+
+
+                document.getElementById(
+                    'modalExchangeSizeWrapper'
+                ).style.display =
+                    'flex';
+            }
+
+
+            // -----------------------------------------------
+            // EXCHANGE COLOR
+            // ONLY SHOW WHEN COLOR EXISTS
+            // -----------------------------------------------
+
+            if (
+                returnRequest.exchange_variant_id &&
+                returnRequest.exchange_color
+            ) {
+
+                document.getElementById(
+                    'modalExchangeColor'
+                ).innerText =
+                    returnRequest.exchange_color;
+
+
+                document.getElementById(
+                    'modalExchangeColorWrapper'
+                ).style.display =
+                    'flex';
+            }
+
+
+            // -----------------------------------------------
+            // EXCHANGE QUANTITY
+            // -----------------------------------------------
+
+            document.getElementById(
+                'modalExchangeQuantity'
+            ).innerText =
+                returnRequest.exchange_quantity ||
+                1;
+
+
+            document.getElementById(
+                'modalExchangeQuantityWrapper'
+            ).style.display =
+                'flex';
         }
 
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+
+        // ====================================================
+        // SUBMITTED DATE
+        // ====================================================
+
+        if (returnRequest.created_at) {
+
+            document.getElementById(
+                'modalReturnSubmitted'
+            ).innerText =
+
+                new Date(
+                    returnRequest.created_at
+                ).toLocaleString(
+                    'en-IN'
+                );
         }
+
+
+        // ====================================================
+        // PROCESSED DATE
+        // ====================================================
+
+        const processedWrapper =
+            document.getElementById(
+                'modalReturnProcessedWrapper'
+            );
+
+
+        if (
+            returnRequest.processed_at
+        ) {
+
+            document.getElementById(
+                'modalReturnProcessed'
+            ).innerText =
+
+                new Date(
+                    returnRequest.processed_at
+                ).toLocaleString(
+                    'en-IN'
+                );
+
+
+            processedWrapper.style.display =
+                'flex';
+
+        }
+
+        else {
+
+            processedWrapper.style.display =
+                'none';
+        }
+
+    }
+}
+    }
+
+    // ============================================================
+    // ===== CONTACT SUPPORT =====
+    // ============================================================
+ function contactSupport() {
+    window.location.href = "{{ route('contact') }}";
+}
+
+    // ============================================================
+    // ===== HELPER FUNCTIONS =====
+    // ============================================================
+    function formatNumber(num) {
+        if (num === undefined || num === null || isNaN(num)) return '0.00';
+        return parseFloat(num).toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
     </script>
 @endsection

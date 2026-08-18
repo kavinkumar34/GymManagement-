@@ -199,6 +199,62 @@
         </li>
 
 
+        <!-- ===== RETURN & EXCHANGE MENU ===== -->
+<li class="nav-item has-dropdown">
+    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+        <i class="fas fa-undo-alt"></i> <span>Returns</span>
+        @php
+            $pendingReturns = 0;
+            try {
+                if (Schema::hasTable('return_exchange_requests')) {
+                    $pendingReturns = \App\Models\ReturnExchange::where('status', 'pending')->count();
+                }
+            } catch (\Exception $e) {
+                $pendingReturns = 0;
+            }
+        @endphp
+        @if ($pendingReturns > 0)
+            <span class="badge bg-warning ms-2">{{ $pendingReturns }}</span>
+        @endif
+    </a>
+    <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}">
+                <i class="fas fa-list"></i> All Returns
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=pending">
+                <i class="fas fa-clock"></i> Pending
+                @if ($pendingReturns > 0)
+                    <span class="badge bg-warning ms-2">{{ $pendingReturns }}</span>
+                @endif
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=processing">
+                <i class="fas fa-spinner"></i> Processing
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=approved">
+                <i class="fas fa-check-circle text-success"></i> Approved
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=completed">
+                <i class="fas fa-check-double text-success"></i> Completed
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=rejected">
+                <i class="fas fa-times-circle text-danger"></i> Rejected
+            </a>
+        </li>
+    </ul>
+</li>
+
+
         <!-- Reports -->
 <li class="nav-item has-dropdown">
     <a class="nav-link dropdown-toggle" href="javascript:void(0)">

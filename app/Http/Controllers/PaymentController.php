@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\UserAddress;
 use App\Models\Coupon;
 use App\Models\OrderCancellation;
+use App\Models\ReturnExchange;
 use App\Mail\OrderConfirmationMail;
 use Illuminate\Support\Facades\DB;
 
@@ -1161,8 +1162,11 @@ class PaymentController extends Controller
     public function getOrderDetails($id)
     {
         try {
-            $order = Order::with(['user', 'items', 'cancellation'])->find($id);
-
+$order = Order::with([
+    'user',
+    'items',
+    'cancellation'
+])->find($id);
             if (!$order) {
                 return response()->json([
                     'success' => false,
@@ -1177,6 +1181,16 @@ class PaymentController extends Controller
                     'message' => 'Unauthorized'
                 ], 403);
             }
+            // ==========================================
+// RETURN / EXCHANGE REQUEST DETAILS
+// ==========================================
+$returnRequest = ReturnExchange::with([
+    'exchangeProduct',
+    'exchangeVariant'
+])
+    ->where('order_id', $order->id)
+    ->latest('id')
+    ->first();
 
             $shippingAddress = null;
 
@@ -1324,6 +1338,7 @@ class PaymentController extends Controller
                     'items' => $items,
                     'shipping_address' => $shippingAddress,
                     'cancellation' => $order->cancellation,
+                    'return_request' => $returnRequest,
                     'product_revenue' => $orderData['product_revenue'],
                     'actual_price' => $orderData['actual_price'],
                     'profit' => $orderData['profit'],

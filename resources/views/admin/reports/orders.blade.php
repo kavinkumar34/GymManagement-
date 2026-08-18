@@ -620,17 +620,95 @@
                             <td><strong>#{{ $order->order_number }}</strong></td>
                             <td>{{ $order->user->name ?? 'N/A' }}</td>
                             <td>
-                                @foreach($order->items as $item)
-                                    <span style="font-size:11px; display:block; border-bottom:1px solid #f1f5f9; padding:2px 0;">
-                                        {{ $item->product_name ?? 'Product' }} (x{{ $item->quantity }})
-                                    </span>
-                                @endforeach
+    @foreach($order->items as $item)
+    <span style="font-size:11px; display:block; border-bottom:1px solid #f1f5f9; padding:2px 0;">
+
+        {{ $item->report_product_name ?? 'Product' }} (x{{ $item->quantity }})
+
+        @if(str_contains(strtolower($item->report_product_name ?? ''), 'return'))
+            <span style="display:block; color:#dc2626; font-weight:700; margin-top:2px;">
+                Return
+            </span>
+        @endif  
+
+    </span>
+@endforeach
                             </td>
-                            <td style="color:#2563eb; font-weight:600;">₹{{ number_format($order->product_revenue ?? 0, 2) }}</td>
-                            <td style="color:#d97706; font-weight:600;">₹{{ number_format($order->actual_price ?? 0, 2) }}</td>
-                            <td style="color: #16a34a; font-weight:700;">₹{{ number_format($order->profit ?? 0, 2) }}</td>
-                            <td style="color:#7c3aed; font-weight:600;">₹{{ number_format($order->shipping_charge ?? 0, 2) }}</td>
-                            <td><strong>₹{{ number_format($order->total_with_shipping ?? 0, 2) }}</strong></td>
+                            @php
+                                /*
+                                 * Display calculation fix:
+                                 * For a variant product, Actual Price MUST come from
+                                 * product_variants.cost_price.
+                                 *
+                                 * The controller already selects:
+                                 * product_variants.cost_price as variant_cost_price
+                                 *
+                                 * We calculate a fallback here because the current
+                                 * report data may still contain actual_price = 0.
+                                 * Normal products continue using the controller value.
+                                 */
+                                $displayActualPrice = (float) ($order->actual_price ?? 0);
+
+                                if ($displayActualPrice <= 0 && $order->items->count() > 0) {
+                                    $displayActualPrice = 0;
+
+                                    foreach ($order->items as $reportItem) {
+                                        $itemQuantity = (int) ($reportItem->quantity ?? 0);
+
+                                        if (!empty($reportItem->variant_id)) {
+                                            // Variant product -> cost_price
+                                            $unitActualPrice = (float) (
+                                                $reportItem->variant_cost_price ?? 0
+                                            );
+                                        } else {
+                                            // Normal product -> products.price
+                                            $unitActualPrice = (float) (
+                                                $reportItem->product_price
+                                                ?? $reportItem->price
+                                                ?? 0
+                                            );
+                                        }
+
+                                        $displayActualPrice +=
+                                            $unitActualPrice * $itemQuantity;
+                                    }
+                                }
+
+                                $displayProductRevenue = (float) (
+                                    $order->product_revenue ?? 0
+                                );
+
+                                $displayProfit =
+                                    $displayProductRevenue - $displayActualPrice;
+
+                                $displayShipping = (float) (
+                                    $order->report_shipping_charge
+                                    ?? $order->shipping_charge
+                                    ?? 0
+                                );
+
+                                $displayTotal = $displayProductRevenue + $displayShipping;
+                            @endphp
+
+                            <td style="color:#2563eb; font-weight:600;">
+                                ₹{{ number_format($displayProductRevenue, 2) }}
+                            </td>
+
+                            <td style="color:#d97706; font-weight:600;">
+                                ₹{{ number_format($displayActualPrice, 2) }}
+                            </td>
+
+                            <td style="color:#16a34a; font-weight:700;">
+                                ₹{{ number_format($displayProfit, 2) }}
+                            </td>
+
+                            <td style="color:#7c3aed; font-weight:600;">
+                                ₹{{ number_format($displayShipping, 2) }}
+                            </td>
+
+                            <td>
+                                <strong>₹{{ number_format($displayTotal, 2) }}</strong>
+                            </td>
                             <td>
                                 <span class="badge-status badge-{{ strtolower($order->order_status) }}">
                                     {{ $order->order_status }}

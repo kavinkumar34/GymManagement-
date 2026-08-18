@@ -23,6 +23,9 @@ use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\AddressApiController;
+// ===== RETURN & EXCHANGE ROUTES =====
+use App\Http\Controllers\ReturnExchangeController;
+use App\Http\Controllers\Admin\AdminReturnExchangeController;
 
 
 // ============ NEW CONTROLLERS ============
@@ -1163,3 +1166,18 @@ Route::prefix('admin')->name('admin.')->group(function() {
 
 // Cancel order route (user)
 Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');
+
+
+// ===== RETURN & EXCHANGE ROUTES (USER) =====
+Route::middleware(['auth'])->group(function () {
+    Route::get('/return-exchange/check/{orderId}', [ReturnExchangeController::class, 'checkEligibility'])->name('return.check');
+    Route::post('/return-exchange/submit', [ReturnExchangeController::class, 'store'])->name('return.submit');
+});
+
+// ===== RETURN & EXCHANGE ROUTES (ADMIN) =====
+Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/returns', [AdminReturnExchangeController::class, 'index'])->name('returns.index');
+    Route::get('/returns/{id}/details', [AdminReturnExchangeController::class, 'getDetails'])->name('returns.details');
+    Route::put('/returns/{id}/status', [AdminReturnExchangeController::class, 'updateStatus'])->name('returns.status');
+    Route::post('/returns/bulk-update', [AdminReturnExchangeController::class, 'bulkUpdate'])->name('returns.bulk-update');
+});
