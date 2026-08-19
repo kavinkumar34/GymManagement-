@@ -1,4 +1,6 @@
 @extends('layouts.app')
+<title>About Us</title>
+
 
 @section('content')
 <style>

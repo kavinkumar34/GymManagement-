@@ -15,12 +15,11 @@ use App\Models\OrderCancellation;
 use App\Models\ReturnExchange;
 use App\Mail\OrderConfirmationMail;
 use Illuminate\Support\Facades\DB;
+use Razorpay\Api\Api;
 
 class PaymentController extends Controller
 {
-    private $merchantKey = '5FOEb9';
-    private $merchantSalt = 'Q7wnZax0G4ySOkdHDpW7bb1Zv8KvsGCs';
-    private $payuUrl = 'https://test.payu.in/_payment';
+  
 
     /**
      * Handle guest user registration and auto-login
@@ -206,8 +205,13 @@ class PaymentController extends Controller
             $this->saveGuestAddress($user, $guestAddressData);
         }
         
-        return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
-    }
+return $this->createRazorpayOrder(
+    $user,
+    $txnid,
+    $totalAmount,
+    $productInfo,
+    $order->id
+);    }
     
     private function processCartCheckout($request, $user, $checkoutCart)
     {
@@ -385,8 +389,13 @@ class PaymentController extends Controller
             $this->saveGuestAddress($user, $guestAddressData);
         }
         
-        return $this->redirectToPayU($user, $txnid, $totalAmount, $productInfo, $order->id);
-    }
+return $this->createRazorpayOrder(
+    $user,
+    $txnid,
+    $totalAmount,
+    $productInfo,
+    $order->id
+);    }
     
     private function createOrder(
         $txnid,
@@ -585,40 +594,60 @@ class PaymentController extends Controller
             'order_status' => 'Pending',
             'refund_status' => 'none',
             'refund_amount' => 0,
-            'payment_method' => 'PayU',
+'payment_method' => 'Razorpay',
             'transaction_id' => $txnid,
             'order_date' => now(),
             'payment_details' => !empty($paymentDetails) ? json_encode($paymentDetails) : null
         ]);
     }
     
-    private function redirectToPayU($user, $txnid, $totalAmount, $productInfo, $orderId)
-    {
-        $hashString = $this->merchantKey . '|' . $txnid . '|' . $totalAmount . '|' . $productInfo . '|' . 
-                      $user->name . '|' . $user->email . '|' . '||||||||||' . $this->merchantSalt;
-        
-        $hash = hash('sha512', $hashString);
-        
-        session(['pending_order_id' => $orderId]);
-        session(['pending_user_id' => $user->id]);
+private function createRazorpayOrder($user, $txnid, $totalAmount, $productInfo, $orderId)
+{
 
-        $successUrl = url('/payment/success');
-        $failureUrl = url('/payment/failure');
+    try {
+        $api = new Api(
+            config('services.razorpay.key_id'),
+            config('services.razorpay.key_secret')
+        );
 
-        return view('payment.payu-form', [
-            'action' => $this->payuUrl,
-            'key' => $this->merchantKey,
-            'txnid' => $txnid,
-            'amount' => $totalAmount,
-            'productinfo' => $productInfo,
-            'firstname' => $user->name,
-            'email' => $user->email,
-            'phone' => $user->phone ?? '9876543210',
-            'surl' => $successUrl,
-            'furl' => $failureUrl,
-            'hash' => $hash
+        // Razorpay amount must be in paisephp artisan optimize:clear
+        $amountInPaise = (int) round($totalAmount * 100);
+
+        $razorpayOrder = $api->order->create([
+            'receipt' => $txnid,
+            'amount' => $amountInPaise,
+            'currency' => 'INR',
         ]);
+
+        session([
+            'pending_order_id' => $orderId,
+            'pending_user_id' => $user->id,
+        ]);
+
+        return view('payment.razorpay-form', [
+            'razorpayKey' => config('services.razorpay.key_id'),
+            'razorpayOrderId' => $razorpayOrder['id'],
+            'amount' => $amountInPaise,
+            'currency' => 'INR',
+            'orderId' => $orderId,
+            'txnid' => $txnid,
+            'productInfo' => $productInfo,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone ?? '',
+        ]);
+
+    } catch (\Exception $e) {
+        Log::error('Razorpay order creation failed', [
+            'order_id' => $orderId,
+            'txnid' => $txnid,
+            'error' => $e->getMessage(),
+        ]);
+
+        return redirect()->route('cart')
+            ->with('error', 'Unable to initialize Razorpay payment. Please try again.');
     }
+}
 
     public function paymentSuccess(Request $request)
     {
@@ -1457,4 +1486,192 @@ $returnRequest = ReturnExchange::with([
             Log::error('Stack trace: ' . $e->getTraceAsString());
         }
     }
+    public function verifyRazorpayPayment(Request $request)
+{
+    try {
+
+        $request->validate([
+            'razorpay_payment_id' => 'required|string',
+            'razorpay_order_id' => 'required|string',
+            'razorpay_signature' => 'required|string',
+            'order_id' => 'required|integer',
+        ]);
+
+        $api = new Api(
+            config('services.razorpay.key_id'),
+            config('services.razorpay.key_secret')
+        );
+
+        // Verify Razorpay signature
+        $attributes = [
+            'razorpay_order_id' => $request->razorpay_order_id,
+            'razorpay_payment_id' => $request->razorpay_payment_id,
+            'razorpay_signature' => $request->razorpay_signature,
+        ];
+
+        $api->utility->verifyPaymentSignature($attributes);
+
+        $order = Order::find($request->order_id);
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found'
+            ], 404);
+        }
+
+        // Prevent duplicate processing
+        if ($order->payment_status === 'SUCCESS') {
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment already verified'
+            ]);
+        }
+
+        // Get existing payment details
+        $paymentDetails = [];
+
+        if (!empty($order->payment_details)) {
+
+            $paymentDetails = is_string($order->payment_details)
+                ? json_decode($order->payment_details, true)
+                : $order->payment_details;
+
+            if (!is_array($paymentDetails)) {
+                $paymentDetails = [];
+            }
+        }
+
+        // Save Razorpay response
+        $paymentDetails['razorpay_response'] = [
+            'razorpay_payment_id' => $request->razorpay_payment_id,
+            'razorpay_order_id' => $request->razorpay_order_id,
+            'razorpay_signature' => $request->razorpay_signature,
+        ];
+
+        // Update order
+        $order->update([
+            'payment_status' => 'SUCCESS',
+            'order_status' => 'Confirmed',
+            'payment_id' => $request->razorpay_payment_id,
+            'transaction_id' => $request->razorpay_payment_id,
+            'payment_details' => json_encode($paymentDetails)
+        ]);
+
+        Log::info(
+            'Razorpay payment verified successfully',
+            [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'payment_id' => $request->razorpay_payment_id
+            ]
+        );
+
+        // Clear checkout session
+        session()->forget('pending_order_id');
+        session()->forget('pending_user_id');
+        session()->forget('checkout_cart');
+
+        // Send confirmation email
+        $this->sendOrderConfirmationEmail($order);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment verified successfully'
+        ]);
+
+    } catch (\Exception $e) {
+
+        Log::error(
+            'Razorpay payment verification failed',
+            [
+                'error' => $e->getMessage(),
+                'order_id' => $request->order_id ?? null
+            ]
+        );
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Payment verification failed'
+        ], 400);
+    }
+}
+
+
+public function razorpayPaymentFailure(Request $request)
+{
+    try {
+
+        $orderId = $request->input('order_id');
+
+        $order = Order::find($orderId);
+
+        if ($order) {
+
+            // Restore stock only if order is still pending
+            if ($order->payment_status === 'PENDING') {
+
+                foreach ($order->items as $item) {
+
+                    if ($item->variant_id) {
+
+                        $variant = \App\Models\ProductVariant::find(
+                            $item->variant_id
+                        );
+
+                        if ($variant) {
+                            $variant->increment(
+                                'stock',
+                                $item->quantity
+                            );
+                        }
+
+                    } else {
+
+                        $product = Product::find(
+                            $item->product_id
+                        );
+
+                        if ($product) {
+                            $product->increment(
+                                'stock',
+                                $item->quantity
+                            );
+                        }
+                    }
+                }
+
+                $order->update([
+                    'payment_status' => 'FAILED',
+                    'order_status' => 'Failed'
+                ]);
+            }
+        }
+
+        session()->forget('pending_order_id');
+        session()->forget('pending_user_id');
+        session()->forget('checkout_cart');
+
+        return redirect()
+            ->route('cart')
+            ->with(
+                'error',
+                'Payment failed or was cancelled. Please try again.'
+            );
+
+    } catch (\Exception $e) {
+
+        Log::error(
+            'Razorpay failure handling error: ' .
+            $e->getMessage()
+        );
+
+        return redirect()
+            ->route('cart')
+            ->with(
+                'error',
+                'Payment failed. Please try again.'
+            );
+    }
+}
 }

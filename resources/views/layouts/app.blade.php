@@ -5,7 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>{{ App\Models\Setting::get('company_name', null) ?: 'Gym Management' }}</title>    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+@php
+    $companyLogo = \App\Models\Setting::get('company_logo', null);
+@endphp
+
+<title>{{ App\Models\Setting::get('company_name', null) ?: 'Home' }}</title>
+
+@if($companyLogo && (str_starts_with($companyLogo, '/storage/') || str_starts_with($companyLogo, 'storage/')))
+    <link rel="icon" type="image/png" href="{{ asset($companyLogo) }}">
+@else
+    <link rel="icon" href="data:,">
+@endif
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- ================================================================

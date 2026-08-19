@@ -1,5 +1,6 @@
 {{-- resources/views/payment/my-orders.blade.php --}}
 @extends('layouts.app')
+<title>My Orders</title>
 
 @section('content')
     <style>
@@ -1456,6 +1457,13 @@
                 padding: 6px 10px;
             }
         }
+        /* ===== RETURN / EXCHANGE BUTTON - CONTENT WIDTH ONLY ===== */
+.order-body > .btn-return-exchange,
+.order-body > .btn-review.reviewed {
+    align-self: flex-start !important;
+    width: fit-content !important;
+    max-width: 100%;
+}
     </style>
 
     <div class="container mt-4 pt-2 pb-5 mb-4">
@@ -2333,7 +2341,7 @@
                 <div class="modal-body">
                     <input type="hidden" id="return_order_id" value="">
                     
-                    <div id="returnEligibilityInfo" class="mb-3"></div>
+                 {{--   <div id="returnEligibilityInfo" class="mb-3"></div> --}}
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Select Product <span class="text-danger">*</span></label>

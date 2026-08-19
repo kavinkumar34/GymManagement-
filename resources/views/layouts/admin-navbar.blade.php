@@ -202,7 +202,7 @@
         <!-- ===== RETURN & EXCHANGE MENU ===== -->
 <li class="nav-item has-dropdown">
     <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-        <i class="fas fa-undo-alt"></i> <span>Returns</span>
+        <i class="fas fa-undo-alt"></i> <span>Return/Exchange</span>
         @php
             $pendingReturns = 0;
             try {
@@ -236,21 +236,21 @@
                 <i class="fas fa-spinner"></i> Processing
             </a>
         </li>
-        <li>
+   {{--     <li>
             <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=approved">
                 <i class="fas fa-check-circle text-success"></i> Approved
             </a>
-        </li>
+        </li> --}}
         <li>
             <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=completed">
                 <i class="fas fa-check-double text-success"></i> Completed
             </a>
         </li>
-        <li>
+    {{--    <li>
             <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=rejected">
                 <i class="fas fa-times-circle text-danger"></i> Rejected
             </a>
-        </li>
+        </li> --}}
     </ul>
 </li>
 

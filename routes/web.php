@@ -161,6 +161,17 @@ Route::post('/contact', [ContactController::class, 'submit'])->name('contact.sub
 Route::post('/buy-now', [PaymentController::class, 'buyNow'])->name('buy.now');
 Route::post('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::post('/payment/failure', [PaymentController::class, 'paymentFailure'])->name('payment.failure');
+// ============ RAZORPAY PAYMENT ROUTES ============
+
+Route::post(
+    '/razorpay/payment/verify',
+    [PaymentController::class, 'verifyRazorpayPayment']
+)->name('razorpay.payment.verify');
+
+Route::get(
+    '/razorpay/payment/failure',
+    [PaymentController::class, 'razorpayPaymentFailure']
+)->name('razorpay.payment.failure');
 Route::get('/order/success/{id}', [PaymentController::class, 'orderSuccess'])->name('order.success');
 Route::get('/my-orders', [PaymentController::class, 'myOrders'])->name('my.orders')->middleware('auth');
 
