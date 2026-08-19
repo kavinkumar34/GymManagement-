@@ -27,7 +27,31 @@
         $pendingCount = 0;
     }
 
-    // New pending orders count
+    // =========================================================
+    // ★★★ ORDER STATUS COUNTS ★★★
+    // Total = Pending + Confirmed + Shipped
+    // =========================================================
+    $pendingOrdersCount = 0;
+    $confirmedOrdersCount = 0;
+    $shippedOrdersCount = 0;
+    $totalOrdersCount = 0;
+
+    try {
+        if (Schema::hasTable('orders')) {
+            $pendingOrdersCount = Order::where('order_status', 'Pending')->count();
+            $confirmedOrdersCount = Order::where('order_status', 'Confirmed')->count();
+            $shippedOrdersCount = Order::where('order_status', 'Shipped')->count();
+            // Total = Pending + Confirmed + Shipped
+            $totalOrdersCount = $pendingOrdersCount + $confirmedOrdersCount + $shippedOrdersCount;
+        }
+    } catch (\Exception $e) {
+        $pendingOrdersCount = 0;
+        $confirmedOrdersCount = 0;
+        $shippedOrdersCount = 0;
+        $totalOrdersCount = 0;
+    }
+
+    // New pending orders count (payment status PENDING)
     $newPendingOrders = 0;
     try {
         if (Schema::hasTable('orders')) {
@@ -79,13 +103,13 @@
                 <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
             </a>
         </li>
-      <!-- Users -->
-<li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.users.index') }}">
-        <i class="fas fa-users"></i>
-        <span>Users</span>
-    </a>
-</li>
+        <!-- Users -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.users.index') }}">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </a>
+        </li>
 
         <!-- Products Dropdown -->
         <li class="nav-item has-dropdown">
@@ -123,12 +147,6 @@
                         <i class="fas fa-building"></i> Brands
                     </a>
                 </li>
-               
-               {{-- <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.attributes.index') }}">
-                        <i class="fas fa-list-ul"></i> Attributes
-                    </a>
-                </li> --}}
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.topcategories.index') }}">
                         <i class="fas fa-layer-group"></i> Top Categories
@@ -187,87 +205,78 @@
             </a>
         </li>
 
-        <!-- Payments -->
+        <!-- ========================================================= -->
+        <!-- ★★★ ORDERS WITH RED BADGE (TOTAL COUNT) ★★★              -->
+        <!-- Total = Pending + Confirmed + Shipped                     -->
+        <!-- ========================================================= -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.payments.index') }}" id="paymentsNavLink"
                 onclick="markPaymentsViewed()">
                 <i class="fas fa-credit-card"></i> <span>Orders</span>
-                @if ($newPendingOrders > 0)
-                    <span class="badge bg-danger ms-2" id="pendingBadge">{{ $newPendingOrders }}</span>
+                @if ($totalOrdersCount > 0)
+                    <span class="badge bg-danger ms-2" id="ordersTotalBadge">{{ $totalOrdersCount }}</span>
                 @endif
             </a>
         </li>
 
-
         <!-- ===== RETURN & EXCHANGE MENU ===== -->
-<li class="nav-item has-dropdown">
-    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-        <i class="fas fa-undo-alt"></i> <span>Return/Exchange</span>
-        @php
-            $pendingReturns = 0;
-            try {
-                if (Schema::hasTable('return_exchange_requests')) {
-                    $pendingReturns = \App\Models\ReturnExchange::where('status', 'pending')->count();
-                }
-            } catch (\Exception $e) {
-                $pendingReturns = 0;
-            }
-        @endphp
-        @if ($pendingReturns > 0)
-            <span class="badge bg-warning ms-2">{{ $pendingReturns }}</span>
-        @endif
-    </a>
-    <ul class="dropdown-menu-custom">
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}">
-                <i class="fas fa-list"></i> All Returns
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=pending">
-                <i class="fas fa-clock"></i> Pending
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-undo-alt"></i> <span>Return/Exchange</span>
+                @php
+                    $pendingReturns = 0;
+                    try {
+                        if (Schema::hasTable('return_exchange_requests')) {
+                            $pendingReturns = \App\Models\ReturnExchange::where('status', 'pending')->count();
+                        }
+                    } catch (\Exception $e) {
+                        $pendingReturns = 0;
+                    }
+                @endphp
                 @if ($pendingReturns > 0)
                     <span class="badge bg-warning ms-2">{{ $pendingReturns }}</span>
                 @endif
             </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}">
+                        <i class="fas fa-list"></i> All Returns
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=pending">
+                        <i class="fas fa-clock"></i> Pending
+                        @if ($pendingReturns > 0)
+                            <span class="badge bg-warning ms-2">{{ $pendingReturns }}</span>
+                        @endif
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=processing">
+                        <i class="fas fa-spinner"></i> Processing
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=completed">
+                        <i class="fas fa-check-double text-success"></i> Completed
+                    </a>
+                </li>
+            </ul>
         </li>
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=processing">
-                <i class="fas fa-spinner"></i> Processing
-            </a>
-        </li>
-   {{--     <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=approved">
-                <i class="fas fa-check-circle text-success"></i> Approved
-            </a>
-        </li> --}}
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=completed">
-                <i class="fas fa-check-double text-success"></i> Completed
-            </a>
-        </li>
-    {{--    <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.returns.index') }}?status=rejected">
-                <i class="fas fa-times-circle text-danger"></i> Rejected
-            </a>
-        </li> --}}
-    </ul>
-</li>
-
 
         <!-- Reports -->
-<li class="nav-item has-dropdown">
-    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-        <i class="fas fa-chart-pie"></i> <span>Reports</span>
-    </a>
-    <ul class="dropdown-menu-custom">
-        <li>
-            <a class="dropdown-item-custom" href="{{ route('admin.reports.orders') }}">
-                <i class="fas fa-shopping-cart"></i> Orders Report
+        <li class="nav-item has-dropdown">
+            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+                <i class="fas fa-chart-pie"></i> <span>Reports</span>
             </a>
+            <ul class="dropdown-menu-custom">
+                <li>
+                    <a class="dropdown-item-custom" href="{{ route('admin.reports.orders') }}">
+                        <i class="fas fa-shopping-cart"></i> Orders Report
+                    </a>
+                </li>
+            </ul>
         </li>
-    </ul>
-</li>
 
         <!-- Deliverable Pincodes -->
         <li class="nav-item">
@@ -290,53 +299,6 @@
             </a>
         </li>
 
-     <!-- ===== OFFERS MENU - NEW ===== -->
-        {{--<li class="nav-item has-dropdown">
-            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-                <i class="fas fa-tags"></i> <span>Offers</span>
-                <span class="dropdown-arrow">▼</span>
-                @if ($activeOffersCount > 0)
-                    <span class="badge bg-success ms-2">{{ $activeOffersCount }}</span>
-                @endif
-            </a>
-            <ul class="dropdown-menu-custom">
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.offers.create') }}">
-                        <i class="fas fa-plus"></i> Create Offer
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.offers.index') }}">
-                        <i class="fas fa-list"></i> All Offers
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'active') }}">
-                        <i class="fas fa-check-circle text-success"></i> Active Offers
-                        @if ($activeOffersCount > 0)
-                            <span class="badge bg-success ms-2">{{ $activeOffersCount }}</span>
-                        @endif
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'scheduled') }}">
-                        <i class="fas fa-clock text-warning"></i> Scheduled Offers
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'expired') }}">
-                        <i class="fas fa-hourglass-end text-muted"></i> Expired Offers
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.offers.status', 'inactive') }}">
-                        <i class="fas fa-pause-circle text-danger"></i> Inactive Offers
-                    </a>
-                </li>
-            </ul>
-        </li> --}}
-
-        
         <!-- ===== COUPONS MENU ===== -->
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
@@ -365,6 +327,7 @@
                 </li>
             </ul>
         </li>
+
         <!-- ===== GYM ONE DIVIDER ===== -->
         <li class="nav-divider">
             <span class="divider-text">Gym One</span>
@@ -386,7 +349,6 @@
                         <i class="fas fa-user-plus"></i> Add Member
                     </a>
                 </li>
-
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.member.index') }}">
                         <i class="fas fa-list"></i> Member List
@@ -406,7 +368,6 @@
                         <i class="fas fa-user-plus"></i> Add Trainer
                     </a>
                 </li>
-
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.trainer.index') }}">
                         <i class="fas fa-list"></i> Trainer List
@@ -415,21 +376,18 @@
             </ul>
         </li>
 
-
         <!-- Membership Dropdown -->
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-id-card"></i>
                 <span>Membership</span>
             </a>
-
             <ul class="dropdown-menu-custom">
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.membership.create') }}">
                         <i class="fas fa-plus-circle"></i> Add Membership
                     </a>
                 </li>
-
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.membership.index') }}">
                         <i class="fas fa-list"></i> Membership List
@@ -438,23 +396,18 @@
             </ul>
         </li>
 
-
-
-        <!--Package GropDown -->
-
+        <!-- Package Dropdown -->
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-id-card"></i>
                 <span>Package</span>
             </a>
-
             <ul class="dropdown-menu-custom">
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.package.create') }}">
                         <i class="fas fa-plus-circle"></i> Add Package
                     </a>
                 </li>
-
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.package.index') }}">
                         <i class="fas fa-list"></i> Package List
@@ -462,9 +415,8 @@
                 </li>
             </ul>
         </li>
-        <!-- ============================================ -->
-        <!-- ASSIGN TRAINER - NEW MENU                    -->
-        <!-- ============================================ -->
+
+        <!-- ASSIGN TRAINER -->
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-user-tag"></i>
@@ -484,6 +436,7 @@
             </ul>
         </li>
 
+        <!-- Payments -->
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-user-tag"></i>
@@ -495,20 +448,11 @@
                         <i class="fas fa-hand-holding-usd"></i> Hand Payment
                     </a>
                 </li>
-                {{-- 
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.payment.orders') }}">
-                        <i class="fas fa-list"></i>Membership Payment
-                    </a>
-                </li>
-                --}}
             </ul>
         </li>
 
-
-
-
-            <li class="nav-item has-dropdown">
+        <!-- Attendance -->
+        <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-user-tag"></i>
                 <span>Attendance</span>
@@ -516,22 +460,16 @@
             <ul class="dropdown-menu-custom">
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.member-attendance.index') }}">
- Member Attendance
+                        Member Attendance
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.trainer-attendance.index') }}">
-                                                              
-
-Trainer Attendance
+                        Trainer Attendance
                     </a>
                 </li>
             </ul>
         </li>
-
-
-
-
 
     </ul>
 
@@ -912,7 +850,6 @@ Trainer Attendance
         overflow: hidden;
     }
 
-
     .has-dropdown.active .dropdown-menu-custom {
         display: block !important;
         animation: slideDown 0.3s ease;
@@ -923,7 +860,6 @@ Trainer Attendance
             opacity: 0;
             transform: translateY(-10px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
@@ -963,6 +899,31 @@ Trainer Attendance
         color: #4a9eff;
     }
 
+    /* ===== BADGES ===== */
+    .badge {
+        margin-left: auto;
+        flex-shrink: 0;
+        font-size: 0.6rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffa726 !important;
+        color: #0d1b2a;
+    }
+
+    .badge.bg-danger {
+        background-color: #ef5350 !important;
+        color: #ffffff;
+    }
+
+    .badge.bg-success {
+        background-color: #4caf50 !important;
+        color: #ffffff;
+    }
+
     /* ===== GYM ONE DIVIDER ===== */
     .nav-divider {
         padding: 18px 20px 8px 20px;
@@ -995,31 +956,6 @@ Trainer Attendance
         text-align: center;
         width: 100%;
         text-shadow: 0 0 30px rgba(74, 158, 255, 0.15);
-    }
-
-    /* ===== BADGES ===== */
-    .badge {
-        margin-left: auto;
-        flex-shrink: 0;
-        font-size: 0.6rem;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-weight: 600;
-    }
-
-    .badge.bg-warning {
-        background-color: #ffa726 !important;
-        color: #0d1b2a;
-    }
-
-    .badge.bg-danger {
-        background-color: #ef5350 !important;
-        color: #ffffff;
-    }
-
-    .badge.bg-success {
-        background-color: #4caf50 !important;
-        color: #ffffff;
     }
 
     /* ===== SIDEBAR FOOTER ===== */
@@ -1209,44 +1145,34 @@ Trainer Attendance
     }
 
     @keyframes badgeBlink {
-
         0% {
             opacity: 1;
             transform: scale(1);
         }
-
         50% {
             opacity: .3;
             transform: scale(1.25);
         }
-
         100% {
             opacity: 1;
             transform: scale(1);
         }
-
     }
 
     .blinkBadge {
-
         animation: blink 1s infinite;
-
     }
 
     @keyframes blink {
-
         0% {
             opacity: 1;
         }
-
         50% {
             opacity: .3;
             transform: scale(1.25);
         }
-
         100% {
             opacity: 1;
         }
-
     }
 </style>

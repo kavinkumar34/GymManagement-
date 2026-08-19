@@ -31,7 +31,7 @@
     .stat-card {
         background: white;
         border-radius: 16px;
-        padding: 20px 20px 20px 24px;
+        padding: 18px 20px 18px 22px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
         transition: all 0.3s ease;
         border: 1px solid #f1f5f9;
@@ -40,12 +40,18 @@
         height: 100%;
         display: flex;
         flex-direction: column;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        min-height: 120px;
     }
 
     .stat-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 40px rgba(0,0,0,0.08);
         border-color: transparent;
+        text-decoration: none;
+        color: inherit;
     }
 
     /* Card Top Section - Icon and Content */
@@ -53,45 +59,60 @@
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 12px;
+        gap: 10px;
+        margin-bottom: 2px;
+        flex: 1;
     }
 
     .stat-card .stat-icon-wrapper {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         flex-shrink: 0;
     }
 
+    .stat-card .stat-right {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        min-width: 0;
+        flex-shrink: 1;
+    }
+
     .stat-card .stat-number {
-        font-size: 1.75rem;
+        font-size: 1.6rem;
         font-weight: 700;
         color: #0f172a;
         line-height: 1.2;
+        white-space: nowrap;
     }
 
     .stat-card .stat-label {
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         color: #64748b;
         font-weight: 500;
-        margin-top: 2px;
+        margin-top: 1px;
+        white-space: nowrap;
+        letter-spacing: 0.2px;
     }
 
     .stat-card .stat-change {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         font-weight: 600;
         padding: 2px 10px;
         border-radius: 20px;
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        margin-top: 6px;
+        margin-top: 4px;
         align-self: flex-start;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 
     .stat-change.positive {
@@ -386,6 +407,63 @@
             justify-content: center;
         }
     }
+
+    /* ===== STAT CARD CLICK CURSOR ===== */
+    .stat-card-clickable {
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .stat-card-clickable:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .stat-card .stat-bottom-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-top: 2px;
+        flex-shrink: 0;
+        min-height: 26px;
+    }
+
+    /* ===== RESPONSIVE FIXES ===== */
+    @media (max-width: 992px) {
+        .stat-card .stat-number {
+            font-size: 1.4rem;
+        }
+        .stat-card .stat-label {
+            font-size: 0.72rem;
+        }
+        .stat-card .stat-change {
+            font-size: 0.6rem;
+            padding: 1px 8px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stat-card {
+            padding: 14px 16px 14px 18px;
+            min-height: 100px;
+        }
+        .stat-card .stat-icon-wrapper {
+            width: 38px;
+            height: 38px;
+            font-size: 1rem;
+        }
+        .stat-card .stat-number {
+            font-size: 1.2rem;
+        }
+        .stat-card .stat-label {
+            font-size: 0.68rem;
+        }
+        .stat-card .stat-change {
+            font-size: 0.55rem;
+            padding: 1px 6px;
+        }
+    }
 </style>
 
 <div class="admin-main-content">
@@ -435,115 +513,127 @@
             </a>
         </div>
 
-        <!-- ===== STATISTICS CARDS ===== -->
+        <!-- ===== STATISTICS CARDS - CLICKABLE ===== -->
         <div class="stat-grid">
             <!-- Total Orders -->
-            <div class="stat-card">
+            <a href="{{ route('admin.payments.index') }}" class="stat-card stat-card-clickable">
                 <div class="stat-card-top">
                     <div>
                         <div class="stat-icon-wrapper icon-blue">
                             <i class="fas fa-shopping-cart"></i>
                         </div>
                     </div>
-                    <div style="text-align: right;">
+                    <div class="stat-right">
                         <div class="stat-number">{{ $totalOrders ?? 0 }}</div>
                         <div class="stat-label">Total Orders</div>
                     </div>
                 </div>
-                <span class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> {{ $ordersGrowth ?? '0' }}%
-                </span>
-            </div>
+                <div class="stat-bottom-row">
+                    <span class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> {{ $ordersGrowth ?? '0' }}%
+                    </span>
+                </div>
+            </a>
 
             <!-- Total Revenue -->
-            <div class="stat-card">
+            <a href="{{ route('admin.reports.orders') }}" class="stat-card stat-card-clickable">
                 <div class="stat-card-top">
                     <div>
                         <div class="stat-icon-wrapper icon-green">
                             <i class="fas fa-rupee-sign"></i>
                         </div>
                     </div>
-                    <div style="text-align: right;">
+                    <div class="stat-right">
                         <div class="stat-number">₹{{ number_format($totalRevenue ?? 0, 0) }}</div>
                         <div class="stat-label">Total Revenue</div>
                     </div>
                 </div>
-                <span class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> {{ $revenueGrowth ?? '0' }}%
-                </span>
-            </div>
+                <div class="stat-bottom-row">
+                    <span class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> {{ $revenueGrowth ?? '0' }}%
+                    </span>
+                </div>
+            </a>
 
             <!-- Total Products -->
-            <div class="stat-card">
+            <a href="{{ route('admin.products.index') }}" class="stat-card stat-card-clickable">
                 <div class="stat-card-top">
                     <div>
                         <div class="stat-icon-wrapper icon-purple">
                             <i class="fas fa-box"></i>
                         </div>
                     </div>
-                    <div style="text-align: right;">
+                    <div class="stat-right">
                         <div class="stat-number">{{ $totalProducts ?? 0 }}</div>
                         <div class="stat-label">Total Products</div>
                     </div>
                 </div>
-            {{--    <span class="stat-change neutral">
-                    <i class="fas fa-minus"></i> {{ $productsGrowth ?? '0' }}%
-                </span> --}}
-            </div>
+                <div class="stat-bottom-row">
+                    <span class="stat-change neutral">
+                        <i class="fas fa-minus"></i> {{ $productsGrowth ?? '0' }}%
+                    </span>
+                </div>
+            </a>
 
             <!-- Total Users -->
-            <div class="stat-card">
+            <a href="{{ route('admin.users.index') }}" class="stat-card stat-card-clickable">
                 <div class="stat-card-top">
                     <div>
                         <div class="stat-icon-wrapper icon-cyan">
                             <i class="fas fa-users"></i>
                         </div>
                     </div>
-                    <div style="text-align: right;">
+                    <div class="stat-right">
                         <div class="stat-number">{{ $totalMembers ?? 0 }}</div>
                         <div class="stat-label">Total Users</div>
                     </div>
                 </div>
-                <span class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i> {{ $membersGrowth ?? '0' }}%
-                </span>
-            </div>
+                <div class="stat-bottom-row">
+                    <span class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> {{ $membersGrowth ?? '0' }}%
+                    </span>
+                </div>
+            </a>
 
             <!-- Pending Orders -->
-            <div class="stat-card">
+            <a href="{{ route('admin.payments.index') }}" class="stat-card stat-card-clickable">
                 <div class="stat-card-top">
                     <div>
                         <div class="stat-icon-wrapper icon-red">
                             <i class="fas fa-clock"></i>
                         </div>
                     </div>
-                    <div style="text-align: right;">
+                    <div class="stat-right">
                         <div class="stat-number">{{ $pendingOrders ?? 0 }}</div>
                         <div class="stat-label">Pending Orders</div>
                     </div>
                 </div>
-                <span class="stat-change negative">
-                    <i class="fas fa-exclamation-triangle"></i> Needs Attention
-                </span>
-            </div>
+                <div class="stat-bottom-row">
+                    <span class="stat-change negative">
+                        <i class="fas fa-exclamation-triangle"></i> Needs Attention
+                    </span>
+                </div>
+            </a>
 
             <!-- Revenue This Month -->
-            <div class="stat-card">
+            <a href="{{ route('admin.reports.orders') }}" class="stat-card stat-card-clickable">
                 <div class="stat-card-top">
                     <div>
                         <div class="stat-icon-wrapper icon-orange">
                             <i class="fas fa-calendar-check"></i>
                         </div>
                     </div>
-                    <div style="text-align: right;">
+                    <div class="stat-right">
                         <div class="stat-number">₹{{ number_format($monthlyRevenue ?? 0, 0) }}</div>
                         <div class="stat-label">Revenue This Month</div>
                     </div>
                 </div>
-                <span class="stat-change neutral">
-                    <i class="fas fa-calendar-alt"></i> {{ now()->format('M Y') }}
-                </span>
-            </div>
+                <div class="stat-bottom-row">
+                    <span class="stat-change neutral">
+                        <i class="fas fa-calendar-alt"></i> {{ now()->format('M Y') }}
+                    </span>
+                </div>
+            </a>
         </div>
 
         <!-- ===== CHARTS SECTION ===== -->

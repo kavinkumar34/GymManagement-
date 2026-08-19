@@ -1758,7 +1758,7 @@
             .sub-category-item {
                 min-width: 80px;
                 padding: 8px 10px;
-                height: 140px;
+                height: 80px;
             }
 
             .sub-category-item .sub-cat-icon {

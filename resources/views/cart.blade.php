@@ -1987,15 +1987,21 @@ async function loadDeliverableStates() {
         }
 
         // ============ NAVIGATION ============
-        function goToCheckout() {
-            if (checkStockIssues()) {
-                showCustomAlert('⚠️ Stock Issue', 'Some items have stock issues. Please check your cart.', 'warning');
-                return;
-            }
-            currentPage = 'checkout';
-            showAddressForm = false;
-            renderPage();
-        }
+     function goToCheckout() {
+    if (checkStockIssues()) {
+        showCustomAlert('⚠️ Stock Issue', 'Some items have stock issues. Please check your cart.', 'warning');
+        return;
+    }
+    currentPage = 'checkout';
+    showAddressForm = false;
+    
+    // 🔥 SET DEFAULT PAYMENT TO ONLINE
+    if (!selectedPayment) {
+        selectedPayment = 'online';
+    }
+    
+    renderPage();
+}
 
         function goToCart() {
             currentPage = 'cart';

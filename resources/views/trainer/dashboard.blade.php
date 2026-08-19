@@ -235,11 +235,21 @@
                     @endif
                 </div>
 
-                <!-- Assigned Members List -->
+                <!-- ========================================================= -->
+                <!-- Assigned Members List with View Button on Right Side       -->
+                <!-- ========================================================= -->
                 <div class="mt-4">
-                    <h5 style="color: #0d2818;">
-                        <i class="fas fa-list me-2 text-success"></i>Assigned Members List
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 style="color: #0d2818; margin: 0;">
+                            <i class="fas fa-list me-2 text-success"></i>Assigned Members List
+                        </h5>
+                        <!-- View Button - Right Side Corner -->
+                        <a href="{{ route('trainer.members') }}" 
+                           class="btn action-btn" 
+                           style="background: #0d2818; color: white; border-radius: 6px; border: none; padding: 5px 16px; font-size: 0.8rem; height: 34px; min-width: 70px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
+                            <i class="fas fa-eye me-1"></i> View All
+                        </a>
+                    </div>
 
                     @if($memberCount > 0)
                         <div class="table-responsive">
@@ -252,7 +262,6 @@
                                         <th>Phone</th>
                                         <th>Membership</th>
                                         <th>Goal</th>
-                                        <th width="100">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -286,13 +295,6 @@
                                                     {{ $member->goal_type ?? 'Fitness' }}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <a href="{{ route('trainer.members') }}" 
-                                                   class="btn action-btn" 
-                                                   style="background: #0d2818; color: white; border-radius: 6px; border: none; padding: 3px 10px; font-size: 0.7rem; height: 28px; min-width: 55px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;">
-                                                    <i class="fas fa-eye me-1"></i> View
-                                                </a>
-                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -323,13 +325,13 @@
     }
     
     .action-btn {
-        padding: 3px 10px !important;
-        font-size: 0.7rem !important;
+        padding: 5px 16px !important;
+        font-size: 0.8rem !important;
         border-radius: 6px !important;
-        height: 28px !important;
-        min-height: 28px !important;
-        max-height: 28px !important;
-        min-width: 55px !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        max-height: 34px !important;
+        min-width: 70px !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -339,8 +341,13 @@
         line-height: 1 !important;
         white-space: nowrap !important;
     }
-    .action-btn i { font-size: 0.65rem !important; }
-    .action-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.15); opacity: 0.9; }
+    .action-btn i { font-size: 0.75rem !important; }
+    .action-btn:hover { 
+        transform: translateY(-2px); 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+        opacity: 0.9; 
+        background: #1a472a !important;
+    }
 
     .table-hover tbody tr:hover {
         background: rgba(13, 40, 24, 0.03);
@@ -354,23 +361,34 @@
 
     @media (max-width: 768px) {
         .card-header .d-flex { flex-direction: column; gap: 10px; align-items: flex-start !important; }
-        .action-btn { height: 26px !important; min-height: 26px !important; max-height: 26px !important; min-width: 48px !important; padding: 2px 8px !important; font-size: 0.65rem !important; }
+        .action-btn { height: 30px !important; min-height: 30px !important; max-height: 30px !important; min-width: 60px !important; padding: 4px 12px !important; font-size: 0.7rem !important; }
+        .action-btn i { font-size: 0.65rem !important; }
         .row.g-3 .col-md-6 { margin-bottom: 15px; }
         .table-responsive { font-size: 0.85rem; }
         .stat-card:hover { transform: translateY(-3px); }
+        .d-flex.justify-content-between.align-items-center.mb-3 { 
+            flex-direction: column; 
+            align-items: flex-start !important; 
+            gap: 10px; 
+        }
     }
 
     @media (max-width: 576px) {
         .table-responsive { font-size: 0.8rem; }
         .badge { font-size: 0.65rem; }
-        .action-btn { height: 24px !important; min-height: 24px !important; max-height: 24px !important; min-width: 42px !important; padding: 1px 6px !important; font-size: 0.6rem !important; }
-        .action-btn i { font-size: 0.55rem !important; }
+        .action-btn { height: 28px !important; min-height: 28px !important; max-height: 28px !important; min-width: 50px !important; padding: 3px 10px !important; font-size: 0.65rem !important; }
+        .action-btn i { font-size: 0.6rem !important; }
         .card-header h4 { font-size: 1rem; }
         .stat-card .card-body { padding: 15px !important; }
         .stat-card h2 { font-size: 1.5rem !important; }
         .stat-card h6 { font-size: 0.75rem !important; }
         .stat-card .rounded-circle { padding: 10px !important; }
         .stat-card .rounded-circle i { font-size: 1.2rem !important; }
+        .d-flex.justify-content-between.align-items-center.mb-3 { 
+            flex-direction: column; 
+            align-items: flex-start !important; 
+            gap: 8px; 
+        }
     }
 </style>
 
