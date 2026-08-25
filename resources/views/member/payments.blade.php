@@ -8,7 +8,7 @@
                 <!-- Card Header - Matching Navbar Theme -->
                 <div class="payment-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h4 class="mb-0">
-                        <i class="fas fa-hand-holding-usd me-2"></i> Hand Payment
+                        <i class="fas fa-hand-holding-usd me-2"></i>  Payment
                     </h4>
                     <span class="payment-date">
                         <i class="fas fa-calendar-alt me-1"></i> {{ now()->format('d M Y, h:i A') }}

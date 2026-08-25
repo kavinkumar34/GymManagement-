@@ -1645,11 +1645,9 @@
             font-family: var(--font-body);
         }
 
-        .search-result-item .result-price {
-            font-size: 0.8rem;
-            color: var(--signal);
-            font-weight: 700;
-        }
+     .search-result-item .result-price {
+    display: none !important;
+}
 
         .search-result-item .result-category {
             font-size: 0.7rem;
@@ -2526,53 +2524,54 @@
             // ================================================================
             // ===== FETCH LIVE SEARCH =====
             // ================================================================
-            async function fetchLiveSearch(query) {
-                const searchResults = document.getElementById('searchResults');
+       // ================================================================
+// ===== FETCH LIVE SEARCH =====
+// ================================================================
+async function fetchLiveSearch(query) {
+    const searchResults = document.getElementById('searchResults');
 
-                try {
-                    const response = await fetch(`/search-products?q=${encodeURIComponent(query)}`);
-                    const products = await response.json();
+    try {
+        const response = await fetch(`/search-products?q=${encodeURIComponent(query)}`);
+        const products = await response.json();
 
-                    if (products.length === 0) {
-                        searchResults.innerHTML =
-                            '<div class="no-results"><i class="fas fa-search"></i> No products found</div>';
-                        return;
-                    }
+        if (products.length === 0) {
+            searchResults.innerHTML =
+                '<div class="no-results"><i class="fas fa-search"></i> No products found</div>';
+            return;
+        }
 
-                    let html = '';
-                    products.forEach(function(product) {
-                        const imageUrl = product.image_url || '{{ asset('images/no-image.png') }}';
-                        const price = product.price || product.mrp || '0';
+        let html = '';
+        products.forEach(function(product) {
+            const imageUrl = product.image_url || '{{ asset('images/no-image.png') }}';
 
-                        html += `
-                        <a href="/product/${product.id}" class="search-result-item">
-                            <img src="${imageUrl}" alt="${product.name}" class="result-image" onerror="this.src='{{ asset('images/no-image.png') }}'">
-                            <div class="result-info">
-                                <div class="result-name">${product.name}</div>
-                                <div class="result-price">₹${Number(price).toFixed(2)}</div>
-                                <div class="result-category">${product.category_name || ''} ${product.sub_category_name ? '› ' + product.sub_category_name : ''}</div>
-                            </div>
-                        </a>
-                    `;
-                    });
-
-                    html += `
-                    <div class="view-all-results">
-                        <a href="{{ url('/') }}?search=${encodeURIComponent(query)}">
-                            <i class="fas fa-arrow-right"></i> View all results
-                        </a>
+            html += `
+                <a href="/product/${product.id}" class="search-result-item">
+                    <img src="${imageUrl}" alt="${product.name}" class="result-image" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                    <div class="result-info">
+                        <div class="result-name">${product.name}</div>
+                        <div class="result-category">${product.category_name || ''} ${product.sub_category_name ? '› ' + product.sub_category_name : ''}</div>
                     </div>
-                `;
+                </a>
+            `;
+        });
 
-                    searchResults.innerHTML = html;
-                    searchResults.classList.add('show');
+        html += `
+            <div class="view-all-results">
+                <a href="{{ url('/') }}?search=${encodeURIComponent(query)}">
+                    <i class="fas fa-arrow-right"></i> View all results
+                </a>
+            </div>
+        `;
 
-                } catch (error) {
-                    console.error('Search error:', error);
-                    searchResults.innerHTML =
-                        '<div class="no-results"><i class="fas fa-exclamation-circle"></i> Error loading results</div>';
-                }
-            }
+        searchResults.innerHTML = html;
+        searchResults.classList.add('show');
+
+    } catch (error) {
+        console.error('Search error:', error);
+        searchResults.innerHTML =
+            '<div class="no-results"><i class="fas fa-exclamation-circle"></i> Error loading results</div>';
+    }
+}
 
             // ================================================================
             // ===== HANDLE URL SEARCH PARAMETER =====

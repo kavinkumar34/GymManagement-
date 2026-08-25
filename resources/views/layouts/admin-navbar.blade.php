@@ -445,7 +445,7 @@
             <ul class="dropdown-menu-custom">
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.hand.payment') }}">
-                        <i class="fas fa-hand-holding-usd"></i> Hand Payment
+                        <i class="fas fa-hand-holding-usd"></i>  Payment
                     </a>
                 </li>
             </ul>
