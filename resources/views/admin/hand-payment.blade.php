@@ -641,8 +641,8 @@
             <!-- Card Header -->
             <div class="card-header">
                 <div>
-                    <h4><i class="fas fa-hand-holding-usd"></i> Hand Payment</h4>
-                    <small>Manage hand payments for members</small>
+                    <h4><i class="fas fa-hand-holding-usd"></i>  Payment</h4>
+                    <small>Manage  payments for members</small>
                 </div>
                 <span class="header-date">
                     <i class="fas fa-calendar-alt"></i> {{ now()->format('d M Y, h:i A') }}
@@ -758,7 +758,7 @@
                                         <div class="empty-state">
                                             <i class="fas fa-hand-holding-usd"></i>
                                             <h5>No Members Found</h5>
-                                            <p>No members are available for hand payment.</p>
+                                            <p>No members are available for  payment.</p>
                                         </div>
                                     </td>
                                 </tr>

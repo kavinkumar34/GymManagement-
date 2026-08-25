@@ -54,141 +54,209 @@
         </div>
 
         <!-- ===========================================
-                    STATISTICS CARDS
+                    QUICK ACTIONS - TOP SECTION (UNIQUE LIGHT DESIGN)
+        ============================================ -->
+
+        <div class="quick-actions-wrapper mb-4">
+
+            <div class="quick-actions-card">
+
+                <div class="quick-actions-header">
+
+                    <h5 class="fw-bold mb-0">
+
+                        <i class="fas fa-bolt text-warning me-2"></i>
+
+                        Quick Actions
+
+                    </h5>
+
+                    <span class="quick-actions-badge">
+
+                        <i class="fas fa-clock"></i> Instant Access
+
+                    </span>
+
+                </div>
+
+                <div class="quick-actions-body">
+
+                    <div class="quick-action-item">
+
+                        <a href="{{ route('admin.member.create') }}" class="quick-action-btn primary">
+
+                            <div class="quick-action-icon">
+
+                                <i class="fas fa-user-plus"></i>
+
+                            </div>
+
+                            <div class="quick-action-text">
+
+                                <span class="action-title">Add Member</span>
+
+                                <span class="action-sub">Register new member</span>
+
+                            </div>
+
+                            <span class="action-arrow"><i class="fas fa-arrow-right"></i></span>
+
+                        </a>
+
+                    </div>
+
+                    <div class="quick-action-item">
+
+                        <a href="{{ route('admin.trainer.create') }}" class="quick-action-btn success">
+
+                            <div class="quick-action-icon">
+
+                                <i class="fas fa-user-tie"></i>
+
+                            </div>
+
+                            <div class="quick-action-text">
+
+                                <span class="action-title">Add Trainer</span>
+
+                                <span class="action-sub">Hire new trainer</span>
+
+                            </div>
+
+                            <span class="action-arrow"><i class="fas fa-arrow-right"></i></span>
+
+                        </a>
+
+                    </div>
+
+                    <div class="quick-action-item">
+
+                        <a href="{{ route('admin.membership.create') }}" class="quick-action-btn warning">
+
+                            <div class="quick-action-icon">
+
+                                <i class="fas fa-id-card"></i>
+
+                            </div>
+
+                            <div class="quick-action-text">
+
+                                <span class="action-title">Membership</span>
+
+                                <span class="action-sub">Create new plan</span>
+
+                            </div>
+
+                            <span class="action-arrow"><i class="fas fa-arrow-right"></i></span>
+
+                        </a>
+
+                    </div>
+
+                    <div class="quick-action-item">
+
+                        <a href="{{ route('admin.package.create') }}" class="quick-action-btn danger">
+
+                            <div class="quick-action-icon">
+
+                                <i class="fas fa-box-open"></i>
+
+                            </div>
+
+                            <div class="quick-action-text">
+
+                                <span class="action-title">Add Package</span>
+
+                                <span class="action-sub">Create new package</span>
+
+                            </div>
+
+                            <span class="action-arrow"><i class="fas fa-arrow-right"></i></span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===========================================
+                    STATISTICS CARDS (ALL CLICKABLE)
         ============================================ -->
 
         <div class="row">
 
-            <!-- Members -->
-
+            <!-- Total Members -> Member List -->
             <div class="col-xl-3 col-md-6 mb-4">
-
-                <div class="dashboard-card blue">
-
+                <div class="dashboard-card blue clickable-card" onclick="window.location.href='{{ route('admin.member.index') }}'">
                     <div class="card-icon">
-
                         <i class="fas fa-users"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Total Members</h6>
-
                         <h2>{{ $totalMembers }}</h2>
-
                         <small>
-
                             {{ $memberGrowth }}%
-
                             Growth
-
                         </small>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- Active -->
-
+            <!-- Active Members -> Filter Active Members -->
             <div class="col-xl-3 col-md-6 mb-4">
-
-                <div class="dashboard-card green">
-
+                <div class="dashboard-card green clickable-card" onclick="window.location.href='{{ route('admin.member.index', ['status' => 'Active']) }}'">
                     <div class="card-icon">
-
                         <i class="fas fa-user-check"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Active Members</h6>
-
                         <h2>{{ $activeMembers }}</h2>
-
                         <small>
-
                             {{ $activeMemberGrowth }}%
-
                             Growth
-
                         </small>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- Trainers -->
-
+            <!-- Total Trainers -> Trainer List -->
             <div class="col-xl-3 col-md-6 mb-4">
-
-                <div class="dashboard-card orange">
-
+                <div class="dashboard-card orange clickable-card" onclick="window.location.href='{{ route('admin.trainer.index') }}'">
                     <div class="card-icon">
-
                         <i class="fas fa-user-tie"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Total Trainers</h6>
-
                         <h2>{{ $totalTrainers }}</h2>
-
                         <small>
-
                             {{ $trainerGrowth }}%
-
                             Growth
-
                         </small>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- Revenue -->
-
+            <!-- Total Revenue -> Payment Page -->
             <div class="col-xl-3 col-md-6 mb-4">
-
-                <div class="dashboard-card purple">
-
+                <div class="dashboard-card purple clickable-card" onclick="window.location.href='{{ route('admin.hand.payment') }}'">
                     <div class="card-icon">
-
                         <i class="fas fa-indian-rupee-sign"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Total Revenue</h6>
-
                         <h2>
-
                             ₹{{ number_format($totalRevenue,2) }}
-
                         </h2>
-
                         <small>
-
                             {{ $revenueGrowth }}%
-
                             Growth
-
                         </small>
-
                     </div>
-
                 </div>
-
             </div>
 
         </div>
@@ -197,373 +265,679 @@
 
         <div class="row">
 
+            <!-- Membership Plans -> Membership List -->
             <div class="col-xl-3 col-md-6 mb-4">
-
-                <div class="dashboard-card dark">
-
+                <div class="dashboard-card dark clickable-card" onclick="window.location.href='{{ route('admin.membership.index') }}'">
                     <div class="card-icon">
-
                         <i class="fas fa-credit-card"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Membership Plans</h6>
-
                         <h2>{{ $totalMemberships }}</h2>
-
                     </div>
-
                 </div>
-
             </div>
 
+            <!-- Total Packages -> Package List -->
             <div class="col-xl-3 col-md-6 mb-4">
-
-                <div class="dashboard-card red">
-
+                <div class="dashboard-card red clickable-card" onclick="window.location.href='{{ route('admin.package.index') }}'">
                     <div class="card-icon">
-
                         <i class="fas fa-box-open"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Total Packages</h6>
-
                         <h2>{{ $totalPackages }}</h2>
-
                     </div>
-
                 </div>
-
             </div>
 
+            <!-- Monthly Revenue -> Payment Page -->
             <div class="col-xl-3 col-md-6 mb-4">
-
-                <div class="dashboard-card cyan">
-
+                <div class="dashboard-card cyan clickable-card" onclick="window.location.href='{{ route('admin.hand.payment') }}'">
                     <div class="card-icon">
-
                         <i class="fas fa-wallet"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Monthly Revenue</h6>
-
                         <h2>
-
                             ₹{{ number_format($monthlyRevenue,2) }}
-
                         </h2>
-
                     </div>
-
                 </div>
-
             </div>
 
+            <!-- Today's Check-in -->
             <div class="col-xl-3 col-md-6 mb-4">
-
                 <div class="dashboard-card teal">
-
                     <div class="card-icon">
-
                         <i class="fas fa-calendar-check"></i>
-
                     </div>
-
                     <div>
-
                         <h6>Today's Check-in</h6>
-
                         <h2>
-
                             {{ $todayCheckins }}
-
                         </h2>
-
                     </div>
-
                 </div>
-
             </div>
 
         </div>
 
-<style>
+        <style>
 
-.dashboard-header{
+        .dashboard-header{
 
-background:#fff;
+        background:#fff;
 
-padding:25px;
+        padding:25px;
 
-border-radius:15px;
+        border-radius:15px;
 
-box-shadow:0 5px 20px rgba(0,0,0,.08);
+        box-shadow:0 5px 20px rgba(0,0,0,.08);
 
-margin-bottom:25px;
+        margin-bottom:25px;
 
-}
+        }
 
-.dashboard-card{
+        .dashboard-card{
 
-display:flex;
+        display:flex;
 
-align-items:center;
+        align-items:center;
 
-justify-content:space-between;
+        justify-content:space-between;
 
-padding:25px;
+        padding:25px;
 
-border-radius:18px;
+        border-radius:18px;
 
-color:#fff;
+        color:#fff;
 
-transition:.3s;
+        transition:.3s;
 
-box-shadow:0 10px 30px rgba(0,0,0,.1);
+        box-shadow:0 10px 30px rgba(0,0,0,.1);
 
-}
+        }
 
-.dashboard-card:hover{
+        .dashboard-card:hover{
 
-transform:translateY(-8px);
+        transform:translateY(-8px);
 
-}
+        }
 
-.dashboard-card h6{
+        .dashboard-card h6{
 
-font-size:15px;
+        font-size:15px;
 
-margin-bottom:8px;
+        margin-bottom:8px;
 
-opacity:.9;
+        opacity:.9;
 
-}
+        }
 
-.dashboard-card h2{
+        .dashboard-card h2{
 
-font-size:32px;
+        font-size:32px;
 
-font-weight:700;
+        font-weight:700;
 
-margin-bottom:5px;
+        margin-bottom:5px;
 
-}
+        }
 
-.card-icon{
+        .card-icon{
 
-width:70px;
+        width:70px;
 
-height:70px;
+        height:70px;
 
-border-radius:50%;
+        border-radius:50%;
 
-background:rgba(255,255,255,.2);
+        background:rgba(255,255,255,.2);
 
-display:flex;
+        display:flex;
 
-justify-content:center;
+        justify-content:center;
 
-align-items:center;
+        align-items:center;
 
-font-size:28px;
+        font-size:28px;
 
-}
+        }
 
-.blue{
+        /* Clickable Card Style */
+        .clickable-card {
+            cursor: pointer;
+            position: relative;
+        }
 
-background:linear-gradient(135deg,#4facfe,#00f2fe);
+        .clickable-card::after {
+            content: '\f054';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            color: rgba(255,255,255,0.7);
+        }
 
-}
+        .clickable-card:hover::after {
+            opacity: 1;
+            transform: translateX(3px);
+        }
 
-.green{
+        .clickable-card:active {
+            transform: scale(0.97);
+        }
 
-background:linear-gradient(135deg,#43e97b,#38f9d7);
+        .blue{
 
-}
+        background:linear-gradient(135deg,#4facfe,#00f2fe);
 
-.orange{
+        }
 
-background:linear-gradient(135deg,#fa709a,#fee140);
+        .green{
 
-}
+        background:linear-gradient(135deg,#43e97b,#38f9d7);
 
-.purple{
+        }
 
-background:linear-gradient(135deg,#6a11cb,#2575fc);
+        .orange{
 
-}
+        background:linear-gradient(135deg,#fa709a,#fee140);
 
-.dark{
+        }
 
-background:linear-gradient(135deg,#232526,#414345);
+        .purple{
 
-}
+        background:linear-gradient(135deg,#6a11cb,#2575fc);
 
-.red{
+        }
 
-background:linear-gradient(135deg,#ff512f,#dd2476);
+        .dark{
 
-}
+        background:linear-gradient(135deg,#232526,#414345);
 
-.cyan{
+        }
 
-background:linear-gradient(135deg,#00c6ff,#0072ff);
+        .red{
 
-}
+        background:linear-gradient(135deg,#ff512f,#dd2476);
 
-.teal{
+        }
 
-background:linear-gradient(135deg,#11998e,#38ef7d);
+        .cyan{
 
-}
+        background:linear-gradient(135deg,#00c6ff,#0072ff);
 
-</style>
+        }
 
-{{-- ===========================================
-        CHART SECTION
-=========================================== --}}
+        .teal{
 
-<div class="row mt-4">
+        background:linear-gradient(135deg,#11998e,#38ef7d);
 
-    <!-- Revenue Chart -->
+        }
 
-    <div class="col-lg-8 mb-4">
+        /* ============================================================
+                    QUICK ACTIONS - UNIQUE LIGHT DESIGN
+        ============================================================ */
 
-        <div class="card border-0 shadow-lg rounded-4">
+        .quick-actions-wrapper {
 
-            <div class="card-header bg-white border-0 py-3">
+            padding: 0;
 
-                <div class="d-flex justify-content-between align-items-center">
+        }
 
-                    <h5 class="fw-bold mb-0">
+        .quick-actions-card {
 
-                        <i class="fas fa-chart-line text-primary me-2"></i>
+            background: #ffffff;
 
-                        Revenue Overview
+            border-radius: 18px;
 
-                    </h5>
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06);
 
-                    <span class="badge bg-success">
+            border: 1px solid rgba(0,0,0,0.04);
 
-                        Last 6 Months
+            overflow: hidden;
 
-                    </span>
+            transition: all 0.3s ease;
 
-                </div>
+        }
 
-            </div>
+        .quick-actions-card:hover {
 
-            <div class="card-body">
+            box-shadow: 0 8px 35px rgba(0,0,0,0.10);
 
-                <canvas id="revenueChart" height="120"></canvas>
+        }
 
-            </div>
+        .quick-actions-header {
 
-        </div>
+            display: flex;
 
-    </div>
+            justify-content: space-between;
 
-    <!-- Membership Distribution -->
+            align-items: center;
 
-    <div class="col-lg-4 mb-4">
+            padding: 18px 28px;
 
-        <div class="card border-0 shadow-lg rounded-4">
+            background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
 
-            <div class="card-header bg-white border-0 py-3">
+            border-bottom: 1px solid rgba(0,0,0,0.04);
 
-                <h5 class="fw-bold mb-0">
+        }
 
-                    <i class="fas fa-chart-pie text-danger me-2"></i>
+        .quick-actions-header h5 {
 
-                    Membership Distribution
+            font-size: 1.1rem;
 
-                </h5>
+            color: #1a1a2e;
 
-            </div>
+        }
 
-            <div class="card-body">
+        .quick-actions-header h5 i {
 
-                <canvas id="membershipChart" height="220"></canvas>
+            color: #f59e0b;
 
-                <hr>
+        }
 
-                @foreach($membershipPlans as $plan)
+        .quick-actions-badge {
 
-                    <div class="d-flex justify-content-between mb-3">
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
 
-                        <div>
+            color: #92400e;
 
-                            <strong>{{ $plan->plan_name }}</strong>
+            padding: 5px 16px;
+
+            border-radius: 50px;
+
+            font-size: 0.75rem;
+
+            font-weight: 600;
+
+            letter-spacing: 0.3px;
+
+        }
+
+        .quick-actions-badge i {
+
+            margin-right: 5px;
+
+        }
+
+        .quick-actions-body {
+
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 0;
+
+            padding: 8px;
+
+        }
+
+        .quick-action-item {
+
+            padding: 4px;
+
+        }
+
+        .quick-action-btn {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 16px;
+
+            padding: 16px 20px;
+
+            border-radius: 14px;
+
+            text-decoration: none;
+
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            background: #f8fafc;
+
+            border: 1px solid transparent;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+        .quick-action-btn::before {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 0;
+
+            opacity: 0;
+
+            transition: all 0.4s ease;
+
+            border-radius: 14px;
+
+        }
+
+        .quick-action-btn:hover {
+
+            transform: translateY(-3px);
+
+            box-shadow: 0 8px 25px rgba(0,0,0,0.10);
+
+        }
+
+        .quick-action-btn:hover::before {
+
+            opacity: 1;
+
+        }
+
+        .quick-action-btn:hover .action-arrow {
+
+            transform: translateX(5px);
+
+            opacity: 1;
+
+        }
+
+        .quick-action-btn.primary {
+
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+
+            border-color: rgba(37, 99, 235, 0.15);
+
+        }
+
+        .quick-action-btn.primary:hover {
+
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+
+            border-color: #3b82f6;
+
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.20);
+
+        }
+
+        .quick-action-btn.primary .quick-action-icon {
+
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+
+            color: white;
+
+        }
+
+        .quick-action-btn.success {
+
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+
+            border-color: rgba(34, 197, 94, 0.15);
+
+        }
+
+        .quick-action-btn.success:hover {
+
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+
+            border-color: #22c55e;
+
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.20);
+
+        }
+
+        .quick-action-btn.success .quick-action-icon {
+
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+
+            color: white;
+
+        }
+
+        .quick-action-btn.warning {
+
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+
+            border-color: rgba(245, 158, 11, 0.15);
+
+        }
+
+        .quick-action-btn.warning:hover {
+
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+
+            border-color: #f59e0b;
+
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.20);
+
+        }
+
+        .quick-action-btn.warning .quick-action-icon {
+
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+
+            color: white;
+
+        }
+
+        .quick-action-btn.danger {
+
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
+
+            border-color: rgba(239, 68, 68, 0.15);
+
+        }
+
+        .quick-action-btn.danger:hover {
+
+            background: linear-gradient(135deg, #fecaca, #fca5a5);
+
+            border-color: #ef4444;
+
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.20);
+
+        }
+
+        .quick-action-btn.danger .quick-action-icon {
+
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+
+            color: white;
+
+        }
+
+        .quick-action-icon {
+
+            width: 48px;
+
+            height: 48px;
+
+            border-radius: 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 20px;
+
+            flex-shrink: 0;
+
+            transition: all 0.3s ease;
+
+        }
+
+        .quick-action-btn:hover .quick-action-icon {
+
+            transform: scale(1.05) rotate(-3deg);
+
+        }
+
+        .quick-action-text {
+
+            flex: 1;
+
+            min-width: 0;
+
+        }
+
+        .action-title {
+
+            display: block;
+
+            font-weight: 700;
+
+            font-size: 0.95rem;
+
+            color: #1a1a2e;
+
+            letter-spacing: 0.2px;
+
+        }
+
+        .action-sub {
+
+            display: block;
+
+            font-size: 0.75rem;
+
+            color: #6b7280;
+
+            font-weight: 500;
+
+            margin-top: 2px;
+
+        }
+
+        .action-arrow {
+
+            color: #9ca3af;
+
+            font-size: 0.85rem;
+
+            transition: all 0.3s ease;
+
+            opacity: 0.5;
+
+            flex-shrink: 0;
+
+        }
+
+        .quick-action-btn:hover .action-arrow {
+
+            opacity: 1;
+
+        }
+
+        /* Responsive Quick Actions */
+
+        @media (max-width: 1200px) {
+
+            .quick-actions-body {
+
+                grid-template-columns: repeat(2, 1fr);
+
+            }
+
+        }
+
+        @media (max-width: 576px) {
+
+            .quick-actions-body {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .quick-actions-header {
+
+                flex-direction: column;
+
+                gap: 8px;
+
+                text-align: center;
+
+                padding: 15px 20px;
+
+            }
+
+            .quick-action-btn {
+
+                padding: 14px 16px;
+
+            }
+
+            .quick-action-icon {
+
+                width: 40px;
+
+                height: 40px;
+
+                font-size: 16px;
+
+            }
+
+            .action-title {
+
+                font-size: 0.85rem;
+
+            }
+
+        }
+
+        </style>
+
+        {{-- ===========================================
+                CHART SECTION
+        =========================================== --}}
+
+        <div class="row mt-4">
+
+            <!-- Revenue Chart -->
+
+            <div class="col-lg-8 mb-4">
+
+                <div class="card border-0 shadow-lg rounded-4">
+
+                    <div class="card-header bg-white border-0 py-3">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <h5 class="fw-bold mb-0">
+
+                                <i class="fas fa-chart-line text-primary me-2"></i>
+
+                                Revenue Overview
+
+                            </h5>
+
+                            <span class="badge bg-success">
+
+                                Last 6 Months
+
+                            </span>
 
                         </div>
 
-                        <span class="badge bg-primary">
-
-                            {{ $plan->members_count }}
-
-                            Members
-
-                        </span>
-
                     </div>
 
-                    <div class="progress mb-3" style="height:8px;">
+                    <div class="card-body">
 
-                        <div class="progress-bar bg-success"
-
-                             style="width: {{ $plan->percentage }}%">
-
-                        </div>
-
-                    </div>
-
-                @endforeach
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-{{-- ===========================================
-        PROGRESS CARDS
-=========================================== --}}
-
-<div class="row">
-
-    <div class="col-lg-4 mb-4">
-
-        <div class="card border-0 shadow rounded-4">
-
-            <div class="card-body">
-
-                <h6 class="fw-bold">
-
-                    Member Target
-
-                </h6>
-
-                <h3>
-
-                    {{ $memberProgress }}%
-
-                </h3>
-
-                <div class="progress mt-3">
-
-                    <div class="progress-bar bg-primary"
-
-                        style="width: {{ $memberProgress }}%">
+                        <canvas id="revenueChart" height="120"></canvas>
 
                     </div>
 
@@ -571,699 +945,734 @@ background:linear-gradient(135deg,#11998e,#38ef7d);
 
             </div>
 
-        </div>
+            <!-- Membership Distribution -->
 
-    </div>
+            <div class="col-lg-4 mb-4">
 
-    <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-lg rounded-4">
 
-        <div class="card border-0 shadow rounded-4">
+                    <div class="card-header bg-white border-0 py-3">
 
-            <div class="card-body">
+                        <h5 class="fw-bold mb-0">
 
-                <h6 class="fw-bold">
+                            <i class="fas fa-chart-pie text-danger me-2"></i>
 
-                    Revenue Target
+                            Membership Distribution
 
-                </h6>
-
-                <h3>
-
-                    {{ $revenueProgress }}%
-
-                </h3>
-
-                <div class="progress mt-3">
-
-                    <div class="progress-bar bg-success"
-
-                        style="width: {{ $revenueProgress }}%">
+                        </h5>
 
                     </div>
 
-                </div>
+                    <div class="card-body">
 
-            </div>
+                        <canvas id="membershipChart" height="220"></canvas>
 
-        </div>
+                        <hr>
 
-    </div>
+                        @foreach($membershipPlans as $plan)
 
-    <div class="col-lg-4 mb-4">
+                            <div class="d-flex justify-content-between mb-3">
 
-        <div class="card border-0 shadow rounded-4">
+                                <div>
 
-            <div class="card-body">
+                                    <strong>{{ $plan->plan_name }}</strong>
 
-                <h6 class="fw-bold">
+                                </div>
 
-                    Today's Attendance
+                                <span class="badge bg-primary">
 
-                </h6>
+                                    {{ $plan->members_count }}
 
-                <h3>
-
-                    {{ $checkinProgress }}%
-
-                </h3>
-
-                <div class="progress mt-3">
-
-                    <div class="progress-bar bg-warning"
-
-                        style="width: {{ $checkinProgress }}%">
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-{{-- ===========================================
-        CHART JS
-=========================================== --}}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-
-const revenueChart = new Chart(
-
-document.getElementById('revenueChart'),
-
-{
-
-type:'line',
-
-data:{
-
-labels:@json($chartLabels),
-
-datasets:[
-
-{
-
-label:'Revenue',
-
-data:@json($chartRevenue),
-
-borderColor:'#2563eb',
-
-backgroundColor:'rgba(37,99,235,.15)',
-
-fill:true,
-
-tension:.4
-
-},
-
-{
-
-label:'Target',
-
-data:@json($chartTarget),
-
-borderColor:'#22c55e',
-
-borderDash:[6,6],
-
-fill:false,
-
-tension:.4
-
-}
-
-]
-
-},
-
-options:{
-
-responsive:true,
-
-plugins:{
-
-legend:{
-
-position:'top'
-
-}
-
-}
-
-}
-
-}
-
-);
-
-const membershipChart = new Chart(
-
-document.getElementById('membershipChart'),
-
-{
-
-type:'doughnut',
-
-data:{
-
-labels:@json($membershipLabels),
-
-datasets:[{
-
-data:@json($membershipData)
-
-}]
-
-},
-
-options:{
-
-responsive:true,
-
-plugins:{
-
-legend:{
-
-position:'bottom'
-
-}
-
-}
-
-}
-
-}
-
-);
-
-</script>
-
-{{-- ===========================================================
-                    RECENT MEMBERS
-=========================================================== --}}
-
-<div class="row mt-4">
-
-    <div class="col-lg-8 mb-4">
-
-        <div class="card border-0 shadow-lg rounded-4">
-
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-
-                <h5 class="fw-bold mb-0">
-
-                    <i class="fas fa-users text-primary me-2"></i>
-
-                    Recent Members
-
-                </h5>
-
-                <a href="{{ route('admin.member.index') }}"
-                   class="btn btn-primary btn-sm">
-
-                    View All
-
-                </a>
-
-            </div>
-
-            <div class="card-body table-responsive">
-
-                <table class="table table-hover align-middle">
-
-                    <thead class="table-light">
-
-                        <tr>
-
-                            <th>Photo</th>
-
-                            <th>Member</th>
-
-                            <th>Trainer</th>
-
-                            <th>Plan</th>
-
-                            <th>Status</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                    @forelse($recentMembers as $member)
-
-                        <tr>
-
-                            <td width="70">
-
-                                @if($member->photo)
-
-                                <img src="{{ asset('storage/'.$member->photo) }}"
-                                     class="rounded-circle"
-                                     width="50"
-                                     height="50">
-
-                                @else
-
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}"
-                                     class="rounded-circle"
-                                     width="50">
-
-                                @endif
-
-                            </td>
-
-                            <td>
-
-                                <strong>{{ $member->name }}</strong>
-
-                                <br>
-
-                                <small class="text-muted">
-
-                                    {{ $member->phone }}
-
-                                </small>
-
-                            </td>
-
-                            <td>
-
-                                {{ optional($member->trainer)->name ?? 'Not Assigned' }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $member->membership_plan }}
-
-                            </td>
-
-                            <td>
-
-                                @if($member->status=='Active')
-
-                                <span class="badge bg-success">
-
-                                    Active
+                                    Members
 
                                 </span>
 
-                                @else
+                            </div>
 
-                                <span class="badge bg-danger">
+                            <div class="progress mb-3" style="height:8px;">
 
-                                    Inactive
+                                <div class="progress-bar bg-success"
 
-                                </span>
+                                     style="width: {{ $plan->percentage }}%">
 
-                                @endif
+                                </div>
 
-                            </td>
+                            </div>
 
-                        </tr>
+                        @endforeach
 
-                    @empty
+                    </div>
 
-                        <tr>
-
-                            <td colspan="5"
-                                class="text-center text-muted">
-
-                                No Members Found
-
-                            </td>
-
-                        </tr>
-
-                    @endforelse
-
-                    </tbody>
-
-                </table>
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        {{-- ===========================================
+                PROGRESS CARDS
+        =========================================== --}}
 
-{{-- ===========================================================
-                    RECENT TRAINERS
-=========================================================== --}}
+        <div class="row">
 
-    <div class="col-lg-4 mb-4">
+            <div class="col-lg-4 mb-4">
 
-        <div class="card border-0 shadow-lg rounded-4">
+                <div class="card border-0 shadow rounded-4">
 
-            <div class="card-header bg-white">
+                    <div class="card-body">
 
-                <h5 class="fw-bold mb-0">
+                        <h6 class="fw-bold">
 
-                    <i class="fas fa-user-tie text-success me-2"></i>
-
-                    Recent Trainers
-
-                </h5>
-
-            </div>
-
-            <div class="card-body">
-
-                @forelse($recentTrainers as $trainer)
-
-                <div class="d-flex align-items-center mb-3">
-
-                    @if($trainer->photo)
-
-                    <img src="{{ asset('storage/'.$trainer->photo) }}"
-                         class="rounded-circle me-3"
-                         width="55"
-                         height="55">
-
-                    @else
-
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($trainer->name) }}"
-                         class="rounded-circle me-3"
-                         width="55">
-
-                    @endif
-
-                    <div>
-
-                        <h6 class="mb-1">
-
-                            {{ $trainer->name }}
+                            Member Target
 
                         </h6>
 
-                        <small class="text-muted">
+                        <h3>
 
-                            {{ $trainer->specialization }}
+                            {{ $memberProgress }}%
 
-                        </small>
+                        </h3>
+
+                        <div class="progress mt-3">
+
+                            <div class="progress-bar bg-primary"
+
+                                style="width: {{ $memberProgress }}%">
+
+                            </div>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-                @empty
+            </div>
 
-                <p class="text-center">
+            <div class="col-lg-4 mb-4">
 
-                    No Trainers Found
+                <div class="card border-0 shadow rounded-4">
 
-                </p>
+                    <div class="card-body">
 
-                @endforelse
+                        <h6 class="fw-bold">
+
+                            Revenue Target
+
+                        </h6>
+
+                        <h3>
+
+                            {{ $revenueProgress }}%
+
+                        </h3>
+
+                        <div class="progress mt-3">
+
+                            <div class="progress-bar bg-success"
+
+                                style="width: {{ $revenueProgress }}%">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-4 mb-4">
+
+                <div class="card border-0 shadow rounded-4">
+
+                    <div class="card-body">
+
+                        <h6 class="fw-bold">
+
+                            Today's Attendance
+
+                        </h6>
+
+                        <h3>
+
+                            {{ $checkinProgress }}%
+
+                        </h3>
+
+                        <div class="progress mt-3">
+
+                            <div class="progress-bar bg-warning"
+
+                                style="width: {{ $checkinProgress }}%">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+        {{-- ===========================================
+                CHART JS
+        =========================================== --}}
 
-</div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-{{-- ===========================================================
-                    MEMBERSHIP PLANS
-=========================================================== --}}
+        <script>
 
-<div class="row">
+        const revenueChart = new Chart(
 
-<div class="col-lg-6 mb-4">
+        document.getElementById('revenueChart'),
 
-<div class="card border-0 shadow-lg rounded-4">
+        {
 
-<div class="card-header bg-white">
+        type:'line',
 
-<h5 class="fw-bold">
+        data:{
 
-<i class="fas fa-id-card text-warning me-2"></i>
+        labels:@json($chartLabels),
 
-Latest Membership Plans
+        datasets:[
 
-</h5>
+        {
 
-</div>
+        label:'Revenue',
 
-<div class="card-body table-responsive">
+        data:@json($chartRevenue),
 
-<table class="table">
+        borderColor:'#2563eb',
 
-<thead>
+        backgroundColor:'rgba(37,99,235,.15)',
 
-<tr>
+        fill:true,
 
-<th>Plan</th>
+        tension:.4
 
-<th>Duration</th>
+        },
 
-<th>Price</th>
+        {
 
-</tr>
+        label:'Target',
 
-</thead>
+        data:@json($chartTarget),
 
-<tbody>
+        borderColor:'#22c55e',
 
-@foreach($recentMemberships as $plan)
+        borderDash:[6,6],
 
-<tr>
+        fill:false,
 
-<td>
+        tension:.4
 
-{{ $plan->plan_name }}
+        }
 
-</td>
+        ]
 
-<td>
+        },
 
-{{ $plan->duration }}
+        options:{
 
-{{ $plan->duration_type }}
+        responsive:true,
 
-</td>
+        plugins:{
 
-<td>
+        legend:{
 
-₹ {{ number_format($plan->final_price,2) }}
+        position:'top'
 
-</td>
+        }
 
-</tr>
+        }
 
-@endforeach
+        }
 
-</tbody>
+        }
 
-</table>
+        );
 
-</div>
+        const membershipChart = new Chart(
 
-</div>
+        document.getElementById('membershipChart'),
 
-</div>
+        {
 
-{{-- ===========================================================
-                    PACKAGES
-=========================================================== --}}
+        type:'doughnut',
 
-<div class="col-lg-6 mb-4">
+        data:{
 
-<div class="card border-0 shadow-lg rounded-4">
+        labels:@json($membershipLabels),
 
-<div class="card-header bg-white">
+        datasets:[{
 
-<h5 class="fw-bold">
+        data:@json($membershipData)
 
-<i class="fas fa-box-open text-danger me-2"></i>
+        }]
 
-Latest Packages
+        },
 
-</h5>
+        options:{
 
-</div>
+        responsive:true,
 
-<div class="card-body table-responsive">
+        plugins:{
 
-<table class="table">
+        legend:{
 
-<thead>
+        position:'bottom'
 
-<tr>
+        }
 
-<th>Package</th>
+        }
 
-<th>Duration</th>
+        }
 
-<th>Price</th>
+        }
 
-</tr>
+        );
 
-</thead>
+        </script>
 
-<tbody>
+        {{-- ===========================================================
+                    RECENT MEMBERS
+        =========================================================== --}}
 
-@foreach($recentPackages as $package)
+        <div class="row mt-4">
 
-<tr>
+            <div class="col-lg-8 mb-4">
 
-<td>
+                <div class="card border-0 shadow-lg rounded-4">
 
-{{ $package->package_name }}
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
 
-</td>
+                        <h5 class="fw-bold mb-0">
 
-<td>
+                            <i class="fas fa-users text-primary me-2"></i>
 
-{{ $package->duration }}
+                            Recent Members
 
-{{ $package->duration_type }}
+                        </h5>
 
-</td>
+                        <a href="{{ route('admin.member.index') }}"
+                           class="btn btn-primary btn-sm">
 
-<td>
+                            View All
 
-₹ {{ number_format($package->price,2) }}
+                        </a>
 
-</td>
+                    </div>
 
-</tr>
+                    <div class="card-body table-responsive">
 
-@endforeach
+                        <table class="table table-hover align-middle">
 
-</tbody>
+                            <thead class="table-light">
 
-</table>
+                                <tr>
 
-</div>
+                                    <th>Photo</th>
 
-</div>
+                                    <th>Member</th>
 
-</div>
+                                    <th>Trainer</th>
 
-</div>
+                                    <th>Plan</th>
 
+                                    <th>Status</th>
 
+                                </tr>
 
-{{-- ============================================================
-                    QUICK ACTIONS
-============================================================ --}}
+                            </thead>
 
-<div class="row">
+                            <tbody>
 
-    <div class="col-lg-12">
+                            @forelse($recentMembers as $member)
+
+                                <tr>
+
+                                    <td width="70">
+
+                                        @if($member->photo)
+
+                                        <img src="{{ asset('storage/'.$member->photo) }}"
+                                             class="rounded-circle"
+                                             width="50"
+                                             height="50">
+
+                                        @else
+
+                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}"
+                                             class="rounded-circle"
+                                             width="50">
+
+                                        @endif
+
+                                    </td>
+
+                                    <td>
+
+                                        <strong>{{ $member->name }}</strong>
+
+                                        <br>
+
+                                        <small class="text-muted">
+
+                                            {{ $member->phone }}
+
+                                        </small>
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ optional($member->trainer)->name ?? 'Not Assigned' }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ $member->membership_plan }}
+
+                                    </td>
+
+                                    <td>
+
+                                        @if($member->status=='Active')
+
+                                        <span class="badge bg-success">
+
+                                            Active
+
+                                        </span>
+
+                                        @else
+
+                                        <span class="badge bg-danger">
+
+                                            Inactive
+
+                                        </span>
+
+                                        @endif
+
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+
+                                    <td colspan="5"
+                                        class="text-center text-muted">
+
+                                        No Members Found
+
+                                    </td>
+
+                                </tr>
+
+                            @endforelse
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {{-- ===========================================================
+                    RECENT TRAINERS (WITH VIEW ALL)
+        =========================================================== --}}
+
+            <div class="col-lg-4 mb-4">
+
+                <div class="card border-0 shadow-lg rounded-4">
+
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+                        <h5 class="fw-bold mb-0">
+
+                            <i class="fas fa-user-tie text-success me-2"></i>
+
+                            Recent Trainers
+
+                        </h5>
+
+                        <a href="{{ route('admin.trainer.index') }}"
+                           class="btn btn-success btn-sm">
+
+                            View All
+
+                        </a>
+
+                    </div>
+
+                    <div class="card-body">
+
+                        @forelse($recentTrainers as $trainer)
+
+                        <div class="d-flex align-items-center mb-3">
+
+                            @if($trainer->photo)
+
+                            <img src="{{ asset('storage/'.$trainer->photo) }}"
+                                 class="rounded-circle me-3"
+                                 width="55"
+                                 height="55">
+
+                            @else
+
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($trainer->name) }}"
+                                 class="rounded-circle me-3"
+                                 width="55">
+
+                            @endif
+
+                            <div>
+
+                                <h6 class="mb-1">
+
+                                    {{ $trainer->name }}
+
+                                </h6>
+
+                                <small class="text-muted">
+
+                                    {{ $trainer->specialization }}
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        @empty
+
+                        <p class="text-center">
+
+                            No Trainers Found
+
+                        </p>
+
+                        @endforelse
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {{-- ===========================================================
+                    MEMBERSHIP PLANS (WITH VIEW ALL)
+        =========================================================== --}}
+
+        <div class="row">
+
+        <div class="col-lg-6 mb-4">
 
         <div class="card border-0 shadow-lg rounded-4">
 
-            <div class="card-header bg-white">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
 
-                <h5 class="fw-bold mb-0">
+        <h5 class="fw-bold">
 
-                    <i class="fas fa-bolt text-warning me-2"></i>
+        <i class="fas fa-id-card text-warning me-2"></i>
 
-                    Quick Actions
+        Latest Membership Plans
 
-                </h5>
+        </h5>
 
-            </div>
+        <a href="{{ route('admin.membership.index') }}"
+           class="btn btn-warning btn-sm">
 
-            <div class="card-body">
+            View All
 
-                <div class="row text-center">
+        </a>
 
-                    <div class="col-md-3 mb-3">
+        </div>
 
-                        <a href="{{ route('admin.member.create') }}"
-                           class="btn btn-primary w-100 py-3">
+        <div class="card-body table-responsive">
 
-                            <i class="fas fa-user-plus fa-2x d-block mb-2"></i>
+        <table class="table">
 
-                            Add Member
+        <thead>
 
-                        </a>
+        <tr>
 
-                    </div>
+        <th>Plan</th>
 
-                    <div class="col-md-3 mb-3">
+        <th>Duration</th>
 
-                        <a href="{{ route('admin.trainer.create') }}"
-                           class="btn btn-success w-100 py-3">
+        <th>Price</th>
 
-                            <i class="fas fa-user-tie fa-2x d-block mb-2"></i>
+        </tr>
 
-                            Add Trainer
+        </thead>
 
-                        </a>
+        <tbody>
 
-                    </div>
+        @foreach($recentMemberships as $plan)
 
-                    <div class="col-md-3 mb-3">
+        <tr>
 
-                        <a href="{{ route('admin.membership.create') }}"
-                           class="btn btn-warning w-100 py-3">
+        <td>
 
-                            <i class="fas fa-id-card fa-2x d-block mb-2"></i>
+        {{ $plan->plan_name }}
 
-                            Membership
+        </td>
 
-                        </a>
+        <td>
 
-                    </div>
+        {{ $plan->duration }}
 
-                    <div class="col-md-3 mb-3">
+        {{ $plan->duration_type }}
 
-                        <a href="{{ route('admin.package.create') }}"
-                           class="btn btn-danger w-100 py-3">
+        </td>
 
-                            <i class="fas fa-box-open fa-2x d-block mb-2"></i>
+        <td>
 
-                            Add Package
+        ₹ {{ number_format($plan->final_price,2) }}
 
-                        </a>
+        </td>
 
-                    </div>
+        </tr>
+
+        @endforeach
+
+        </tbody>
+
+        </table>
+
+        </div>
+
+        </div>
+
+        </div>
+
+        {{-- ===========================================================
+                    PACKAGES (WITH VIEW ALL)
+        =========================================================== --}}
+
+        <div class="col-lg-6 mb-4">
+
+        <div class="card border-0 shadow-lg rounded-4">
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+
+        <h5 class="fw-bold">
+
+        <i class="fas fa-box-open text-danger me-2"></i>
+
+        Latest Packages
+
+        </h5>
+
+        <a href="{{ route('admin.package.index') }}"
+           class="btn btn-danger btn-sm">
+
+            View All
+
+        </a>
+
+        </div>
+
+        <div class="card-body table-responsive">
+
+        <table class="table">
+
+        <thead>
+
+        <tr>
+
+        <th>Package</th>
+
+        <th>Duration</th>
+
+        <th>Price</th>
+
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        @foreach($recentPackages as $package)
+
+        <tr>
+
+        <td>
+
+        {{ $package->package_name }}
+
+        </td>
+
+        <td>
+
+        {{ $package->duration }}
+
+        {{ $package->duration_type }}
+
+        </td>
+
+        <td>
+
+        ₹ {{ number_format($package->price,2) }}
+
+        </td>
+
+        </tr>
+
+        @endforeach
+
+        </tbody>
+
+        </table>
+
+        </div>
+
+        </div>
+
+        </div>
+
+        </div>
+
+        {{-- ============================================================
+                    DASHBOARD FOOTER
+        ============================================================ --}}
+
+        <div class="row mt-4">
+
+            <div class="col-12">
+
+                <div class="text-center text-muted">
+
+                    <hr>
+
+                    <small>
+
+                        © {{ date('Y') }}
+
+                        Gym Management System 
+
+                      
+
+                    </small>
 
                 </div>
 
             </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-{{-- ============================================================
-                    DASHBOARD FOOTER
-============================================================ --}}
-
-<div class="row mt-4">
-
-    <div class="col-12">
-
-        <div class="text-center text-muted">
-
-            <hr>
-
-            <small>
-
-                © {{ date('Y') }}
-
-                Gym Management System |
-
-                Dashboard Version 1.0
-
-            </small>
 
         </div>
 

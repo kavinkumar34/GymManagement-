@@ -330,7 +330,7 @@
 
         <!-- ===== GYM ONE DIVIDER ===== -->
         <li class="nav-divider">
-            <span class="divider-text">Gym One</span>
+            <span class="divider-text">Gym Management</span>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.gym.dashboard') }}">
@@ -447,7 +447,7 @@
                     <a class="dropdown-item-custom" href="{{ route('admin.hand.payment') }}">
                         <i class="fas fa-hand-holding-usd"></i>  Payment
                     </a>
-                </li>
+                </li> 
             </ul>
         </li>
 
