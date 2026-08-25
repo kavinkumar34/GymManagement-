@@ -255,25 +255,35 @@ class ProductController extends Controller
         }
 
         // Update product basic info
-        $product->update([
-            'name' => $request->name,
-            'top_category_id' => $request->top_category_id,
-            'brand_id' => $request->brand_id,
-            'category_id' => $request->category_id,
-            'sub_category_id' => $request->sub_category_id,
-            'product_type_id' => $request->product_type_id,
-            'size_chart_id' => $request->size_chart_id,
-            'price' => $request->price ?? 0,
-            'final_price' => $request->final_price ?? 0,
-            'mrp' => $request->mrp ?? 0,
-            'gst_percentage' => $gstRate,
-            'stock' => $request->stock ?? 0,
-            'description' => $request->description,
-            'status' => $request->status ?? 'Active',
-            'return_days' => $request->return_days ?? 7,
-            'cod_available' => $request->has('cod_available') ? 1 : 0,
-            'delivery_days' => $request->delivery_days ?? 3,
-        ]);
+    $product->update([
+    'name' => $request->name,
+    'top_category_id' => $request->top_category_id,
+    'brand_id' => $request->brand_id,
+    'category_id' => $request->category_id,
+    'sub_category_id' => $request->sub_category_id,
+    'product_type_id' => $request->product_type_id,
+    'size_chart_id' => $request->size_chart_id,
+
+    'price' => $request->price ?? 0,
+    'mrp' => $request->mrp ?? 0,
+
+    'gst_percentage' => $gstRate,
+    'gst_amount' => $request->gst_amount ?? 0,
+    'total_price' => $request->total_price ?? 0,
+
+    'discount_type' => $request->discount_type ?? 'flat',
+    'discount_value' => $request->discount_value ?? 0,
+    'discount_amount' => $request->discount_amount ?? 0,
+
+    'final_price' => $request->final_price ?? 0,
+
+    'stock' => $request->stock ?? 0,
+    'description' => $request->description,
+    'status' => $request->status ?? 'Active',
+    'return_days' => $request->return_days ?? 7,
+    'cod_available' => $request->has('cod_available') ? 1 : 0,
+    'delivery_days' => $request->delivery_days ?? 3,
+]);
 
         // ===================== HANDLE VARIANTS =====================
         

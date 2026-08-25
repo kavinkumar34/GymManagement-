@@ -2268,84 +2268,93 @@
                 </div>
             </div>
         @endauth
-
-        <!-- ===== FOOTER ===== -->
-        <footer class="footer mt-auto">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-<div class="footer-logo">
-    @php
-        $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
-        $companyName = \App\Models\Setting::get('company_name', null);
-        $isImage = $companyLogo && (str_starts_with($companyLogo, '/storage/') || str_starts_with($companyLogo, 'storage/'));
-    @endphp
-    @if($isImage && file_exists(public_path($companyLogo)))
-        <img src="{{ asset($companyLogo) }}" alt="Logo" style="height: 30px; width: auto; margin-right: 10px;">
-    @else
-        <i class="{{ $companyLogo }} me-2"></i>
-    @endif
-    @if($companyName)
-        <strong>{{ $companyName }}</strong>
-    @endif
-</div>
-                        <p class="footer-about mt-3">
-                            Your complete fitness management solution. We provide gym management software,
-                            fitness equipment, supplements, and workout gear to help you achieve your fitness goals.
-                        </p>
-                        <div class="social-icons mt-3">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
-                            <a href="#"><i class="fab fa-twitter"></i></a>
-                            <a href="#"><i class="fab fa-youtube"></i></a>
-                            <a href="https://wa.me/919025595190?text=Hi%20FitForge%2C%20I%20need%20assistance."
-                                target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
-                        <h5>Quick Links</h5>
-                        <ul class="footer-links">
-                            <li><a href="{{ url('/') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
-                            <li><a href="{{ route('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
-                            <li><a
-                                    href="@if (auth()->check()) {{ route('contact') }} @else {{ route('login') }} @endif"><i
-                                        class="fas fa-chevron-right"></i> Contact</a></li>
-                            <li><a
-                                    href="@if (auth()->check()) {{ route('my.orders') }} @else {{ route('login') }} @endif"><i
-                                        class="fas fa-chevron-right"></i> My Orders</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
-                        <h5>Customer Service</h5>
-                        <ul class="footer-links">
-                            <li><a href="#"><i class="fas fa-chevron-right"></i> Returns & Exchange</a></li>
-                            <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
-                            <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
-                            <li><a href="#"><i class="fas fa-chevron-right"></i> Terms & Conditions</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="col-lg-4 col-md-6">
-                        <h5>Get In Touch</h5>
-                        <ul class="footer-contact">
-                            <li><i class="fas fa-map-marker-alt"></i><span>123 Fitness Street, Chennai - 600001</span></li>
-                            <li><i class="fas fa-phone-alt"></i><span>+91 98765 43210</span></li>
-                            <li><i class="fas fa-envelope"></i><span>info@fitforge.com</span></li>
-                            <li><i class="fab fa-whatsapp"></i><span><a
-                                        href="https://wa.me/919025595190?text=Hi%20FitForge%2C%20I%20need%20assistance."
-                                        target="_blank" rel="noopener noreferrer">+91 90255 95190</a></span></li>
-                        </ul>
-                    </div>
+<!-- ===== FOOTER ===== -->
+<footer class="footer mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                <div class="footer-logo">
+                    @php
+                        $companyLogo = \App\Models\Setting::get('company_logo', 'fas fa-dumbbell');
+                        $companyName = \App\Models\Setting::get('company_name', null);
+                        $isImage = $companyLogo && (str_starts_with($companyLogo, '/storage/') || str_starts_with($companyLogo, 'storage/'));
+                    @endphp
+                    @if($isImage && file_exists(public_path($companyLogo)))
+                        <img src="{{ asset($companyLogo) }}" alt="Logo" style="height: 30px; width: auto; margin-right: 10px;">
+                    @else
+                        <i class="{{ $companyLogo }} me-2"></i>
+                    @endif
+                    @if($companyName)
+                        <strong>{{ $companyName }}</strong>
+                    @endif
                 </div>
-
-                <div class="row bottom-bar">
-                    <div class="col-12 text-center">
-<p class="mb-0">&copy; {{ date('Y') }} {{ $companyName ?: 'Gym Management' }}. All rights reserved.</p>                    </div>
+                <p class="footer-about mt-3">
+                    Your complete fitness management solution. We provide gym management software,
+                    fitness equipment, supplements, and workout gear to help you achieve your fitness goals.
+                </p>
+                <div class="social-icons mt-3">
+                    @php
+                        $footerFacebook = \App\Models\Setting::get('footer_facebook', '#');
+                        $footerInstagram = \App\Models\Setting::get('footer_instagram', '#');
+                        $footerWhatsappSocial = \App\Models\Setting::get('footer_whatsapp_social', '#');
+                    @endphp
+                    @if($footerFacebook && $footerFacebook != '#')
+                        <a href="{{ $footerFacebook }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                    @endif
+                    @if($footerInstagram && $footerInstagram != '#')
+                        <a href="{{ $footerInstagram }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                    @endif
+                    @if($footerWhatsappSocial && $footerWhatsappSocial != '#')
+                        <a href="{{ $footerWhatsappSocial }}" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+                    @endif
                 </div>
             </div>
-        </footer>
+
+            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                <h5>Quick Links</h5>
+                <ul class="footer-links">
+                    <li><a href="{{ url('/') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="{{ route('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                    <li><a href="@if (auth()->check()) {{ route('contact') }} @else {{ route('login') }} @endif"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    <li><a href="@if (auth()->check()) {{ route('my.orders') }} @else {{ route('login') }} @endif"><i class="fas fa-chevron-right"></i> My Orders</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                <h5>Customer Service</h5>
+              <ul class="footer-links">
+    <li><a href="{{ route('returns.exchange') }}"><i class="fas fa-chevron-right"></i> Returns & Exchange</a></li>
+    <li><a href="{{ route('shipping.policy') }}"><i class="fas fa-chevron-right"></i> Shipping Policy</a></li>
+    <li><a href="{{ route('privacy.policy') }}"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+    <li><a href="{{ route('terms.conditions') }}"><i class="fas fa-chevron-right"></i> Terms & Conditions</a></li>
+</ul>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <h5>Get In Touch</h5>
+                <ul class="footer-contact">
+                    @php
+                        $footerAddress = \App\Models\Setting::get('footer_address', '123 Fitness Street, Chennai - 600001');
+                        $footerPhone = \App\Models\Setting::get('footer_phone', '+91 98765 43210');
+                        $footerEmail = \App\Models\Setting::get('footer_email', 'info@fitforge.com');
+                        $footerWhatsapp = \App\Models\Setting::get('footer_whatsapp', '+91 90255 95190');
+                        $footerWhatsappLink = \App\Models\Setting::get('footer_whatsapp_link', 'https://wa.me/919025595190?text=Hi%20FitForge%2C%20I%20need%20assistance.');
+                    @endphp
+                    <li><i class="fas fa-map-marker-alt"></i><span>{{ $footerAddress }}</span></li>
+                    <li><i class="fas fa-phone-alt"></i><span>{{ $footerPhone }}</span></li>
+                    <li><i class="fas fa-envelope"></i><span>{{ $footerEmail }}</span></li>
+                    <li><i class="fab fa-whatsapp"></i><span><a href="{{ $footerWhatsappLink }}" target="_blank" rel="noopener noreferrer">{{ $footerWhatsapp }}</a></span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row bottom-bar">
+            <div class="col-12 text-center">
+                <p class="mb-0">&copy; {{ date('Y') }} {{ $companyName ?: 'Gym Management' }}. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</footer>
 
         <!-- WhatsApp Floating Button -->
         <a href="https://wa.me/919025595190?text=Hi%20FitForge%2C%20I%20need%20assistance." target="_blank"

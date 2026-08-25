@@ -1199,12 +1199,12 @@
                             </div>
 
                             <div class="col-md-3 mb-3">
-                                <label class="field-label">MRP (₹) <span class="required-star">*</span></label>
+                                <label class="field-label">Selling Price (₹) <span class="required-star">*</span></label>
                                 <div class="price-input-group">
                                     <span class="currency-symbol">₹</span>
                                     <input type="number" step="0.01" name="mrp" id="mrp" class="form-control" required min="0" value="0" oninput="calculateAll()">
                                 </div>
-                                <div class="help-text">Maximum Retail Price</div>
+                                <div class="help-text">Customer price before discount</div>
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -1244,7 +1244,7 @@
                                     <span class="currency-symbol">₹</span>
                                     <input type="number" step="0.01" id="total_price_field" class="form-control" readonly style="background: #fff3cd; font-weight: 600; color: #856404; border-color: #ffc107;">
                                 </div>
-                                <div class="help-text">MRP + GST</div>
+                                <div class="help-text">SP + GST</div>
                             </div>
 
                             <div class="col-md-3 mb-3">
@@ -1519,7 +1519,9 @@
             if (discountType === 'flat') {
                 discountAmount = discountValue;
             } else {
-                discountAmount = (mrp * discountValue) / 100;
+                discountAmount = (totalPrice * discountValue) / 100;
+                    discountAmount = Math.round(discountAmount);
+
             }
             var finalPrice = totalPrice - discountAmount;
             if (finalPrice < 0) finalPrice = 0;
@@ -1938,10 +1940,13 @@
             if (discountType === 'flat') {
                 discountAmount = discountValue;
                 $('#discount_value_hint').text('Enter flat discount amount');
-            } else {
-                discountAmount = (mrp * discountValue) / 100;
-                $('#discount_value_hint').text('Enter percentage discount (%)');
-            }
+        } else {
+    discountAmount = (priceWithGst * discountValue) / 100;
+
+
+
+    $('#discount_value_hint').text('Enter percentage discount (%)');
+}
             var sellingPrice = priceWithGst - discountAmount;
             if (sellingPrice < 0) sellingPrice = 0;
 

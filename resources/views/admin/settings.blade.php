@@ -33,7 +33,7 @@
         box-shadow: var(--shadow);
         border: 1px solid rgba(0,0,0,0.04);
         overflow: hidden;
-        max-width: 900px;
+        max-width: 1000px;
         margin: 0 auto;
     }
 
@@ -313,6 +313,41 @@
         margin-top: 10px;
     }
 
+    /* Footer Fields */
+    .footer-field-group {
+        background: var(--light-gray);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border-color);
+    }
+
+    .footer-field-group .row {
+        margin-bottom: 0;
+    }
+
+    .footer-field-group .social-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .footer-field-group .social-field .social-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+        font-size: 14px;
+    }
+
+    .social-icon.facebook { background: #1877f2; }
+    .social-icon.instagram { background: #e4405f; }
+    .social-icon.whatsapp { background: #25d366; }
+
     /* Toast Styles */
     .custom-toast-container {
         position: fixed;
@@ -481,6 +516,10 @@
             width: 100%;
             justify-content: center;
         }
+
+        .footer-field-group .social-field {
+            flex-wrap: wrap;
+        }
     }
 
     @media (max-width: 576px) {
@@ -582,7 +621,7 @@
         <div class="card-header">
             <div>
                 <h4><i class="fas fa-cog"></i> Company Settings</h4>
-                <small>Manage your company branding</small>
+                <small>Manage your company branding and footer details</small>
             </div>
             <span style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
                 <i class="fas fa-circle" style="font-size:6px; color:#4caf50;"></i> Settings
@@ -593,26 +632,26 @@
             <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
                 @csrf
 
+                <!-- ===== BRANDING SETTINGS ===== -->
                 <div class="section-title">
                     <i class="fas fa-paint-brush"></i> Branding Settings
                 </div>
 
                 <div class="row compact-row">
-                    <!-- Company Name - OPTIONAL -->
-                    <div class="col-md-6 mb-3">
+                    <!-- Company Name -->
+                    {{--<div class="col-md-6 mb-3">
                         <label class="form-label">Company Name <span class="text-muted" style="font-size:10px; font-weight:400;">(Optional)</span></label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-building"></i></span>
                             <input type="text" name="company_name" class="form-control" value="{{ $settings['company_name'] ?? '' }}" placeholder="Enter company name">
                         </div>
                         <small class="text-muted-sm">Leave empty to use default name</small>
-                    </div>
+                    </div> --}}
 
-                    <!-- Company Logo - Image Upload (stores in company_logo field) -->
+                    <!-- Company Logo -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Company Logo <span class="text-muted" style="font-size:10px; font-weight:400;">(Optional)</span></label>
+                        <label class="form-label">Company Logo </label>
                         <div class="logo-upload-wrapper">
-                            <!-- Logo Preview -->
                             <div class="logo-preview-box" id="logoPreviewBox">
                                 @php
                                     $logoValue = $settings['company_logo'] ?? 'fas fa-dumbbell';
@@ -645,13 +684,91 @@
                     </div>
                 </div>
 
+                <div class="section-title mt-4">
+                    <i class="fas fa-map-marker-alt"></i> Footer Settings
+                </div>
+
+                <!-- ===== FOOTER CONTACT DETAILS ===== -->
+                <div class="footer-field-group">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-map-marker-alt text-danger"></i> Address</label>
+                            <input type="text" name="footer_address" class="form-control" value="{{ $settings['footer_address'] ?? '' }}" placeholder="Enter address">
+                            <small class="text-muted-sm">Company physical address</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-phone-alt text-success"></i> Phone Number</label>
+                            <input type="text" name="footer_phone" class="form-control" value="{{ $settings['footer_phone'] ?? '' }}" placeholder="Enter phone number">
+                            <small class="text-muted-sm">Contact phone number</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-envelope text-primary"></i> Email</label>
+                            <input type="email" name="footer_email" class="form-control" value="{{ $settings['footer_email'] ?? '' }}" placeholder="Enter email address">
+                            <small class="text-muted-sm">Contact email address</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fab fa-whatsapp text-success"></i> WhatsApp Number</label>
+                            <input type="text" name="footer_whatsapp" class="form-control" value="{{ $settings['footer_whatsapp'] ?? '' }}" placeholder="Enter WhatsApp number">
+                            <small class="text-muted-sm">WhatsApp number display</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <label class="form-label"><i class="fas fa-link text-info"></i> WhatsApp Link</label>
+                            <input type="url" name="footer_whatsapp_link" class="form-control" value="{{ $settings['footer_whatsapp_link'] ?? '' }}" placeholder="https://wa.me/919025595190?text=Hi">
+                            <small class="text-muted-sm">Full WhatsApp link for chat</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== SOCIAL MEDIA LINKS ===== -->
+                <div class="section-title mt-3">
+                    <i class="fas fa-share-alt"></i> Social Media Links
+                </div>
+
+                <div class="footer-field-group">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="social-field">
+                                <div class="social-icon facebook"><i class="fab fa-facebook-f"></i></div>
+                                <div style="flex:1;">
+                                    <label class="form-label" style="font-size:11px;">Facebook</label>
+                                    <input type="url" name="footer_facebook" class="form-control" value="{{ $settings['footer_facebook'] ?? '#' }}" placeholder="https://facebook.com/yourpage">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="social-field">
+                                <div class="social-icon instagram"><i class="fab fa-instagram"></i></div>
+                                <div style="flex:1;">
+                                    <label class="form-label" style="font-size:11px;">Instagram</label>
+                                    <input type="url" name="footer_instagram" class="form-control" value="{{ $settings['footer_instagram'] ?? '#' }}" placeholder="https://instagram.com/yourpage">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="social-field">
+                                <div class="social-icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+                                <div style="flex:1;">
+                                    <label class="form-label" style="font-size:11px;">WhatsApp</label>
+                                    <input type="url" name="footer_whatsapp_social" class="form-control" value="{{ $settings['footer_whatsapp_social'] ?? '#' }}" placeholder="https://wa.me/yournumber">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="text-muted-sm"><i class="fas fa-info-circle"></i> Enter full URLs for social media links. Leave as '#' to disable.</small>
+                </div>
+
+                <!-- ===== FORM ACTIONS ===== -->
                 <div class="form-actions">
                     <button type="submit" class="btn-save">
-                        <i class="fas fa-save"></i> Save Settings
+                        <i class="fas fa-save"></i> Save All Settings
                     </button>
-                    <button type="button" class="btn-preview" onclick="window.location.reload();">
+                {{--    <button type="button" class="btn-preview" onclick="window.location.reload();">
                         <i class="fas fa-eye"></i> Preview
-                    </button>
+                    </button> --}}
                 </div>
 
             </form>

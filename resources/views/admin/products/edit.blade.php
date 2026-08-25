@@ -1816,15 +1816,21 @@
             var gstRate = currentGstRate || 0;
 
             var gstAmount = (mrp * gstRate) / 100;
-            var totalPrice = mrp + gstAmount;
-            var discountAmount = 0;
-            if (discountType === 'flat') {
-                discountAmount = discountValue;
-            } else {
-                discountAmount = (mrp * discountValue) / 100;
-            }
-            var finalPrice = totalPrice - discountAmount;
-            if (finalPrice < 0) finalPrice = 0;
+        var totalPrice = mrp + gstAmount;
+
+var discountAmount = 0;
+
+if (discountType === 'flat') {
+    discountAmount = discountValue;
+} else {
+    discountAmount = (totalPrice * discountValue) / 100;
+        discountAmount = Math.round(discountAmount);
+
+}
+
+var finalPrice = totalPrice - discountAmount;
+
+if (finalPrice < 0) finalPrice = 0;
 
             var calcSpan = row.find('.size-calculation');
             if (calcSpan.length > 0) {
@@ -2365,17 +2371,23 @@
             var gstAmount = (sellingPrice * gstRate) / 100;
             var totalPrice = sellingPrice + gstAmount;
 
-            var discountAmount = 0;
-            if (discountType === 'flat') {
-                discountAmount = discountValue;
-                $('#discount_value_hint').text('Enter flat discount amount (₹)');
-            } else {
-                discountAmount = (sellingPrice * discountValue) / 100;
-                $('#discount_value_hint').text('Enter percentage discount (%)');
-            }
+           var discountAmount = 0;
 
-            var finalPrice = totalPrice - discountAmount;
-            if (finalPrice < 0) finalPrice = 0;
+if (discountType === 'flat') {
+    discountAmount = discountValue;
+    $('#discount_value_hint').text('Enter flat discount amount (₹)');
+} else {
+    discountAmount = (totalPrice * discountValue) / 100;
+        discountAmount = Math.round(discountAmount);
+
+
+
+
+    $('#discount_value_hint').text('Enter percentage discount (%)');
+}
+
+var finalPrice = totalPrice - discountAmount;
+if (finalPrice < 0) finalPrice = 0;
 
             $('#gst_amount_field').val(gstAmount.toFixed(2));
             $('#total_price_display').val(totalPrice.toFixed(2));

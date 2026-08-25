@@ -929,6 +929,24 @@ Route::get('reset-password/{token}/{email}', [App\Http\Controllers\Auth\ForgotPa
 Route::post('reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('password.reset');
 
 
+// ===== STATIC PAGES =====
+Route::get('/returns-exchange', function () {
+    return view('pages.returns-exchange');
+})->name('returns.exchange');
+
+Route::get('/shipping-policy', function () {
+    return view('pages.shipping-policy');
+})->name('shipping.policy');
+
+Route::get('/privacy-policy', function () {
+    return view('pages.privacy-policy');
+})->name('privacy.policy');
+
+Route::get('/terms-conditions', function () {
+    return view('pages.terms-conditions');
+})->name('terms.conditions');
+
+
 // ============ MEMBER/TRAINER LOGIN WITH ROLE SELECTION FOR GYM MANAGEMENET ============
 
 Route::get('/member-trainer-login', [App\Http\Controllers\Auth\MemberTrainerLoginController::class, 'showLoginForm'])->name('member.trainer.login');

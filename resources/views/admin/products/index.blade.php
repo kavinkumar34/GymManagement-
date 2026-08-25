@@ -1516,48 +1516,532 @@
                     allImages = [mainImageSrc];
                 }
 
-                var galleryHtml = '';
-                if (allImages.length > 0) {
-                    galleryHtml = `
-                        <div class="gallery-container">
-                            <span class="detail-label"><i class="fas fa-images me-1"></i> Product Gallery</span>
+            var galleryHtml = '';
+
+if (variants.length > 0) {
+
+    // ==========================================
+    // VARIANT PRODUCT GALLERY
+    // Group images by color / variant
+    // ==========================================
+
+    var galleryGroups = {};
+
+    variants.forEach(function(v) {
+
+        var groupKey = v.color || 'No Color';
+
+        if (!galleryGroups[groupKey]) {
+            galleryGroups[groupKey] = {
+                color: v.color || 'N/A',
+                images: []
+            };
+        }
+
+        if (v.variant_images && v.variant_images.length > 0) {
+
+            v.variant_images.forEach(function(img) {
+
+                var imagePath = '/storage/' + img.image_path;
+
+                // Avoid duplicate images
+                if (!galleryGroups[groupKey].images.includes(imagePath)) {
+                    galleryGroups[groupKey].images.push(imagePath);
+                }
+
+            });
+
+        }
+
+    });
+
+
+    var galleryGroupList = Object.values(galleryGroups);
+
+
+    galleryHtml = `
+        <div class="gallery-container">
+
+            <span class="detail-label">
+                <i class="fas fa-images me-1"></i>
+                Product Gallery
+            </span>
+
+            <div style="margin-top:10px;">
+
+                ${galleryGroupList.map(function(group, groupIndex) {
+
+                    return `
+                        <div style="
+                            margin-bottom:16px;
+                        ">
+
+                            <!-- VARIANT / COLOR NAME -->
+                            <div style="
+                                font-size:13px;
+                                font-weight:600;
+                                color:#495057;
+                                margin-bottom:7px;
+                                display:flex;
+                                align-items:center;
+                                gap:6px;
+                            ">
+                                <span style="
+                                    width:8px;
+                                    height:8px;
+                                    background:#6c757d;
+                                    border-radius:50%;
+                                    display:inline-block;
+                                "></span>
+
+                                ${group.color}
+                            </div>
+
+
+                            <!-- VARIANT IMAGES -->
                             <div class="gallery-thumbnails">
-                                ${allImages.map(function(imgSrc, index) {
+
+                                ${group.images.map(function(imgSrc, imageIndex) {
+
                                     return `
-                                        <div class="gallery-thumb ${index === 0 ? 'active' : ''}" 
-                                            onclick="changeGalleryImage(this, '${imgSrc}')" 
-                                            title="Image ${index + 1}">
-                                            <img src="${imgSrc}" alt="Product Image ${index + 1}" onerror="this.parentElement.style.display='none'">
+                                        <div
+                                            class="gallery-thumb ${
+                                                groupIndex === 0 && imageIndex === 0
+                                                    ? 'active'
+                                                    : ''
+                                            }"
+                                            onclick="changeGalleryImage(this, '${imgSrc}')"
+                                            title="${group.color} Image ${imageIndex + 1}"
+                                        >
+
+                                            <img
+                                                src="${imgSrc}"
+                                                alt="${group.color} Image ${imageIndex + 1}"
+                                                onerror="this.parentElement.style.display='none'"
+                                            >
+
                                         </div>
                                     `;
+
                                 }).join('')}
+
                             </div>
+
                         </div>
                     `;
+
+                }).join('')}
+
+            </div>
+
+        </div>
+    `;
+
+
+} else if (allImages.length > 0) {
+
+    // ==========================================
+    // NORMAL PRODUCT GALLERY
+    // Existing logic - DO NOT CHANGE
+    // ==========================================
+
+    galleryHtml = `
+        <div class="gallery-container">
+
+            <span class="detail-label">
+                <i class="fas fa-images me-1"></i>
+                Product Gallery
+            </span>
+
+            <div class="gallery-thumbnails">
+
+                ${allImages.map(function(imgSrc, index) {
+
+                    return `
+                        <div
+                            class="gallery-thumb ${index === 0 ? 'active' : ''}"
+                            onclick="changeGalleryImage(this, '${imgSrc}')"
+                            title="Image ${index + 1}"
+                        >
+
+                            <img
+                                src="${imgSrc}"
+                                alt="Product Image ${index + 1}"
+                                onerror="this.parentElement.style.display='none'"
+                            >
+
+                        </div>
+                    `;
+
+                }).join('')}
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+var variantsHtml = '';
+
+if (variants.length > 0) {
+
+    // Group sizes under same color / variant
+    var groupedVariants = {};
+
+    variants.forEach(function(v) {
+
+        var groupKey = v.color || 'No Color';
+
+        if (!groupedVariants[groupKey]) {
+            groupedVariants[groupKey] = {
+                color: v.color || 'N/A',
+                variants: [],
+                images: []
+            };
+        }
+
+        // Keep every size as one row inside same variant card
+        groupedVariants[groupKey].variants.push(v);
+
+        // Collect unique variant images
+        if (v.variant_images && v.variant_images.length > 0) {
+
+            v.variant_images.forEach(function(img) {
+
+                var alreadyExists =
+                    groupedVariants[groupKey].images.some(function(existing) {
+                        return existing.image_path === img.image_path;
+                    });
+
+                if (!alreadyExists) {
+                    groupedVariants[groupKey].images.push(img);
                 }
 
-                var variantsHtml = '';
-                if (variants.length > 0) {
-                    variantsHtml = `
-                        <div class="mt-3">
-                            <span class="detail-label"><i class="fas fa-palette me-1"></i> Variants</span>
-                            <div class="mt-2">
-                                ${variants.map(function(v) {
-                                    return `
-                                        <span class="variant-badge" style="display:inline-block; background:#e9ecef; padding:2px 10px; border-radius:12px; font-size:12px; margin:2px 4px 2px 0;">
-                                            <span style="font-weight:600; color:#0d6efd;">${v.size || 'N/A'}</span>
-                                            ${v.color ? '<span style="color:#6c757d;">| ' + v.color + '</span>' : ''}
-                                            <span style="color:#28a745; font-weight:600;">| Stock: ${v.stock}</span>
-                                            ${v.price ? '| ₹' + parseFloat(v.price).toFixed(2) : ''}
+            });
+        }
+
+    });
+
+
+    var variantGroups = Object.values(groupedVariants);
+
+
+    // Create HTML for each variant/color group
+    variantsHtml = `
+        <div class="mt-4">
+
+            <span class="detail-label">
+                <i class="fas fa-palette me-1"></i>
+                Variants
+            </span>
+
+            <div class="mt-2">
+
+                ${variantGroups.map(function(group, index) {
+
+                    var firstVariant = group.variants[0];
+
+                    var variantImage = mainImageSrc;
+
+                    if (group.images.length > 0) {
+                        variantImage =
+                            '/storage/' + group.images[0].image_path;
+                    }
+
+
+                    return `
+                        <div style="
+                            border:1px solid #e9ecef;
+                            border-radius:12px;
+                            padding:15px;
+                            margin-bottom:18px;
+                            background:#fff;
+                        ">
+
+                            <div class="row g-3">
+
+                                <!-- VARIANT IMAGE -->
+                                <div class="col-md-3">
+
+                                    <div style="
+                                        width:100%;
+                                        height:180px;
+                                        border:1px solid #e9ecef;
+                                        border-radius:10px;
+                                        overflow:hidden;
+                                        background:#f8f9fa;
+                                        display:flex;
+                                        align-items:center;
+                                        justify-content:center;
+                                    ">
+
+                                        <img
+                                            src="${variantImage}"
+                                            alt="Variant ${index + 1}"
+                                            style="
+                                                width:100%;
+                                                height:100%;
+                                                object-fit:contain;
+                                            "
+                                            onerror="
+                                                this.src='https://via.placeholder.com/250x250?text=No+Image'
+                                            "
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- VARIANT DETAILS -->
+                                <div class="col-md-9">
+
+                                    <div style="
+                                        display:flex;
+                                        justify-content:space-between;
+                                        align-items:center;
+                                        margin-bottom:12px;
+                                    ">
+
+                                        <strong style="
+                                            font-size:16px;
+                                            color:#1a1a2e;
+                                        ">
+                                            Variant ${index + 1}
+                                        </strong>
+
+                                        <span class="badge bg-secondary">
+                                            Color:
+                                            ${group.color}
                                         </span>
-                                    `;
-                                }).join('')}
+
+                                    </div>
+
+
+                                    <!-- SIZE TABLE -->
+
+                                    <div style="
+                                        border:1px solid #e9ecef;
+                                        border-radius:8px;
+                                        overflow:hidden;
+                                    ">
+
+                                     <div style="
+    display:grid;
+    grid-template-columns:
+        0.7fr
+        0.8fr
+        1fr
+        1.2fr
+        1.2fr
+        1.2fr;
+    gap:8px;
+    background:#f8f9fa;
+    padding:10px;
+    font-size:11px;
+    font-weight:600;
+    color:#6c757d;
+">
+
+                                            <div>SIZE</div>
+                                            <div>STOCK</div>
+                                            <div>MRP</div>
+                                            <div>DISCOUNT</div>
+                                            <div>TOTAL</div>
+                                            <div> PRICE</div>
+
+                                        </div>
+
+
+                                        ${group.variants.map(function(v) {
+
+                                            var mrp =
+                                                parseFloat(v.mrp || 0);
+
+                                            var discountValue =
+                                                parseFloat(
+                                                    v.discount_value || 0
+                                                );
+
+                                            var discountAmount =
+                                                parseFloat(
+                                                    v.discount_amount || 0
+                                                );
+
+                                            var totalPrice =
+                                                parseFloat(
+                                                    v.total_price || 0
+                                                );
+
+                                            var finalPrice =
+                                                parseFloat(
+                                                    v.final_price || 0
+                                                );
+
+                                            var discountType =
+                                                v.discount_type || 'flat';
+
+
+                                            return `
+                                              <div style="
+    display:grid;
+    grid-template-columns:
+        0.7fr
+        0.8fr
+        1fr
+        1.2fr
+        1.2fr
+        1.2fr;
+    gap:8px;
+    padding:10px;
+    border-top:1px solid #e9ecef;
+    align-items:center;
+    font-size:12px;
+">
+
+                                                    <!-- SIZE -->
+                                                    <div>
+                                                        <strong>
+                                                            ${v.size || 'N/A'}
+                                                        </strong>
+                                                    </div>
+
+
+                                                    <!-- STOCK -->
+                                                    <div>
+
+                                                        <span class="badge bg-${
+                                                            parseInt(v.stock || 0) > 0
+                                                                ? 'success'
+                                                                : 'danger'
+                                                        }">
+                                                            ${v.stock || 0}
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <!-- MRP -->
+                                                    <div>
+                                                        ₹${mrp.toFixed(2)}
+                                                    </div>
+
+
+                                                    <!-- DISCOUNT -->
+                                                    <div>
+
+                                                        ${
+                                                            discountType === 'percentage'
+                                                            ?
+                                                            discountValue + '%'
+                                                            :
+                                                            '₹' +
+                                                            discountValue.toFixed(2)
+                                                        }
+
+                                                        <small style="
+                                                            display:block;
+                                                            color:#6c757d;
+                                                            font-size:10px;
+                                                        ">
+                                                            ₹${discountAmount.toFixed(2)}
+                                                        </small>
+
+                                                    </div>
+
+
+                                                    <!-- TOTAL -->
+                                                    <div>
+                                                        ₹${totalPrice.toFixed(2)}
+                                                    </div>
+
+
+                                                    <!-- FINAL PRICE -->
+                                                    <div>
+                                                        <strong style="
+                                                            color:#28a745;
+                                                        ">
+                                                            ₹${finalPrice.toFixed(2)}
+                                                        </strong>
+                                                    </div>
+
+                                                </div>
+                                            `;
+
+                                        }).join('')}
+
+                                    </div>
+
+
+                                    <!-- GST / OTHER DETAILS OF FIRST VARIANT -->
+
+                                    <div class="detail-grid mt-3">
+
+                                        <div class="detail-row">
+
+                                            <div class="detail-label">
+                                                GST Percentage
+                                            </div>
+
+                                            <div class="detail-value">
+                                                ${
+                                                    parseFloat(
+                                                        firstVariant.gst_percentage || 0
+                                                    ).toFixed(2)
+                                                }%
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="detail-row">
+
+                                            <div class="detail-label">
+                                                GST Amount
+                                            </div>
+
+                                            <div class="detail-value">
+                                                ₹${
+                                                    parseFloat(
+                                                        firstVariant.gst_amount || 0
+                                                    ).toFixed(2)
+                                                }
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="detail-row">
+
+                                            <div class="detail-label">
+                                                Variant Images
+                                            </div>
+
+                                            <div class="detail-value">
+                                                ${group.images.length}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
                             </div>
+
                         </div>
                     `;
-                }
 
-                var html = `
+                }).join('')}
+
+            </div>
+
+        </div>
+    `;
+}
+
+var html = `
                     <div class="row">
                         <div class="col-md-5 product-detail-left">
                             <img src="${mainImageSrc}" 
@@ -1574,6 +2058,7 @@
                                 ${product.sub_category_name ? '<span class="badge bg-secondary me-1">' + product.sub_category_name + '</span>' : ''}
                                 ${product.brand_name ? '<span class="badge bg-secondary">' + product.brand_name + '</span>' : ''}
                             </div>
+                            ${variants.length === 0 ? `
                             <div class="mb-3">
                                 <div class="price-tag" style="font-size:24px; font-weight:700; color:#28a745;">
                                     ₹${parseFloat(product.final_price || product.price).toFixed(2)}
@@ -1652,8 +2137,11 @@
                                     <div class="detail-label">Delivery Days</div>
                                     <div class="detail-value">${product.delivery_days || 'N/A'} days</div>
                                 </div>
-                            </div>
-                            ${variantsHtml}
+                          </div>
+
+` : ''}
+
+${variantsHtml}
                             ${product.description ? `
                                 <div class="mt-3">
                                     <span class="detail-label"><i class="fas fa-align-left me-1"></i> Description</span>
