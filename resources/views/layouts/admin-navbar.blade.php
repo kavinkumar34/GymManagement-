@@ -445,9 +445,9 @@
             <ul class="dropdown-menu-custom">
                 <li>
                     <a class="dropdown-item-custom" href="{{ route('admin.hand.payment') }}">
-                        <i class="fas fa-hand-holding-usd"></i>  Payment
+                        <i class="fas fa-hand-holding-usd"></i> Payment
                     </a>
-                </li> 
+                </li>
             </ul>
         </li>
 
@@ -491,104 +491,322 @@
 </form>
 
 <script>
-    // ============ DROPDOWN CLICK TOGGLE - IMPROVED ============
+    // =========================================================
+    // ADMIN SIDEBAR - SCROLL POSITION + ACTIVE PAGE + DROPDOWNS
+    // =========================================================
     document.addEventListener('DOMContentLoaded', function() {
 
-        // ===========================
-        // DROPDOWN TOGGLE
-        // ===========================
+        const sidebar = document.querySelector('.admin-sidebar');
+        const sidebarNav = document.querySelector('.sidebar-nav');
         const dropdowns = document.querySelectorAll('.has-dropdown');
+        const SCROLL_KEY = 'adminSidebarScrollPosition';
 
+        // =========================================================
+        // HELPER: NORMALIZE URL PATH
+        // =========================================================
+        function normalizePath(path) {
+            if (!path) return '/';
+
+            path = path.split('?')[0].split('#')[0];
+            path = path.replace(/\\/g, '/');
+            path = path.replace(/\/+$/, '');
+
+            return path || '/';
+        }
+
+        // =========================================================
+        // SAVE SIDEBAR SCROLL POSITION
+        // =========================================================
+        function saveSidebarScroll() {
+            if (!sidebarNav) return;
+
+            sessionStorage.setItem(
+                SCROLL_KEY,
+                String(sidebarNav.scrollTop)
+            );
+        }
+
+        // =========================================================
+        // RESTORE SIDEBAR SCROLL POSITION
+        // =========================================================
+        function restoreSidebarScroll() {
+            if (!sidebarNav) return;
+
+            const savedPosition =
+                sessionStorage.getItem(SCROLL_KEY);
+
+            if (savedPosition === null) return;
+
+            const position = parseInt(savedPosition, 10);
+
+            if (Number.isNaN(position)) return;
+
+            // Restore immediately
+            sidebarNav.scrollTop = position;
+
+            // Restore again after layout/reflow
+            requestAnimationFrame(function() {
+                sidebarNav.scrollTop = position;
+            });
+
+            // Dropdowns can change the height, so restore after that too
+            setTimeout(function() {
+                sidebarNav.scrollTop = position;
+            }, 50);
+
+            setTimeout(function() {
+                sidebarNav.scrollTop = position;
+            }, 200);
+
+            setTimeout(function() {
+                sidebarNav.scrollTop = position;
+            }, 400);
+        }
+
+        // =========================================================
+        // SAVE POSITION WHEN SIDEBAR IS SCROLLED
+        // =========================================================
+        if (sidebarNav) {
+            sidebarNav.addEventListener('scroll', function() {
+                saveSidebarScroll();
+            }, {
+                passive: true
+            });
+        }
+
+        // =========================================================
+        // SAVE POSITION BEFORE NAVIGATING TO ANOTHER PAGE
+        // =========================================================
+        if (sidebarNav) {
+            sidebarNav.querySelectorAll('a[href]').forEach(function(link) {
+
+                link.addEventListener('click', function() {
+                    saveSidebarScroll();
+                });
+
+            });
+        }
+
+        // =========================================================
+        // DROPDOWN TOGGLE
+        // =========================================================
         dropdowns.forEach(function(dropdown) {
 
-            const toggle = dropdown.querySelector('.dropdown-toggle');
-            const menu = dropdown.querySelector('.dropdown-menu-custom');
-            const arrow = dropdown.querySelector('.dropdown-arrow');
+            const toggle =
+                dropdown.querySelector('.dropdown-toggle');
+
+            const menu =
+                dropdown.querySelector('.dropdown-menu-custom');
+
+            const arrow =
+                dropdown.querySelector('.dropdown-arrow');
+
+            if (!toggle || !menu) return;
 
             toggle.addEventListener('click', function(e) {
 
                 e.preventDefault();
                 e.stopPropagation();
 
-                // Close other dropdowns
+                // Save current position before changing dropdown height
+                saveSidebarScroll();
+
+                // Close all other dropdowns
                 dropdowns.forEach(function(item) {
 
                     if (item !== dropdown) {
 
                         item.classList.remove('active');
 
-                        const m = item.querySelector('.dropdown-menu-custom');
-                        const a = item.querySelector('.dropdown-arrow');
+                        const otherMenu =
+                            item.querySelector('.dropdown-menu-custom');
 
-                        if (m) m.style.display = 'none';
-                        if (a) a.style.transform = 'rotate(0deg)';
+                        const otherArrow =
+                            item.querySelector('.dropdown-arrow');
+
+                        if (otherMenu) {
+                            otherMenu.style.display = 'none';
+                        }
+
+                        if (otherArrow) {
+                            otherArrow.style.transform = 'rotate(0deg)';
+                        }
                     }
-
                 });
 
                 // Toggle current dropdown
                 if (dropdown.classList.contains('active')) {
 
                     dropdown.classList.remove('active');
-
                     menu.style.display = 'none';
 
-                    if (arrow)
+                    if (arrow) {
                         arrow.style.transform = 'rotate(0deg)';
+                    }
 
                 } else {
 
                     dropdown.classList.add('active');
-
                     menu.style.display = 'block';
 
-                    if (arrow)
+                    if (arrow) {
                         arrow.style.transform = 'rotate(180deg)';
-
+                    }
                 }
 
+                // Keep the sidebar at the same position after dropdown height changes
+                restoreSidebarScroll();
             });
-
         });
 
+        // =========================================================
+        // ACTIVE PAGE HIGHLIGHT
+        // =========================================================
+        const currentPath =
+            normalizePath(window.location.pathname);
 
-        // ==========================================
-        // KEEP CURRENT DROPDOWN OPEN AFTER PAGE LOAD
-        // ==========================================
-        const currentUrl = window.location.href;
+        // Remove old active classes
+        document.querySelectorAll(
+            '.sidebar-nav .nav-link.active, .sidebar-nav .dropdown-item-custom.active'
+        ).forEach(function(element) {
+            element.classList.remove('active');
+        });
 
-        document.querySelectorAll('.dropdown-item-custom').forEach(function(item) {
+        // Close all dropdowns first
+        dropdowns.forEach(function(dropdown) {
 
-            if (item.href === currentUrl ||
-                currentUrl.startsWith(item.href)) {
+            dropdown.classList.remove('active');
 
-                item.classList.add('active');
+            const menu =
+                dropdown.querySelector('.dropdown-menu-custom');
 
-                const parent = item.closest('.has-dropdown');
+            const arrow =
+                dropdown.querySelector('.dropdown-arrow');
 
-                if (parent) {
-
-                    parent.classList.add('active');
-
-                    const menu = parent.querySelector('.dropdown-menu-custom');
-                    const arrow = parent.querySelector('.dropdown-arrow');
-
-                    if (menu)
-                        menu.style.display = 'block';
-
-                    if (arrow)
-                        arrow.style.transform = 'rotate(180deg)';
-
-                }
-
+            if (menu) {
+                menu.style.display = 'none';
             }
 
+            if (arrow) {
+                arrow.style.transform = 'rotate(0deg)';
+            }
         });
 
+        // =========================================================
+        // FIND ACTIVE NORMAL NAV LINK
+        // =========================================================
+        document.querySelectorAll(
+            '.sidebar-nav > .nav-item > .nav-link[href]'
+        ).forEach(function(link) {
 
-        // ===========================
-        // CLICK OUTSIDE
-        // ===========================
+            const href = link.getAttribute('href');
+
+            if (!href ||
+                href === '#' ||
+                href.startsWith('javascript:')) {
+                return;
+            }
+
+            try {
+
+                const linkUrl = new URL(
+                    href,
+                    window.location.origin
+                );
+
+                const linkPath =
+                    normalizePath(linkUrl.pathname);
+
+                // Exact path match OR child path match
+                if (
+                    linkPath === currentPath ||
+                    (linkPath !== '/' && currentPath.startsWith(linkPath + '/'))
+                ) {
+                    link.classList.add('active');
+                }
+
+            } catch (error) {
+                console.log('Unable to check active nav link:', error);
+            }
+        });
+
+        // =========================================================
+        // FIND ACTIVE DROPDOWN ITEM
+        // =========================================================
+        document.querySelectorAll(
+            '.sidebar-nav .dropdown-item-custom[href]'
+        ).forEach(function(item) {
+
+            const href = item.getAttribute('href');
+
+            if (!href || href === '#') return;
+
+            try {
+
+                const itemUrl = new URL(
+                    href,
+                    window.location.origin
+                );
+
+                const itemPath =
+                    normalizePath(itemUrl.pathname);
+
+                if (itemPath === currentPath) {
+
+                    // Light-blue highlight for current page
+                    item.classList.add('active');
+
+                    // Open the parent dropdown
+                    const parent =
+                        item.closest('.has-dropdown');
+
+                    if (parent) {
+
+                        parent.classList.add('active');
+
+                        const parentMenu =
+                            parent.querySelector('.dropdown-menu-custom');
+
+                        const parentArrow =
+                            parent.querySelector('.dropdown-arrow');
+
+                        if (parentMenu) {
+                            parentMenu.style.display = 'block';
+                        }
+
+                        if (parentArrow) {
+                            parentArrow.style.transform = 'rotate(180deg)';
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.log('Unable to check active dropdown item:', error);
+            }
+        });
+
+        // =========================================================
+        // RESTORE SIDEBAR POSITION AFTER ACTIVE DROPDOWN IS OPENED
+        // =========================================================
+        restoreSidebarScroll();
+
+        // =========================================================
+        // RESTORE AGAIN WHEN PAGE IS FULLY LOADED
+        // =========================================================
+        window.addEventListener('load', function() {
+            restoreSidebarScroll();
+        });
+
+        // =========================================================
+        // RESTORE WHEN PAGE IS RESTORED FROM BROWSER HISTORY
+        // =========================================================
+        window.addEventListener('pageshow', function() {
+            restoreSidebarScroll();
+        });
+
+        // =========================================================
+        // CLICK OUTSIDE SIDEBAR
+        // =========================================================
         document.addEventListener('click', function(e) {
 
             if (!e.target.closest('.admin-sidebar')) {
@@ -597,87 +815,87 @@
 
                     dropdown.classList.remove('active');
 
-                    const menu = dropdown.querySelector('.dropdown-menu-custom');
-                    const arrow = dropdown.querySelector('.dropdown-arrow');
+                    const menu =
+                        dropdown.querySelector('.dropdown-menu-custom');
 
-                    if (menu)
+                    const arrow =
+                        dropdown.querySelector('.dropdown-arrow');
+
+                    if (menu) {
                         menu.style.display = 'none';
+                    }
 
-                    if (arrow)
+                    if (arrow) {
                         arrow.style.transform = 'rotate(0deg)';
-
+                    }
                 });
-
             }
-
         });
 
-
-        // ===========================
+        // =========================================================
         // MARK PAYMENTS VIEWED
-        // ===========================
+        // =========================================================
         window.markPaymentsViewed = function() {
 
-            const badge = document.getElementById("pendingBadge");
+            const badge =
+                document.getElementById('pendingBadge');
 
             if (badge) {
-
-                badge.style.display = "none";
-
-                badge.innerHTML = "";
-
+                badge.style.display = 'none';
+                badge.innerHTML = '';
             }
 
             fetch('{{ route('admin.payments.mark-viewed') }}', {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                    "Content-Type": "application/json"
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
                 }
+            }).catch(function(error) {
+                console.log('Unable to mark payments viewed:', error);
             });
+        };
 
-        }
-
-
-        // ===========================
+        // =========================================================
         // CHECK NEW ORDERS
-        // ===========================
+        // =========================================================
         function checkNewOrders() {
 
             fetch('{{ route('admin.payments.check-new') }}')
-                .then(res => res.json())
-                .then(data => {
+                .then(function(res) {
+                    return res.json();
+                })
+                .then(function(data) {
 
-                    let badge = document.getElementById("pendingBadge");
+                    let badge =
+                        document.getElementById('pendingBadge');
 
                     if (data.new_count > 0) {
 
                         if (!badge) {
 
-                            badge = document.createElement("span");
+                            badge = document.createElement('span');
+                            badge.id = 'pendingBadge';
+                            badge.className = 'badge bg-danger ms-2';
 
-                            badge.id = "pendingBadge";
+                            const paymentsLink =
+                                document.getElementById('paymentsNavLink');
 
-                            badge.className = "badge bg-danger ms-2";
-
-                            document.getElementById("paymentsNavLink").appendChild(badge);
-
+                            if (paymentsLink) {
+                                paymentsLink.appendChild(badge);
+                            }
                         }
 
                         badge.innerHTML = data.new_count;
-
-                        badge.style.display = "inline-block";
-
+                        badge.style.display = 'inline-block';
                     }
-
+                })
+                .catch(function(error) {
+                    console.log('Unable to check new orders:', error);
                 });
-
         }
 
         checkNewOrders();
-
-        checkNewOrders();
-
         setInterval(checkNewOrders, 2000);
     });
 </script>
@@ -692,8 +910,7 @@
         height: 100vh;
         background: linear-gradient(180deg, #0d1b2a 0%, #1b3a5c 50%, #0d1b2a 100%);
         color: #ffffff;
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: hidden;
         z-index: 1000;
         display: flex;
         flex-direction: column;
@@ -755,7 +972,8 @@
         list-style: none;
         padding: 10px 0;
         margin: 0;
-        flex: 1;
+        flex: 1 1 auto;
+        min-height: 0;
         overflow-y: auto;
         overflow-x: hidden;
         padding-bottom: 80px;
@@ -792,10 +1010,15 @@
     }
 
     .sidebar-nav .nav-link.active {
-        background: rgba(74, 158, 255, 0.15);
-        color: #ffffff;
-        border-left-color: #4a9eff;
+        background: rgba(74, 158, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-left: 3px solid #4a9eff !important;
         font-weight: 600;
+        box-shadow: inset 0 0 20px rgba(74, 158, 255, 0.08);
+    }
+
+    .sidebar-nav .nav-link.active i {
+        color: #4a9eff !important;
     }
 
     .sidebar-nav .nav-link i {
@@ -860,6 +1083,7 @@
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -1130,14 +1354,15 @@
     }
 
     .dropdown-item-custom.active {
-        background: rgba(74, 158, 255, 0.18);
-        border-left: 3px solid #4a9eff;
-        color: #ffffff;
+        background: rgba(74, 158, 255, 0.18) !important;
+        border-left: 3px solid #4a9eff !important;
+        color: #ffffff !important;
         font-weight: 600;
+        box-shadow: inset 0 0 18px rgba(74, 158, 255, 0.06);
     }
 
     .dropdown-item-custom.active i {
-        color: #4a9eff;
+        color: #4a9eff !important;
     }
 
     #pendingBadge {
@@ -1149,10 +1374,12 @@
             opacity: 1;
             transform: scale(1);
         }
+
         50% {
             opacity: .3;
             transform: scale(1.25);
         }
+
         100% {
             opacity: 1;
             transform: scale(1);
@@ -1167,10 +1394,12 @@
         0% {
             opacity: 1;
         }
+
         50% {
             opacity: .3;
             transform: scale(1.25);
         }
+
         100% {
             opacity: 1;
         }

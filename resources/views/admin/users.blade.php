@@ -83,6 +83,43 @@
     }
 
     /* ============================================ */
+    /* HEADER ACTIONS - EXPORT BUTTON              */
+    /* ============================================ */
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .export-btn {
+        background: #22c55e;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+    
+    .export-btn:hover {
+        background: #16a34a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
+        color: white;
+    }
+    
+    .export-btn i {
+        font-size: 14px;
+    }
+
+    /* ============================================ */
     /* SEARCH & FILTER SECTION                    */
     /* ============================================ */
     .search-filter-section {
@@ -525,9 +562,18 @@
                 <h4><i class="fas fa-users"></i> Users List</h4>
                 <small style="opacity:0.8;">Manage all registered users</small>
             </div>
-            <span style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
-                <i class="fas fa-user"></i> Total: {{ $users->count() }}
-            </span>
+            
+            <!-- ===== HEADER ACTIONS WITH EXPORT BUTTON ===== -->
+            <div class="header-actions">
+                <span style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
+                    <i class="fas fa-user"></i> Total: {{ $users->count() }}
+                </span>
+                
+                <!-- ===== EXPORT BUTTON ===== -->
+                <a href="{{ route('admin.users.export', request()->query()) }}" class="export-btn">
+                    <i class="fas fa-file-excel"></i> Export to CSV
+                </a>
+            </div>
         </div>
 
         <div class="card-body">

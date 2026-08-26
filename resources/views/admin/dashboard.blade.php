@@ -2,6 +2,20 @@
 
 @section('content')
 <style>
+    /* ===== DASHBOARD WIDTH / BOX-SIZING SAFETY ===== */
+    .admin-main-content {
+        min-width: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .dashboard-container {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
     /* ===== DASHBOARD STAT CARDS ===== */
     .stat-grid {
         display: grid;
@@ -10,9 +24,17 @@
         margin-bottom: 25px;
     }
 
-    @media (max-width: 1200px) {
+    /*
+     * IMPORTANT RESPONSIVE FIX:
+     * The admin sidebar takes 270px of the viewport.
+     * On smaller laptop screens / browser zoom levels, the available
+     * dashboard width can become much smaller even when the CSS
+     * viewport is still above 1200px. Six cards in one row can then
+     * become too narrow and their contents can overlap.
+     */
+    @media (max-width: 1400px) {
         .stat-grid {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
 
@@ -44,6 +66,8 @@
         text-decoration: none;
         color: inherit;
         min-height: 120px;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .stat-card:hover {
@@ -75,14 +99,16 @@
         flex-shrink: 0;
     }
 
-    .stat-card .stat-right {
-        text-align: right;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        min-width: 0;
-        flex-shrink: 1;
-    }
+.stat-card .stat-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 0;
+    flex: 1;
+    flex-shrink: 1;
+    max-width: 100%;
+}
 
     .stat-card .stat-number {
         font-size: 1.6rem;
@@ -92,14 +118,19 @@
         white-space: nowrap;
     }
 
-    .stat-card .stat-label {
-        font-size: 0.78rem;
-        color: #64748b;
-        font-weight: 500;
-        margin-top: 1px;
-        white-space: nowrap;
-        letter-spacing: 0.2px;
-    }
+.stat-card .stat-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 1px;
+    white-space: normal;
+    letter-spacing: 0.2px;
+    max-width: 100%;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.3;
+    text-align: right;
+}
 
     .stat-card .stat-change {
         font-size: 0.65rem;
@@ -191,7 +222,7 @@
         margin-bottom: 20px;
     }
 
-    @media (max-width: 992px) {
+    @media (max-width: 1200px) {
         .dashboard-grid {
             grid-template-columns: 1fr;
         }
@@ -397,6 +428,19 @@
         letter-spacing: 0.5px;
     }
 
+    /* ===== WELCOME BANNER RESPONSIVE FIX ===== */
+    @media (max-width: 1100px) {
+        .welcome-banner {
+            align-items: flex-start;
+        }
+
+        .welcome-banner .welcome-stats {
+            width: 100%;
+            justify-content: space-between;
+            gap: 16px;
+        }
+    }
+
     @media (max-width: 768px) {
         .welcome-banner {
             flex-direction: column;
@@ -467,7 +511,7 @@
 </style>
 
 <div class="admin-main-content">
-    <div class="container-fluid">
+    <div class="container-fluid dashboard-container">
         <!-- ===== WELCOME BANNER ===== -->
         <div class="welcome-banner">
             <div>

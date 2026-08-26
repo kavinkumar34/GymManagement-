@@ -195,6 +195,8 @@ Route::get('/api/offers/category/{category_id}', [PublicOfferController::class, 
 // ============ ADMIN ROUTES ============
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/export', [UserController::class, 'export'])->name('users.export');  // ← NEW
+
         Route::get('/products/{id}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
