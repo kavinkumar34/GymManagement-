@@ -451,6 +451,21 @@
             </ul>
         </li>
 
+        <!-- ===== REPORTS MENU ===== -->
+<li class="nav-item has-dropdown">
+    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+        <i class="fas fa-chart-line"></i>
+        <span>Reports</span>
+    </a>
+    <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.finance.reports') }}">
+                <i class="fas fa-rupee-sign"></i> Finance Reports
+            </a>
+        </li>
+    </ul>
+</li>
+
         <!-- Attendance -->
         <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">

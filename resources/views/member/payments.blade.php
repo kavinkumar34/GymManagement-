@@ -44,7 +44,11 @@
                                     <th>Plan Type</th>
                                     <th>Plan Name</th>
                                     <th>Final Price</th>
+                                    <th>Payment Type</th>
+                                    <th>Transaction ID</th>
                                     <th>Joined Date</th>
+                                    <th>Expiry Date</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -66,6 +70,8 @@
                                         <td class="member-name">{{ $member->name }}</td>
                                         <td class="member-email">{{ $member->email }}</td>
                                         <td class="member-phone">{{ $member->phone }}</td>
+                                        
+                                        <!-- ===== PLAN TYPE ===== -->
                                         <td>
                                             @if($member->plan_type == 'membership')
                                                 <span class="plan-badge membership">
@@ -75,21 +81,78 @@
                                                 <span class="plan-badge package">
                                                     <i class="fas fa-box me-1"></i> Package
                                                 </span>
+                                            @elseif($member->plan_type == 'monthly')
+                                                <span class="plan-badge monthly">
+                                                    <i class="fas fa-calendar-alt me-1"></i> Monthly
+                                                </span>
                                             @else
                                                 <span class="plan-badge none">-</span>
                                             @endif
                                         </td>
+                                        
                                         <td>
                                             <span class="plan-name-badge">
                                                 <i class="fas fa-tag me-1"></i> {{ $member->membership_plan ?? 'Basic' }}
                                             </span>
                                         </td>
+                                        
                                         <td><span class="price-amount">₹ {{ number_format($member->final_price ?? 0, 2) }}</span></td>
+                                        
+                                        <!-- ===== PAYMENT TYPE ===== -->
+                                        <td>
+                                            @if($member->payment_type == 'hand')
+                                                <span class="payment-badge hand">
+                                                    <i class="fas fa-hand-holding-usd me-1"></i> Hand
+                                                </span>
+                                            @elseif($member->payment_type == 'online')
+                                                <span class="payment-badge online">
+                                                    <i class="fas fa-wifi me-1"></i> Online
+                                                </span>
+                                            @else
+                                                <span class="plan-badge none">-</span>
+                                            @endif
+                                        </td>
+                                        
+                                        <!-- ===== TRANSACTION ID ===== -->
+                                        <td>
+                                            @if($member->transaction_id)
+                                                <span class="transaction-id-badge">{{ $member->transaction_id }}</span>
+                                            @else
+                                                <span class="plan-badge none">-</span>
+                                            @endif
+                                        </td>
+                                        
                                         <td class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</td>
+                                        
+                                        <!-- ===== EXPIRY DATE ===== -->
+                                        <td>
+                                            @if($member->expiry_date)
+                                                {{ date('d-m-Y', strtotime($member->expiry_date)) }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        
+                                        <!-- ===== STATUS ===== -->
+                                        <td>
+                                            @if($member->expiry_date)
+                                                @if(now()->gt($member->expiry_date))
+                                                    <span class="plan-badge none">Expired</span>
+                                                @else
+                                                    @php
+                                                        // ✅ FIX: Whole number only
+                                                        $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                                    @endphp
+                                                    <span class="plan-badge membership">{{ $daysLeft }} days left</span>
+                                                @endif
+                                            @else
+                                                <span class="plan-badge none">-</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @else
                                     <tr>
-                                        <td colspan="10" class="empty-row">
+                                        <td colspan="14" class="empty-row">
                                             <i class="fas fa-users fa-2x mb-2"></i>
                                             <p>No members found.</p>
                                         </td>
@@ -166,7 +229,7 @@
 }
 
 /* ============================================ */
-/* TABLE                                        */
+/* TABLE - ALL DATA IN SINGLE LINE              */
 /* ============================================ */
 .payment-table {
     width: 100%;
@@ -175,6 +238,8 @@
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(13, 27, 62, 0.06);
+    table-layout: auto;
+    min-width: 1200px;
 }
 
 .payment-table thead {
@@ -205,9 +270,19 @@
     padding: 10px 14px;
     color: #334155;
     vertical-align: middle;
+    white-space: nowrap;
 }
 
-/* Member Photo */
+/* ============================================ */
+/* TEXT-NOWRAP - SINGLE LINE WITHOUT CUTOFF    */
+/* ============================================ */
+.text-nowrap {
+    white-space: nowrap !important;
+}
+
+/* ============================================ */
+/* MEMBER PHOTO                                 */
+/* ============================================ */
 .member-photo {
     width: 45px;
     height: 45px;
@@ -215,6 +290,7 @@
     overflow: hidden;
     border: 2px solid #e2e8f0;
     flex-shrink: 0;
+    display: inline-block;
 }
 
 .member-photo img {
@@ -248,8 +324,9 @@
 }
 
 .member-email {
-    color: #64748b;
+    color: #1a2a6c;
     font-size: 0.85rem;
+    font-weight: 500;
 }
 
 .member-phone {
@@ -260,6 +337,7 @@
     font-weight: 700;
     color: #10b981;
     font-size: 1rem;
+    white-space: nowrap;
 }
 
 .join-date {
@@ -278,6 +356,7 @@
     font-weight: 600;
     display: inline-flex;
     align-items: center;
+    white-space: nowrap;
 }
 
 .plan-badge.membership {
@@ -288,6 +367,11 @@
 .plan-badge.package {
     background: #fef3c7;
     color: #92400e;
+}
+
+.plan-badge.monthly {
+    background: #fff3e0;
+    color: #e65100;
 }
 
 .plan-badge.none {
@@ -304,6 +388,45 @@
     color: #1d4ed8;
     display: inline-flex;
     align-items: center;
+    white-space: nowrap;
+}
+
+/* ============================================ */
+/* PAYMENT BADGES                               */
+/* ============================================ */
+.payment-badge {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.payment-badge.hand {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.payment-badge.online {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* ============================================ */
+/* TRANSACTION ID BADGE                         */
+/* ============================================ */
+.transaction-id-badge {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: monospace;
+    background: #f1f5f9;
+    color: #334155;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 /* ============================================ */
@@ -331,6 +454,7 @@
 @media (max-width: 992px) {
     .payment-table {
         font-size: 0.8rem;
+        min-width: 1000px;
     }
     
     .payment-table thead th,
@@ -361,6 +485,7 @@
     
     .payment-table {
         font-size: 0.75rem;
+        min-width: 900px;
     }
     
     .payment-table thead th,
@@ -389,9 +514,15 @@
     }
     
     .plan-badge,
-    .plan-name-badge {
+    .plan-name-badge,
+    .payment-badge {
         font-size: 0.65rem;
         padding: 2px 10px;
+    }
+    
+    .transaction-id-badge {
+        font-size: 0.6rem;
+        padding: 2px 8px;
     }
     
     .payment-date {
@@ -400,13 +531,14 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
     .payment-card-body {
         padding: 12px;
     }
     
     .payment-table {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
+        min-width: 800px;
     }
     
     .payment-table thead th,
@@ -415,18 +547,19 @@
     }
     
     .payment-table thead th {
-        font-size: 0.5rem;
+        font-size: 0.55rem;
+        padding: 6px 6px;
     }
     
     .member-photo {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
     }
     
     .photo-placeholder {
-        width: 28px;
-        height: 28px;
-        font-size: 0.7rem;
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
     }
     
     .member-email {
@@ -438,14 +571,85 @@
     }
     
     .plan-badge,
-    .plan-name-badge {
-        font-size: 0.55rem;
-        padding: 2px 6px;
+    .plan-name-badge,
+    .payment-badge {
+        font-size: 0.6rem;
+        padding: 2px 8px;
     }
     
     .plan-badge i,
-    .plan-name-badge i {
+    .plan-name-badge i,
+    .payment-badge i {
         display: none;
+    }
+    
+    .transaction-id-badge {
+        font-size: 0.55rem;
+        padding: 1px 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .payment-card-body {
+        padding: 8px;
+    }
+    
+    .payment-table {
+        font-size: 0.6rem;
+        min-width: 700px;
+    }
+    
+    .payment-table thead th,
+    .payment-table tbody td {
+        padding: 3px 4px;
+    }
+    
+    .payment-table thead th {
+        font-size: 0.5rem;
+        padding: 4px 4px;
+        letter-spacing: 0;
+    }
+    
+    .member-photo {
+        width: 25px;
+        height: 25px;
+        border-width: 1px;
+    }
+    
+    .photo-placeholder {
+        width: 25px;
+        height: 25px;
+        font-size: 0.6rem;
+    }
+    
+    .member-email {
+        font-size: 0.55rem;
+    }
+    
+    .member-phone {
+        font-size: 0.6rem;
+    }
+    
+    .price-amount {
+        font-size: 0.65rem;
+    }
+    
+    .plan-badge,
+    .plan-name-badge,
+    .payment-badge {
+        font-size: 0.5rem;
+        padding: 1px 5px;
+    }
+    
+    .plan-badge i,
+    .plan-name-badge i,
+    .payment-badge i {
+        display: none;
+    }
+    
+    .transaction-id-badge {
+        font-size: 0.45rem;
+        padding: 1px 4px;
     }
 }
 </style>

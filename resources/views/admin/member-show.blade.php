@@ -596,7 +596,7 @@
                 </table>
 
                 <!-- ========================================== -->
-                <!-- MEMBERSHIP INFORMATION                     -->
+                <!-- MEMBERSHIP INFORMATION - UPDATED           -->
                 <!-- ========================================== -->
                 <div class="section-title mt-3">
                     <i class="fas fa-id-card"></i> Membership Information
@@ -610,13 +610,15 @@
                                 <span class="badge-custom primary"><i class="fas fa-id-card"></i> Membership</span>
                             @elseif($member->plan_type == 'package')
                                 <span class="badge-custom success"><i class="fas fa-box"></i> Package</span>
+                            @elseif($member->plan_type == 'monthly')
+                                <span class="badge-custom warning"><i class="fas fa-calendar-alt"></i> Monthly</span>
                             @else
                                 <span class="badge-custom secondary">Not Selected</span>
                             @endif
                         </td>
                     </tr>
                     <tr>
-                        <th>Membership / Package</th>
+                        <th>Membership / Package / Plan Name</th>
                         <td>
                             @if ($member->membership_plan)
                                 <span class="badge-custom info">{{ $member->membership_plan }}</span>
@@ -644,6 +646,44 @@
                                 <span class="badge-custom success"><i class="fas fa-check-circle"></i> Active</span>
                             @else
                                 <span class="badge-custom warning"><i class="fas fa-times-circle"></i> Inactive</span>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- ========================================== -->
+                <!-- PAYMENT INFORMATION                        -->
+                <!-- ========================================== -->
+                <div class="section-title mt-3">
+                    <i class="fas fa-credit-card"></i> Payment Information
+                </div>
+
+                <table class="details-table">
+                    <tr>
+                        <th>Payment Type</th>
+                        <td>
+                            @if($member->payment_type == 'hand')
+                                <span class="badge-custom primary"><i class="fas fa-hand-holding-usd"></i> Hand Payment</span>
+                            @elseif($member->payment_type == 'online')
+                                <span class="badge-custom success"><i class="fas fa-wifi"></i> Online Payment</span>
+                            @else
+                                <span class="badge-custom secondary">Not specified</span>
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <td>{{ $member->transaction_id ?? 'Not specified' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Payment Screenshot</th>
+                        <td>
+                            @if($member->payment_screenshot)
+                                <a href="{{ asset('storage/' . $member->payment_screenshot) }}" target="_blank" class="btn-primary" style="padding:4px 12px; font-size:12px;">
+                                    <i class="fas fa-eye"></i> View Screenshot
+                                </a>
+                            @else
+                                <span class="badge-custom secondary">No screenshot uploaded</span>
                             @endif
                         </td>
                     </tr>
@@ -690,6 +730,26 @@
                         <td>{{ $member->updated_at ? $member->updated_at->format('d-m-Y h:i A') : '-' }}</td>
                     </tr>
                 </table>
+
+  <tr>
+    <th>Expiry Date</th>
+    <td>
+        @if($member->expiry_date)
+            {{ date('d-m-Y', strtotime($member->expiry_date)) }}
+            @if(now()->gt($member->expiry_date))
+                <span class="badge-custom warning"><i class="fas fa-times-circle"></i> Expired</span>
+            @else
+                @php
+                    // ✅ FIX: Whole number only
+                    $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                @endphp
+                <span class="badge-custom success"><i class="fas fa-clock"></i> {{ $daysLeft }} days left</span>
+            @endif
+        @else
+            <span class="badge-custom secondary">No expiry set</span>
+        @endif
+    </td>
+</tr>
 
                 <!-- ========================================== -->
                 <!-- FORM ACTIONS                              -->

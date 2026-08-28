@@ -121,7 +121,11 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
+        <!-- ========================================== -->
+        <!-- STATS CARDS - 4 Cards in a Row             -->
+        <!-- ========================================== -->
+        
+        <!-- Card 1: Membership Status -->
         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
             <div class="stat-card memberships">
                 <div class="stat-icon-wrapper">
@@ -137,6 +141,39 @@
             </div>
         </div>
 
+<!-- Card 2: Plan Expiry -->
+<div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
+    <div class="stat-card expiry">
+        <div class="stat-icon-wrapper" style="background: #fef3c7; color: #f59e0b;">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-label">Plan Expiry</span>
+            @if($member)
+                @if($member->expiry_date)
+                    @if(now()->gt($member->expiry_date))
+                        <span class="stat-value inactive">Expired</span>
+                        <span class="stat-sub">Expired on {{ date('d M Y', strtotime($member->expiry_date)) }}</span>
+                    @else
+                        @php
+                            // ✅ FIX: Whole number only
+                            $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                        @endphp
+                        <span class="stat-value active">{{ $daysLeft }} days</span>
+                        <span class="stat-sub">Expires on {{ date('d M Y', strtotime($member->expiry_date)) }}</span>
+                    @endif
+                @else
+                    <span class="stat-value active">No Expiry</span>
+                    <span class="stat-sub">No expiry date set</span>
+                @endif
+            @else
+                <span class="stat-value">N/A</span>
+                <span class="stat-sub">No member data</span>
+            @endif
+        </div>
+    </div>
+</div>
+        <!-- Card 3: Attendance -->
         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
             <div class="stat-card attendance">
                 <div class="stat-icon-wrapper">
@@ -156,6 +193,7 @@
             </div>
         </div>
 
+        <!-- Card 4: BMI -->
         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
             <div class="stat-card bmi">
                 <div class="stat-icon-wrapper">
@@ -183,23 +221,9 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
-            <div class="stat-card weight">
-                <div class="stat-icon-wrapper">
-                    <i class="fas fa-weight-scale"></i>
-                </div>
-                <div class="stat-info">
-                    <span class="stat-label">Current Weight</span>
-                    <span class="stat-value">{{ $weight ? $weight . ' kg' : 'N/A' }}</span>
-                    <span class="stat-sub">
-                        <i class="fas fa-calendar-alt me-1"></i> 
-                        {{ $member && $member->updated_at ? $member->updated_at->format('d M Y') : 'Never' }}
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Today's Workout & Diet -->
+        <!-- ========================================== -->
+        <!-- TODAY'S WORKOUT & DIET - 2 Columns        -->
+        <!-- ========================================== -->
         <div class="col-lg-6 col-md-12 mb-4">
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
@@ -284,7 +308,9 @@
             </div>
         </div>
 
-        <!-- Payment History - Same data as payments.blade.php -->
+        <!-- ========================================== -->
+        <!-- RECENT PAYMENTS - Full Width               -->
+        <!-- ========================================== -->
         <div class="col-12 mb-4">
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
@@ -326,6 +352,10 @@
                                                 <span class="plan-badge package">
                                                     <i class="fas fa-box me-1"></i> Package
                                                 </span>
+                                            @elseif($member->plan_type == 'monthly')
+                                                <span class="plan-badge monthly">
+                                                    <i class="fas fa-calendar-alt me-1"></i> Monthly
+                                                </span>
                                             @else
                                                 <span class="plan-badge none">-</span>
                                             @endif
@@ -364,13 +394,17 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                @if($payment->plan_type == 'membership' || $member->plan_type == 'membership')
+                                                @if($payment->plan_type == 'membership')
                                                     <span class="plan-badge membership">
                                                         <i class="fas fa-id-card me-1"></i> Membership
                                                     </span>
-                                                @elseif($payment->plan_type == 'package' || $member->plan_type == 'package')
+                                                @elseif($payment->plan_type == 'package')
                                                     <span class="plan-badge package">
                                                         <i class="fas fa-box me-1"></i> Package
+                                                    </span>
+                                                @elseif($payment->plan_type == 'monthly')
+                                                    <span class="plan-badge monthly">
+                                                        <i class="fas fa-calendar-alt me-1"></i> Monthly
                                                     </span>
                                                 @else
                                                     <span class="plan-badge none">-</span>
@@ -567,6 +601,11 @@
 .stat-card.memberships .stat-icon-wrapper {
     background: #dbeafe;
     color: #1a2a6c;
+}
+
+.stat-card.expiry .stat-icon-wrapper {
+    background: #fef3c7;
+    color: #f59e0b;
 }
 
 .stat-card.attendance .stat-icon-wrapper {
@@ -823,7 +862,7 @@
 }
 
 /* ============================================ */
-/* PAYMENT TABLE - Same as payments.blade.php   */
+/* PAYMENT TABLE                                */
 /* ============================================ */
 .payment-table-dashboard {
     width: 100%;
@@ -866,7 +905,7 @@
     color: #0d1b3e;
 }
 
-/* Plan Badges - Same as payments.blade.php */
+/* Plan Badges */
 .plan-badge {
     padding: 4px 14px;
     border-radius: 20px;
@@ -884,6 +923,11 @@
 .plan-badge.package {
     background: #fef3c7;
     color: #92400e;
+}
+
+.plan-badge.monthly {
+    background: #fff3e0;
+    color: #e65100;
 }
 
 .plan-badge.none {

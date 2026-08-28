@@ -288,7 +288,7 @@
         }
 
         /* ============================================ */
-        /* TABLE STYLES                                */
+        /* TABLE STYLES - ALL DATA IN SINGLE LINE      */
         /* ============================================ */
         .table-responsive {
             overflow-x: auto;
@@ -301,6 +301,7 @@
             border-collapse: collapse;
             font-size: 13px;
             margin: 0;
+            min-width: 1200px;
         }
 
         .table-payment thead {
@@ -327,6 +328,7 @@
             padding: 10px 14px;
             vertical-align: middle;
             border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
         }
 
         .table-payment tbody tr:hover {
@@ -366,14 +368,17 @@
         .table-payment .member-name {
             font-weight: 600;
             color: var(--dark);
+            display: inline-block;
         }
 
         .table-payment .member-email {
-            display: block;
             font-size: 11px;
             color: var(--gray);
+            display: inline-block;
+            margin-left: 4px;
         }
 
+        /* ===== PLAN TAG STYLES ===== */
         .table-payment .plan-tag {
             padding: 3px 12px;
             border-radius: 50px;
@@ -395,11 +400,17 @@
             color: #92400e;
         }
 
+        .table-payment .plan-tag.monthly {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
         .table-payment .plan-tag.none {
             background: #f5f5f5;
             color: #9e9e9e;
         }
 
+        /* ===== PLAN NAME BADGE ===== */
         .table-payment .plan-name-badge {
             background: #dbeafe;
             color: #1d4ed8;
@@ -410,14 +421,56 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            white-space: nowrap;
         }
 
+        /* ===== PAYMENT TYPE STYLES ===== */
+        .table-payment .payment-tag {
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .table-payment .payment-tag.hand {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .table-payment .payment-tag.online {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .table-payment .payment-tag.none {
+            background: #f5f5f5;
+            color: #9e9e9e;
+        }
+
+        /* ===== PRICE ===== */
         .table-payment .price-amount {
             font-weight: 700;
             color: #10b981;
             font-size: 14px;
+            white-space: nowrap;
         }
 
+        /* ===== TRANSACTION ID ===== */
+        .table-payment .transaction-id {
+            font-size: 11px;
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+
+        /* ===== JOIN DATE ===== */
         .table-payment .join-date {
             font-size: 12px;
             color: var(--gray);
@@ -641,8 +694,8 @@
             <!-- Card Header -->
             <div class="card-header">
                 <div>
-                    <h4><i class="fas fa-hand-holding-usd"></i>  Payment</h4>
-                    <small>Manage  payments for members</small>
+                    <h4><i class="fas fa-hand-holding-usd"></i> Hand Payment</h4>
+                    <small>Manage hand payments for members</small>
                 </div>
                 <span class="header-date">
                     <i class="fas fa-calendar-alt"></i> {{ now()->format('d M Y, h:i A') }}
@@ -686,6 +739,12 @@
                             <option value="">All Plans</option>
                             <option value="membership">Membership</option>
                             <option value="package">Package</option>
+                            <option value="monthly">Monthly Plan</option>
+                        </select>
+                        <select id="paymentFilter" onchange="filterTable()">
+                            <option value="">All Payment Types</option>
+                            <option value="hand">Hand Payment</option>
+                            <option value="online">Online Payment</option>
                         </select>
                         <select id="priceFilter" onchange="filterTable()">
                             <option value="">All Prices</option>
@@ -711,6 +770,8 @@
                                 <th>Plan Type</th>
                                 <th>Plan Name</th>
                                 <th>Final Price</th>
+                                <th>Payment Type</th>
+                                <th>Transaction ID</th>
                                 <th>Joined</th>
                             </tr>
                         </thead>
@@ -732,33 +793,60 @@
                                         <span class="member-email">{{ $member->email }}</span>
                                     </td>
                                     <td>{{ $member->phone }}</td>
+                                    
+                                    <!-- ===== PLAN TYPE ===== -->
                                     <td>
                                         @if ($member->plan_type == 'membership')
-                                            <span class="plan-tag membership"><i class="fas fa-id-card"></i>
-                                                Membership</span>
+                                            <span class="plan-tag membership"><i class="fas fa-id-card"></i> Membership</span>
                                         @elseif($member->plan_type == 'package')
                                             <span class="plan-tag package"><i class="fas fa-box"></i> Package</span>
+                                        @elseif($member->plan_type == 'monthly')
+                                            <span class="plan-tag monthly"><i class="fas fa-calendar-alt"></i> Monthly</span>
                                         @else
                                             <span class="plan-tag none">-</span>
                                         @endif
                                     </td>
+                                    
+                                    <!-- ===== PLAN NAME ===== -->
                                     <td>
                                         <span class="plan-name-badge">
                                             <i class="fas fa-tag"></i> {{ $member->membership_plan ?? 'Basic' }}
                                         </span>
                                     </td>
-                                    <td><span class="price-amount">₹
-                                            {{ number_format($member->final_price ?? 0, 2) }}</span></td>
-                                    <td><span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span>
+                                    
+                                    <!-- ===== FINAL PRICE ===== -->
+                                    <td><span class="price-amount">₹ {{ number_format($member->final_price ?? 0, 2) }}</span></td>
+                                    
+                                    <!-- ===== PAYMENT TYPE ===== -->
+                                    <td>
+                                        @if($member->payment_type == 'hand')
+                                            <span class="payment-tag hand"><i class="fas fa-hand-holding-usd"></i> Hand</span>
+                                        @elseif($member->payment_type == 'online')
+                                            <span class="payment-tag online"><i class="fas fa-wifi"></i> Online</span>
+                                        @else
+                                            <span class="payment-tag none">-</span>
+                                        @endif
                                     </td>
+                                    
+                                    <!-- ===== TRANSACTION ID ===== -->
+                                    <td>
+                                        @if($member->transaction_id)
+                                            <span class="transaction-id">{{ $member->transaction_id }}</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    
+                                    <!-- ===== JOINED DATE ===== -->
+                                    <td><span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span></td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9">
+                                    <td colspan="11">
                                         <div class="empty-state">
                                             <i class="fas fa-hand-holding-usd"></i>
                                             <h5>No Members Found</h5>
-                                            <p>No members are available for  payment.</p>
+                                            <p>No members are available for hand payment.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -793,6 +881,7 @@
         function filterTable() {
             var searchValue = document.getElementById('searchInput').value.toLowerCase();
             var planFilter = document.getElementById('planFilter').value.toLowerCase();
+            var paymentFilter = document.getElementById('paymentFilter').value.toLowerCase();
             var priceFilter = document.getElementById('priceFilter').value;
 
             var rows = document.querySelectorAll('#tableBody tr');
@@ -803,14 +892,16 @@
             rows.forEach(function(row) {
                 var text = row.textContent.toLowerCase();
                 var planType = row.querySelector('td:nth-child(6)')?.textContent.toLowerCase() || '';
+                var paymentType = row.querySelector('td:nth-child(9)')?.textContent.toLowerCase() || '';
                 var priceText = row.querySelector('td:nth-child(8)')?.textContent.replace('₹', '').replace(/,/g, '')
                     .trim() || '0';
                 var price = parseFloat(priceText) || 0;
 
                 var matchesSearch = text.includes(searchValue);
                 var matchesPlan = planFilter === '' || planType.includes(planFilter);
+                var matchesPayment = paymentFilter === '' || paymentType.includes(paymentFilter);
 
-                if (matchesSearch && matchesPlan) {
+                if (matchesSearch && matchesPlan && matchesPayment) {
                     rowData.push({
                         row: row,
                         price: price,
@@ -857,7 +948,7 @@
                 var tr = document.createElement('tr');
                 tr.id = 'noResultRow';
                 var td = document.createElement('td');
-                td.colSpan = 9;
+                td.colSpan = 11;
                 td.style.textAlign = 'center';
                 td.style.padding = '30px';
                 td.style.color = '#6c757d';
@@ -874,6 +965,7 @@
         function resetFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('planFilter').value = '';
+            document.getElementById('paymentFilter').value = '';
             document.getElementById('priceFilter').value = '';
             filterTable();
         }

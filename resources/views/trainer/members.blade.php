@@ -48,6 +48,7 @@
                             <option value="all">All Plans</option>
                             <option value="membership">Membership</option>
                             <option value="package">Package</option>
+                            <option value="monthly">Monthly Plan</option>
                         </select>
                     </div>
                     <div class="col-md-1 col-lg-2">
@@ -93,6 +94,8 @@
                                 <td><span class="badge" style="background: #1a472a; color: white;">{{ $member->member_id }}</span></td>
                                 <td class="member-name"><strong>{{ $member->name }}</strong></td>
                                 <td class="member-phone">{{ $member->phone }}</td>
+                                
+                                <!-- ===== UPDATED PLAN COLUMN ===== -->
                                 <td class="member-plan">
                                     @if($member->plan_type == 'membership')
                                         <span class="badge" style="background: #0d2818; color: #ffd54f;">
@@ -106,10 +109,17 @@
                                         </span>
                                         <br>
                                         <small class="text-muted">{{ $member->membership_plan }}</small>
+                                    @elseif($member->plan_type == 'monthly')
+                                        <span class="badge" style="background: #fff3e0; color: #e65100;">
+                                            <i class="fas fa-calendar-alt me-1"></i> Monthly
+                                        </span>
+                                        <br>
+                                        <small class="text-muted">{{ $member->membership_plan ?? 'Monthly Plan' }}</small>
                                     @else
                                         <span class="badge bg-secondary">N/A</span>
                                     @endif
                                 </td>
+                                
                                 <td>
                                     <span class="badge" style="background: #8b5cf6; color: white;">
                                         {{ $member->goal_type ?? 'Fitness' }}
@@ -252,7 +262,17 @@
                                             <div class="col-sm-6">
                                                 <div class="info-item" style="background: #f8fafc; padding: 10px 15px; border-radius: 10px; border-left: 3px solid #1a472a;">
                                                     <small class="text-muted d-block">Plan Type</small>
-                                                    <strong>{{ ucfirst($member->plan_type ?? 'N/A') }}</strong>
+                                                    <strong>
+                                                        @if($member->plan_type == 'membership')
+                                                            Membership
+                                                        @elseif($member->plan_type == 'package')
+                                                            Package
+                                                        @elseif($member->plan_type == 'monthly')
+                                                            Monthly Plan
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </strong>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6">
@@ -418,7 +438,6 @@ function resetFilters() {
     const filterStatus = document.getElementById('filterStatus');
     const filterPlan = document.getElementById('filterPlan');
     
-    // Use custom event to trigger filter
     if (searchInput) {
         searchInput.dispatchEvent(new Event('input'));
     }

@@ -264,6 +264,29 @@
     }
 
     /* ============================================ */
+    /* DYNAMIC FIELDS - ANIMATION                 */
+    /* ============================================ */
+    .dynamic-field {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .dynamic-field.show {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ============================================ */
     /* COMPACT ROW - REDUCED SPACING              */
     /* ============================================ */
     .compact-row {
@@ -580,11 +603,12 @@
                             <option value="">-- Select Plan Type --</option>
                             <option value="membership">Membership</option>
                             <option value="package">Package</option>
+                            <option value="monthly">Monthly Plan</option>
                         </select>
                     </div>
 
                     <!-- Membership Plan -->
-                    <div class="col-md-3 mb-3" id="membershipPlanDiv" style="display:none;">
+                    <div class="col-md-3 mb-3 dynamic-field" id="membershipPlanDiv">
                         <label class="form-label">Membership Plan <span class="text-danger">*</span></label>
                         <select name="membership_plan" id="membershipPlan" class="form-control" onchange="getMembershipDetails()">
                             <option value="">-- Select Membership --</option>
@@ -595,7 +619,7 @@
                     </div>
 
                     <!-- Package -->
-                    <div class="col-md-3 mb-3" id="packageDiv" style="display:none;">
+                    <div class="col-md-3 mb-3 dynamic-field" id="packageDiv">
                         <label class="form-label">Package <span class="text-danger">*</span></label>
                         <select name="package_name" id="packageName" class="form-control" onchange="getPackageDetails()">
                             <option value="">-- Select Package --</option>
@@ -606,7 +630,21 @@
                     </div>
                 </div>
 
-                <div class="row compact-row">
+                <!-- ===== MONTHLY PLAN FIELDS (Only Month & Price - Manual Input) ===== -->
+                <div class="row compact-row dynamic-field" id="monthlyFieldsDiv">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Month <span class="text-danger">*</span></label>
+                        <input type="number" name="monthly_month" id="monthlyMonth" class="form-control" placeholder="Enter months (e.g., 3)" min="1" onchange="calculateMonthlyTotal()">
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Price (per month) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" name="monthly_price" id="monthlyPrice" class="form-control" placeholder="e.g., 500" onchange="calculateMonthlyTotal()">
+                    </div>
+                </div>
+
+                <!-- ===== HIDE THESE FIELDS FOR MONTHLY PLAN ===== -->
+                <div class="row compact-row" id="membershipFieldsDiv">
                     <!-- Duration -->
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Duration</label>
@@ -637,8 +675,8 @@
                     </div>
                 </div>
 
-                <div class="row compact-row">
-                    <!-- Description -->
+                <!-- Description - Hide for Monthly Plan -->
+                <div class="row compact-row" id="descriptionDiv">
                     <div class="col-md-12 mb-3">
                         <label class="form-label">Description</label>
                         <textarea name="description_display" id="descriptionDisplay" class="form-control" rows="2" readonly></textarea>
@@ -650,6 +688,48 @@
                     <div class="col-md-12 mb-3">
                         <label class="form-label">Included Features</label>
                         <textarea name="features_display" id="featuresDisplay" class="form-control" rows="3" readonly></textarea>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- PAYMENT INFORMATION (NEW)                 -->
+                <!-- ========================================== -->
+                <div class="section-title mt-2">
+                    <i class="fas fa-credit-card"></i> Payment Information
+                </div>
+
+                <div class="row compact-row">
+                    <!-- Payment Type -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Payment Type <span class="text-danger">*</span></label>
+                        <select name="payment_type" id="paymentType" class="form-control" required onchange="togglePaymentFields()">
+                            <option value="">-- Select Payment Type --</option>
+                            <option value="hand">Hand Payment</option>
+                            <option value="online">Online Payment</option>
+                        </select>
+                    </div>
+
+                    <!-- Transaction ID (Dynamic - Online Payment) -->
+                    <div class="col-md-4 mb-3 dynamic-field" id="transactionIdDiv">
+                        <label class="form-label">Transaction ID <span class="text-danger">*</span></label>
+                        <input type="text" name="transaction_id" id="transactionId" class="form-control" placeholder="Enter transaction ID">
+                    </div>
+
+                    <!-- Upload Screenshot (Dynamic - Online Payment) -->
+                    <div class="col-md-4 mb-3 dynamic-field" id="screenshotDiv">
+                        <label class="form-label">Upload Screenshot</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-input-container">
+                                <div class="file-label">
+                                    <i class="fas fa-image"></i>
+                                    <span>Choose screenshot</span>
+                                </div>
+                                <input type="file" name="payment_screenshot" accept="image/*" id="paymentScreenshot" onchange="updateScreenshotFileName()">
+                            </div>
+                            <span class="file-name" id="screenshotFileName">
+                                <span class="no-file">No file chosen</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -700,7 +780,24 @@ function updateFileName() {
     
     if (input.files && input.files.length > 0) {
         var fileName = input.files[0].name;
-        // Truncate long file names
+        if (fileName.length > 30) {
+            fileName = fileName.substring(0, 27) + '...';
+        }
+        display.innerHTML = '<span class="selected-file"><i class="fas fa-check-circle" style="color:#4caf50;"></i> ' + fileName + '</span>';
+    } else {
+        display.innerHTML = '<span class="no-file">No file chosen</span>';
+    }
+}
+
+// ============================================
+// PAYMENT SCREENSHOT - FILE NAME UPDATE
+// ============================================
+function updateScreenshotFileName() {
+    var input = document.getElementById('paymentScreenshot');
+    var display = document.getElementById('screenshotFileName');
+    
+    if (input.files && input.files.length > 0) {
+        var fileName = input.files[0].name;
         if (fileName.length > 30) {
             fileName = fileName.substring(0, 27) + '...';
         }
@@ -723,7 +820,6 @@ function calculateAge() {
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
-        // You can add an age display if needed
         console.log('Age:', age);
     }
 }
@@ -748,10 +844,28 @@ function calculateBMI() {
 function togglePlanFields() {
     let planType = document.getElementById('planType').value;
     
-    document.getElementById('membershipPlanDiv').style.display = (planType == 'membership') ? 'block' : 'none';
-    document.getElementById('packageDiv').style.display = (planType == 'package') ? 'block' : 'none';
+    // Hide all dynamic fields first
+    document.getElementById('membershipPlanDiv').classList.remove('show');
+    document.getElementById('packageDiv').classList.remove('show');
+    document.getElementById('monthlyFieldsDiv').classList.remove('show');
     
-    // Clear fields
+    // Show based on selection
+    if (planType == 'membership') {
+        document.getElementById('membershipPlanDiv').classList.add('show');
+        document.getElementById('membershipFieldsDiv').style.display = 'flex';
+        document.getElementById('descriptionDiv').style.display = 'flex';
+    } else if (planType == 'package') {
+        document.getElementById('packageDiv').classList.add('show');
+        document.getElementById('membershipFieldsDiv').style.display = 'flex';
+        document.getElementById('descriptionDiv').style.display = 'flex';
+    } else if (planType == 'monthly') {
+        document.getElementById('monthlyFieldsDiv').classList.add('show');
+        document.getElementById('membershipFieldsDiv').style.display = 'none';
+        document.getElementById('descriptionDiv').style.display = 'none';
+        document.getElementById('featuresDiv').style.display = 'none';
+    }
+    
+    // Clear all fields
     clearFields();
 }
 
@@ -812,7 +926,6 @@ function getPackageDetails() {
                 document.getElementById('finalPriceHidden').value = data.data.price;
                 document.getElementById('descriptionDisplay').value = data.data.description || '';
                 
-                // Show features
                 if (data.data.included_features) {
                     document.getElementById('featuresDisplay').value = data.data.included_features;
                     document.getElementById('featuresDiv').style.display = 'block';
@@ -831,6 +944,43 @@ function getPackageDetails() {
 }
 
 // ============================================
+// CALCULATE MONTHLY TOTAL
+// ============================================
+function calculateMonthlyTotal() {
+    let month = document.getElementById('monthlyMonth').value;
+    let price = document.getElementById('monthlyPrice').value;
+    
+    if (month && price && price > 0) {
+        let total = parseFloat(month) * parseFloat(price);
+        document.getElementById('finalPriceDisplay').value = '₹ ' + total.toFixed(2);
+        document.getElementById('finalPriceHidden').value = total.toFixed(2);
+        document.getElementById('durationDisplay').value = month + ' Month(s)';
+        document.getElementById('membershipDuration').value = month + ' Month(s)';
+        document.getElementById('priceDisplay').value = '₹ ' + price + ' × ' + month + ' months';
+    } else {
+        document.getElementById('finalPriceDisplay').value = '';
+        document.getElementById('finalPriceHidden').value = '';
+    }
+}
+
+// ============================================
+// TOGGLE PAYMENT FIELDS
+// ============================================
+function togglePaymentFields() {
+    let paymentType = document.getElementById('paymentType').value;
+    
+    // Hide all payment dynamic fields first
+    document.getElementById('transactionIdDiv').classList.remove('show');
+    document.getElementById('screenshotDiv').classList.remove('show');
+    
+    // Show based on selection
+    if (paymentType == 'online') {
+        document.getElementById('transactionIdDiv').classList.add('show');
+        document.getElementById('screenshotDiv').classList.add('show');
+    }
+}
+
+// ============================================
 // CLEAR FIELDS
 // ============================================
 function clearFields() {
@@ -842,10 +992,20 @@ function clearFields() {
     document.getElementById('descriptionDisplay').value = '';
     document.getElementById('featuresDisplay').value = '';
     document.getElementById('featuresDiv').style.display = 'none';
+    document.getElementById('monthlyMonth').value = '';
+    document.getElementById('monthlyPrice').value = '';
 }
+
+// ============================================
+// INITIALIZE
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    togglePlanFields();
+    togglePaymentFields();
+});
 </script>
 
 <!-- Hidden field for membership duration (used for form submission) -->
-<input type="hidden" name="membership_duration" id="membershipDuration" form="memberForm">
+<input type="hidden" name="membership_duration" id="membershipDurationHidden" form="memberForm">
 
 @endsection

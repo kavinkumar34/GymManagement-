@@ -27,9 +27,6 @@
             min-height: 100vh;
         }
 
-        /* ============================================ */
-        /* CARD STYLES                                 */
-        /* ============================================ */
         .edit-card {
             background: #ffffff;
             border-radius: var(--radius-lg);
@@ -75,9 +72,6 @@
             padding: 20px 24px;
         }
 
-        /* ============================================ */
-        /* SECTION HEADERS                             */
-        /* ============================================ */
         .section-title {
             font-size: 14px;
             font-weight: 600;
@@ -97,9 +91,6 @@
             font-size: 14px;
         }
 
-        /* ============================================ */
-        /* FORM STYLES                                 */
-        /* ============================================ */
         .form-label {
             font-size: 12px;
             font-weight: 500;
@@ -141,9 +132,6 @@
             resize: vertical;
         }
 
-        /* ============================================ */
-        /* DROPDOWN - SAME AS INPUTS                   */
-        /* ============================================ */
         select.form-control {
             appearance: none;
             -webkit-appearance: none;
@@ -180,15 +168,11 @@
             color: #1a1a2e !important;
         }
 
-        /* Firefox fix */
         select.form-control:-moz-focusring {
             color: #1a1a2e !important;
             text-shadow: 0 0 0 #1a1a2e !important;
         }
 
-        /* ============================================ */
-        /* FILE INPUT WITH FILE NAME                  */
-        /* ============================================ */
         .file-input-wrapper {
             position: relative;
             height: 38px;
@@ -285,9 +269,6 @@
             color: var(--gray);
         }
 
-        /* ============================================ */
-        /* COMPACT ROW                                */
-        /* ============================================ */
         .compact-row {
             margin-bottom: 0;
         }
@@ -296,9 +277,6 @@
             margin-bottom: 10px !important;
         }
 
-        /* ============================================ */
-        /* BUTTON STYLES                               */
-        /* ============================================ */
         .btn-primary {
             background: var(--primary);
             color: #fff;
@@ -348,9 +326,14 @@
             flex-wrap: wrap;
         }
 
-        /* ============================================ */
-        /* RESPONSIVE                                  */
-        /* ============================================ */
+        .dynamic-field {
+            display: none;
+        }
+
+        .dynamic-field.show {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .admin-main-content {
                 padding: 12px 15px;
@@ -455,8 +438,7 @@
                     <h4><i class="fas fa-edit"></i> Edit Member</h4>
                     <small>Update member details</small>
                 </div>
-                <span
-                    style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
+                <span style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
                     <i class="fas fa-user"></i> {{ $member->member_id }}
                 </span>
             </div>
@@ -475,21 +457,17 @@
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Full Name -->
                         <div class="col-md-8 mb-3">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control"
-                                value="{{ old('name', $member->name) }}" required>
+                            <input type="text" name="name" class="form-control" value="{{ old('name', $member->name) }}" required>
                         </div>
 
-                        <!-- Profile Photo -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Profile Photo</label>
                             @if ($member->photo)
                                 <div class="current-photo">
                                     <img src="{{ asset('storage/' . $member->photo) }}" alt="{{ $member->name }}">
-                                    <span class="photo-label"><i class="fas fa-check-circle text-success"></i> Current
-                                        Photo</span>
+                                    <span class="photo-label"><i class="fas fa-check-circle text-success"></i> Current Photo</span>
                                 </div>
                             @endif
                             <div class="file-input-wrapper">
@@ -498,8 +476,7 @@
                                         <i class="fas fa-camera"></i>
                                         <span>Choose photo</span>
                                     </div>
-                                    <input type="file" name="photo" accept="image/*" id="profilePhoto"
-                                        onchange="updateFileName()">
+                                    <input type="file" name="photo" accept="image/*" id="profilePhoto" onchange="updateFileName()">
                                 </div>
                                 <span class="file-name" id="fileNameDisplay">
                                     <span class="no-file">No file chosen</span>
@@ -510,58 +487,42 @@
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Gender -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Gender <span class="text-danger">*</span></label>
                             <select name="gender" class="form-control" required>
-                                <option value="Male" {{ old('gender', $member->gender) == 'Male' ? 'selected' : '' }}>Male
-                                </option>
-                                <option value="Female" {{ old('gender', $member->gender) == 'Female' ? 'selected' : '' }}>
-                                    Female</option>
-                                <option value="Other" {{ old('gender', $member->gender) == 'Other' ? 'selected' : '' }}>
-                                    Other</option>
+                                <option value="Male" {{ old('gender', $member->gender) == 'Male' ? 'selected' : '' }}>Male</option>
+                                <option value="Female" {{ old('gender', $member->gender) == 'Female' ? 'selected' : '' }}>Female</option>
+                                <option value="Other" {{ old('gender', $member->gender) == 'Other' ? 'selected' : '' }}>Other</option>
                             </select>
                         </div>
 
-                        <!-- Date of Birth -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Date of Birth</label>
-                            <input type="date" name="dob" class="form-control" value="{{ old('dob', $member->dob) }}"
-                                id="dob">
+                            <input type="date" name="dob" class="form-control" value="{{ old('dob', $member->dob) }}" id="dob">
                         </div>
 
-                        <!-- Age -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Age</label>
-                            <input type="text" name="age" class="form-control" value="{{ old('age', $member->age) }}"
-                                readonly>
+                            <input type="text" name="age" class="form-control" value="{{ old('age', $member->age) }}" readonly>
                         </div>
 
-                        <!-- Phone Number -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input type="tel" name="phone" class="form-control"
-                                value="{{ old('phone', $member->phone) }}" required>
+                            <input type="tel" name="phone" class="form-control" value="{{ old('phone', $member->phone) }}" required>
                         </div>
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Email -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" name="email" class="form-control"
-                                value="{{ old('email', $member->email) }}" required>
+                            <input type="email" name="email" class="form-control" value="{{ old('email', $member->email) }}" required>
                         </div>
 
-                        <!-- Emergency Contact -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Emergency Contact</label>
-                            <input type="tel" name="emergency_contact" class="form-control"
-                                value="{{ old('emergency_contact', $member->emergency_contact) }}"
-                                placeholder="Emergency phone number">
+                            <input type="tel" name="emergency_contact" class="form-control" value="{{ old('emergency_contact', $member->emergency_contact) }}" placeholder="Emergency phone number">
                         </div>
 
-                        <!-- Member ID -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Member ID</label>
                             <input type="text" class="form-control" value="{{ $member->member_id }}" readonly>
@@ -569,7 +530,6 @@
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Address -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Address</label>
                             <textarea name="address" class="form-control" rows="2">{{ old('address', $member->address) }}</textarea>
@@ -584,59 +544,38 @@
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Height -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Height (cm)</label>
-                            <input type="number" step="0.01" name="height" class="form-control"
-                                value="{{ old('height', $member->height) }}" id="height" onchange="calculateBMI()">
+                            <input type="number" step="0.01" name="height" class="form-control" value="{{ old('height', $member->height) }}" id="height" onchange="calculateBMI()">
                         </div>
 
-                        <!-- Weight -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Weight (kg)</label>
-                            <input type="number" step="0.01" name="weight" class="form-control"
-                                value="{{ old('weight', $member->weight) }}" id="weight" onchange="calculateBMI()">
+                            <input type="number" step="0.01" name="weight" class="form-control" value="{{ old('weight', $member->weight) }}" id="weight" onchange="calculateBMI()">
                         </div>
 
-                        <!-- BMI -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">BMI</label>
-                            <input type="text" name="bmi" class="form-control" id="bmi"
-                                value="{{ old('bmi', $member->bmi) }}" readonly>
+                            <input type="text" name="bmi" class="form-control" id="bmi" value="{{ old('bmi', $member->bmi) }}" readonly>
                         </div>
 
-                        <!-- Goal Type -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Goal Type <span class="text-danger">*</span></label>
                             <select name="goal_type" class="form-control" required>
-                                <option value="Weight Loss"
-                                    {{ old('goal_type', $member->goal_type) == 'Weight Loss' ? 'selected' : '' }}>Weight
-                                    Loss</option>
-                                <option value="Muscle Gain"
-                                    {{ old('goal_type', $member->goal_type) == 'Muscle Gain' ? 'selected' : '' }}>Muscle
-                                    Gain</option>
-                                <option value="Fitness"
-                                    {{ old('goal_type', $member->goal_type) == 'Fitness' ? 'selected' : '' }}>Fitness
-                                </option>
-                                <option value="Body Building"
-                                    {{ old('goal_type', $member->goal_type) == 'Body Building' ? 'selected' : '' }}>Body
-                                    Building</option>
-                                <option value="Fat Loss"
-                                    {{ old('goal_type', $member->goal_type) == 'Fat Loss' ? 'selected' : '' }}>Fat Loss
-                                </option>
-                                <option value="Strength Training"
-                                    {{ old('goal_type', $member->goal_type) == 'Strength Training' ? 'selected' : '' }}>
-                                    Strength Training</option>
+                                <option value="Weight Loss" {{ old('goal_type', $member->goal_type) == 'Weight Loss' ? 'selected' : '' }}>Weight Loss</option>
+                                <option value="Muscle Gain" {{ old('goal_type', $member->goal_type) == 'Muscle Gain' ? 'selected' : '' }}>Muscle Gain</option>
+                                <option value="Fitness" {{ old('goal_type', $member->goal_type) == 'Fitness' ? 'selected' : '' }}>Fitness</option>
+                                <option value="Body Building" {{ old('goal_type', $member->goal_type) == 'Body Building' ? 'selected' : '' }}>Body Building</option>
+                                <option value="Fat Loss" {{ old('goal_type', $member->goal_type) == 'Fat Loss' ? 'selected' : '' }}>Fat Loss</option>
+                                <option value="Strength Training" {{ old('goal_type', $member->goal_type) == 'Strength Training' ? 'selected' : '' }}>Strength Training</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Medical Issues -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Medical Issues (if any)</label>
-                            <textarea name="medical_issues" class="form-control" rows="2"
-                                placeholder="Any medical conditions or allergies">{{ old('medical_issues', $member->medical_issues) }}</textarea>
+                            <textarea name="medical_issues" class="form-control" rows="2" placeholder="Any medical conditions or allergies">{{ old('medical_issues', $member->medical_issues) }}</textarea>
                         </div>
                     </div>
 
@@ -648,38 +587,33 @@
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Join Date -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Join Date <span class="text-danger">*</span></label>
-                            <input type="date" name="join_date" class="form-control"
-                                value="{{ old('join_date', $member->join_date) }}" required>
+                            <input type="date" name="join_date" class="form-control" value="{{ old('join_date', $member->join_date) }}" required>
                         </div>
-
-                        <!-- Plan Type -->
+<!-- Expiry Date -->
+<div class="col-md-3 mb-3">
+    <label class="form-label">Expiry Date</label>
+    <input type="date" name="expiry_date" class="form-control" value="{{ old('expiry_date', $member->expiry_date) }}" readonly>
+    <small class="text-muted" style="font-size:11px;">Auto-calculated based on plan duration</small>
+</div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Plan Type <span class="text-danger">*</span></label>
-                            <select name="plan_type" id="planType" class="form-control" required
-                                onchange="togglePlanFields()">
+                            <select name="plan_type" id="planType" class="form-control" required onchange="togglePlanFields()">
                                 <option value="">-- Select Plan Type --</option>
-                                <option value="membership"
-                                    {{ old('plan_type', $member->plan_type) == 'membership' ? 'selected' : '' }}>Membership
-                                </option>
-                                <option value="package"
-                                    {{ old('plan_type', $member->plan_type) == 'package' ? 'selected' : '' }}>Package
-                                </option>
+                                <option value="membership" {{ old('plan_type', $member->plan_type) == 'membership' ? 'selected' : '' }}>Membership</option>
+                                <option value="package" {{ old('plan_type', $member->plan_type) == 'package' ? 'selected' : '' }}>Package</option>
+                                <option value="monthly" {{ old('plan_type', $member->plan_type) == 'monthly' ? 'selected' : '' }}>Monthly Plan</option>
                             </select>
                         </div>
 
                         <!-- Membership Plan -->
-                        <div class="col-md-3 mb-3" id="membershipPlanDiv"
-                            style="{{ old('plan_type', $member->plan_type) == 'membership' ? 'display:block;' : 'display:none;' }}">
+                        <div class="col-md-3 mb-3 dynamic-field" id="membershipPlanDiv">
                             <label class="form-label">Membership Plan <span class="text-danger">*</span></label>
-                            <select name="membership_plan" id="membershipPlan" class="form-control"
-                                onchange="getMembershipDetails()">
+                            <select name="membership_plan" id="membershipPlan" class="form-control" onchange="getMembershipDetails()">
                                 <option value="">-- Select Membership --</option>
                                 @foreach ($memberships as $membership)
-                                    <option value="{{ $membership->plan_name }}"
-                                        {{ old('membership_plan', $member->membership_plan) == $membership->plan_name ? 'selected' : '' }}>
+                                    <option value="{{ $membership->plan_name }}" {{ old('membership_plan', $member->membership_plan) == $membership->plan_name ? 'selected' : '' }}>
                                         {{ $membership->plan_name }}
                                     </option>
                                 @endforeach
@@ -687,15 +621,12 @@
                         </div>
 
                         <!-- Package -->
-                        <div class="col-md-3 mb-3" id="packageDiv"
-                            style="{{ old('plan_type', $member->plan_type) == 'package' ? 'display:block;' : 'display:none;' }}">
+                        <div class="col-md-3 mb-3 dynamic-field" id="packageDiv">
                             <label class="form-label">Package <span class="text-danger">*</span></label>
-                            <select name="package_name" id="packageName" class="form-control"
-                                onchange="getPackageDetails()">
+                            <select name="package_name" id="packageName" class="form-control" onchange="getPackageDetails()">
                                 <option value="">-- Select Package --</option>
                                 @foreach ($packages as $package)
-                                    <option value="{{ $package->package_name }}"
-                                        {{ old('package_name', $member->membership_plan) == $package->package_name ? 'selected' : '' }}>
+                                    <option value="{{ $package->package_name }}" {{ old('package_name', $member->membership_plan) == $package->package_name ? 'selected' : '' }}>
                                         {{ $package->package_name }}
                                     </option>
                                 @endforeach
@@ -703,45 +634,49 @@
                         </div>
                     </div>
 
-                    <div class="row compact-row">
-                        <!-- Duration -->
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Duration</label>
-                            <input type="text" name="duration_display" id="durationDisplay" class="form-control"
-                                value="{{ old('membership_duration', $member->membership_duration) }}" readonly>
-                            <input type="hidden" name="membership_duration" id="membershipDuration"
-                                value="{{ old('membership_duration', $member->membership_duration) }}">
+                    <!-- ===== MONTHLY PLAN FIELDS ===== -->
+                    <div class="row compact-row" id="monthlyFieldsRow">
+                        <div class="col-md-3 mb-3 dynamic-field" id="monthlyMonthDiv">
+                            <label class="form-label">Month <span class="text-danger">*</span></label>
+                            <input type="number" name="monthly_month" id="monthlyMonth" class="form-control" value="{{ old('monthly_month', $member->monthly_month) }}" placeholder="Enter months (e.g., 3)" min="1" onchange="calculateMonthlyTotal()">
                         </div>
 
-                        <!-- Price -->
+                        <div class="col-md-3 mb-3 dynamic-field" id="monthlyPriceDiv">
+                            <label class="form-label">Price (per month) <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" name="monthly_price" id="monthlyPrice" class="form-control" value="{{ old('monthly_price', $member->monthly_price) }}" placeholder="e.g., 500" onchange="calculateMonthlyTotal()">
+                        </div>
+                    </div>
+
+                    <!-- ===== HIDE THESE FIELDS FOR MONTHLY PLAN ===== -->
+                    <div class="row compact-row" id="membershipFieldsDiv">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Duration</label>
+                            <input type="text" name="duration_display" id="durationDisplay" class="form-control" value="{{ old('membership_duration', $member->membership_duration) }}" readonly>
+                            <input type="hidden" name="membership_duration" id="membershipDuration" value="{{ old('membership_duration', $member->membership_duration) }}">
+                        </div>
+
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Price</label>
                             <input type="text" name="price_display" id="priceDisplay" class="form-control" readonly>
                         </div>
 
-                        <!-- Final Price -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Final Price</label>
-                            <input type="text" name="final_price_display" id="finalPriceDisplay" class="form-control"
-                                value="{{ old('final_price', $member->final_price) }}" readonly>
-                            <input type="hidden" name="final_price" id="finalPriceHidden"
-                                value="{{ old('final_price', $member->final_price) }}">
+                            <input type="text" name="final_price_display" id="finalPriceDisplay" class="form-control" value="{{ old('final_price', $member->final_price) }}" readonly>
+                            <input type="hidden" name="final_price" id="finalPriceHidden" value="{{ old('final_price', $member->final_price) }}">
                         </div>
 
-                        <!-- Status -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Status <span class="text-danger">*</span></label>
                             <select name="status" class="form-control" required>
-                                <option value="Active" {{ old('status', $member->status) == 'Active' ? 'selected' : '' }}>
-                                    Active</option>
-                                <option value="Inactive"
-                                    {{ old('status', $member->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                                <option value="Active" {{ old('status', $member->status) == 'Active' ? 'selected' : '' }}>Active</option>
+                                <option value="Inactive" {{ old('status', $member->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="row compact-row">
-                        <!-- Description -->
+                    <!-- Description -->
+                    <div class="row compact-row" id="descriptionDiv">
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Description</label>
                             <textarea name="description_display" id="descriptionDisplay" class="form-control" rows="2" readonly></textarea>
@@ -749,10 +684,55 @@
                     </div>
 
                     <div class="row compact-row" id="featuresDiv" style="display:none;">
-                        <!-- Included Features -->
                         <div class="col-md-12 mb-3">
                             <label class="form-label">Included Features</label>
                             <textarea name="features_display" id="featuresDisplay" class="form-control" rows="3" readonly></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- PAYMENT INFORMATION                        -->
+                    <!-- ========================================== -->
+                    <div class="section-title mt-2">
+                        <i class="fas fa-credit-card"></i> Payment Information
+                    </div>
+
+                    <div class="row compact-row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Payment Type</label>
+                            <select name="payment_type" id="paymentType" class="form-control" onchange="togglePaymentFields()">
+                                <option value="">-- Select Payment Type --</option>
+                                <option value="hand" {{ old('payment_type', $member->payment_type) == 'hand' ? 'selected' : '' }}>Hand Payment</option>
+                                <option value="online" {{ old('payment_type', $member->payment_type) == 'online' ? 'selected' : '' }}>Online Payment</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3 dynamic-field" id="transactionIdDiv">
+                            <label class="form-label">Transaction ID</label>
+                            <input type="text" name="transaction_id" class="form-control" value="{{ old('transaction_id', $member->transaction_id) }}" placeholder="Enter transaction ID">
+                        </div>
+
+                        <div class="col-md-4 mb-3 dynamic-field" id="screenshotDiv">
+                            <label class="form-label">Upload Screenshot</label>
+                            @if ($member->payment_screenshot)
+                                <div class="current-photo">
+                                    <img src="{{ asset('storage/' . $member->payment_screenshot) }}" alt="Payment Screenshot" style="width:50px; height:50px; border-radius:8px; object-fit:cover; border:2px solid var(--border-color);">
+                                    <span class="photo-label"><i class="fas fa-check-circle text-success"></i> Current</span>
+                                </div>
+                            @endif
+                            <div class="file-input-wrapper">
+                                <div class="file-input-container">
+                                    <div class="file-label">
+                                        <i class="fas fa-image"></i>
+                                        <span>Choose screenshot</span>
+                                    </div>
+                                    <input type="file" name="payment_screenshot" accept="image/*" id="paymentScreenshot" onchange="updateScreenshotFileName()">
+                                </div>
+                                <span class="file-name" id="screenshotFileName">
+                                    <span class="no-file">No file chosen</span>
+                                </span>
+                            </div>
+                            <small class="text-muted" style="font-size:11px;">Leave empty to keep current screenshot</small>
                         </div>
                     </div>
 
@@ -764,14 +744,12 @@
                     </div>
 
                     <div class="row compact-row">
-                        <!-- Assign Trainer -->
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Assign Trainer</label>
                             <select name="trainer_id" class="form-control">
                                 <option value="">-- Select Trainer --</option>
                                 @foreach ($trainers as $trainer)
-                                    <option value="{{ $trainer->id }}"
-                                        {{ old('trainer_id', $member->trainer_id) == $trainer->id ? 'selected' : '' }}>
+                                    <option value="{{ $trainer->id }}" {{ old('trainer_id', $member->trainer_id) == $trainer->id ? 'selected' : '' }}>
                                         {{ $trainer->name }} ({{ $trainer->specialization }})
                                     </option>
                                 @endforeach
@@ -809,9 +787,25 @@
                 if (fileName.length > 30) {
                     fileName = fileName.substring(0, 27) + '...';
                 }
-                display.innerHTML =
-                    '<span class="selected-file"><i class="fas fa-check-circle" style="color:#4caf50;"></i> ' + fileName +
-                    '</span>';
+                display.innerHTML = '<span class="selected-file"><i class="fas fa-check-circle" style="color:#4caf50;"></i> ' + fileName + '</span>';
+            } else {
+                display.innerHTML = '<span class="no-file">No file chosen</span>';
+            }
+        }
+
+        // ============================================
+        // PAYMENT SCREENSHOT - FILE NAME UPDATE
+        // ============================================
+        function updateScreenshotFileName() {
+            var input = document.getElementById('paymentScreenshot');
+            var display = document.getElementById('screenshotFileName');
+
+            if (input.files && input.files.length > 0) {
+                var fileName = input.files[0].name;
+                if (fileName.length > 30) {
+                    fileName = fileName.substring(0, 27) + '...';
+                }
+                display.innerHTML = '<span class="selected-file"><i class="fas fa-check-circle" style="color:#4caf50;"></i> ' + fileName + '</span>';
             } else {
                 display.innerHTML = '<span class="no-file">No file chosen</span>';
             }
@@ -837,9 +831,17 @@
         function togglePlanFields() {
             let planType = document.getElementById('planType').value;
 
+            // Hide all dynamic fields first
+            document.getElementById('membershipPlanDiv').classList.remove('show');
+            document.getElementById('packageDiv').classList.remove('show');
+            document.getElementById('monthlyMonthDiv').classList.remove('show');
+            document.getElementById('monthlyPriceDiv').classList.remove('show');
+
+            // Show based on selection
             if (planType == 'membership') {
-                document.getElementById('membershipPlanDiv').style.display = 'block';
-                document.getElementById('packageDiv').style.display = 'none';
+                document.getElementById('membershipPlanDiv').classList.add('show');
+                document.getElementById('membershipFieldsDiv').style.display = 'flex';
+                document.getElementById('descriptionDiv').style.display = 'flex';
                 document.getElementById('packageName').value = '';
                 clearFields();
                 let membershipPlan = document.getElementById('membershipPlan');
@@ -847,17 +849,27 @@
                     getMembershipDetails();
                 }
             } else if (planType == 'package') {
-                document.getElementById('membershipPlanDiv').style.display = 'none';
-                document.getElementById('packageDiv').style.display = 'block';
+                document.getElementById('packageDiv').classList.add('show');
+                document.getElementById('membershipFieldsDiv').style.display = 'flex';
+                document.getElementById('descriptionDiv').style.display = 'flex';
                 document.getElementById('membershipPlan').value = '';
                 clearFields();
                 let packageName = document.getElementById('packageName');
                 if (packageName.value) {
                     getPackageDetails();
                 }
+            } else if (planType == 'monthly') {
+                document.getElementById('monthlyMonthDiv').classList.add('show');
+                document.getElementById('monthlyPriceDiv').classList.add('show');
+                document.getElementById('membershipFieldsDiv').style.display = 'none';
+                document.getElementById('descriptionDiv').style.display = 'none';
+                document.getElementById('featuresDiv').style.display = 'none';
+                clearFields();
+                // Auto-calculate if values exist
+                calculateMonthlyTotal();
             } else {
-                document.getElementById('membershipPlanDiv').style.display = 'none';
-                document.getElementById('packageDiv').style.display = 'none';
+                document.getElementById('membershipFieldsDiv').style.display = 'none';
+                document.getElementById('descriptionDiv').style.display = 'none';
                 clearFields();
             }
         }
@@ -937,6 +949,43 @@
         }
 
         // ============================================
+        // CALCULATE MONTHLY TOTAL
+        // ============================================
+        function calculateMonthlyTotal() {
+            let month = document.getElementById('monthlyMonth').value;
+            let price = document.getElementById('monthlyPrice').value;
+
+            if (month && price && price > 0) {
+                let total = parseFloat(month) * parseFloat(price);
+                document.getElementById('finalPriceDisplay').value = '₹ ' + total.toFixed(2);
+                document.getElementById('finalPriceHidden').value = total.toFixed(2);
+                document.getElementById('durationDisplay').value = month + ' Month(s)';
+                document.getElementById('membershipDuration').value = month + ' Month(s)';
+                document.getElementById('priceDisplay').value = '₹ ' + price + ' × ' + month + ' months';
+                document.getElementById('descriptionDisplay').value = 'Monthly Plan - ' + month + ' Month(s) at ₹' + price + '/month';
+            } else {
+                // Don't clear if values are empty - keep existing
+            }
+        }
+
+        // ============================================
+        // TOGGLE PAYMENT FIELDS
+        // ============================================
+        function togglePaymentFields() {
+            let paymentType = document.getElementById('paymentType').value;
+
+            // Hide all payment dynamic fields first
+            document.getElementById('transactionIdDiv').classList.remove('show');
+            document.getElementById('screenshotDiv').classList.remove('show');
+
+            // Show based on selection
+            if (paymentType == 'online') {
+                document.getElementById('transactionIdDiv').classList.add('show');
+                document.getElementById('screenshotDiv').classList.add('show');
+            }
+        }
+
+        // ============================================
         // CLEAR FIELDS
         // ============================================
         function clearFields() {
@@ -962,7 +1011,18 @@
                 getMembershipDetails();
             } else if (planType == 'package' && packageName.value) {
                 getPackageDetails();
+            } else if (planType == 'monthly') {
+                // Show monthly fields and calculate
+                document.getElementById('monthlyMonthDiv').classList.add('show');
+                document.getElementById('monthlyPriceDiv').classList.add('show');
+                document.getElementById('membershipFieldsDiv').style.display = 'none';
+                document.getElementById('descriptionDiv').style.display = 'none';
+                document.getElementById('featuresDiv').style.display = 'none';
+                calculateMonthlyTotal();
             }
+
+            // Toggle payment fields on load
+            togglePaymentFields();
         });
     </script>
 @endsection

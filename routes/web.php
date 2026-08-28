@@ -1212,3 +1212,9 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/returns/{id}/status', [AdminReturnExchangeController::class, 'updateStatus'])->name('returns.status');
     Route::post('/returns/bulk-update', [AdminReturnExchangeController::class, 'bulkUpdate'])->name('returns.bulk-update');
 });
+
+
+// ============ FINANCE REPORTS ============
+Route::get('/admin/finance-reports', [App\Http\Controllers\Admin\FinanceReportController::class, 'index'])
+    ->name('admin.finance.reports')
+    ->middleware('auth:admin');

@@ -365,6 +365,11 @@
             color: #6a1b9a;
         }
 
+        .table-members .plan-tag.monthly {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
         .table-members .plan-tag.none {
             background: #f5f5f5;
             color: #9e9e9e;
@@ -969,6 +974,7 @@
                             <option value="">All Plans</option>
                             <option value="membership">Membership</option>
                             <option value="package">Package</option>
+                            <option value="monthly">Monthly Plan</option>
                         </select>
                         <select id="statusFilter" onchange="filterTable()">
                             <option value="">All Status</option>
@@ -996,9 +1002,13 @@
                                 <th>Plan</th>
                                 <th>Plan Name</th>
                                 <th>Price</th>
+                                <th>Payment Type</th>
+                                <th>Transaction ID</th>
                                 <th>Trainer</th>
                                 <th>Status</th>
                                 <th>Joined</th>
+                                <th>Expiry Date</th>
+<th>Plan Status</th>
                                 <th class="text-center" style="width:120px;">Actions</th>
                             </tr>
                         </thead>
@@ -1018,19 +1028,40 @@
                                     <td><strong>{{ $member->name }}</strong></td>
                                     <td>{{ $member->email }}</td>
                                     <td>{{ $member->phone }}</td>
+                                    
+                                    <!-- ===== UPDATED PLAN COLUMN ===== -->
                                     <td>
                                         @if ($member->plan_type == 'membership')
-                                            <span class="plan-tag membership"><i class="fas fa-id-card"></i>
-                                                Membership</span>
+                                            <span class="plan-tag membership"><i class="fas fa-id-card"></i> Membership</span>
                                         @elseif($member->plan_type == 'package')
                                             <span class="plan-tag package"><i class="fas fa-box"></i> Package</span>
+                                        @elseif($member->plan_type == 'monthly')
+                                            <span class="plan-tag monthly"><i class="fas fa-calendar-alt"></i> Monthly</span>
                                         @else
                                             <span class="plan-tag none">-</span>
                                         @endif
                                     </td>
+                                    
                                     <td><span class="plan-name">{{ $member->membership_plan ?? '-' }}</span></td>
-                                    <td><span class="price-amount">₹
-                                            {{ number_format($member->final_price ?? 0, 2) }}</span></td>
+                                    <td><span class="price-amount">₹ {{ number_format($member->final_price ?? 0, 2) }}</span></td>
+                                    
+                                    <td>
+                                        @if($member->payment_type == 'hand')
+                                            <span class="plan-tag membership"><i class="fas fa-hand-holding-usd"></i> Hand</span>
+                                        @elseif($member->payment_type == 'online')
+                                            <span class="plan-tag package"><i class="fas fa-wifi"></i> Online</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($member->transaction_id)
+                                            <span class="plan-name" style="font-size:11px;">{{ $member->transaction_id }}</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    
                                     <td>
                                         @if ($member->trainer)
                                             <span class="trainer-name">
@@ -1054,6 +1085,41 @@
                                     </td>
                                     <td><span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span>
                                     </td>
+                                    <!-- Expiry Date -->
+<td>
+    @if($member->expiry_date)
+        {{ date('d-m-Y', strtotime($member->expiry_date)) }}
+    @else
+        <span class="plan-tag none">-</span>
+    @endif
+</td>
+<!-- Plan Status -->
+<td>
+    @if($member->expiry_date)
+        @if(now()->gt($member->expiry_date))
+            <span class="status-badge inactive">
+                <span class="dot"></span> Expired
+            </span>
+        @else
+            @php
+                // ✅ FIX: Whole number only
+                $daysLeft = floor(now()->diffInDays($member->expiry_date));
+            @endphp
+            @if($daysLeft <= 7)
+                <span class="status-badge" style="background: #fef3c7; color: #92400e; padding: 4px 14px; border-radius: 50px; font-size: 11px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+                    <span class="dot" style="width:6px; height:6px; border-radius:50%; background:#f59e0b; display:inline-block;"></span>
+                    {{ $daysLeft }} days left
+                </span>
+            @else
+                <span class="status-badge active">
+                    <span class="dot"></span> {{ $daysLeft }} days left
+                </span>
+            @endif
+        @endif
+    @else
+        <span class="plan-tag none">-</span>
+    @endif
+</td>
                                     <td>
                                         <div class="action-btns">
                                             <a href="{{ route('admin.member.show', $member->id) }}" class="btn-action view"
@@ -1073,7 +1139,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="13">
+                                    <td colspan="15">
                                         <div class="empty-state">
                                             <i class="fas fa-users"></i>
                                             <h5>No Members Found</h5>
@@ -1197,8 +1263,8 @@
             rows.forEach(function(row) {
                 var text = row.textContent.toLowerCase();
                 var planType = row.querySelector('td:nth-child(7)')?.textContent.toLowerCase() || '';
-                var statusType = row.querySelector('td:nth-child(11)')?.textContent.toLowerCase() || '';
-                var joinDate = row.querySelector('td:nth-child(12)')?.textContent.trim() || '';
+                var statusType = row.querySelector('td:nth-child(13)')?.textContent.toLowerCase() || '';
+                var joinDate = row.querySelector('td:nth-child(14)')?.textContent.trim() || '';
 
                 var joinDateFormatted = '';
                 if (joinDate) {
@@ -1233,7 +1299,7 @@
                 var tr = document.createElement('tr');
                 tr.id = 'noResultRow';
                 var td = document.createElement('td');
-                td.colSpan = 13;
+                td.colSpan = 15;
                 td.style.textAlign = 'center';
                 td.style.padding = '30px';
                 td.style.color = '#6c757d';
