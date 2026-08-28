@@ -1,6 +1,19 @@
 @extends('layouts.member-layout')
 
 @section('content')
+@php
+    // Fetch member data
+    $member = App\Models\Member::where('email', session('gym_user_email'))->first();
+    
+    // Fetch payment history for this member
+    $paymentHistory = collect();
+    if ($member) {
+        $paymentHistory = App\Models\PaymentHistory::where('member_id', $member->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+@endphp
+
 <div class="container-fluid px-3 px-md-4">
     <div class="row">
         <div class="col-12">
@@ -8,7 +21,7 @@
                 <!-- Card Header - Matching Navbar Theme -->
                 <div class="payment-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h4 class="mb-0">
-                        <i class="fas fa-hand-holding-usd me-2"></i>  Payment
+                        <i class="fas fa-hand-holding-usd me-2"></i> My Payments
                     </h4>
                     <span class="payment-date">
                         <i class="fas fa-calendar-alt me-1"></i> {{ now()->format('d M Y, h:i A') }}
@@ -52,7 +65,107 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if($member)
+                                @if($paymentHistory && $paymentHistory->count() > 0)
+                                    @foreach($paymentHistory as $index => $payment)
+                                        <tr>
+                                            <td>{{ $payment->id ?? $index + 1 }}</td>
+                                            <td>
+                                                <div class="member-photo">
+                                                    @if($member && $member->photo)
+                                                        <img src="{{ asset('storage/'.$member->photo) }}" alt="{{ $member->name }}">
+                                                    @else
+                                                        <span class="photo-placeholder">
+                                                            {{ $member ? substr($member->name, 0, 1) : 'U' }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td><strong class="member-id">{{ $member ? $member->member_id : 'N/A' }}</strong></td>
+                                            <td class="member-name">{{ $member ? $member->name : 'N/A' }}</td>
+                                            <td class="member-email">{{ $member ? $member->email : 'N/A' }}</td>
+                                            <td class="member-phone">{{ $member ? $member->phone : 'N/A' }}</td>
+                                            
+                                            <!-- ===== PLAN TYPE ===== -->
+                                            <td>
+                                                @if($payment->plan_type == 'membership')
+                                                    <span class="plan-badge membership">
+                                                        <i class="fas fa-id-card me-1"></i> Membership
+                                                    </span>
+                                                @elseif($payment->plan_type == 'package')
+                                                    <span class="plan-badge package">
+                                                        <i class="fas fa-box me-1"></i> Package
+                                                    </span>
+                                                @elseif($payment->plan_type == 'monthly')
+                                                    <span class="plan-badge monthly">
+                                                        <i class="fas fa-calendar-alt me-1"></i> Monthly
+                                                    </span>
+                                                @else
+                                                    <span class="plan-badge none">-</span>
+                                                @endif
+                                            </td>
+                                            
+                                            <!-- ===== PLAN NAME ===== -->
+                                            <td>
+                                                <span class="plan-name-badge">
+                                                    <i class="fas fa-tag me-1"></i> {{ $payment->plan_name ?? 'Basic' }}
+                                                </span>
+                                            </td>
+                                            
+                                            <!-- ===== FINAL PRICE ===== -->
+                                            <td><span class="price-amount">₹ {{ number_format($payment->amount ?? 0, 2) }}</span></td>
+                                            
+                                            <!-- ===== PAYMENT TYPE ===== -->
+                                            <td>
+                                                @if($payment->payment_type == 'hand')
+                                                    <span class="payment-badge hand">
+                                                        <i class="fas fa-hand-holding-usd me-1"></i> Hand
+                                                    </span>
+                                                @elseif($payment->payment_type == 'online')
+                                                    <span class="payment-badge online">
+                                                        <i class="fas fa-wifi me-1"></i> Online
+                                                    </span>
+                                                @else
+                                                    <span class="plan-badge none">-</span>
+                                                @endif
+                                            </td>
+                                            
+                                            <!-- ===== TRANSACTION ID ===== -->
+                                            <td>
+                                                @if($payment->transaction_id)
+                                                    <span class="transaction-id-badge">{{ $payment->transaction_id }}</span>
+                                                @else
+                                                    <span class="plan-badge none">-</span>
+                                                @endif
+                                            </td>
+                                            
+                                            <!-- ===== PAYMENT DATE ===== -->
+                                            <td class="join-date">{{ date('d-m-Y', strtotime($payment->payment_date)) }}</td>
+                                            
+                                            <!-- ===== EXPIRY DATE (FROM PAYMENT HISTORY) ===== -->
+                                            <td>
+                                                @if($payment->new_expiry_date)
+                                                    {{ date('d-m-Y', strtotime($payment->new_expiry_date)) }}
+                                                @else
+                                                    -
+                                                @endif
+                                            </td>
+                                            
+                                            <!-- ===== STATUS ===== -->
+                                            <td>
+                                                @if($payment->old_expiry_date && $payment->new_expiry_date)
+                                                    <span class="plan-badge" style="background: #fef3c7; color: #92400e; padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; white-space: nowrap;">
+                                                        <i class="fas fa-sync me-1"></i> Renewed
+                                                    </span>
+                                                @else
+                                                    <span class="plan-badge membership">
+                                                        <i class="fas fa-check me-1"></i> New
+                                                    </span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @elseif($member)
+                                    <!-- If no payment history, show current member data -->
                                     <tr>
                                         <td>{{ $member->id }}</td>
                                         <td>
@@ -140,7 +253,6 @@
                                                     <span class="plan-badge none">Expired</span>
                                                 @else
                                                     @php
-                                                        // ✅ FIX: Whole number only
                                                         $daysLeft = floor(now()->diffInDays($member->expiry_date));
                                                     @endphp
                                                     <span class="plan-badge membership">{{ $daysLeft }} days left</span>

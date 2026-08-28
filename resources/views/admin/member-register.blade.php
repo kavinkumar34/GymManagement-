@@ -507,11 +507,17 @@
                         <input type="date" name="dob" class="form-control" id="dob" onchange="calculateAge()">
                     </div>
 
-                    <!-- Phone Number -->
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                        <input type="tel" name="phone" class="form-control" required>
-                    </div>
+                     <!-- Phone Number -->
+    <div class="col-md-3 mb-3">
+        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+        <input type="tel" name="phone" class="form-control" 
+               pattern="[0-9]{10}" 
+               maxlength="10" 
+               minlength="10"
+               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
+               required>
+        <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
+    </div>
 
                     <!-- Email -->
                     <div class="col-md-3 mb-3">
@@ -521,11 +527,17 @@
                 </div>
 
                 <div class="row compact-row">
-                    <!-- Emergency Contact -->
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Emergency Contact</label>
-                        <input type="tel" name="emergency_contact" class="form-control" placeholder="Emergency phone number">
-                    </div>
+                   <!-- Emergency Contact -->
+    <div class="col-md-4 mb-3">
+        <label class="form-label">Emergency Contact</label>
+        <input type="tel" name="emergency_contact" class="form-control" 
+               pattern="[0-9]{10}" 
+               maxlength="10" 
+               minlength="10"
+               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
+               placeholder="Emergency phone number">
+        <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
+    </div>
 
                     <!-- Address -->
                     <div class="col-md-8 mb-3">

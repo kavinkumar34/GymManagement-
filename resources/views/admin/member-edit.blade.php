@@ -334,6 +334,50 @@
             display: block;
         }
 
+        /* ============================================ */
+        /* DISABLED FIELDS STYLES                      */
+        /* ============================================ */
+        .disabled-section {
+            opacity: 0.6;
+            position: relative;
+        }
+
+        .disabled-section .disabled-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .disabled-section .disabled-overlay .lock-badge {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            color: #92400e;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .disabled-section .disabled-overlay .lock-badge i {
+            color: #f59e0b;
+            margin-right: 8px;
+        }
+
+        /* ============================================ */
+        /* PHONE INPUT - ONLY 10 DIGITS               */
+        /* ============================================ */
+        input[type="tel"] {
+            letter-spacing: 0.5px;
+        }
+
         @media (max-width: 768px) {
             .admin-main-content {
                 padding: 12px 15px;
@@ -445,12 +489,32 @@
 
             <!-- Card Body -->
             <div class="card-body">
-                <form method="POST" action="{{ route('admin.member.update', $member->id) }}" enctype="multipart/form-data">
+                
+                <!-- ========================================== -->
+                <!-- ⚠️ INFO: ACTIVE MEMBER - LIMITED EDIT     -->
+                <!-- ========================================== -->
+                @if($member->status == 'Active' && !$member->isExpired())
+                    <div class="alert alert-info" style="background: #dbeafe; border-left: 4px solid #3b82f6; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-info-circle" style="font-size: 20px; color: #3b82f6;"></i>
+                            <div>
+                                <strong style="color: #1d4ed8;">Member is Active!</strong><br>
+                                <span style="color: #1d4ed8; font-size: 0.85rem;">
+                                    You can edit Personal Information and Fitness Information. 
+                                    Email, Membership & Payment details are locked until plan expires.
+                                    <strong>{{ floor(now()->diffInDays($member->expiry_date)) }} days left.</strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('admin.member.update', $member->id) }}" enctype="multipart/form-data" id="editForm">
                     @csrf
                     @method('PUT')
 
                     <!-- ========================================== -->
-                    <!-- PERSONAL INFORMATION                       -->
+                    <!-- PERSONAL INFORMATION (ALWAYS EDITABLE)    -->
                     <!-- ========================================== -->
                     <div class="section-title">
                         <i class="fas fa-user"></i> Personal Information
@@ -503,29 +567,43 @@
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Age</label>
-                            <input type="text" name="age" class="form-control" value="{{ old('age', $member->age) }}" readonly>
+                            <input type="text" name="age" class="form-control" id="age" value="{{ old('age', $member->age) }}" readonly>
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                            <input type="tel" name="phone" class="form-control" value="{{ old('phone', $member->phone) }}" required>
+                            <input type="tel" name="phone" class="form-control" value="{{ old('phone', $member->phone) }}" 
+                                   pattern="[0-9]{10}" maxlength="10" minlength="10" 
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
+                            <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
+                            @error('phone')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="row compact-row">
+                        <!-- ===== EMAIL - READONLY IF ACTIVE ===== -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" name="email" class="form-control" value="{{ old('email', $member->email) }}" required>
+                            <input type="email" name="email" class="form-control" value="{{ old('email', $member->email) }}" 
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }} required>
                         </div>
 
+                        <!-- ===== EMERGENCY CONTACT - ONLY 10 DIGITS ===== -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Emergency Contact</label>
-                            <input type="tel" name="emergency_contact" class="form-control" value="{{ old('emergency_contact', $member->emergency_contact) }}" placeholder="Emergency phone number">
+                            <input type="tel" name="emergency_contact" class="form-control" value="{{ old('emergency_contact', $member->emergency_contact) }}" 
+                                   pattern="[0-9]{10}" maxlength="10" minlength="10"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" placeholder="Enter 10 digit number">
+                            <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
                         </div>
 
+                        <!-- ===== MEMBER ID - READONLY IF ACTIVE ===== -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Member ID</label>
-                            <input type="text" class="form-control" value="{{ $member->member_id }}" readonly>
+                            <input type="text" class="form-control" value="{{ $member->member_id }}" 
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }} readonly>
                         </div>
                     </div>
 
@@ -537,7 +615,7 @@
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- FITNESS INFORMATION                        -->
+                    <!-- FITNESS INFORMATION (ALWAYS EDITABLE)     -->
                     <!-- ========================================== -->
                     <div class="section-title mt-2">
                         <i class="fas fa-heartbeat"></i> Fitness Information
@@ -580,26 +658,43 @@
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- MEMBERSHIP INFORMATION                     -->
+                    <!-- MEMBERSHIP INFORMATION (LOCKED IF ACTIVE) -->
                     <!-- ========================================== -->
                     <div class="section-title mt-2">
                         <i class="fas fa-id-card"></i> Membership Information
+                        @if($member->status == 'Active' && !$member->isExpired())
+                            <span style="font-size:11px; color:#f59e0b; font-weight:400; margin-left:8px;">
+                                <i class="fas fa-lock me-1"></i> Locked
+                            </span>
+                        @endif
                     </div>
 
-                    <div class="row compact-row">
+                    <div class="row compact-row {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled-section' : '' }}">
+                        @if($member->status == 'Active' && !$member->isExpired())
+                            <div class="disabled-overlay">
+                                <span class="lock-badge">
+                                    <i class="fas fa-lock"></i> Locked - Plan Active
+                                </span>
+                            </div>
+                        @endif
+
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Join Date <span class="text-danger">*</span></label>
-                            <input type="date" name="join_date" class="form-control" value="{{ old('join_date', $member->join_date) }}" required>
+                            <input type="date" name="join_date" class="form-control" value="{{ old('join_date', $member->join_date) }}" 
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }} required>
                         </div>
-<!-- Expiry Date -->
-<div class="col-md-3 mb-3">
-    <label class="form-label">Expiry Date</label>
-    <input type="date" name="expiry_date" class="form-control" value="{{ old('expiry_date', $member->expiry_date) }}" readonly>
-    <small class="text-muted" style="font-size:11px;">Auto-calculated based on plan duration</small>
-</div>
+
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" name="expiry_date" class="form-control" value="{{ old('expiry_date', $member->expiry_date) }}" 
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }} readonly>
+                            <small class="text-muted" style="font-size:11px;">Auto-calculated based on plan duration</small>
+                        </div>
+
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Plan Type <span class="text-danger">*</span></label>
-                            <select name="plan_type" id="planType" class="form-control" required onchange="togglePlanFields()">
+                            <select name="plan_type" id="planType" class="form-control" required onchange="togglePlanFields()"
+                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled style=background:#f8f9fa;color:#6c757d;' : '' }}>
                                 <option value="">-- Select Plan Type --</option>
                                 <option value="membership" {{ old('plan_type', $member->plan_type) == 'membership' ? 'selected' : '' }}>Membership</option>
                                 <option value="package" {{ old('plan_type', $member->plan_type) == 'package' ? 'selected' : '' }}>Package</option>
@@ -610,7 +705,8 @@
                         <!-- Membership Plan -->
                         <div class="col-md-3 mb-3 dynamic-field" id="membershipPlanDiv">
                             <label class="form-label">Membership Plan <span class="text-danger">*</span></label>
-                            <select name="membership_plan" id="membershipPlan" class="form-control" onchange="getMembershipDetails()">
+                            <select name="membership_plan" id="membershipPlan" class="form-control" onchange="getMembershipDetails()"
+                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled style=background:#f8f9fa;color:#6c757d;' : '' }}>
                                 <option value="">-- Select Membership --</option>
                                 @foreach ($memberships as $membership)
                                     <option value="{{ $membership->plan_name }}" {{ old('membership_plan', $member->membership_plan) == $membership->plan_name ? 'selected' : '' }}>
@@ -623,7 +719,8 @@
                         <!-- Package -->
                         <div class="col-md-3 mb-3 dynamic-field" id="packageDiv">
                             <label class="form-label">Package <span class="text-danger">*</span></label>
-                            <select name="package_name" id="packageName" class="form-control" onchange="getPackageDetails()">
+                            <select name="package_name" id="packageName" class="form-control" onchange="getPackageDetails()"
+                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled style=background:#f8f9fa;color:#6c757d;' : '' }}>
                                 <option value="">-- Select Package --</option>
                                 @foreach ($packages as $package)
                                     <option value="{{ $package->package_name }}" {{ old('package_name', $member->membership_plan) == $package->package_name ? 'selected' : '' }}>
@@ -638,12 +735,14 @@
                     <div class="row compact-row" id="monthlyFieldsRow">
                         <div class="col-md-3 mb-3 dynamic-field" id="monthlyMonthDiv">
                             <label class="form-label">Month <span class="text-danger">*</span></label>
-                            <input type="number" name="monthly_month" id="monthlyMonth" class="form-control" value="{{ old('monthly_month', $member->monthly_month) }}" placeholder="Enter months (e.g., 3)" min="1" onchange="calculateMonthlyTotal()">
+                            <input type="number" name="monthly_month" id="monthlyMonth" class="form-control" value="{{ old('monthly_month', $member->monthly_month) }}" placeholder="Enter months (e.g., 3)" min="1" onchange="calculateMonthlyTotal()"
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }}>
                         </div>
 
                         <div class="col-md-3 mb-3 dynamic-field" id="monthlyPriceDiv">
                             <label class="form-label">Price (per month) <span class="text-danger">*</span></label>
-                            <input type="number" step="0.01" name="monthly_price" id="monthlyPrice" class="form-control" value="{{ old('monthly_price', $member->monthly_price) }}" placeholder="e.g., 500" onchange="calculateMonthlyTotal()">
+                            <input type="number" step="0.01" name="monthly_price" id="monthlyPrice" class="form-control" value="{{ old('monthly_price', $member->monthly_price) }}" placeholder="e.g., 500" onchange="calculateMonthlyTotal()"
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }}>
                         </div>
                     </div>
 
@@ -668,7 +767,8 @@
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Status <span class="text-danger">*</span></label>
-                            <select name="status" class="form-control" required>
+                            <select name="status" class="form-control" required
+                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled style=background:#f8f9fa;color:#6c757d;' : '' }}>
                                 <option value="Active" {{ old('status', $member->status) == 'Active' ? 'selected' : '' }}>Active</option>
                                 <option value="Inactive" {{ old('status', $member->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                             </select>
@@ -691,16 +791,30 @@
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- PAYMENT INFORMATION                        -->
+                    <!-- PAYMENT INFORMATION (LOCKED IF ACTIVE)    -->
                     <!-- ========================================== -->
                     <div class="section-title mt-2">
                         <i class="fas fa-credit-card"></i> Payment Information
+                        @if($member->status == 'Active' && !$member->isExpired())
+                            <span style="font-size:11px; color:#f59e0b; font-weight:400; margin-left:8px;">
+                                <i class="fas fa-lock me-1"></i> Locked
+                            </span>
+                        @endif
                     </div>
 
-                    <div class="row compact-row">
+                    <div class="row compact-row {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled-section' : '' }}">
+                        @if($member->status == 'Active' && !$member->isExpired())
+                            <div class="disabled-overlay">
+                                <span class="lock-badge">
+                                    <i class="fas fa-lock"></i> Locked - Plan Active
+                                </span>
+                            </div>
+                        @endif
+
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Payment Type</label>
-                            <select name="payment_type" id="paymentType" class="form-control" onchange="togglePaymentFields()">
+                            <select name="payment_type" id="paymentType" class="form-control" onchange="togglePaymentFields()"
+                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled style=background:#f8f9fa;color:#6c757d;' : '' }}>
                                 <option value="">-- Select Payment Type --</option>
                                 <option value="hand" {{ old('payment_type', $member->payment_type) == 'hand' ? 'selected' : '' }}>Hand Payment</option>
                                 <option value="online" {{ old('payment_type', $member->payment_type) == 'online' ? 'selected' : '' }}>Online Payment</option>
@@ -709,7 +823,8 @@
 
                         <div class="col-md-4 mb-3 dynamic-field" id="transactionIdDiv">
                             <label class="form-label">Transaction ID</label>
-                            <input type="text" name="transaction_id" class="form-control" value="{{ old('transaction_id', $member->transaction_id) }}" placeholder="Enter transaction ID">
+                            <input type="text" name="transaction_id" class="form-control" value="{{ old('transaction_id', $member->transaction_id) }}" placeholder="Enter transaction ID"
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }}>
                         </div>
 
                         <div class="col-md-4 mb-3 dynamic-field" id="screenshotDiv">
@@ -726,7 +841,8 @@
                                         <i class="fas fa-image"></i>
                                         <span>Choose screenshot</span>
                                     </div>
-                                    <input type="file" name="payment_screenshot" accept="image/*" id="paymentScreenshot" onchange="updateScreenshotFileName()">
+                                    <input type="file" name="payment_screenshot" accept="image/*" id="paymentScreenshot" onchange="updateScreenshotFileName()"
+                                           {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled style=background:#f8f9fa;color:#6c757d;' : '' }}>
                                 </div>
                                 <span class="file-name" id="screenshotFileName">
                                     <span class="no-file">No file chosen</span>
@@ -735,6 +851,25 @@
                             <small class="text-muted" style="font-size:11px;">Leave empty to keep current screenshot</small>
                         </div>
                     </div>
+
+                    <!-- ========================================== -->
+                    <!-- RENEWAL PAYMENT FIELD (Only if expired)   -->
+                    <!-- ========================================== -->
+                    @if($member->status == 'Inactive' || $member->isExpired())
+                    <div class="row compact-row" id="renewalPaymentDiv">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-credit-card" style="color: #10b981;"></i> Renewal Payment Amount
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="renewal_amount" class="form-control" placeholder="Enter renewal payment amount" value="{{ old('renewal_amount', $member->final_price) }}" required>
+                            <small class="text-muted">This will be recorded in payment history for finance reports.</small>
+                            @error('renewal_amount')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- ========================================== -->
                     <!-- ASSIGNMENT                                 -->
@@ -770,6 +905,7 @@
                     </div>
 
                 </form>
+
             </div>
         </div>
     </div>
@@ -826,18 +962,37 @@
         }
 
         // ============================================
+        // AUTO-CALCULATE AGE FROM DOB
+        // ============================================
+        function calculateAgeFromDOB() {
+            var dobInput = document.getElementById('dob');
+            var ageInput = document.getElementById('age');
+            
+            if (dobInput && dobInput.value) {
+                var birthDate = new Date(dobInput.value);
+                var today = new Date();
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                ageInput.value = age;
+            }
+        }
+
+        // ============================================
         // TOGGLE PLAN FIELDS
         // ============================================
         function togglePlanFields() {
             let planType = document.getElementById('planType').value;
 
-            // Hide all dynamic fields first
             document.getElementById('membershipPlanDiv').classList.remove('show');
             document.getElementById('packageDiv').classList.remove('show');
             document.getElementById('monthlyMonthDiv').classList.remove('show');
             document.getElementById('monthlyPriceDiv').classList.remove('show');
 
-            // Show based on selection
             if (planType == 'membership') {
                 document.getElementById('membershipPlanDiv').classList.add('show');
                 document.getElementById('membershipFieldsDiv').style.display = 'flex';
@@ -865,7 +1020,6 @@
                 document.getElementById('descriptionDiv').style.display = 'none';
                 document.getElementById('featuresDiv').style.display = 'none';
                 clearFields();
-                // Auto-calculate if values exist
                 calculateMonthlyTotal();
             } else {
                 document.getElementById('membershipFieldsDiv').style.display = 'none';
@@ -963,8 +1117,6 @@
                 document.getElementById('membershipDuration').value = month + ' Month(s)';
                 document.getElementById('priceDisplay').value = '₹ ' + price + ' × ' + month + ' months';
                 document.getElementById('descriptionDisplay').value = 'Monthly Plan - ' + month + ' Month(s) at ₹' + price + '/month';
-            } else {
-                // Don't clear if values are empty - keep existing
             }
         }
 
@@ -974,11 +1126,9 @@
         function togglePaymentFields() {
             let paymentType = document.getElementById('paymentType').value;
 
-            // Hide all payment dynamic fields first
             document.getElementById('transactionIdDiv').classList.remove('show');
             document.getElementById('screenshotDiv').classList.remove('show');
 
-            // Show based on selection
             if (paymentType == 'online') {
                 document.getElementById('transactionIdDiv').classList.add('show');
                 document.getElementById('screenshotDiv').classList.add('show');
@@ -1012,7 +1162,6 @@
             } else if (planType == 'package' && packageName.value) {
                 getPackageDetails();
             } else if (planType == 'monthly') {
-                // Show monthly fields and calculate
                 document.getElementById('monthlyMonthDiv').classList.add('show');
                 document.getElementById('monthlyPriceDiv').classList.add('show');
                 document.getElementById('membershipFieldsDiv').style.display = 'none';
@@ -1021,8 +1170,16 @@
                 calculateMonthlyTotal();
             }
 
-            // Toggle payment fields on load
             togglePaymentFields();
+
+            // ===== ADD DOB EVENT LISTENER FOR AGE =====
+            var dobInput = document.getElementById('dob');
+            if (dobInput) {
+                dobInput.addEventListener('change', calculateAgeFromDOB);
+                dobInput.addEventListener('blur', calculateAgeFromDOB);
+                // Calculate age on page load if DOB has value
+                calculateAgeFromDOB();
+            }
         });
     </script>
 @endsection

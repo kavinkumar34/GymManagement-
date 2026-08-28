@@ -340,7 +340,7 @@
     }
 
     /* ============================================ */
-    /* TABLE STYLES - SAME AS HAND-PAYMENT         */
+    /* TABLE STYLES                                */
     /* ============================================ */
     .table-responsive {
         overflow-x: auto;
@@ -521,6 +521,27 @@
         font-size: 12px;
         color: var(--gray);
         white-space: nowrap;
+    }
+
+    .table-payment .status-badge {
+        padding: 3px 12px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .table-payment .status-badge.new {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .table-payment .status-badge.renewed {
+        background: #fef3c7;
+        color: #92400e;
     }
 
     /* ============================================ */
@@ -846,19 +867,18 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- MEMBERS TABLE WITH SEARCH & EXPORT         -->
+    <!-- PAYMENT HISTORY TABLE (SHOWS OLD + NEW)    -->
     <!-- ========================================== -->
     <div class="report-card">
         <div class="card-header">
             <div>
-                <h4><i class="fas fa-users"></i> Members List</h4>
-                <small>All registered members</small>
+                <h4><i class="fas fa-history"></i> Payment History</h4>
+                <small>Complete payment history of all members (old + new renewals)</small>
             </div>
             <div class="header-actions">
                 <span style="color: rgba(255,255,255,0.7); font-size: 13px;">
-                    <i class="fas fa-user"></i> Total: {{ $members->total() }}
+                    <i class="fas fa-credit-card"></i> Total Payments: {{ $paymentHistory->total() }}
                 </span>
-                <!-- ===== EXPORT BUTTON ===== -->
                 <button class="export-btn" onclick="exportTableToCSV()">
                     <i class="fas fa-file-excel"></i> Export to CSV
                 </button>
@@ -871,8 +891,7 @@
             <div class="search-filter-section">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search by name, email, phone, member ID..."
-                        onkeyup="filterTable()">
+                    <input type="text" id="searchInput" placeholder="Search by member name, email, plan..." onkeyup="filterTable()">
                 </div>
                 <div class="filter-group">
                     <select id="planFilter" onchange="filterTable()">
@@ -897,43 +916,36 @@
                 <table class="table-payment" id="paymentTable">
                     <thead>
                         <tr>
-                            <th class="text-center" style="width:50px;">S.No</th>
-                            <th style="width:50px;">Photo</th>
-                            <th>Member ID</th>
-                            <th>Name</th>
-                            <th>Phone</th>
+                            <th class="text-center" style="width:50px;">#</th>
+                            <th>Member</th>
                             <th>Plan Type</th>
                             <th>Plan Name</th>
-                            <th>Final Price</th>
+                            <th>Duration</th>
+                            <th>Amount</th>
                             <th>Payment Type</th>
                             <th>Transaction ID</th>
-                            <th>Joined</th>
+                            <th>Payment Date</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        @forelse($members as $index => $member)
+                        @forelse($paymentHistory as $index => $payment)
                             <tr>
-                                <td class="text-center sno">{{ $members->firstItem() + $index }}</td>
+                                <td class="text-center sno">{{ $paymentHistory->firstItem() + $index }}</td>
                                 <td>
-                                    @if ($member->photo)
-                                        <img src="{{ asset('storage/' . $member->photo) }}" class="avatar-img"
-                                            alt="{{ $member->name }}">
+                                    @if($payment->member)
+                                        <span class="member-name">{{ $payment->member->name }}</span>
+                                        <span class="member-email">{{ $payment->member->email }}</span>
                                     @else
-                                        <img src="{{ asset('images/no-image.png') }}" class="avatar-img" alt="No Image">
+                                        <span class="plan-tag none">Member Deleted</span>
                                     @endif
                                 </td>
-                                <td><span class="member-id-badge">{{ $member->member_id }}</span></td>
                                 <td>
-                                    <span class="member-name">{{ $member->name }}</span>
-                                    <span class="member-email">{{ $member->email }}</span>
-                                </td>
-                                <td>{{ $member->phone }}</td>
-                                <td>
-                                    @if ($member->plan_type == 'membership')
+                                    @if($payment->plan_type == 'membership')
                                         <span class="plan-tag membership"><i class="fas fa-id-card"></i> Membership</span>
-                                    @elseif($member->plan_type == 'package')
+                                    @elseif($payment->plan_type == 'package')
                                         <span class="plan-tag package"><i class="fas fa-box"></i> Package</span>
-                                    @elseif($member->plan_type == 'monthly')
+                                    @elseif($payment->plan_type == 'monthly')
                                         <span class="plan-tag monthly"><i class="fas fa-calendar-alt"></i> Monthly</span>
                                     @else
                                         <span class="plan-tag none">-</span>
@@ -941,35 +953,47 @@
                                 </td>
                                 <td>
                                     <span class="plan-name-badge">
-                                        <i class="fas fa-tag"></i> {{ $member->membership_plan ?? 'Basic' }}
+                                        <i class="fas fa-tag"></i> {{ $payment->plan_name ?? 'N/A' }}
                                     </span>
                                 </td>
-                                <td><span class="price-amount">₹ {{ number_format($member->final_price ?? 0, 2) }}</span></td>
+                                <td>{{ $payment->duration ?? '-' }}</td>
+                                <td><span class="price-amount">₹ {{ number_format($payment->amount, 2) }}</span></td>
                                 <td>
-                                    @if($member->payment_type == 'hand')
+                                    @if($payment->payment_type == 'hand')
                                         <span class="payment-tag hand"><i class="fas fa-hand-holding-usd"></i> Hand</span>
-                                    @elseif($member->payment_type == 'online')
+                                    @elseif($payment->payment_type == 'online')
                                         <span class="payment-tag online"><i class="fas fa-wifi"></i> Online</span>
                                     @else
                                         <span class="payment-tag none">-</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($member->transaction_id)
-                                        <span class="transaction-id">{{ $member->transaction_id }}</span>
+                                    @if($payment->transaction_id)
+                                        <span class="transaction-id">{{ $payment->transaction_id }}</span>
                                     @else
                                         <span class="plan-tag none">-</span>
                                     @endif
                                 </td>
-                                <td><span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span></td>
+                                <td><span class="join-date">{{ date('d-m-Y', strtotime($payment->payment_date)) }}</span></td>
+                                <td>
+                                    @if($payment->old_expiry_date && $payment->new_expiry_date)
+                                        <span class="status-badge renewed">
+                                            <i class="fas fa-sync"></i> Renewed
+                                        </span>
+                                    @else
+                                        <span class="status-badge new">
+                                            <i class="fas fa-check"></i> New
+                                        </span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11">
+                                <td colspan="10">
                                     <div class="empty-state">
-                                        <i class="fas fa-users"></i>
-                                        <h5>No Members Found</h5>
-                                        <p>No members are registered.</p>
+                                        <i class="fas fa-credit-card"></i>
+                                        <h5>No Payment History Found</h5>
+                                        <p>No payments have been recorded yet.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -981,12 +1005,12 @@
             <!-- ===== PAGINATION ===== -->
             <div class="pagination-wrapper">
                 <div class="pagination-info">
-                    Showing <strong>{{ $members->firstItem() ?? 0 }}</strong> to
-                    <strong>{{ $members->lastItem() ?? 0 }}</strong> of <strong>{{ $members->total() ?? 0 }}</strong>
+                    Showing <strong>{{ $paymentHistory->firstItem() ?? 0 }}</strong> to
+                    <strong>{{ $paymentHistory->lastItem() ?? 0 }}</strong> of <strong>{{ $paymentHistory->total() ?? 0 }}</strong>
                     entries
                 </div>
                 <div class="pagination-links">
-                    {{ $members->links() }}
+                    {{ $paymentHistory->links() }}
                 </div>
             </div>
 
@@ -1136,8 +1160,8 @@ function filterTable() {
 
     rows.forEach(function(row) {
         var text = row.textContent.toLowerCase();
-        var planType = row.querySelector('td:nth-child(6)')?.textContent.toLowerCase() || '';
-        var paymentType = row.querySelector('td:nth-child(9)')?.textContent.toLowerCase() || '';
+        var planType = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+        var paymentType = row.querySelector('td:nth-child(7)')?.textContent.toLowerCase() || '';
 
         var matchesSearch = text.includes(searchValue);
         var matchesPlan = planFilter === '' || planType.includes(planFilter);
@@ -1163,11 +1187,11 @@ function filterTable() {
         var tr = document.createElement('tr');
         tr.id = 'noResultRow';
         var td = document.createElement('td');
-        td.colSpan = 11;
+        td.colSpan = 10;
         td.style.textAlign = 'center';
         td.style.padding = '30px';
         td.style.color = '#6c757d';
-        td.innerHTML = '<i class="fas fa-search" style="font-size:24px; display:block; margin-bottom:8px; color:#dee2e6;"></i> No members found matching your filters.';
+        td.innerHTML = '<i class="fas fa-search" style="font-size:24px; display:block; margin-bottom:8px; color:#dee2e6;"></i> No payment history found matching your filters.';
         tr.appendChild(td);
         tbody.appendChild(tr);
     }
@@ -1184,113 +1208,78 @@ function resetFilters() {
 }
 
 // ============================================
-// EXPORT TABLE TO CSV (FINAL FIXED VERSION)
+// EXPORT TABLE TO CSV
 // ============================================
 function exportTableToCSV() {
     var rows = document.querySelectorAll('#paymentTable tbody tr');
     var data = [];
 
-    // Headers - Exactly matching the table
-    var headers = ['S.No', 'Photo', 'Member ID', 'Name', 'Email', 'Phone', 'Plan Type', 'Plan Name', 'Final Price', 'Payment Type', 'Transaction ID', 'Joined'];
+    // Headers
+    var headers = ['#', 'Member Name', 'Member Email', 'Plan Type', 'Plan Name', 'Duration', 'Amount', 'Payment Type', 'Transaction ID', 'Payment Date', 'Status'];
     data.push(headers);
 
-    // Data rows
     rows.forEach(function(row) {
-        // Skip hidden rows (filtered out)
         if (row.style.display === 'none') return;
 
         var rowData = [];
         var cells = row.querySelectorAll('td');
 
-        // Skip if empty row (no results)
         if (cells.length === 0) return;
 
-        // Column 0: S.No
-        rowData.push('"' + (cells[0]?.textContent.trim() || '') + '"');
+        cells.forEach(function(cell, index) {
+            var text = cell.textContent.trim();
 
-        // Column 1: Photo
-        var img = cells[1]?.querySelector('img');
-        if (img) {
-            rowData.push('"' + (img.alt || 'Photo') + '"');
-        } else {
-            rowData.push('"No Photo"');
-        }
-
-        // Column 2: Member ID
-        rowData.push('"' + (cells[2]?.textContent.trim() || '') + '"');
-
-        // Column 3: Name
-        var name = cells[3]?.querySelector('.member-name')?.textContent.trim() || '';
-        rowData.push('"' + name + '"');
-
-        // Column 4: Email
-        var email = cells[3]?.querySelector('.member-email')?.textContent.trim() || '';
-        rowData.push('"' + email + '"');
-
-        // Column 5: Phone - Force as text with tab
-        var phone = cells[4]?.textContent.trim() || '';
-        if (phone && phone !== '-' && phone !== '') {
-            rowData.push('"\t' + phone + '"');
-        } else {
-            rowData.push('"-"');
-        }
-
-        // Column 6: Plan Type
-        var planTag = cells[5]?.querySelector('.plan-tag');
-        var planType = planTag ? planTag.textContent.trim() : (cells[5]?.textContent.trim() || '');
-        rowData.push('"' + planType + '"');
-
-        // Column 7: Plan Name
-        var planName = cells[6]?.querySelector('.plan-name-badge');
-        var planNameText = planName ? planName.textContent.trim() : (cells[6]?.textContent.trim() || '');
-        rowData.push('"' + planNameText + '"');
-
-        // Column 8: Final Price - Force as text with tab
-        var priceEl = cells[7]?.querySelector('.price-amount');
-        var priceText = priceEl ? priceEl.textContent.trim() : (cells[7]?.textContent.trim() || '');
-        if (priceText && priceText !== '-' && priceText !== '') {
-            rowData.push('"\t' + priceText + '"');
-        } else {
-            rowData.push('"-"');
-        }
-
-        // Column 9: Payment Type
-        var paymentTag = cells[8]?.querySelector('.payment-tag');
-        var paymentType = paymentTag ? paymentTag.textContent.trim() : (cells[8]?.textContent.trim() || '');
-        rowData.push('"' + paymentType + '"');
-
-        // Column 10: Transaction ID - Force as text with tab
-        var transId = cells[9]?.querySelector('.transaction-id');
-        var transText = transId ? transId.textContent.trim() : (cells[9]?.textContent.trim() || '');
-        if (transText && transText !== '-' && transText !== '') {
-            rowData.push('"\t' + transText + '"');
-        } else {
-            rowData.push('"-"');
-        }
-
-        // Column 11: Joined Date - Force as text with tab
-        var joinDate = cells[10]?.textContent.trim() || '';
-        if (joinDate && joinDate !== '-' && joinDate !== '') {
-            rowData.push('"\t' + joinDate + '"');
-        } else {
-            rowData.push('"-"');
-        }
+            if (index === 0) { // #
+                rowData.push(text);
+            } else if (index === 1) { // Member
+                var name = cell.querySelector('.member-name')?.textContent.trim() || '';
+                var email = cell.querySelector('.member-email')?.textContent.trim() || '';
+                rowData.push(name);
+                rowData.push(email);
+            } else if (index === 2) { // Plan Type
+                var planTag = cell.querySelector('.plan-tag');
+                rowData.push(planTag ? planTag.textContent.trim() : text);
+            } else if (index === 3) { // Plan Name
+                var planName = cell.querySelector('.plan-name-badge');
+                rowData.push(planName ? planName.textContent.trim() : text);
+            } else if (index === 4) { // Duration
+                rowData.push(text);
+            } else if (index === 5) { // Amount
+                var price = cell.querySelector('.price-amount');
+                rowData.push(price ? price.textContent.trim() : text);
+            } else if (index === 6) { // Payment Type
+                var paymentTag = cell.querySelector('.payment-tag');
+                rowData.push(paymentTag ? paymentTag.textContent.trim() : text);
+            } else if (index === 7) { // Transaction ID
+                var transId = cell.querySelector('.transaction-id');
+                rowData.push(transId ? transId.textContent.trim() : text);
+            } else if (index === 8) { // Payment Date
+                rowData.push(text);
+            } else if (index === 9) { // Status
+                var statusBadge = cell.querySelector('.status-badge');
+                rowData.push(statusBadge ? statusBadge.textContent.trim() : text);
+            }
+        });
 
         data.push(rowData);
     });
 
-    // Convert to CSV with UTF-8 BOM
     var csvContent = '';
     data.forEach(function(row) {
-        csvContent += row.join(',') + '\n';
+        var rowStr = row.map(function(cell) {
+            if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                return '"' + cell.replace(/"/g, '""') + '"';
+            }
+            return cell;
+        }).join(',');
+        csvContent += rowStr + '\n';
     });
 
-    // Create and download
     var blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     var link = document.createElement('a');
     var url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', 'members_list_' + new Date().toISOString().slice(0,10) + '.csv');
+    link.setAttribute('download', 'payment_history_' + new Date().toISOString().slice(0,10) + '.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

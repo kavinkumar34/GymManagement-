@@ -436,8 +436,8 @@
             </ul>
         </li>
 
-        <!-- Payments -->
-        <li class="nav-item has-dropdown">
+       <!-- Payments -->
+     {{--    <li class="nav-item has-dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)">
                 <i class="fas fa-user-tag"></i>
                 <span>Payments</span>
@@ -449,13 +449,13 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> --}}
 
         <!-- ===== REPORTS MENU ===== -->
 <li class="nav-item has-dropdown">
     <a class="nav-link dropdown-toggle" href="javascript:void(0)">
         <i class="fas fa-chart-line"></i>
-        <span>Reports</span>
+        <span>Reports/payments</span>
     </a>
     <ul class="dropdown-menu-custom">
         <li>

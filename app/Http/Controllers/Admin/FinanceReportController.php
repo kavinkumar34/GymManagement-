@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Member;
+use App\Models\PaymentHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,83 +13,55 @@ class FinanceReportController extends Controller
     public function index(Request $request)
     {
         // ==========================================
-        // REVENUE FROM MEMBERSHIPS
+        // REVENUE FROM PAYMENT HISTORY (ALL TIME)
         // ==========================================
-        $membershipRevenue = Member::where('plan_type', 'membership')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+        $totalRevenue = PaymentHistory::sum('amount') ?? 0;
 
         // ==========================================
-        // REVENUE FROM PACKAGES
+        // REVENUE BY PLAN TYPE
         // ==========================================
-        $packageRevenue = Member::where('plan_type', 'package')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+        $membershipRevenue = PaymentHistory::where('plan_type', 'membership')->sum('amount') ?? 0;
+        $packageRevenue = PaymentHistory::where('plan_type', 'package')->sum('amount') ?? 0;
+        $monthlyRevenue = PaymentHistory::where('plan_type', 'monthly')->sum('amount') ?? 0;
 
         // ==========================================
-        // REVENUE FROM MONTHLY PLANS
+        // REVENUE BY PAYMENT TYPE
         // ==========================================
-        $monthlyRevenue = Member::where('plan_type', 'monthly')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
-
-        // ==========================================
-        // TOTAL REVENUE
-        // ==========================================
-        $totalRevenue = $membershipRevenue + $packageRevenue + $monthlyRevenue;
-
-        // ==========================================
-        // HAND PAYMENT REVENUE
-        // ==========================================
-        $handPaymentRevenue = Member::where('payment_type', 'hand')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
-
-        // ==========================================
-        // ONLINE PAYMENT REVENUE
-        // ==========================================
-        $onlinePaymentRevenue = Member::where('payment_type', 'online')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+        $handPaymentRevenue = PaymentHistory::where('payment_type', 'hand')->sum('amount') ?? 0;
+        $onlinePaymentRevenue = PaymentHistory::where('payment_type', 'online')->sum('amount') ?? 0;
 
         // ==========================================
         // HAND PAYMENT BY PLAN TYPE
         // ==========================================
-        $handMembership = Member::where('payment_type', 'hand')
+        $handMembership = PaymentHistory::where('payment_type', 'hand')
             ->where('plan_type', 'membership')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+            ->sum('amount') ?? 0;
 
-        $handPackage = Member::where('payment_type', 'hand')
+        $handPackage = PaymentHistory::where('payment_type', 'hand')
             ->where('plan_type', 'package')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+            ->sum('amount') ?? 0;
 
-        $handMonthly = Member::where('payment_type', 'hand')
+        $handMonthly = PaymentHistory::where('payment_type', 'hand')
             ->where('plan_type', 'monthly')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+            ->sum('amount') ?? 0;
 
         // ==========================================
         // ONLINE PAYMENT BY PLAN TYPE
         // ==========================================
-        $onlineMembership = Member::where('payment_type', 'online')
+        $onlineMembership = PaymentHistory::where('payment_type', 'online')
             ->where('plan_type', 'membership')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+            ->sum('amount') ?? 0;
 
-        $onlinePackage = Member::where('payment_type', 'online')
+        $onlinePackage = PaymentHistory::where('payment_type', 'online')
             ->where('plan_type', 'package')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+            ->sum('amount') ?? 0;
 
-        $onlineMonthly = Member::where('payment_type', 'online')
+        $onlineMonthly = PaymentHistory::where('payment_type', 'online')
             ->where('plan_type', 'monthly')
-            ->where('status', 'Active')
-            ->sum('final_price') ?? 0;
+            ->sum('amount') ?? 0;
 
         // ==========================================
-        // COUNT BY PLAN TYPE
+        // COUNT BY PLAN TYPE (From Members Table)
         // ==========================================
         $membershipCount = Member::where('plan_type', 'membership')
             ->where('status', 'Active')
@@ -105,18 +78,15 @@ class FinanceReportController extends Controller
         $totalMembers = Member::where('status', 'Active')->count();
 
         // ==========================================
-        // HAND PAYMENT COUNT
+        // PAYMENT COUNT BY TYPE (From PaymentHistory)
         // ==========================================
-        $handCount = Member::where('payment_type', 'hand')
-            ->where('status', 'Active')
-            ->count();
+        $handCount = PaymentHistory::where('payment_type', 'hand')
+            ->distinct('member_id')
+            ->count('member_id');
 
-        // ==========================================
-        // ONLINE PAYMENT COUNT
-        // ==========================================
-        $onlineCount = Member::where('payment_type', 'online')
-            ->where('status', 'Active')
-            ->count();
+        $onlineCount = PaymentHistory::where('payment_type', 'online')
+            ->distinct('member_id')
+            ->count('member_id');
 
         // ==========================================
         // MONTHLY REVENUE CHART DATA (Last 12 Months)
@@ -128,10 +98,9 @@ class FinanceReportController extends Controller
             $month = now()->subMonths($i);
             $monthlyLabels[] = $month->format('M Y');
 
-            $revenue = Member::where('status', 'Active')
-                ->whereYear('join_date', $month->year)
-                ->whereMonth('join_date', $month->month)
-                ->sum('final_price') ?? 0;
+            $revenue = PaymentHistory::whereYear('payment_date', $month->year)
+                ->whereMonth('payment_date', $month->month)
+                ->sum('amount') ?? 0;
 
             $monthlyChartData[] = $revenue;
         }
@@ -145,27 +114,42 @@ class FinanceReportController extends Controller
         for ($i = 11; $i >= 0; $i--) {
             $month = now()->subMonths($i);
 
-            $hand = Member::where('payment_type', 'hand')
-                ->where('status', 'Active')
-                ->whereYear('join_date', $month->year)
-                ->whereMonth('join_date', $month->month)
-                ->sum('final_price') ?? 0;
+            $hand = PaymentHistory::where('payment_type', 'hand')
+                ->whereYear('payment_date', $month->year)
+                ->whereMonth('payment_date', $month->month)
+                ->sum('amount') ?? 0;
 
-            $online = Member::where('payment_type', 'online')
-                ->where('status', 'Active')
-                ->whereYear('join_date', $month->year)
-                ->whereMonth('join_date', $month->month)
-                ->sum('final_price') ?? 0;
+            $online = PaymentHistory::where('payment_type', 'online')
+                ->whereYear('payment_date', $month->year)
+                ->whereMonth('payment_date', $month->month)
+                ->sum('amount') ?? 0;
 
             $monthlyHandData[] = $hand;
             $monthlyOnlineData[] = $online;
         }
 
         // ==========================================
-        // MEMBERS TABLE DATA (WITH PAGINATION)
+        // TODAY, WEEK, MONTH REVENUE
         // ==========================================
-        $members = Member::with('trainer')
-            ->orderBy('id', 'desc')
+        $todayRevenue = PaymentHistory::whereDate('payment_date', today())->sum('amount') ?? 0;
+        $weekRevenue = PaymentHistory::whereBetween('payment_date', [now()->startOfWeek(), now()->endOfWeek()])->sum('amount') ?? 0;
+        $monthRevenue = PaymentHistory::whereMonth('payment_date', now()->month)
+            ->whereYear('payment_date', now()->year)
+            ->sum('amount') ?? 0;
+
+        // ==========================================
+        // AVERAGE REVENUE PER MEMBER
+        // ==========================================
+        $totalMembersAll = Member::count();
+        $averagePerMember = $totalMembersAll > 0 
+            ? round($totalRevenue / $totalMembersAll, 2) 
+            : 0;
+
+        // ==========================================
+        // PAYMENT HISTORY TABLE DATA (WITH PAGINATION)
+        // ==========================================
+        $paymentHistory = PaymentHistory::with('member')
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('admin.finance-reports', compact(
@@ -191,7 +175,11 @@ class FinanceReportController extends Controller
             'monthlyChartData',
             'monthlyHandData',
             'monthlyOnlineData',
-            'members'
+            'todayRevenue',
+            'weekRevenue',
+            'monthRevenue',
+            'averagePerMember',
+            'paymentHistory'  // ✅ NEW - Payment History with pagination
         ));
     }
 }

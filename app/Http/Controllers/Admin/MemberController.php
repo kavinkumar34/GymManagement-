@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Models\Trainer;
 use App\Models\Membership;
 use App\Models\Package;
+use App\Models\PaymentHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -90,7 +91,6 @@ class MemberController extends Controller
                 $membershipPlan = $membership->plan_name;
                 $membershipDuration = $membership->duration . ' ' . $membership->duration_type;
                 $finalPrice = $membership->final_price;
-                // Calculate expiry date - Convert duration to integer
                 $expiryDate = Carbon::parse($request->join_date)->addMonths((int)$membership->duration)->toDateString();
             }
         } elseif ($request->plan_type == 'package' && $request->package_name) {
@@ -99,19 +99,15 @@ class MemberController extends Controller
                 $membershipPlan = $package->package_name;
                 $membershipDuration = $package->duration . ' ' . $package->duration_type;
                 $finalPrice = $package->price;
-                // Calculate expiry date - Convert duration to integer
                 $expiryDate = Carbon::parse($request->join_date)->addMonths((int)$package->duration)->toDateString();
             }
         } elseif ($request->plan_type == 'monthly') {
-            // ===== MONTHLY PLAN - FIXED =====
-            // ✅ Convert string to integer
             $monthlyMonth = (int)$request->monthly_month;
             $monthlyPrice = (float)$request->monthly_price;
             $monthlyTotal = $request->monthly_total ?? ($monthlyMonth * $monthlyPrice);
             $membershipPlan = 'Monthly Plan';
             $membershipDuration = $monthlyMonth . ' Month(s)';
             $finalPrice = $monthlyTotal;
-            // Calculate expiry date - Use integer $monthlyMonth
             $expiryDate = Carbon::parse($request->join_date)->addMonths($monthlyMonth)->toDateString();
         }
 
@@ -149,6 +145,20 @@ class MemberController extends Controller
             'payment_screenshot' => $screenshotPath,
         ]);
         
+        // ===== SAVE PAYMENT HISTORY =====
+        PaymentHistory::create([
+            'member_id' => $member->id,
+            'plan_type' => $request->plan_type,
+            'plan_name' => $membershipPlan,
+            'duration' => $membershipDuration,
+            'amount' => $finalPrice,
+            'payment_type' => $request->payment_type,
+            'transaction_id' => $request->transaction_id,
+            'payment_date' => $request->join_date,
+            'old_expiry_date' => null,
+            'new_expiry_date' => $expiryDate,
+        ]);
+        
         // ===== UPDATE TRAINER ASSIGNED COUNT =====
         if ($request->trainer_id) {
             $trainer = Trainer::find($request->trainer_id);
@@ -168,7 +178,7 @@ class MemberController extends Controller
     
     public function edit($id)
     {
-        $member = Member::findOrFail($id);
+        $member = Member::with('trainer')->findOrFail($id);
         $trainers = Trainer::where('status', 'Active')->get();
         $memberships = Membership::where('status', 'Active')->get();
         $packages = Package::where('status', 'Active')->get();
@@ -180,16 +190,46 @@ class MemberController extends Controller
     {
         $member = Member::findOrFail($id);
         
-        // ===== VALIDATION =====
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:members,email,' . $id,
-            'status' => 'required',
-            'payment_type' => 'nullable|in:hand,online',
-            'transaction_id' => 'nullable|string|max:100',
-            'payment_screenshot' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        ]);
+        // ==========================================
+        // CHECK: IS MEMBER ACTIVE?
+        // ==========================================
+        $isActive = ($member->status == 'Active' && !$member->isExpired());
+        
+        if ($isActive) {
+            // ===== WHEN ACTIVE: ONLY ALLOW PERSONAL INFO, FITNESS INFO & TRAINER =====
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'gender' => 'required',
+                'phone' => 'required|string|max:20',
+                'email' => 'nullable|email|unique:members,email,' . $id,
+                'address' => 'nullable|string',
+                'height' => 'nullable|numeric',
+                'weight' => 'nullable|numeric',
+                'goal_type' => 'required',
+                'medical_issues' => 'nullable|string',
+                'trainer_id' => 'nullable|exists:trainers,id',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'emergency_contact' => 'nullable|string|max:20',
+                'dob' => 'nullable|date',
+            ]);
+        } else {
+            // ===== WHEN EXPIRED/INACTIVE: ALLOW ALL FIELDS =====
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'phone' => 'required|string|max:20',
+                'email' => 'required|email|unique:members,email,' . $id,
+                'status' => 'required',
+                'payment_type' => 'nullable|in:hand,online',
+                'transaction_id' => 'nullable|string|max:100',
+                'payment_screenshot' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+                'plan_type' => 'nullable|in:membership,package,monthly',
+                'membership_plan' => 'nullable',
+                'package_name' => 'nullable',
+                'join_date' => 'nullable|date',
+                'trainer_id' => 'nullable|exists:trainers,id',
+                'renewal_amount' => 'nullable|numeric',
+            ]);
+        }
         
         // ===== CALCULATE BMI =====
         $bmi = $member->bmi;
@@ -197,6 +237,49 @@ class MemberController extends Controller
             $heightInMeters = $request->height / 100;
             $bmi = round($request->weight / ($heightInMeters * $heightInMeters), 1);
         }
+        
+        // ===== HANDLE PHOTO UPLOAD =====
+        $photoPath = $member->photo;
+        if ($request->hasFile('photo')) {
+            if ($member->photo && Storage::disk('public')->exists($member->photo)) {
+                Storage::disk('public')->delete($member->photo);
+            }
+            $photoPath = $request->file('photo')->store('member-photos', 'public');
+        }
+        
+        // ==========================================
+        // BASE UPDATE DATA (ALWAYS UPDATED)
+        // ==========================================
+        $updateData = [
+            'name' => $request->name,
+            'gender' => $request->gender,
+            'dob' => $request->dob,
+            'age' => $request->age,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'height' => $request->height,
+            'weight' => $request->weight,
+            'bmi' => $bmi,
+            'emergency_contact' => $request->emergency_contact,
+            'medical_issues' => $request->medical_issues,
+            'goal_type' => $request->goal_type,
+            'photo' => $photoPath,
+            'trainer_id' => $request->trainer_id,
+        ];
+        
+        // ==========================================
+        // IF ACTIVE: DON'T UPDATE LOCKED FIELDS
+        // ==========================================
+        if ($isActive) {
+            // Only update base data (Personal + Fitness + Trainer)
+            $member->update($updateData);
+            
+            return redirect()->route('admin.members')->with('success', 'Personal information updated successfully! ✅');
+        }
+        
+        // ==========================================
+        // IF EXPIRED/INACTIVE: UPDATE ALL FIELDS
+        // ==========================================
         
         // ===== HANDLE PAYMENT SCREENSHOT UPLOAD =====
         $screenshotPath = $member->payment_screenshot;
@@ -214,6 +297,7 @@ class MemberController extends Controller
         $monthlyMonth = $member->monthly_month;
         $monthlyPrice = $member->monthly_price;
         $expiryDate = $member->expiry_date;
+        $oldExpiryDate = $member->expiry_date;
         
         if ($request->plan_type == 'package' && $request->package_name) {
             $package = Package::where('package_name', $request->package_name)->first();
@@ -236,7 +320,6 @@ class MemberController extends Controller
         }
         
         if ($request->plan_type == 'monthly') {
-            // ✅ Convert to integer for monthly plan in update
             $monthlyMonth = (int)($request->monthly_month ?? $member->monthly_month);
             $monthlyPrice = (float)($request->monthly_price ?? $member->monthly_price);
             $monthlyTotal = $monthlyMonth * $monthlyPrice;
@@ -246,39 +329,43 @@ class MemberController extends Controller
             $expiryDate = Carbon::parse($request->join_date)->addMonths($monthlyMonth)->toDateString();
         }
         
-        // ===== UPDATE MEMBER =====
-        $member->update([
-            'name' => $request->name,
-            'gender' => $request->gender,
-            'dob' => $request->dob,
-            'age' => $request->age,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'address' => $request->address,
-            'height' => $request->height,
-            'weight' => $request->weight,
-            'bmi' => $bmi,
-            'emergency_contact' => $request->emergency_contact,
-            'join_date' => $request->join_date,
-            'expiry_date' => $expiryDate,
-            'plan_type' => $request->plan_type,
-            'membership_plan' => $membershipPlan,
-            'membership_duration' => $membershipDuration,
-            'final_price' => $finalPrice,
-            'trainer_id' => $request->trainer_id,
-            'medical_issues' => $request->medical_issues,
-            'goal_type' => $request->goal_type,
-            'status' => $request->status,
-            
-            // ===== NEW PAYMENT FIELDS =====
-            'monthly_month' => $monthlyMonth,
-            'monthly_price' => $monthlyPrice,
-            'payment_type' => $request->payment_type,
-            'transaction_id' => $request->transaction_id,
-            'payment_screenshot' => $screenshotPath,
-        ]);
+        // ===== ADD LOCKED FIELDS TO UPDATE =====
+        $updateData['email'] = $request->email;
+        $updateData['join_date'] = $request->join_date;
+        $updateData['expiry_date'] = $expiryDate;
+        $updateData['plan_type'] = $request->plan_type;
+        $updateData['membership_plan'] = $membershipPlan;
+        $updateData['membership_duration'] = $membershipDuration;
+        $updateData['final_price'] = $finalPrice;
+        $updateData['status'] = $request->status;
+        $updateData['monthly_month'] = $monthlyMonth;
+        $updateData['monthly_price'] = $monthlyPrice;
+        $updateData['payment_type'] = $request->payment_type;
+        $updateData['transaction_id'] = $request->transaction_id;
+        $updateData['payment_screenshot'] = $screenshotPath;
         
-        return redirect()->route('admin.members')->with('success', 'Member updated successfully!');
+        // ===== UPDATE MEMBER =====
+        $member->update($updateData);
+        
+        // ==========================================
+        // ✅ SAVE PAYMENT HISTORY (ONLY IF RENEWED)
+        // ==========================================
+        if ($request->status == 'Active' && $oldExpiryDate != $expiryDate && $request->renewal_amount) {
+            PaymentHistory::create([
+                'member_id' => $member->id,
+                'plan_type' => $request->plan_type,
+                'plan_name' => $membershipPlan,
+                'duration' => $membershipDuration,
+                'amount' => $request->renewal_amount ?? $finalPrice,
+                'payment_type' => $request->payment_type ?? $member->payment_type,
+                'transaction_id' => $request->transaction_id,
+                'payment_date' => $request->join_date ?? now(),
+                'old_expiry_date' => $oldExpiryDate,
+                'new_expiry_date' => $expiryDate,
+            ]);
+        }
+        
+        return redirect()->route('admin.members')->with('success', 'Member updated successfully! 🎉');
     }
     
     public function destroy($id)
