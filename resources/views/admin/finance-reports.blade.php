@@ -27,9 +27,6 @@
         min-height: 100vh;
     }
 
-    /* ============================================ */
-    /* CARD STYLES                                 */
-    /* ============================================ */
     .report-card {
         background: #ffffff;
         border-radius: var(--radius-lg);
@@ -118,6 +115,8 @@
         border: 1px solid var(--border-color);
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         transition: all 0.3s;
+        cursor: pointer;
+        position: relative;
     }
 
     .stat-item:hover {
@@ -147,6 +146,7 @@
     .stat-item .stat-value.red { color: #ef4444; }
     .stat-item .stat-value.teal { color: #0d9488; }
     .stat-item .stat-value.pink { color: #ec4899; }
+    .stat-item .stat-value.indigo { color: #6366f1; }
 
     .stat-item .stat-icon {
         float: right;
@@ -160,183 +160,66 @@
         margin-top: 2px;
     }
 
+    .stat-item .stat-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-size: 10px;
+        background: var(--primary);
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+
     /* ============================================ */
-    /* CHART CONTAINER                             */
+    /* TABLE CONTAINER                             */
     /* ============================================ */
-    .chart-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
+    .table-container {
+        display: none;
+        animation: fadeIn 0.5s ease;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid var(--border-color);
     }
 
-    @media (max-width: 992px) {
-        .chart-grid {
-            grid-template-columns: 1fr;
-        }
+    .table-container.active {
+        display: block;
     }
 
-    .chart-container {
-        background: #ffffff;
-        border-radius: var(--radius);
-        padding: 20px;
-        border: 1px solid var(--border-color);
-    }
-
-    .chart-container .chart-title {
+    .table-container .table-title {
         font-size: 14px;
         font-weight: 600;
         color: var(--dark);
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
-    .chart-container .chart-title i {
+    .table-container .table-title i {
         color: var(--primary);
     }
 
-    .chart-container canvas {
-        width: 100% !important;
-        height: 280px !important;
-        max-height: 280px;
-    }
-
-    /* ============================================ */
-    /* SEARCH & FILTER SECTION                    */
-    /* ============================================ */
-    .search-filter-section {
-        background: var(--light-gray);
-        border-radius: var(--radius);
-        padding: 16px 18px;
-        margin-bottom: 20px;
-        border: 1px solid var(--border-color);
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .search-filter-section .search-box {
-        flex: 1;
-        min-width: 200px;
-        position: relative;
-    }
-
-    .search-filter-section .search-box i {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
+    .table-container .close-table {
+        float: right;
+        background: none;
+        border: none;
         color: var(--gray);
-        font-size: 14px;
-    }
-
-    .search-filter-section .search-box input {
-        width: 100%;
-        padding: 8px 12px 8px 36px;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        font-size: 13px;
-        transition: all 0.3s;
-        background: #fff;
-        height: 38px;
-    }
-
-    .search-filter-section .search-box input:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
-        outline: none;
-    }
-
-    .search-filter-section .filter-group {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        align-items: center;
-    }
-
-    .search-filter-section .filter-group select {
-        padding: 8px 12px;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        font-size: 13px;
-        background: #fff;
-        height: 38px;
-        min-width: 130px;
-        transition: all 0.3s;
-        color: var(--dark);
-        appearance: none;
-        -webkit-appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 12px center;
-        padding-right: 36px;
-    }
-
-    .search-filter-section .filter-group select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
-        outline: none;
-    }
-
-    .search-filter-section .filter-group .btn-reset {
-        padding: 8px 18px;
-        background: var(--danger);
-        color: #fff;
-        border: none;
-        border-radius: var(--radius);
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 20px;
         cursor: pointer;
+        padding: 0 8px;
         transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        height: 38px;
     }
 
-    .search-filter-section .filter-group .btn-reset:hover {
-        background: #c62828;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(239, 83, 80, 0.35);
+    .table-container .close-table:hover {
+        color: var(--danger);
+        transform: rotate(90deg);
     }
 
-    /* ===== EXPORT BUTTON ===== */
-    .export-btn {
-        background: #22c55e;
-        color: white;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 8px;
-        font-weight: 500;
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        height: 38px;
-    }
-
-    .export-btn:hover {
-        background: #16a34a;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
-        color: white;
-    }
-
-    .export-btn i {
-        font-size: 14px;
-    }
-
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     /* ============================================ */
@@ -397,24 +280,6 @@
         font-size: 12px;
         text-align: center;
         width: 40px;
-    }
-
-    .table-payment .avatar-img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid var(--border-color);
-    }
-
-    .table-payment .member-id-badge {
-        font-family: monospace;
-        font-size: 12px;
-        color: var(--gray);
-        background: #f8f9fa;
-        padding: 2px 10px;
-        border-radius: 4px;
-        white-space: nowrap;
     }
 
     .table-payment .member-name {
@@ -544,9 +409,156 @@
         color: #92400e;
     }
 
-    /* ============================================ */
-    /* PAGINATION                                 */
-    /* ============================================ */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .empty-state i {
+        color: #dee2e6;
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h5 {
+        color: var(--dark);
+        margin-bottom: 4px;
+    }
+
+    .empty-state p {
+        color: var(--gray);
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .search-filter-section {
+        background: var(--light-gray);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .search-filter-section .search-box {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+    .search-filter-section .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        font-size: 14px;
+    }
+
+    .search-filter-section .search-box input {
+        width: 100%;
+        padding: 8px 12px 8px 36px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 13px;
+        transition: all 0.3s;
+        background: #fff;
+        height: 38px;
+    }
+
+    .search-filter-section .search-box input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+        outline: none;
+    }
+
+    .search-filter-section .filter-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .search-filter-section .filter-group select {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        font-size: 13px;
+        background: #fff;
+        height: 38px;
+        min-width: 130px;
+        transition: all 0.3s;
+        color: var(--dark);
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+    }
+
+    .search-filter-section .filter-group select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+        outline: none;
+    }
+
+    .search-filter-section .filter-group .btn-reset {
+        padding: 8px 18px;
+        background: var(--danger);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 38px;
+    }
+
+    .search-filter-section .filter-group .btn-reset:hover {
+        background: #c62828;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(239, 83, 80, 0.35);
+    }
+
+    .export-btn {
+        background: #22c55e;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        height: 38px;
+    }
+
+    .export-btn:hover {
+        background: #16a34a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
+        color: white;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
     .pagination-wrapper {
         display: flex;
         justify-content: space-between;
@@ -561,10 +573,6 @@
     .pagination-wrapper .pagination-info {
         font-size: 13px;
         color: var(--gray);
-    }
-
-    .pagination-wrapper .pagination-info strong {
-        color: var(--dark);
     }
 
     .pagination-wrapper .pagination-links {
@@ -608,31 +616,6 @@
         cursor: not-allowed;
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 40px 20px;
-    }
-
-    .empty-state i {
-        color: #dee2e6;
-        font-size: 48px;
-        margin-bottom: 12px;
-    }
-
-    .empty-state h5 {
-        color: var(--dark);
-        margin-bottom: 4px;
-    }
-
-    .empty-state p {
-        color: var(--gray);
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
-
-    /* ============================================ */
-    /* RESPONSIVE                                  */
-    /* ============================================ */
     @media (max-width: 768px) {
         .admin-main-content {
             padding: 12px 15px;
@@ -729,11 +712,6 @@
             font-size: 16px;
         }
 
-        .chart-container canvas {
-            height: 200px !important;
-            max-height: 200px;
-        }
-
         .table-payment tbody td {
             padding: 4px 6px;
             font-size: 10px;
@@ -742,11 +720,6 @@
         .table-payment thead th {
             padding: 4px 6px;
             font-size: 9px;
-        }
-
-        .table-payment .avatar-img {
-            width: 30px;
-            height: 30px;
         }
 
         .table-payment .plan-tag {
@@ -842,24 +815,227 @@
             </div>
 
             <!-- ========================================== -->
-            <!-- CHARTS                                    -->
+            <!-- DAYWISE & MONTHWISE COLLECTION BOXES      -->
             <!-- ========================================== -->
             <h6 style="font-weight:600; color:#1a1a2e; margin:20px 0 12px 0;">
-                <i class="fas fa-chart-bar" style="color: #4a9eff;"></i> Monthly Charts
+                <i class="fas fa-calendar-alt" style="color: #4a9eff;"></i> Collection Reports
+                <small style="font-weight:400; color:var(--gray); font-size:12px; margin-left:8px;">Click on a box to view details</small>
             </h6>
-            <div class="chart-grid">
-                <div class="chart-container">
-                    <div class="chart-title">
-                        <i class="fas fa-chart-bar" style="color: #3b82f6;"></i> Total Monthly Revenue
-                    </div>
-                    <canvas id="revenueChart"></canvas>
+            <div class="stat-grid-2">
+                <!-- Daywise Box -->
+                <div class="stat-item" onclick="toggleTable('daywiseTableContainer')" style="cursor:pointer; border-left: 4px solid #3b82f6;">
+                    <span class="stat-icon"><i class="fas fa-calendar-day"></i></span>
+                    <span class="stat-badge" style="background:#3b82f6;">Click to View</span>
+                    <div class="stat-label">Daywise Collection</div>
+                    <div class="stat-value indigo">₹ {{ number_format($daywiseTotal ?? 0, 2) }}</div>
+                    <div class="stat-sub">Today | {{ $daywisePayments->count() }} Payments</div>
                 </div>
 
-                <div class="chart-container">
-                    <div class="chart-title">
-                        <i class="fas fa-chart-line" style="color: #0d9488;"></i> Hand vs Online Revenue
-                    </div>
-                    <canvas id="paymentChart"></canvas>
+                <!-- Monthwise Box -->
+                <div class="stat-item" onclick="toggleTable('monthwiseTableContainer')" style="cursor:pointer; border-left: 4px solid #10b981;">
+                    <span class="stat-icon"><i class="fas fa-calendar-alt"></i></span>
+                    <span class="stat-badge" style="background:#10b981;">Click to View</span>
+                    <div class="stat-label">Monthwise Collection</div>
+                    <div class="stat-value green">₹ {{ number_format($monthwiseTotal ?? 0, 2) }}</div>
+                    <div class="stat-sub">Last 12 Months | {{ $monthwisePayments->count() }} Payments</div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- DAYWISE TABLE (Hidden by default)          -->
+            <!-- ========================================== -->
+            <div class="table-container" id="daywiseTableContainer">
+                <div class="table-title">
+                    <i class="fas fa-calendar-day" style="color: #3b82f6;"></i> Daywise Collection (Today - {{ now()->format('d-m-Y') }})
+                    <button class="close-table" onclick="toggleTable('daywiseTableContainer')">&times;</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table-payment">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width:50px;">#</th>
+                                <th>Member</th>
+                                <th>Plan Type</th>
+                                <th>Plan Name</th>
+                                <th>Duration</th>
+                                <th>Amount</th>
+                                <th>Payment Type</th>
+                                <th>Transaction ID</th>
+                                <th>Payment Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($daywisePayments as $index => $payment)
+                                <tr>
+                                    <td class="text-center sno">{{ $index + 1 }}</td>
+                                    <td>
+                                        @if($payment->member)
+                                            <span class="member-name">{{ $payment->member->name }}</span>
+                                            <span class="member-email">{{ $payment->member->email }}</span>
+                                        @else
+                                            <span class="plan-tag none">Member Deleted</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($payment->plan_type == 'membership')
+                                            <span class="plan-tag membership"><i class="fas fa-id-card"></i> Membership</span>
+                                        @elseif($payment->plan_type == 'package')
+                                            <span class="plan-tag package"><i class="fas fa-box"></i> Package</span>
+                                        @elseif($payment->plan_type == 'monthly')
+                                            <span class="plan-tag monthly"><i class="fas fa-calendar-alt"></i> Monthly</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="plan-name-badge">
+                                            <i class="fas fa-tag"></i> {{ $payment->plan_name ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $payment->duration ?? '-' }}</td>
+                                    <td><span class="price-amount">₹ {{ number_format($payment->amount, 2) }}</span></td>
+                                    <td>
+                                        @if($payment->payment_type == 'hand')
+                                            <span class="payment-tag hand"><i class="fas fa-hand-holding-usd"></i> Hand</span>
+                                        @elseif($payment->payment_type == 'online')
+                                            <span class="payment-tag online"><i class="fas fa-wifi"></i> Online</span>
+                                        @else
+                                            <span class="payment-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($payment->transaction_id)
+                                            <span class="transaction-id">{{ $payment->transaction_id }}</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    <td><span class="join-date">{{ date('d-m-Y', strtotime($payment->payment_date)) }}</span></td>
+                                    <td>
+                                        @if($payment->old_expiry_date && $payment->new_expiry_date)
+                                            <span class="status-badge renewed">
+                                                <i class="fas fa-sync"></i> Renewed
+                                            </span>
+                                        @else
+                                            <span class="status-badge new">
+                                                <i class="fas fa-check"></i> New
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10">
+                                        <div class="empty-state">
+                                            <i class="fas fa-calendar-day"></i>
+                                            <h5>No Daywise Payments Found</h5>
+                                            <p>No payments recorded today.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- MONTHWISE TABLE (Hidden by default)        -->
+            <!-- ========================================== -->
+            <div class="table-container" id="monthwiseTableContainer">
+                <div class="table-title">
+                    <i class="fas fa-calendar-alt" style="color: #10b981;"></i> Monthwise Collection (Last 12 Months)
+                    <button class="close-table" onclick="toggleTable('monthwiseTableContainer')">&times;</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table-payment">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width:50px;">#</th>
+                                <th>Member</th>
+                                <th>Plan Type</th>
+                                <th>Plan Name</th>
+                                <th>Duration</th>
+                                <th>Amount</th>
+                                <th>Payment Type</th>
+                                <th>Transaction ID</th>
+                                <th>Payment Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($monthwisePayments as $index => $payment)
+                                <tr>
+                                    <td class="text-center sno">{{ $index + 1 }}</td>
+                                    <td>
+                                        @if($payment->member)
+                                            <span class="member-name">{{ $payment->member->name }}</span>
+                                            <span class="member-email">{{ $payment->member->email }}</span>
+                                        @else
+                                            <span class="plan-tag none">Member Deleted</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($payment->plan_type == 'membership')
+                                            <span class="plan-tag membership"><i class="fas fa-id-card"></i> Membership</span>
+                                        @elseif($payment->plan_type == 'package')
+                                            <span class="plan-tag package"><i class="fas fa-box"></i> Package</span>
+                                        @elseif($payment->plan_type == 'monthly')
+                                            <span class="plan-tag monthly"><i class="fas fa-calendar-alt"></i> Monthly</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="plan-name-badge">
+                                            <i class="fas fa-tag"></i> {{ $payment->plan_name ?? 'N/A' }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $payment->duration ?? '-' }}</td>
+                                    <td><span class="price-amount">₹ {{ number_format($payment->amount, 2) }}</span></td>
+                                    <td>
+                                        @if($payment->payment_type == 'hand')
+                                            <span class="payment-tag hand"><i class="fas fa-hand-holding-usd"></i> Hand</span>
+                                        @elseif($payment->payment_type == 'online')
+                                            <span class="payment-tag online"><i class="fas fa-wifi"></i> Online</span>
+                                        @else
+                                            <span class="payment-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($payment->transaction_id)
+                                            <span class="transaction-id">{{ $payment->transaction_id }}</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    <td><span class="join-date">{{ date('d-m-Y', strtotime($payment->payment_date)) }}</span></td>
+                                    <td>
+                                        @if($payment->old_expiry_date && $payment->new_expiry_date)
+                                            <span class="status-badge renewed">
+                                                <i class="fas fa-sync"></i> Renewed
+                                            </span>
+                                        @else
+                                            <span class="status-badge new">
+                                                <i class="fas fa-check"></i> New
+                                            </span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="10">
+                                        <div class="empty-state">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <h5>No Monthwise Payments Found</h5>
+                                            <p>No payments recorded in the last 12 months.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -867,7 +1043,7 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- PAYMENT HISTORY TABLE (SHOWS OLD + NEW)    -->
+    <!-- PAYMENT HISTORY TABLE                      -->
     <!-- ========================================== -->
     <div class="report-card">
         <div class="card-header">
@@ -1020,133 +1196,24 @@
 </div>
 
 <!-- ========================================== -->
-<!-- CHART.JS                                   -->
+<!-- SCRIPTS                                    -->
 <!-- ========================================== -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-
-    // ============================================
-    // REVENUE CHART
-    // ============================================
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(revenueCtx, {
-        type: 'bar',
-        data: {
-            labels: {!! json_encode($monthlyLabels) !!},
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: {!! json_encode($monthlyChartData) !!},
-                backgroundColor: 'rgba(74, 158, 255, 0.7)',
-                borderColor: '#4a9eff',
-                borderWidth: 2,
-                borderRadius: 4,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0,0,0,0.05)'
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return '₹' + value.toLocaleString();
-                        }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
+// ============================================
+// TOGGLE TABLE VISIBILITY
+// ============================================
+function toggleTable(tableId) {
+    var container = document.getElementById(tableId);
+    if (container) {
+        var allTables = document.querySelectorAll('.table-container');
+        allTables.forEach(function(table) {
+            if (table.id !== tableId) {
+                table.classList.remove('active');
             }
-        }
-    });
-
-    // ============================================
-    // HAND VS ONLINE PAYMENT CHART
-    // ============================================
-    const paymentCtx = document.getElementById('paymentChart').getContext('2d');
-    new Chart(paymentCtx, {
-        type: 'line',
-        data: {
-            labels: {!! json_encode($monthlyLabels) !!},
-            datasets: [
-                {
-                    label: 'Hand Payment (₹)',
-                    data: {!! json_encode($monthlyHandData) !!},
-                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                    borderColor: '#0d9488',
-                    borderWidth: 2.5,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#0d9488',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4
-                },
-                {
-                    label: 'Online Payment (₹)',
-                    data: {!! json_encode($monthlyOnlineData) !!},
-                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                    borderColor: '#ec4899',
-                    borderWidth: 2.5,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#ec4899',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15,
-                        font: {
-                            size: 12
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0,0,0,0.05)'
-                    },
-                    ticks: {
-                        callback: function(value) {
-                            return '₹' + value.toLocaleString();
-                        }
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
-            }
-        }
-    });
-
-});
+        });
+        container.classList.toggle('active');
+    }
+}
 
 // ============================================
 // SEARCH & FILTER TABLE
@@ -1214,7 +1281,6 @@ function exportTableToCSV() {
     var rows = document.querySelectorAll('#paymentTable tbody tr');
     var data = [];
 
-    // Headers
     var headers = ['#', 'Member Name', 'Member Email', 'Plan Type', 'Plan Name', 'Duration', 'Amount', 'Payment Type', 'Transaction ID', 'Payment Date', 'Status'];
     data.push(headers);
 
@@ -1229,33 +1295,33 @@ function exportTableToCSV() {
         cells.forEach(function(cell, index) {
             var text = cell.textContent.trim();
 
-            if (index === 0) { // #
+            if (index === 0) {
                 rowData.push(text);
-            } else if (index === 1) { // Member
+            } else if (index === 1) {
                 var name = cell.querySelector('.member-name')?.textContent.trim() || '';
                 var email = cell.querySelector('.member-email')?.textContent.trim() || '';
                 rowData.push(name);
                 rowData.push(email);
-            } else if (index === 2) { // Plan Type
+            } else if (index === 2) {
                 var planTag = cell.querySelector('.plan-tag');
                 rowData.push(planTag ? planTag.textContent.trim() : text);
-            } else if (index === 3) { // Plan Name
+            } else if (index === 3) {
                 var planName = cell.querySelector('.plan-name-badge');
                 rowData.push(planName ? planName.textContent.trim() : text);
-            } else if (index === 4) { // Duration
+            } else if (index === 4) {
                 rowData.push(text);
-            } else if (index === 5) { // Amount
+            } else if (index === 5) {
                 var price = cell.querySelector('.price-amount');
                 rowData.push(price ? price.textContent.trim() : text);
-            } else if (index === 6) { // Payment Type
+            } else if (index === 6) {
                 var paymentTag = cell.querySelector('.payment-tag');
                 rowData.push(paymentTag ? paymentTag.textContent.trim() : text);
-            } else if (index === 7) { // Transaction ID
+            } else if (index === 7) {
                 var transId = cell.querySelector('.transaction-id');
                 rowData.push(transId ? transId.textContent.trim() : text);
-            } else if (index === 8) { // Payment Date
+            } else if (index === 8) {
                 rowData.push(text);
-            } else if (index === 9) { // Status
+            } else if (index === 9) {
                 var statusBadge = cell.querySelector('.status-badge');
                 rowData.push(statusBadge ? statusBadge.textContent.trim() : text);
             }

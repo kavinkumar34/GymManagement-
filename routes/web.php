@@ -1218,3 +1218,31 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 Route::get('/admin/finance-reports', [App\Http\Controllers\Admin\FinanceReportController::class, 'index'])
     ->name('admin.finance.reports')
     ->middleware('auth:admin');
+
+
+
+    // ============ EXPENSES ROUTES ============
+Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
+    Route::get('/expenses', [App\Http\Controllers\Admin\ExpenseController::class, 'index'])->name('expenses.index');
+    Route::get('/expenses/create', [App\Http\Controllers\Admin\ExpenseController::class, 'create'])->name('expenses.create');
+    Route::post('/expenses', [App\Http\Controllers\Admin\ExpenseController::class, 'store'])->name('expenses.store');
+    Route::get('/expenses/{id}/edit', [App\Http\Controllers\Admin\ExpenseController::class, 'edit'])->name('expenses.edit');
+    Route::put('/expenses/{id}', [App\Http\Controllers\Admin\ExpenseController::class, 'update'])->name('expenses.update');
+    Route::delete('/expenses/{id}', [App\Http\Controllers\Admin\ExpenseController::class, 'destroy'])->name('expenses.destroy');
+    Route::get('/expenses/stats', [App\Http\Controllers\Admin\ExpenseController::class, 'stats'])->name('expenses.stats');
+});
+
+
+
+
+// ============ TRAINER SALARY ROUTES ============
+Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
+    Route::get('/trainer-salaries', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'index'])->name('trainer-salaries.index');
+    Route::get('/trainer-salaries/create', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'create'])->name('trainer-salaries.create');
+    Route::post('/trainer-salaries', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'store'])->name('trainer-salaries.store');
+    Route::get('/trainer-salaries/{id}/edit', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'edit'])->name('trainer-salaries.edit');
+    Route::put('/trainer-salaries/{id}', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'update'])->name('trainer-salaries.update');
+    Route::delete('/trainer-salaries/{id}', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'destroy'])->name('trainer-salaries.destroy');
+    Route::get('/trainer-salaries/report', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'report'])->name('trainer-salaries.report');
+    Route::get('/trainer-salaries/export', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'export'])->name('trainer-salaries.export');
+});

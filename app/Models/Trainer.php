@@ -33,4 +33,25 @@ public function trainerAttendances()
 {
     return $this->hasMany(TrainerAttendance::class, 'trainer_id');
 }
+
+// Add relationship
+public function salaries()
+{
+    return $this->hasMany(TrainerSalary::class);
+}
+
+// Add accessor for total salary received
+public function getTotalSalaryReceivedAttribute()
+{
+    return $this->salaries()->sum('salary_amount');
+}
+
+// Add accessor for total salary this month
+public function getThisMonthSalaryAttribute()
+{
+    return $this->salaries()
+        ->whereYear('salary_month', now()->year)
+        ->whereMonth('salary_month', now()->month)
+        ->sum('salary_amount');
+}
 }

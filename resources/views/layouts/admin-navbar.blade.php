@@ -464,6 +464,23 @@
             </a>
         </li>
     </ul>
+      <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.expenses.index') }}">
+                <i class="fas fa-rupee-sign"></i> Expense
+            </a>
+        </li>
+    </ul>
+
+      <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.trainer-salaries.index') }}">
+                <i class="fas fa-rupee-sign"></i> Trainer Salary
+            </a>
+        </li>
+    </ul>
+
+    
 </li>
 
         <!-- Attendance -->
