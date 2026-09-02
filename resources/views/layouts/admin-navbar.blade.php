@@ -368,7 +368,7 @@
             </a>
         </li>
     </ul>
-</li>s
+</li>
 
         <!-- Trainers Dropdown -->
         <li class="nav-item has-dropdown">
