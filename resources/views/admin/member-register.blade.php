@@ -27,9 +27,6 @@
         min-height: 100vh;
     }
 
-    /* ============================================ */
-    /* CARD STYLES                                 */
-    /* ============================================ */
     .register-card {
         background: #ffffff;
         border-radius: var(--radius-lg);
@@ -75,9 +72,6 @@
         padding: 20px 24px;
     }
 
-    /* ============================================ */
-    /* SECTION HEADERS                             */
-    /* ============================================ */
     .section-title {
         font-size: 14px;
         font-weight: 600;
@@ -97,9 +91,6 @@
         font-size: 14px;
     }
 
-    /* ============================================ */
-    /* FORM STYLES                                 */
-    /* ============================================ */
     .form-label {
         font-size: 12px;
         font-weight: 500;
@@ -141,9 +132,6 @@
         resize: vertical;
     }
 
-    /* ============================================ */
-    /* DROPDOWN STYLES - FORCE DARK TEXT          */
-    /* ============================================ */
     select.form-control {
         appearance: none;
         -webkit-appearance: none;
@@ -180,15 +168,11 @@
         color: #1a1a2e !important;
     }
 
-    /* Firefox fix */
     select.form-control:-moz-focusring {
         color: #1a1a2e !important;
         text-shadow: 0 0 0 #1a1a2e !important;
     }
 
-    /* ============================================ */
-    /* FILE INPUT STYLES - WITH FILE NAME SHOW    */
-    /* ============================================ */
     .file-input-wrapper {
         position: relative;
         height: 38px;
@@ -263,9 +247,6 @@
         font-weight: 500;
     }
 
-    /* ============================================ */
-    /* DYNAMIC FIELDS - ANIMATION                 */
-    /* ============================================ */
     .dynamic-field {
         display: none;
         animation: fadeIn 0.3s ease;
@@ -286,9 +267,6 @@
         }
     }
 
-    /* ============================================ */
-    /* COMPACT ROW - REDUCED SPACING              */
-    /* ============================================ */
     .compact-row {
         margin-bottom: 0;
     }
@@ -297,9 +275,6 @@
         margin-bottom: 10px !important;
     }
 
-    /* ============================================ */
-    /* BUTTON STYLES                               */
-    /* ============================================ */
     .btn-primary {
         background: var(--primary);
         color: #fff;
@@ -349,9 +324,12 @@
         flex-wrap: wrap;
     }
 
-    /* ============================================ */
-    /* RESPONSIVE                                  */
-    /* ============================================ */
+    .date-readonly {
+        background: #f8f9fa !important;
+        color: #6c757d !important;
+        cursor: not-allowed;
+    }
+
     @media (max-width: 768px) {
         .admin-main-content {
             padding: 12px 15px;
@@ -467,13 +445,13 @@
 
                 <div class="row compact-row">
                     <!-- Full Name -->
-                    <div class="col-md-8 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Full Name <span class="text-danger">*</span></label>
                         <input type="text" name="name" class="form-control" required>
                     </div>
 
                     <!-- Profile Photo -->
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Profile Photo</label>
                         <div class="file-input-wrapper">
                             <div class="file-input-container">
@@ -491,6 +469,14 @@
                 </div>
 
                 <div class="row compact-row">
+                    <!-- Register Date - NEW, READONLY, AUTO-FILLED -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Register Date <span class="text-danger">*</span></label>
+                        <input type="date" name="register_date" class="form-control date-readonly" 
+                               value="{{ date('Y-m-d') }}" readonly>
+                        <small class="text-muted" style="font-size:11px;">Auto-filled, cannot be changed</small>
+                    </div>
+
                     <!-- Gender -->
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -507,40 +493,35 @@
                         <input type="date" name="dob" class="form-control" id="dob" onchange="calculateAge()">
                     </div>
 
-                     <!-- Phone Number -->
-    <div class="col-md-3 mb-3">
-        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-        <input type="tel" name="phone" class="form-control" 
-               pattern="[0-9]{10}" 
-               maxlength="10" 
-               minlength="10"
-               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
-               required>
-        <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
-    </div>
-
-                    <!-- Email -->
+                    <!-- Phone Number -->
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Email <span class="text-danger">*</span></label>
-                        <input type="email" name="email" class="form-control" required>
+                        <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                        <input type="tel" name="phone" class="form-control" 
+                               pattern="[0-9]{10}" maxlength="10" minlength="10"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" required>
+                        <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
                     </div>
                 </div>
 
                 <div class="row compact-row">
-                   <!-- Emergency Contact -->
-    <div class="col-md-4 mb-3">
-        <label class="form-label">Emergency Contact</label>
-        <input type="tel" name="emergency_contact" class="form-control" 
-               pattern="[0-9]{10}" 
-               maxlength="10" 
-               minlength="10"
-               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
-               placeholder="Emergency phone number">
-        <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
-    </div>
+                    <!-- Email -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <!-- Emergency Contact -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Emergency Contact</label>
+                        <input type="tel" name="emergency_contact" class="form-control" 
+                               pattern="[0-9]{10}" maxlength="10" minlength="10"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" 
+                               placeholder="Emergency phone number">
+                        <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
+                    </div>
 
                     <!-- Address -->
-                    <div class="col-md-8 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label class="form-label">Address</label>
                         <textarea name="address" class="form-control" rows="2"></textarea>
                     </div>
@@ -595,17 +576,19 @@
                 </div>
 
                 <!-- ========================================== -->
-                <!-- MEMBERSHIP INFORMATION                     -->
+                <!-- MEMBERSHIP INFORMATION - Join Date HERE    -->
                 <!-- ========================================== -->
                 <div class="section-title mt-2">
                     <i class="fas fa-id-card"></i> Membership Information
                 </div>
 
                 <div class="row compact-row">
-                    <!-- Join Date -->
+                    <!-- Join Date - ORIGINAL POSITION -->
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Join Date <span class="text-danger">*</span></label>
-                        <input type="date" name="join_date" class="form-control" required>
+                        <input type="date" name="join_date" class="form-control" 
+                               value="{{ date('Y-m-d') }}" id="joinDate" required>
+                        <small class="text-muted" style="font-size:11px;">Membership start date</small>
                     </div>
 
                     <!-- Plan Type -->
@@ -642,7 +625,7 @@
                     </div>
                 </div>
 
-                <!-- ===== MONTHLY PLAN FIELDS (Only Month & Price - Manual Input) ===== -->
+                <!-- ===== MONTHLY PLAN FIELDS ===== -->
                 <div class="row compact-row dynamic-field" id="monthlyFieldsDiv">
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Month <span class="text-danger">*</span></label>
@@ -687,7 +670,7 @@
                     </div>
                 </div>
 
-                <!-- Description - Hide for Monthly Plan -->
+                <!-- Description -->
                 <div class="row compact-row" id="descriptionDiv">
                     <div class="col-md-12 mb-3">
                         <label class="form-label">Description</label>
@@ -704,13 +687,21 @@
                 </div>
 
                 <!-- ========================================== -->
-                <!-- PAYMENT INFORMATION (NEW)                 -->
+                <!-- PAYMENT INFORMATION - UPDATED              -->
                 <!-- ========================================== -->
                 <div class="section-title mt-2">
                     <i class="fas fa-credit-card"></i> Payment Information
                 </div>
 
                 <div class="row compact-row">
+                    <!-- Payment Date - NEW -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Payment Date <span class="text-danger">*</span></label>
+                        <input type="date" name="payment_date" class="form-control" 
+                               value="{{ date('Y-m-d') }}" id="paymentDate" required>
+                        <small class="text-muted" style="font-size:11px;">Date when payment was made</small>
+                    </div>
+
                     <!-- Payment Type -->
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Payment Type <span class="text-danger">*</span></label>
@@ -726,9 +717,11 @@
                         <label class="form-label">Transaction ID <span class="text-danger">*</span></label>
                         <input type="text" name="transaction_id" id="transactionId" class="form-control" placeholder="Enter transaction ID">
                     </div>
+                </div>
 
+                <div class="row compact-row">
                     <!-- Upload Screenshot (Dynamic - Online Payment) -->
-                    <div class="col-md-4 mb-3 dynamic-field" id="screenshotDiv">
+                    <div class="col-md-12 mb-3 dynamic-field" id="screenshotDiv">
                         <label class="form-label">Upload Screenshot</label>
                         <div class="file-input-wrapper">
                             <div class="file-input-container">
@@ -856,12 +849,10 @@ function calculateBMI() {
 function togglePlanFields() {
     let planType = document.getElementById('planType').value;
     
-    // Hide all dynamic fields first
     document.getElementById('membershipPlanDiv').classList.remove('show');
     document.getElementById('packageDiv').classList.remove('show');
     document.getElementById('monthlyFieldsDiv').classList.remove('show');
     
-    // Show based on selection
     if (planType == 'membership') {
         document.getElementById('membershipPlanDiv').classList.add('show');
         document.getElementById('membershipFieldsDiv').style.display = 'flex';
@@ -877,7 +868,6 @@ function togglePlanFields() {
         document.getElementById('featuresDiv').style.display = 'none';
     }
     
-    // Clear all fields
     clearFields();
 }
 
@@ -981,11 +971,9 @@ function calculateMonthlyTotal() {
 function togglePaymentFields() {
     let paymentType = document.getElementById('paymentType').value;
     
-    // Hide all payment dynamic fields first
     document.getElementById('transactionIdDiv').classList.remove('show');
     document.getElementById('screenshotDiv').classList.remove('show');
     
-    // Show based on selection
     if (paymentType == 'online') {
         document.getElementById('transactionIdDiv').classList.add('show');
         document.getElementById('screenshotDiv').classList.add('show');
@@ -1017,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Hidden field for membership duration (used for form submission) -->
+<!-- Hidden field for membership duration -->
 <input type="hidden" name="membership_duration" id="membershipDurationHidden" form="memberForm">
 
 @endsection

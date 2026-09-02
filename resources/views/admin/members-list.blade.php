@@ -70,6 +70,91 @@
         }
 
         /* ============================================ */
+        /* TABS STYLES                                 */
+        /* ============================================ */
+        .members-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            flex-wrap: wrap;
+        }
+
+        .members-tabs .tab-item {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .members-tabs .tab-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 18px;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            background: transparent;
+            border-right: 1px solid var(--border-color);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .members-tabs .tab-item:last-child .tab-link {
+            border-right: none;
+        }
+
+        .members-tabs .tab-link:hover {
+            background: rgba(74, 158, 255, 0.05);
+            color: var(--dark);
+        }
+
+        .members-tabs .tab-link.active {
+            color: var(--primary);
+            background: #ffffff;
+            border-bottom-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .members-tabs .tab-link .tab-badge {
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .members-tabs .tab-link .tab-badge.all {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .members-tabs .tab-link .tab-badge.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .members-tabs .tab-link .tab-badge.expired {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .members-tabs .tab-link .tab-badge.inactive {
+            background: #f5f5f5;
+            color: #9e9e9e;
+        }
+
+        .members-tabs .tab-link .tab-badge.not-started {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        /* ============================================ */
         /* SEARCH & FILTER SECTION                    */
         /* ============================================ */
         .search-filter-section {
@@ -282,6 +367,7 @@
             border-collapse: collapse;
             font-size: 13px;
             margin: 0;
+            min-width: 1400px;
         }
 
         .table-members thead {
@@ -433,10 +519,50 @@
             background: #ef5350;
         }
 
+        .table-members .status-badge.expired {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .table-members .status-badge.expired .dot {
+            background: #ef5350;
+        }
+
         .table-members .join-date {
             font-size: 12px;
             color: var(--gray);
             white-space: nowrap;
+        }
+
+        /* ============================================ */
+        /* PAY BUTTON                                  */
+        /* ============================================ */
+        .pay-btn {
+            background: #10b981;
+            color: #fff;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+
+        .pay-btn:hover {
+            background: #059669;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+        }
+
+        .pay-btn i {
+            font-size: 10px;
         }
 
         /* ============================================ */
@@ -855,6 +981,26 @@
                 padding: 4px 12px;
                 font-size: 10px;
             }
+
+            .members-tabs {
+                flex-wrap: wrap;
+            }
+
+            .members-tabs .tab-item {
+                flex: 1 1 50%;
+                min-width: unset;
+            }
+
+            .members-tabs .tab-link {
+                font-size: 12px;
+                padding: 8px 12px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .members-tabs .tab-item:last-child .tab-link {
+                border-bottom: none;
+            }
         }
 
         @media (max-width: 576px) {
@@ -920,6 +1066,10 @@
                 padding: 4px 10px;
                 font-size: 10px;
             }
+
+            .members-tabs .tab-item {
+                flex: 1 1 100%;
+            }
         }
     </style>
 
@@ -962,6 +1112,59 @@
                     </div>
                 @endif
 
+                <!-- ========================================== -->
+                <!-- TABS - All | Active | Expired | Inactive  -->
+                <!-- ========================================== -->
+            <!-- ========================================== -->
+<!-- TABS - All | Active | Expired | Inactive  -->
+<!-- ========================================== -->
+@php
+    $currentTab = request('tab', 'all');
+    
+    // Count members for each tab
+    $allCount = $members->total();
+    $activeCount = \App\Models\Member::where('status', 'Active')
+        ->where(function($q) {
+            $q->whereNull('expiry_date')
+              ->orWhere('expiry_date', '>=', now());
+        })
+        ->count();
+    
+    $expiredCount = \App\Models\Member::where('expiry_date', '<', now())->count();
+    $inactiveCount = \App\Models\Member::where('status', 'Inactive')->count();
+@endphp
+
+<div class="members-tabs">
+    <div class="tab-item">
+        <a href="{{ route('admin.member.index', ['tab' => 'all']) }}" 
+           class="tab-link {{ $currentTab == 'all' ? 'active' : '' }}">
+            <i class="fas fa-list"></i> All
+            <span class="tab-badge all">{{ $allCount }}</span>
+        </a>
+    </div>
+    <div class="tab-item">
+        <a href="{{ route('admin.member.index', ['tab' => 'active']) }}" 
+           class="tab-link {{ $currentTab == 'active' ? 'active' : '' }}">
+            <i class="fas fa-check-circle"></i> Active
+            <span class="tab-badge active">{{ $activeCount }}</span>
+        </a>
+    </div>
+    <div class="tab-item">
+        <a href="{{ route('admin.member.index', ['tab' => 'expired']) }}" 
+           class="tab-link {{ $currentTab == 'expired' ? 'active' : '' }}">
+            <i class="fas fa-exclamation-circle"></i> Expired
+            <span class="tab-badge expired">{{ $expiredCount }}</span>
+        </a>
+    </div>
+    <div class="tab-item">
+        <a href="{{ route('admin.member.index', ['tab' => 'inactive']) }}" 
+           class="tab-link {{ $currentTab == 'inactive' ? 'active' : '' }}">
+            <i class="fas fa-user-slash"></i> Inactive
+            <span class="tab-badge inactive">{{ $inactiveCount }}</span>
+        </a>
+    </div>
+</div>
+
                 <!-- Search & Filter -->
                 <div class="search-filter-section">
                     <div class="search-box">
@@ -975,11 +1178,6 @@
                             <option value="membership">Membership</option>
                             <option value="package">Package</option>
                             <option value="monthly">Monthly Plan</option>
-                        </select>
-                        <select id="statusFilter" onchange="filterTable()">
-                            <option value="">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
                         </select>
                         <input type="date" id="dateFilter" onchange="filterTable()" title="Filter by join date">
                         <button class="btn-reset" onclick="resetFilters()">
@@ -999,6 +1197,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
+                                <th>Register Date</th>
                                 <th>Plan</th>
                                 <th>Plan Name</th>
                                 <th>Price</th>
@@ -1006,9 +1205,9 @@
                                 <th>Transaction ID</th>
                                 <th>Trainer</th>
                                 <th>Status</th>
-                                <th>Joined</th>
+                                <th>Join Date</th>
                                 <th>Expiry Date</th>
-<th>Plan Status</th>
+                                <th>Plan Status</th>
                                 <th class="text-center" style="width:120px;">Actions</th>
                             </tr>
                         </thead>
@@ -1018,8 +1217,7 @@
                                     <td class="text-center sno">{{ $members->firstItem() + $index }}</td>
                                     <td>
                                         @if ($member->photo)
-                                            <img src="{{ asset('storage/' . $member->photo) }}" class="avatar-img"
-                                                alt="{{ $member->name }}">
+                                            <img src="{{ asset('storage/' . $member->photo) }}" class="avatar-img" alt="{{ $member->name }}">
                                         @else
                                             <img src="{{ asset('images/no-image.png') }}" class="avatar-img" alt="No Image">
                                         @endif
@@ -1029,7 +1227,16 @@
                                     <td>{{ $member->email }}</td>
                                     <td>{{ $member->phone }}</td>
                                     
-                                    <!-- ===== UPDATED PLAN COLUMN ===== -->
+                                    <!-- Register Date -->
+                                    <td>
+                                        @if($member->register_date)
+                                            <span class="join-date">{{ date('d-m-Y', strtotime($member->register_date)) }}</span>
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    
+                                    <!-- Plan Type -->
                                     <td>
                                         @if ($member->plan_type == 'membership')
                                             <span class="plan-tag membership"><i class="fas fa-id-card"></i> Membership</span>
@@ -1045,6 +1252,7 @@
                                     <td><span class="plan-name">{{ $member->membership_plan ?? '-' }}</span></td>
                                     <td><span class="price-amount">₹ {{ number_format($member->final_price ?? 0, 2) }}</span></td>
                                     
+                                    <!-- Payment Type -->
                                     <td>
                                         @if($member->payment_type == 'hand')
                                             <span class="plan-tag membership"><i class="fas fa-hand-holding-usd"></i> Hand</span>
@@ -1054,6 +1262,8 @@
                                             <span class="plan-tag none">-</span>
                                         @endif
                                     </td>
+                                    
+                                    <!-- Transaction ID -->
                                     <td>
                                         @if($member->transaction_id)
                                             <span class="plan-name" style="font-size:11px;">{{ $member->transaction_id }}</span>
@@ -1062,6 +1272,7 @@
                                         @endif
                                     </td>
                                     
+                                    <!-- Trainer -->
                                     <td>
                                         @if ($member->trainer)
                                             <span class="trainer-name">
@@ -1072,6 +1283,8 @@
                                             <span class="plan-tag none">Not Assigned</span>
                                         @endif
                                     </td>
+                                    
+                                    <!-- Status -->
                                     <td>
                                         @if ($member->status == 'Active')
                                             <span class="status-badge active">
@@ -1083,55 +1296,72 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td><span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span>
-                                    </td>
+                                    
+                                    <!-- Join Date -->
+                                    <td><span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span></td>
+                                    
                                     <!-- Expiry Date -->
-<td>
-    @if($member->expiry_date)
-        {{ date('d-m-Y', strtotime($member->expiry_date)) }}
-    @else
-        <span class="plan-tag none">-</span>
-    @endif
-</td>
-<!-- Plan Status -->
-<td>
-    @if($member->expiry_date)
-        @if(now()->gt($member->expiry_date))
-            <span class="status-badge inactive">
-                <span class="dot"></span> Expired
-            </span>
-        @else
-            @php
-                // ✅ FIX: Whole number only
-                $daysLeft = floor(now()->diffInDays($member->expiry_date));
-            @endphp
-            @if($daysLeft <= 7)
-                <span class="status-badge" style="background: #fef3c7; color: #92400e; padding: 4px 14px; border-radius: 50px; font-size: 11px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
-                    <span class="dot" style="width:6px; height:6px; border-radius:50%; background:#f59e0b; display:inline-block;"></span>
-                    {{ $daysLeft }} days left
-                </span>
-            @else
-                <span class="status-badge active">
-                    <span class="dot"></span> {{ $daysLeft }} days left
-                </span>
-            @endif
-        @endif
-    @else
-        <span class="plan-tag none">-</span>
-    @endif
-</td>
+                                    <td>
+                                        @if($member->expiry_date)
+                                            {{ date('d-m-Y', strtotime($member->expiry_date)) }}
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    
+                                    <!-- Plan Status - WITH PAY BUTTON -->
+                                    <td>
+                                        @if($member->expiry_date)
+                                            @if(now()->gt($member->expiry_date))
+                                                <span class="status-badge expired">
+                                                    <span class="dot"></span> Expired
+                                                    <a href="{{ route('admin.member.edit', $member->id) }}?renew=true&amount={{ $member->final_price }}" 
+                                                       class="pay-btn" title="Renew Member">
+                                                        <i class="fas fa-credit-card"></i> Pay ₹{{ number_format($member->final_price ?? 0, 2) }}
+                                                    </a>
+                                                </span>
+                                            @else
+                                                @php
+                                                    if($member->join_date > now()) {
+                                                        $daysLeft = 0;
+                                                        $statusText = 'Not Started';
+                                                        $badgeClass = 'inactive';
+                                                    } else {
+                                                        $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                                        $statusText = $daysLeft . ' days left';
+                                                        $badgeClass = ($daysLeft <= 7) ? 'warning' : 'active';
+                                                    }
+                                                @endphp
+                                                @if($member->join_date > now())
+                                                    <span class="status-badge inactive">
+                                                        <span class="dot"></span> Not Started
+                                                    </span>
+                                                @elseif($daysLeft <= 7)
+                                                    <span class="status-badge" style="background: #fef3c7; color: #92400e; padding: 4px 14px; border-radius: 50px; font-size: 11px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+                                                        <span class="dot" style="width:6px; height:6px; border-radius:50%; background:#f59e0b; display:inline-block;"></span>
+                                                        {{ $daysLeft }} days left
+                                                    </span>
+                                                @else
+                                                    <span class="status-badge active">
+                                                        <span class="dot"></span> {{ $daysLeft }} days left
+                                                    </span>
+                                                @endif
+                                            @endif
+                                        @else
+                                            <span class="plan-tag none">-</span>
+                                        @endif
+                                    </td>
+                                    
+                                    <!-- Actions -->
                                     <td>
                                         <div class="action-btns">
-                                            <a href="{{ route('admin.member.show', $member->id) }}" class="btn-action view"
-                                                title="View">
+                                            <a href="{{ route('admin.member.show', $member->id) }}" class="btn-action view" title="View">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.member.edit', $member->id) }}" class="btn-action edit"
-                                                title="Edit">
+                                            <a href="{{ route('admin.member.edit', $member->id) }}" class="btn-action edit" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn-action delete"
-                                                onclick="openDeleteModal({{ $member->id }})" title="Delete">
+                                            <button type="button" class="btn-action delete" onclick="openDeleteModal({{ $member->id }})" title="Delete">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -1139,15 +1369,26 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="15">
+                                    <td colspan="18">
                                         <div class="empty-state">
                                             <i class="fas fa-users"></i>
                                             <h5>No Members Found</h5>
-                                            <p>Click "Add Member" to register a new member.</p>
-                                            <a href="{{ route('admin.member.create') }}" class="btn btn-primary"
-                                                style="background:#4a9eff; color:#fff; border:none; padding:8px 20px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:500; font-size:13px;">
-                                                <i class="fas fa-user-plus"></i> Add Member
-                                            </a>
+                                            <p>
+                                                @if($currentTab == 'expired')
+                                                    No expired members found.
+                                                @elseif($currentTab == 'active')
+                                                    No active members found.
+                                                @elseif($currentTab == 'inactive')
+                                                    No inactive members found.
+                                                @else
+                                                    Click "Add Member" to register a new member.
+                                                @endif
+                                            </p>
+                                            @if($currentTab == 'all')
+                                                <a href="{{ route('admin.member.create') }}" class="btn btn-primary" style="background:#4a9eff; color:#fff; border:none; padding:8px 20px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:500; font-size:13px;">
+                                                    <i class="fas fa-user-plus"></i> Add Member
+                                                </a>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -1164,7 +1405,7 @@
                         entries
                     </div>
                     <div class="pagination-links">
-                        {{ $members->links() }}
+                        {{ $members->appends(['tab' => $currentTab])->links() }}
                     </div>
                 </div>
 
@@ -1255,16 +1496,14 @@
         function filterTable() {
             var searchValue = document.getElementById('searchInput').value.toLowerCase();
             var planFilter = document.getElementById('planFilter').value.toLowerCase();
-            var statusFilter = document.getElementById('statusFilter').value.toLowerCase();
             var dateFilter = document.getElementById('dateFilter').value;
 
             var rows = document.querySelectorAll('#tableBody tr');
 
             rows.forEach(function(row) {
                 var text = row.textContent.toLowerCase();
-                var planType = row.querySelector('td:nth-child(7)')?.textContent.toLowerCase() || '';
-                var statusType = row.querySelector('td:nth-child(13)')?.textContent.toLowerCase() || '';
-                var joinDate = row.querySelector('td:nth-child(14)')?.textContent.trim() || '';
+                var planType = row.querySelector('td:nth-child(8)')?.textContent.toLowerCase() || '';
+                var joinDate = row.querySelector('td:nth-child(15)')?.textContent.trim() || '';
 
                 var joinDateFormatted = '';
                 if (joinDate) {
@@ -1276,10 +1515,9 @@
 
                 var matchesSearch = text.includes(searchValue);
                 var matchesPlan = planFilter === '' || planType.includes(planFilter);
-                var matchesStatus = statusFilter === '' || statusType.includes(statusFilter);
                 var matchesDate = dateFilter === '' || joinDateFormatted === dateFilter;
 
-                if (matchesSearch && matchesPlan && matchesStatus && matchesDate) {
+                if (matchesSearch && matchesPlan && matchesDate) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
@@ -1299,7 +1537,7 @@
                 var tr = document.createElement('tr');
                 tr.id = 'noResultRow';
                 var td = document.createElement('td');
-                td.colSpan = 15;
+                td.colSpan = 18;
                 td.style.textAlign = 'center';
                 td.style.padding = '30px';
                 td.style.color = '#6c757d';
@@ -1316,7 +1554,6 @@
         function resetFilters() {
             document.getElementById('searchInput').value = '';
             document.getElementById('planFilter').value = '';
-            document.getElementById('statusFilter').value = '';
             document.getElementById('dateFilter').value = '';
             filterTable();
         }

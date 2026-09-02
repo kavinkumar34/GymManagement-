@@ -59,7 +59,8 @@
                                     <th>Final Price</th>
                                     <th>Payment Type</th>
                                     <th>Transaction ID</th>
-                                    <th>Joined Date</th>
+                                    <th>Payment Date</th>
+                                    <th>Join Date</th>
                                     <th>Expiry Date</th>
                                     <th>Status</th>
                                 </tr>
@@ -140,6 +141,17 @@
                                             
                                             <!-- ===== PAYMENT DATE ===== -->
                                             <td class="join-date">{{ date('d-m-Y', strtotime($payment->payment_date)) }}</td>
+                                            
+                                            <!-- ===== JOIN DATE - FIXED ===== -->
+                                            <td>
+    @if($payment->join_date)
+        <span class="join-date">{{ date('d-m-Y', strtotime($payment->join_date)) }}</span>
+    @elseif($member && $member->join_date)
+        <span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span>
+    @else
+        <span class="plan-badge none">-</span>
+    @endif
+</td>
                                             
                                             <!-- ===== EXPIRY DATE (FROM PAYMENT HISTORY) ===== -->
                                             <td>
@@ -235,7 +247,17 @@
                                             @endif
                                         </td>
                                         
-                                        <td class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</td>
+                                        <!-- ===== PAYMENT DATE ===== -->
+                                        <td class="join-date">{{ date('d-m-Y', strtotime($member->payment_date ?? $member->join_date)) }}</td>
+                                        
+                                        <!-- ===== JOIN DATE - ORIGINAL ===== -->
+                                        <td>
+                                            @if($member->join_date)
+                                                <span class="join-date">{{ date('d-m-Y', strtotime($member->join_date)) }}</span>
+                                            @else
+                                                <span class="plan-badge none">-</span>
+                                            @endif
+                                        </td>
                                         
                                         <!-- ===== EXPIRY DATE ===== -->
                                         <td>
@@ -246,16 +268,27 @@
                                             @endif
                                         </td>
                                         
-                                        <!-- ===== STATUS ===== -->
+                                        <!-- ===== STATUS - FIXED ===== -->
                                         <td>
                                             @if($member->expiry_date)
                                                 @if(now()->gt($member->expiry_date))
                                                     <span class="plan-badge none">Expired</span>
                                                 @else
                                                     @php
-                                                        $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                                        // ✅ FIX: Check if join_date is in future
+                                                        if($member->join_date > now()) {
+                                                            $daysLeft = 0;
+                                                            $statusText = 'Not Started';
+                                                        } else {
+                                                            $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                                            $statusText = $daysLeft . ' days left';
+                                                        }
                                                     @endphp
-                                                    <span class="plan-badge membership">{{ $daysLeft }} days left</span>
+                                                    @if($member->join_date > now())
+                                                        <span class="plan-badge none">Not Started</span>
+                                                    @else
+                                                        <span class="plan-badge membership">{{ $statusText }}</span>
+                                                    @endif
                                                 @endif
                                             @else
                                                 <span class="plan-badge none">-</span>
@@ -264,7 +297,7 @@
                                     </tr>
                                 @else
                                     <tr>
-                                        <td colspan="14" class="empty-row">
+                                        <td colspan="15" class="empty-row">
                                             <i class="fas fa-users fa-2x mb-2"></i>
                                             <p>No members found.</p>
                                         </td>
@@ -351,7 +384,7 @@
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(13, 27, 62, 0.06);
     table-layout: auto;
-    min-width: 1200px;
+    min-width: 1300px;
 }
 
 .payment-table thead {
@@ -566,7 +599,7 @@
 @media (max-width: 992px) {
     .payment-table {
         font-size: 0.8rem;
-        min-width: 1000px;
+        min-width: 1100px;
     }
     
     .payment-table thead th,
@@ -597,7 +630,7 @@
     
     .payment-table {
         font-size: 0.75rem;
-        min-width: 900px;
+        min-width: 1000px;
     }
     
     .payment-table thead th,
@@ -650,7 +683,7 @@
     
     .payment-table {
         font-size: 0.7rem;
-        min-width: 800px;
+        min-width: 900px;
     }
     
     .payment-table thead th,
@@ -708,7 +741,7 @@
     
     .payment-table {
         font-size: 0.6rem;
-        min-width: 700px;
+        min-width: 800px;
     }
     
     .payment-table thead th,

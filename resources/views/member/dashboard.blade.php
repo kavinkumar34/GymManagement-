@@ -156,11 +156,23 @@
                         <span class="stat-sub">Expired on {{ date('d M Y', strtotime($member->expiry_date)) }}</span>
                     @else
                         @php
-                            // ✅ FIX: Whole number only
-                            $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                            // ✅ FIX: Check if join_date is in future
+                            if($member->join_date > now()) {
+                                $daysLeft = 0;
+                                $statusText = 'Not Started';
+                            } else {
+                                $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                $statusText = $daysLeft . ' days';
+                            }
                         @endphp
-                        <span class="stat-value active">{{ $daysLeft }} days</span>
-                        <span class="stat-sub">Expires on {{ date('d M Y', strtotime($member->expiry_date)) }}</span>
+                        <span class="stat-value active">{{ $statusText }}</span>
+                        <span class="stat-sub">
+                            @if($member->join_date > now())
+                                Joins on {{ date('d M Y', strtotime($member->join_date)) }}
+                            @else
+                                Expires on {{ date('d M Y', strtotime($member->expiry_date)) }}
+                            @endif
+                        </span>
                     @endif
                 @else
                     <span class="stat-value active">No Expiry</span>
@@ -308,150 +320,156 @@
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- RECENT PAYMENTS - Full Width               -->
-        <!-- ========================================== -->
-        <div class="col-12 mb-4">
-            <div class="dashboard-card">
-                <div class="dashboard-card-header">
-                    <h5 class="card-title">
-                        <i class="fas fa-credit-card me-2"></i> Recent Payments
-                    </h5>
-                    <a href="{{ route('member.payments.index') }}" class="view-all-link">
-                        View All <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
-                </div>
-                <div class="dashboard-card-body p-0">
-                    <div class="table-responsive">
-                        <table class="payment-table-dashboard">
-                            <thead>
+      <!-- ========================================== -->
+<!-- RECENT PAYMENTS - Full Width               -->
+<!-- ========================================== -->
+<div class="col-12 mb-4">
+    <div class="dashboard-card">
+        <div class="dashboard-card-header">
+            <h5 class="card-title">
+                <i class="fas fa-credit-card me-2"></i> Recent Payments
+            </h5>
+            <a href="{{ route('member.payments.index') }}" class="view-all-link">
+                View All <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        <div class="dashboard-card-body p-0">
+            <div class="table-responsive">
+                <table class="payment-table-dashboard">
+                    <thead>
+                        <tr>
+                            <th>Payment Date</th>  <!-- CHANGED: Removed "Date", added "Payment Date" -->
+                            <th>Plan Type</th>
+                            <th>Plan Name</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if($member)
+                            <!-- Show Member's Current Plan as Payment Info -->
+                            <tr>
+                                <td>
+                                    <span class="payment-date">
+                                        <i class="fas fa-calendar-day me-1"></i>
+                                        <!-- ✅ FIX: Show PAYMENT DATE from member -->
+                                        @if($member->payment_date)
+                                            {{ date('d M Y', strtotime($member->payment_date)) }}
+                                        @else
+                                            {{ $member->created_at ? $member->created_at->format('d M Y') : date('d M Y') }}
+                                        @endif
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($member->plan_type == 'membership')
+                                        <span class="plan-badge membership">
+                                            <i class="fas fa-id-card me-1"></i> Membership
+                                        </span>
+                                    @elseif($member->plan_type == 'package')
+                                        <span class="plan-badge package">
+                                            <i class="fas fa-box me-1"></i> Package
+                                        </span>
+                                    @elseif($member->plan_type == 'monthly')
+                                        <span class="plan-badge monthly">
+                                            <i class="fas fa-calendar-alt me-1"></i> Monthly
+                                        </span>
+                                    @else
+                                        <span class="plan-badge none">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="plan-name-badge">
+                                        <i class="fas fa-tag me-1"></i> 
+                                        {{ $member->membership_plan ?? 'Basic' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="payment-amount">
+                                        ₹ {{ number_format($member->final_price ?? 0, 2) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($member->status == 'Active')
+                                        <span class="payment-status paid">
+                                            <i class="fas fa-check-circle me-1"></i> Paid
+                                        </span>
+                                    @else
+                                        <span class="payment-status failed">
+                                            <i class="fas fa-times-circle me-1"></i> Inactive
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                            
+                            <!-- Additional Orders/Payments from MembershipOrder -->
+                            @foreach($payments as $payment)
                                 <tr>
-                                    <th>Date</th>
-                                    <th>Plan Type</th>
-                                    <th>Plan Name</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
+                                    <td>
+                                        <span class="payment-date">
+                                            <i class="fas fa-calendar-day me-1"></i>
+                                            <!-- ✅ FIX: Show PAYMENT DATE from payment history -->
+                                            {{ $payment->created_at->format('d M Y') }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if($payment->plan_type == 'membership')
+                                            <span class="plan-badge membership">
+                                                <i class="fas fa-id-card me-1"></i> Membership
+                                            </span>
+                                        @elseif($payment->plan_type == 'package')
+                                            <span class="plan-badge package">
+                                                <i class="fas fa-box me-1"></i> Package
+                                            </span>
+                                        @elseif($payment->plan_type == 'monthly')
+                                            <span class="plan-badge monthly">
+                                                <i class="fas fa-calendar-alt me-1"></i> Monthly
+                                            </span>
+                                        @else
+                                            <span class="plan-badge none">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="plan-name-badge">
+                                            <i class="fas fa-tag me-1"></i> 
+                                            {{ $payment->plan_name ?? $member->membership_plan }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="payment-amount">
+                                            ₹ {{ number_format($payment->amount ?? $member->final_price, 2) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if($payment->payment_status == 'SUCCESS')
+                                            <span class="payment-status paid">
+                                                <i class="fas fa-check-circle me-1"></i> Paid
+                                            </span>
+                                        @elseif($payment->payment_status == 'PENDING')
+                                            <span class="payment-status pending">
+                                                <i class="fas fa-clock me-1"></i> Pending
+                                            </span>
+                                        @else
+                                            <span class="payment-status failed">
+                                                <i class="fas fa-times-circle me-1"></i> Failed
+                                            </span>
+                                        @endif
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if($member)
-                                    <!-- Show Member's Current Plan as Payment Info -->
-                                    <tr>
-                                        <td>
-                                            <span class="payment-date">
-                                                <i class="fas fa-calendar-day me-1"></i>
-                                                {{ $member->created_at ? $member->created_at->format('d M Y') : date('d M Y') }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @if($member->plan_type == 'membership')
-                                                <span class="plan-badge membership">
-                                                    <i class="fas fa-id-card me-1"></i> Membership
-                                                </span>
-                                            @elseif($member->plan_type == 'package')
-                                                <span class="plan-badge package">
-                                                    <i class="fas fa-box me-1"></i> Package
-                                                </span>
-                                            @elseif($member->plan_type == 'monthly')
-                                                <span class="plan-badge monthly">
-                                                    <i class="fas fa-calendar-alt me-1"></i> Monthly
-                                                </span>
-                                            @else
-                                                <span class="plan-badge none">-</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <span class="plan-name-badge">
-                                                <i class="fas fa-tag me-1"></i> 
-                                                {{ $member->membership_plan ?? 'Basic' }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="payment-amount">
-                                                ₹ {{ number_format($member->final_price ?? 0, 2) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @if($member->status == 'Active')
-                                                <span class="payment-status paid">
-                                                    <i class="fas fa-check-circle me-1"></i> Paid
-                                                </span>
-                                            @else
-                                                <span class="payment-status failed">
-                                                    <i class="fas fa-times-circle me-1"></i> Inactive
-                                                </span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    
-                                    <!-- Additional Orders/Payments from MembershipOrder -->
-                                    @foreach($payments as $payment)
-                                        <tr>
-                                            <td>
-                                                <span class="payment-date">
-                                                    <i class="fas fa-calendar-day me-1"></i>
-                                                    {{ $payment->created_at->format('d M Y') }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @if($payment->plan_type == 'membership')
-                                                    <span class="plan-badge membership">
-                                                        <i class="fas fa-id-card me-1"></i> Membership
-                                                    </span>
-                                                @elseif($payment->plan_type == 'package')
-                                                    <span class="plan-badge package">
-                                                        <i class="fas fa-box me-1"></i> Package
-                                                    </span>
-                                                @elseif($payment->plan_type == 'monthly')
-                                                    <span class="plan-badge monthly">
-                                                        <i class="fas fa-calendar-alt me-1"></i> Monthly
-                                                    </span>
-                                                @else
-                                                    <span class="plan-badge none">-</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <span class="plan-name-badge">
-                                                    <i class="fas fa-tag me-1"></i> 
-                                                    {{ $payment->plan_name ?? $member->membership_plan }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="payment-amount">
-                                                    ₹ {{ number_format($payment->amount ?? $member->final_price, 2) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                @if($payment->payment_status == 'SUCCESS')
-                                                    <span class="payment-status paid">
-                                                        <i class="fas fa-check-circle me-1"></i> Paid
-                                                    </span>
-                                                @elseif($payment->payment_status == 'PENDING')
-                                                    <span class="payment-status pending">
-                                                        <i class="fas fa-clock me-1"></i> Pending
-                                                    </span>
-                                                @else
-                                                    <span class="payment-status failed">
-                                                        <i class="fas fa-times-circle me-1"></i> Failed
-                                                    </span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="5" class="empty-payment">
-                                            <i class="fas fa-credit-card fa-2x"></i>
-                                            <p>No payment history found.</p>
-                                        </td>
-                                    </tr>
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="5" class="empty-payment">
+                                    <i class="fas fa-credit-card fa-2x"></i>
+                                    <p>No payment history found.</p>
+                                </td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
+</div>
     </div>
 </div>
 

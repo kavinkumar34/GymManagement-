@@ -33,15 +33,15 @@ class MemberController extends Controller
             'address' => 'nullable|string',
             'height' => 'nullable|numeric',
             'weight' => 'nullable|numeric',
+            'register_date' => 'nullable|date',
             'join_date' => 'required|date',
+            'payment_date' => 'nullable|date',
             'plan_type' => 'required|in:membership,package,monthly',
             'membership_plan' => 'nullable|required_if:plan_type,membership',
             'package_name' => 'nullable|required_if:plan_type,package',
             'trainer_id' => 'nullable|exists:trainers,id',
             'goal_type' => 'required',
             'status' => 'required',
-            
-            // ===== NEW VALIDATION FOR PAYMENT =====
             'payment_type' => 'required|in:hand,online',
             'transaction_id' => 'nullable|required_if:payment_type,online|string|max:100',
             'payment_screenshot' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -82,7 +82,6 @@ class MemberController extends Controller
         $finalPrice = null;
         $monthlyMonth = null;
         $monthlyPrice = null;
-        $monthlyTotal = null;
         $expiryDate = null;
 
         if ($request->plan_type == 'membership' && $request->membership_plan) {
@@ -104,16 +103,20 @@ class MemberController extends Controller
         } elseif ($request->plan_type == 'monthly') {
             $monthlyMonth = (int)$request->monthly_month;
             $monthlyPrice = (float)$request->monthly_price;
-            $monthlyTotal = $request->monthly_total ?? ($monthlyMonth * $monthlyPrice);
+            $monthlyTotal = $monthlyMonth * $monthlyPrice;
             $membershipPlan = 'Monthly Plan';
             $membershipDuration = $monthlyMonth . ' Month(s)';
             $finalPrice = $monthlyTotal;
             $expiryDate = Carbon::parse($request->join_date)->addMonths($monthlyMonth)->toDateString();
         }
 
+        // ===== SET PAYMENT DATE =====
+        $paymentDate = $request->payment_date ?? $request->join_date;
+
         // ===== CREATE MEMBER =====
         $member = Member::create([
             'member_id' => $memberId,
+            'register_date' => $request->register_date ?? date('Y-m-d'),
             'name' => $request->name,
             'gender' => $request->gender,
             'dob' => $request->dob,
@@ -136,13 +139,12 @@ class MemberController extends Controller
             'goal_type' => $request->goal_type,
             'photo' => $photoPath,
             'status' => $request->status,
-            
-            // ===== NEW PAYMENT FIELDS =====
             'monthly_month' => $monthlyMonth,
             'monthly_price' => $monthlyPrice,
             'payment_type' => $request->payment_type,
             'transaction_id' => $request->transaction_id,
             'payment_screenshot' => $screenshotPath,
+            'payment_date' => $paymentDate,
         ]);
         
         // ===== SAVE PAYMENT HISTORY =====
@@ -154,7 +156,8 @@ class MemberController extends Controller
             'amount' => $finalPrice,
             'payment_type' => $request->payment_type,
             'transaction_id' => $request->transaction_id,
-            'payment_date' => $request->join_date,
+            'payment_date' => $paymentDate,
+            'join_date' => $request->join_date,
             'old_expiry_date' => null,
             'new_expiry_date' => $expiryDate,
         ]);
@@ -170,9 +173,31 @@ class MemberController extends Controller
         return redirect()->route('admin.members')->with('success', 'Member registered successfully! Member ID: ' . $memberId);
     }
     
-    public function index()
+    // ==========================================
+    // ✅ FIXED: INDEX METHOD WITH TAB FILTERING
+    // ==========================================
+    public function index(Request $request)
     {
-        $members = Member::with('trainer')->orderBy('id', 'desc')->paginate(15);
+        $tab = $request->get('tab', 'all');
+        
+        $query = Member::with('trainer');
+        
+        // Apply filter based on tab
+        if ($tab == 'active') {
+            $query->where('status', 'Active')
+                  ->where(function($q) {
+                      $q->whereNull('expiry_date')
+                        ->orWhere('expiry_date', '>=', now());
+                  });
+        } elseif ($tab == 'expired') {
+            $query->where('expiry_date', '<', now());
+        } elseif ($tab == 'inactive') {
+            $query->where('status', 'Inactive');
+        }
+        // 'all' - no filter
+        
+        $members = $query->orderBy('id', 'desc')->paginate(15);
+        
         return view('admin.members-list', compact('members'));
     }
     
@@ -195,41 +220,40 @@ class MemberController extends Controller
         // ==========================================
         $isActive = ($member->status == 'Active' && !$member->isExpired());
         
-        if ($isActive) {
-            // ===== WHEN ACTIVE: ONLY ALLOW PERSONAL INFO, FITNESS INFO & TRAINER =====
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'gender' => 'required',
-                'phone' => 'required|string|max:20',
-                'email' => 'nullable|email|unique:members,email,' . $id,
-                'address' => 'nullable|string',
-                'height' => 'nullable|numeric',
-                'weight' => 'nullable|numeric',
-                'goal_type' => 'required',
-                'medical_issues' => 'nullable|string',
-                'trainer_id' => 'nullable|exists:trainers,id',
-                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'emergency_contact' => 'nullable|string|max:20',
-                'dob' => 'nullable|date',
-            ]);
-        } else {
-            // ===== WHEN EXPIRED/INACTIVE: ALLOW ALL FIELDS =====
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'phone' => 'required|string|max:20',
-                'email' => 'required|email|unique:members,email,' . $id,
-                'status' => 'required',
-                'payment_type' => 'nullable|in:hand,online',
-                'transaction_id' => 'nullable|string|max:100',
-                'payment_screenshot' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'plan_type' => 'nullable|in:membership,package,monthly',
-                'membership_plan' => 'nullable',
-                'package_name' => 'nullable',
-                'join_date' => 'nullable|date',
-                'trainer_id' => 'nullable|exists:trainers,id',
-                'renewal_amount' => 'nullable|numeric',
-            ]);
+        // ==========================================
+        // VALIDATION - Status always included
+        // ==========================================
+        $rules = [
+            'name' => 'required|string|max:255',
+            'gender' => 'required',
+            'phone' => 'required|string|max:20',
+            'email' => 'nullable|email|unique:members,email,' . $id,
+            'address' => 'nullable|string',
+            'height' => 'nullable|numeric',
+            'weight' => 'nullable|numeric',
+            'goal_type' => 'required',
+            'medical_issues' => 'nullable|string',
+            'trainer_id' => 'nullable|exists:trainers,id',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'emergency_contact' => 'nullable|string|max:20',
+            'dob' => 'nullable|date',
+            'status' => 'required|in:Active,Inactive',
+        ];
+        
+        // If NOT active, allow these fields too
+        if (!$isActive) {
+            $rules['join_date'] = 'required|date';
+            $rules['payment_date'] = 'nullable|date';
+            $rules['payment_type'] = 'nullable|in:hand,online';
+            $rules['transaction_id'] = 'nullable|string|max:100';
+            $rules['payment_screenshot'] = 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048';
+            $rules['plan_type'] = 'nullable|in:membership,package,monthly';
+            $rules['membership_plan'] = 'nullable';
+            $rules['package_name'] = 'nullable';
+            $rules['renewal_amount'] = 'nullable|numeric';
         }
+        
+        $request->validate($rules);
         
         // ===== CALCULATE BMI =====
         $bmi = $member->bmi;
@@ -265,14 +289,18 @@ class MemberController extends Controller
             'goal_type' => $request->goal_type,
             'photo' => $photoPath,
             'trainer_id' => $request->trainer_id,
+            'status' => $request->status,
         ];
         
         // ==========================================
         // IF ACTIVE: DON'T UPDATE LOCKED FIELDS
         // ==========================================
         if ($isActive) {
-            // Only update base data (Personal + Fitness + Trainer)
             $member->update($updateData);
+            
+            if ($request->status == 'Inactive') {
+                return redirect()->route('admin.members')->with('success', 'Member status updated to Inactive! ✅');
+            }
             
             return redirect()->route('admin.members')->with('success', 'Personal information updated successfully! ✅');
         }
@@ -298,6 +326,7 @@ class MemberController extends Controller
         $monthlyPrice = $member->monthly_price;
         $expiryDate = $member->expiry_date;
         $oldExpiryDate = $member->expiry_date;
+        $joinDate = $request->join_date ?? $member->join_date;
         
         if ($request->plan_type == 'package' && $request->package_name) {
             $package = Package::where('package_name', $request->package_name)->first();
@@ -305,7 +334,7 @@ class MemberController extends Controller
                 $membershipPlan = $package->package_name;
                 $membershipDuration = $package->duration . ' ' . $package->duration_type;
                 $finalPrice = $package->price;
-                $expiryDate = Carbon::parse($request->join_date)->addMonths((int)$package->duration)->toDateString();
+                $expiryDate = Carbon::parse($joinDate)->addMonths((int)$package->duration)->toDateString();
             }
         }
         
@@ -315,7 +344,7 @@ class MemberController extends Controller
                 $membershipPlan = $membership->plan_name;
                 $membershipDuration = $membership->duration . ' ' . $membership->duration_type;
                 $finalPrice = $membership->final_price;
-                $expiryDate = Carbon::parse($request->join_date)->addMonths((int)$membership->duration)->toDateString();
+                $expiryDate = Carbon::parse($joinDate)->addMonths((int)$membership->duration)->toDateString();
             }
         }
         
@@ -326,23 +355,28 @@ class MemberController extends Controller
             $membershipPlan = 'Monthly Plan';
             $membershipDuration = $monthlyMonth . ' Month(s)';
             $finalPrice = $monthlyTotal;
-            $expiryDate = Carbon::parse($request->join_date)->addMonths($monthlyMonth)->toDateString();
+            $expiryDate = Carbon::parse($joinDate)->addMonths($monthlyMonth)->toDateString();
         }
+        
+        // ===== SET PAYMENT DATE =====
+        $paymentDate = $request->payment_date ?? $member->payment_date ?? $joinDate;
         
         // ===== ADD LOCKED FIELDS TO UPDATE =====
         $updateData['email'] = $request->email;
-        $updateData['join_date'] = $request->join_date;
+        $updateData['join_date'] = $joinDate;
+        $updateData['payment_date'] = $paymentDate;
         $updateData['expiry_date'] = $expiryDate;
         $updateData['plan_type'] = $request->plan_type;
         $updateData['membership_plan'] = $membershipPlan;
         $updateData['membership_duration'] = $membershipDuration;
         $updateData['final_price'] = $finalPrice;
-        $updateData['status'] = $request->status;
         $updateData['monthly_month'] = $monthlyMonth;
         $updateData['monthly_price'] = $monthlyPrice;
         $updateData['payment_type'] = $request->payment_type;
         $updateData['transaction_id'] = $request->transaction_id;
         $updateData['payment_screenshot'] = $screenshotPath;
+        
+        // ===== REGISTER_DATE IS NOT INCLUDED - NEVER CHANGES =====
         
         // ===== UPDATE MEMBER =====
         $member->update($updateData);
@@ -359,7 +393,8 @@ class MemberController extends Controller
                 'amount' => $request->renewal_amount ?? $finalPrice,
                 'payment_type' => $request->payment_type ?? $member->payment_type,
                 'transaction_id' => $request->transaction_id,
-                'payment_date' => $request->join_date ?? now(),
+                'payment_date' => $paymentDate,
+                'join_date' => $joinDate,
                 'old_expiry_date' => $oldExpiryDate,
                 'new_expiry_date' => $expiryDate,
             ]);

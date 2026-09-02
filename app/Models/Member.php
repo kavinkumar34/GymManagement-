@@ -11,6 +11,7 @@ class Member extends Model
     protected $fillable = [
         // Personal Information
         'member_id', 
+        'register_date',    // NEW - First registration date (NEVER CHANGES)
         'name', 
         'gender', 
         'dob', 
@@ -28,8 +29,8 @@ class Member extends Model
         'goal_type',
         
         // Membership Information
-        'join_date',
-        'expiry_date',  // ✅ NEW
+        'join_date',        // Membership start date (CAN CHANGE on renewal)
+        'expiry_date',
         'plan_type',
         'membership_plan',
         'membership_duration', 
@@ -43,6 +44,7 @@ class Member extends Model
         'payment_type',
         'transaction_id',
         'payment_screenshot',
+        'payment_date',     // NEW - Payment made date
         
         // Assignment
         'trainer_id',
@@ -56,29 +58,25 @@ class Member extends Model
     // RELATIONSHIPS
     // ============================================
     
-    /**
-     * Get the trainer associated with the member.
-     */
     public function trainer()
     {
         return $this->belongsTo(Trainer::class, 'trainer_id');
     }
     
-    /**
-     * Get the attendances for the member.
-     */
     public function attendances()
     {
         return $this->hasMany(MemberAttendance::class, 'member_id');
+    }
+    
+    public function paymentHistories()
+    {
+        return $this->hasMany(PaymentHistory::class, 'member_id');
     }
     
     // ============================================
     // ACCESSORS / MUTATORS
     // ============================================
     
-    /**
-     * Calculate BMI automatically.
-     */
     public function calculateBMI()
     {
         if ($this->height > 0 && $this->weight > 0) {
@@ -88,17 +86,11 @@ class Member extends Model
         return null;
     }
     
-    /**
-     * Get trainer name attribute.
-     */
     public function getTrainerNameAttribute()
     {
         return $this->trainer ? $this->trainer->name : 'Not Assigned';
     }
     
-    /**
-     * Get payment type label.
-     */
     public function getPaymentTypeLabelAttribute()
     {
         $labels = [
@@ -108,9 +100,6 @@ class Member extends Model
         return $labels[$this->payment_type] ?? 'Not specified';
     }
     
-    /**
-     * Get plan type label.
-     */
     public function getPlanTypeLabelAttribute()
     {
         $labels = [
@@ -121,9 +110,6 @@ class Member extends Model
         return $labels[$this->plan_type] ?? 'Not specified';
     }
     
-    /**
-     * Get status label with badge class.
-     */
     public function getStatusBadgeAttribute()
     {
         if ($this->status == 'Active') {
@@ -132,9 +118,6 @@ class Member extends Model
         return '<span class="status-badge inactive"><span class="dot"></span> Inactive</span>';
     }
     
-    /**
-     * Check if member is expired.
-     */
     public function isExpired()
     {
         if (!$this->expiry_date) {
@@ -143,9 +126,6 @@ class Member extends Model
         return now()->gt($this->expiry_date);
     }
     
-    /**
-     * Get days remaining until expiry.
-     */
     public function getDaysRemainingAttribute()
     {
         if (!$this->expiry_date) {
@@ -154,12 +134,9 @@ class Member extends Model
         if ($this->isExpired()) {
             return 0;
         }
-        return now()->diffInDays($this->expiry_date);
+        return floor(now()->diffInDays($this->expiry_date));
     }
     
-    /**
-     * Get expiry status with badge.
-     */
     public function getExpiryStatusAttribute()
     {
         if (!$this->expiry_date) {
@@ -181,41 +158,26 @@ class Member extends Model
     // SCOPES
     // ============================================
     
-    /**
-     * Scope a query to only include active members.
-     */
     public function scopeActive($query)
     {
         return $query->where('status', 'Active');
     }
     
-    /**
-     * Scope a query to only include inactive members.
-     */
     public function scopeInactive($query)
     {
         return $query->where('status', 'Inactive');
     }
     
-    /**
-     * Scope a query to only include members with a specific plan type.
-     */
     public function scopePlanType($query, $type)
     {
         return $query->where('plan_type', $type);
     }
     
-    /**
-     * Scope a query to only include expired members.
-     */
     public function scopeExpired($query)
     {
         return $query->where('expiry_date', '<', now());
     }
     
-    /**
-     * Scope a query to only include non-expired members.
-     */
     public function scopeNotExpired($query)
     {
         return $query->where(function($q) {

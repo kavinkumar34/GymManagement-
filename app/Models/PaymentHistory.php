@@ -17,6 +17,7 @@ class PaymentHistory extends Model
         'payment_type',
         'transaction_id',
         'payment_date',
+        'join_date',        // ✅ NEW - Store join date in payment history
         'old_expiry_date',
         'new_expiry_date',
     ];

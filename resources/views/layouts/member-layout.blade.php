@@ -773,34 +773,61 @@
                         <div class="profile-email">{{ $profileMember->email }}</div>
 
                         <div class="profile-info-grid">
+                            <!-- Member ID -->
                             <div class="profile-info-item">
                                 <div class="label">Member ID</div>
                                 <div class="value">{{ $profileMember->member_id }}</div>
                             </div>
+
+                            <!-- Register Date - NEW -->
+                            <div class="profile-info-item">
+                                <div class="label">Register Date</div>
+                                <div class="value">
+                                    @if($profileMember->register_date)
+                                        {{ \Carbon\Carbon::parse($profileMember->register_date)->format('d M Y') }}
+                                    @else
+                                        {{ \Carbon\Carbon::parse($profileMember->created_at)->format('d M Y') }}
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Phone -->
                             <div class="profile-info-item">
                                 <div class="label">Phone</div>
                                 <div class="value">{{ $profileMember->phone }}</div>
                             </div>
+
+                            <!-- Gender -->
                             <div class="profile-info-item">
                                 <div class="label">Gender</div>
                                 <div class="value">{{ $profileMember->gender ?? 'Not specified' }}</div>
                             </div>
+
+                            <!-- Age -->
                             <div class="profile-info-item">
                                 <div class="label">Age</div>
                                 <div class="value">{{ $profileMember->age ?? 'N/A' }}</div>
                             </div>
+
+                            <!-- Height -->
                             <div class="profile-info-item">
                                 <div class="label">Height</div>
                                 <div class="value">{{ $profileMember->height ?? 'N/A' }} cm</div>
                             </div>
+
+                            <!-- Weight -->
                             <div class="profile-info-item">
                                 <div class="label">Weight</div>
                                 <div class="value">{{ $profileMember->weight ?? 'N/A' }} kg</div>
                             </div>
+
+                            <!-- BMI -->
                             <div class="profile-info-item">
                                 <div class="label">BMI</div>
                                 <div class="value">{{ $profileMember->bmi ?? 'N/A' }}</div>
                             </div>
+
+                            <!-- Goal -->
                             <div class="profile-info-item">
                                 <div class="label">Goal</div>
                                 <div class="value">
@@ -809,28 +836,86 @@
                                     </span>
                                 </div>
                             </div>
+
+                            <!-- Plan Type - UPDATED with Monthly support -->
                             <div class="profile-info-item">
                                 <div class="label">Plan Type</div>
                                 <div class="value">
                                     @if ($profileMember->plan_type == 'membership')
-                                        <span class="badge"
-                                            style="background: #3b82f6; color: white;">Membership</span>
-                                    @elseif($profileMember->plan_type == 'package')
-                                        <span class="badge" style="background: #10b981; color: white;">Package</span>
+                                        <span class="badge" style="background: #3b82f6; color: white;">
+                                            <i class="fas fa-id-card me-1"></i> Membership
+                                        </span>
+                                    @elseif ($profileMember->plan_type == 'package')
+                                        <span class="badge" style="background: #10b981; color: white;">
+                                            <i class="fas fa-box me-1"></i> Package
+                                        </span>
+                                    @elseif ($profileMember->plan_type == 'monthly')
+                                        <span class="badge" style="background: #f59e0b; color: white;">
+                                            <i class="fas fa-calendar-alt me-1"></i> Monthly
+                                        </span>
                                     @else
                                         <span class="badge bg-secondary">N/A</span>
                                     @endif
                                 </div>
                             </div>
+
+                            <!-- Membership Plan Name -->
                             <div class="profile-info-item">
-                                <div class="label">Membership Plan</div>
-                                <div class="value">{{ $profileMember->membership_plan ?? 'Basic' }}</div>
+                                <div class="label">Plan Name</div>
+                                <div class="value">
+                                    <span class="badge" style="background: #8b5cf6; color: white;">
+                                        {{ $profileMember->membership_plan ?? 'Basic' }}
+                                    </span>
+                                </div>
                             </div>
+
+                            <!-- Join Date -->
                             <div class="profile-info-item">
                                 <div class="label">Join Date</div>
                                 <div class="value">
-                                    {{ \Carbon\Carbon::parse($profileMember->join_date)->format('d M Y') }}</div>
+                                    {{ \Carbon\Carbon::parse($profileMember->join_date)->format('d M Y') }}
+                                </div>
                             </div>
+
+                            <!-- Expiry Date - NEW -->
+                          <!-- Expiry Date - FIXED -->
+<div class="profile-info-item">
+    <div class="label">Expiry Date</div>
+    <div class="value">
+        @if($profileMember->expiry_date)
+            @if(\Carbon\Carbon::now()->gt($profileMember->expiry_date))
+                <span class="badge bg-danger">
+                    Expired on {{ \Carbon\Carbon::parse($profileMember->expiry_date)->format('d M Y') }}
+                </span>
+            @else
+                @php
+                    // ✅ FIX: Check if join_date is in future
+                    if($profileMember->join_date > \Carbon\Carbon::now()) {
+                        $daysLeft = 0;
+                        $statusText = 'Not Started';
+                    } else {
+                        $daysLeft = floor(\Carbon\Carbon::now()->diffInDays($profileMember->expiry_date));
+                        $statusText = $daysLeft . ' days left';
+                    }
+                @endphp
+                <span class="badge" style="background: #10b981; color: white;">
+                    {{ \Carbon\Carbon::parse($profileMember->expiry_date)->format('d M Y') }}
+                    <small style="opacity:0.8;">
+                        @if($profileMember->join_date > \Carbon\Carbon::now())
+                            (Not Started)
+                        @else
+                            ({{ $statusText }})
+                        @endif
+                    </small>
+                </span>
+            @endif
+        @else
+            <span class="badge bg-secondary">No Expiry</span>
+        @endif
+    </div>
+</div>
+
+                            <!-- Status -->
                             <div class="profile-info-item">
                                 <div class="label">Status</div>
                                 <div class="value">
@@ -841,23 +926,33 @@
                                     @endif
                                 </div>
                             </div>
-                            @if ($profileMember->trainer_id)
-                                <div class="profile-info-item">
-                                    <div class="label">Trainer</div>
-                                    <div class="value">
+
+                            <!-- Trainer -->
+                            <div class="profile-info-item" style="grid-column: 1 / -1;">
+                                <div class="label">Trainer</div>
+                                <div class="value">
+                                    @if ($profileMember->trainer_id)
                                         @php
                                             $trainer = \App\Models\Trainer::find($profileMember->trainer_id);
                                         @endphp
                                         @if ($trainer)
                                             <span class="badge" style="background: #f59e0b; color: white;">
-                                                {{ $trainer->name ?? 'Not Assigned' }}
+                                                <i class="fas fa-chalkboard-user me-1"></i>
+                                                {{ $trainer->name }}
+                                                <small style="font-weight:400; opacity:0.8;">
+                                                    ({{ $trainer->specialization }})
+                                                </small>
                                             </span>
                                         @else
                                             <span class="badge bg-secondary">Not Assigned</span>
                                         @endif
-                                    </div>
+                                    @else
+                                        <span class="badge bg-secondary">Not Assigned</span>
+                                    @endif
                                 </div>
-                            @endif
+                            </div>
+
+                            <!-- Address -->
                             <div class="profile-info-item" style="grid-column: 1 / -1;">
                                 <div class="label">Address</div>
                                 <div class="value">{{ $profileMember->address ?? 'Not provided' }}</div>

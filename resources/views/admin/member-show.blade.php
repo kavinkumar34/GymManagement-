@@ -27,9 +27,6 @@
             min-height: 100vh;
         }
 
-        /* ============================================ */
-        /* CARD STYLES                                 */
-        /* ============================================ */
         .show-card {
             background: #ffffff;
             border-radius: var(--radius-lg);
@@ -75,9 +72,6 @@
             padding: 20px 24px;
         }
 
-        /* ============================================ */
-        /* PROFILE SECTION                             */
-        /* ============================================ */
         .profile-section {
             display: flex;
             align-items: center;
@@ -166,22 +160,10 @@
         }
 
         @keyframes pulse-dot {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
 
-        /* ============================================ */
-        /* DETAILS TABLE STYLES                        */
-        /* ============================================ */
         .details-table {
             width: 100%;
             border-collapse: collapse;
@@ -249,9 +231,6 @@
             color: #1565c0;
         }
 
-        /* ============================================ */
-        /* SECTION HEADERS                             */
-        /* ============================================ */
         .section-title {
             font-size: 14px;
             font-weight: 600;
@@ -271,9 +250,6 @@
             font-size: 14px;
         }
 
-        /* ============================================ */
-        /* BUTTON STYLES                               */
-        /* ============================================ */
         .btn-primary {
             background: var(--primary);
             color: #fff;
@@ -347,9 +323,6 @@
             margin-top: 20px;
         }
 
-        /* ============================================ */
-        /* RESPONSIVE                                  */
-        /* ============================================ */
         @media (max-width: 768px) {
             .admin-main-content {
                 padding: 12px 15px;
@@ -471,8 +444,7 @@
                     <h4><i class="fas fa-user"></i> Member Details</h4>
                     <small>View complete member information</small>
                 </div>
-                <span
-                    style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
+                <span style="background:rgba(74,158,255,0.2); color:#8ab4f8; padding:3px 12px; border-radius:50px; font-size:11px;">
                     <i class="fas fa-id-card"></i> {{ $member->member_id }}
                 </span>
             </div>
@@ -495,8 +467,7 @@
                             <span><i class="fas fa-envelope"></i> {{ $member->email }}</span>
                             <span><i class="fas fa-phone"></i> {{ $member->phone }}</span>
                             <span><i class="fas fa-venus-mars"></i> {{ $member->gender ?? 'Not specified' }}</span>
-                            <span><i class="fas fa-calendar-alt"></i> Joined:
-                                {{ date('d-m-Y', strtotime($member->join_date)) }}</span>
+                            <span><i class="fas fa-calendar-alt"></i> Joined: {{ date('d-m-Y', strtotime($member->join_date)) }}</span>
                         </div>
                     </div>
 
@@ -524,6 +495,17 @@
                     <tr>
                         <th>Member ID</th>
                         <td><span class="badge-custom primary">{{ $member->member_id }}</span></td>
+                    </tr>
+                    <!-- Register Date - NEW -->
+                    <tr>
+                        <th>Register Date</th>
+                        <td>
+                            @if($member->register_date)
+                                <span class="badge-custom info">{{ date('d-m-Y', strtotime($member->register_date)) }}</span>
+                            @else
+                                <span class="badge-custom secondary">Not specified</span>
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <th>Full Name</th>
@@ -596,13 +578,19 @@
                 </table>
 
                 <!-- ========================================== -->
-                <!-- MEMBERSHIP INFORMATION - UPDATED           -->
+                <!-- MEMBERSHIP INFORMATION                    -->
                 <!-- ========================================== -->
                 <div class="section-title mt-3">
                     <i class="fas fa-id-card"></i> Membership Information
                 </div>
 
                 <table class="details-table">
+                    <tr>
+                        <th>Join Date</th>
+                        <td>
+                            <span class="badge-custom success">{{ date('d-m-Y', strtotime($member->join_date)) }}</span>
+                        </td>
+                    </tr>
                     <tr>
                         <th>Plan Type</th>
                         <td>
@@ -636,8 +624,22 @@
                         <td><strong>₹ {{ number_format($member->final_price ?? 0, 2) }}</strong></td>
                     </tr>
                     <tr>
-                        <th>Join Date</th>
-                        <td>{{ date('d-m-Y', strtotime($member->join_date)) }}</td>
+                        <th>Expiry Date</th>
+                        <td>
+                            @if($member->expiry_date)
+                                {{ date('d-m-Y', strtotime($member->expiry_date)) }}
+                                @if(now()->gt($member->expiry_date))
+                                    <span class="badge-custom warning"><i class="fas fa-times-circle"></i> Expired</span>
+                                @else
+                                    @php
+                                        $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                    @endphp
+                                    <span class="badge-custom success"><i class="fas fa-clock"></i> {{ $daysLeft }} days left</span>
+                                @endif
+                            @else
+                                <span class="badge-custom secondary">No expiry set</span>
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <th>Status</th>
@@ -652,13 +654,24 @@
                 </table>
 
                 <!-- ========================================== -->
-                <!-- PAYMENT INFORMATION                        -->
+                <!-- PAYMENT INFORMATION - UPDATED              -->
                 <!-- ========================================== -->
                 <div class="section-title mt-3">
                     <i class="fas fa-credit-card"></i> Payment Information
                 </div>
 
                 <table class="details-table">
+                    <!-- Payment Date - NEW -->
+                    <tr>
+                        <th>Payment Date</th>
+                        <td>
+                            @if($member->payment_date)
+                                <span class="badge-custom info">{{ date('d-m-Y', strtotime($member->payment_date)) }}</span>
+                            @else
+                                <span class="badge-custom secondary">{{ date('d-m-Y', strtotime($member->join_date)) }}</span>
+                            @endif
+                        </td>
+                    </tr>
                     <tr>
                         <th>Payment Type</th>
                         <td>
@@ -703,8 +716,7 @@
                             @if ($member->trainer)
                                 <span class="badge-custom info">
                                     <i class="fas fa-chalkboard-user"></i> {{ $member->trainer->name }}
-                                    <small
-                                        style="font-weight:400; opacity:0.7;">({{ $member->trainer->specialization }})</small>
+                                    <small style="font-weight:400; opacity:0.7;">({{ $member->trainer->specialization }})</small>
                                 </span>
                             @else
                                 <span class="badge-custom secondary">Not Assigned</span>
@@ -730,26 +742,6 @@
                         <td>{{ $member->updated_at ? $member->updated_at->format('d-m-Y h:i A') : '-' }}</td>
                     </tr>
                 </table>
-
-  <tr>
-    <th>Expiry Date</th>
-    <td>
-        @if($member->expiry_date)
-            {{ date('d-m-Y', strtotime($member->expiry_date)) }}
-            @if(now()->gt($member->expiry_date))
-                <span class="badge-custom warning"><i class="fas fa-times-circle"></i> Expired</span>
-            @else
-                @php
-                    // ✅ FIX: Whole number only
-                    $daysLeft = floor(now()->diffInDays($member->expiry_date));
-                @endphp
-                <span class="badge-custom success"><i class="fas fa-clock"></i> {{ $daysLeft }} days left</span>
-            @endif
-        @else
-            <span class="badge-custom secondary">No expiry set</span>
-        @endif
-    </td>
-</tr>
 
                 <!-- ========================================== -->
                 <!-- FORM ACTIONS                              -->

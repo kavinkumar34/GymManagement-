@@ -339,23 +339,36 @@
         </li>
 
         <!-- Members Dropdown -->
-        <li class="nav-item has-dropdown">
-            <a class="nav-link dropdown-toggle" href="javascript:void(0)">
-                <i class="fas fa-users"></i> <span>Members</span>
+        <!-- Members Dropdown -->
+<!-- Members Dropdown -->
+<li class="nav-item has-dropdown">
+    <a class="nav-link dropdown-toggle" href="javascript:void(0)">
+        <i class="fas fa-users"></i> <span>Members</span>
+    </a>
+    <ul class="dropdown-menu-custom">
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.member.create') }}">
+                <i class="fas fa-user-plus"></i> Add Member
             </a>
-            <ul class="dropdown-menu-custom">
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.member.create') }}">
-                        <i class="fas fa-user-plus"></i> Add Member
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item-custom" href="{{ route('admin.member.index') }}">
-                        <i class="fas fa-list"></i> Member List
-                    </a>
-                </li>
-            </ul>
         </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.member.index', ['tab' => 'all']) }}">
+                <i class="fas fa-list"></i> Member List
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item-custom" href="{{ route('admin.member.index', ['tab' => 'expired']) }}">
+                <i class="fas fa-exclamation-circle" style="color: #ef5350;"></i> Pending Balance
+                @php
+                    $expiredCount = \App\Models\Member::where('expiry_date', '<', now())->count();
+                @endphp
+                @if($expiredCount > 0)
+                    <span class="badge bg-danger ms-2">{{ $expiredCount }}</span>
+                @endif
+            </a>
+        </li>
+    </ul>
+</li>s
 
         <!-- Trainers Dropdown -->
         <li class="nav-item has-dropdown">

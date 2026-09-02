@@ -334,9 +334,6 @@
             display: block;
         }
 
-        /* ============================================ */
-        /* DISABLED FIELDS STYLES                      */
-        /* ============================================ */
         .disabled-section {
             opacity: 0.6;
             position: relative;
@@ -371,9 +368,12 @@
             margin-right: 8px;
         }
 
-        /* ============================================ */
-        /* PHONE INPUT - ONLY 10 DIGITS               */
-        /* ============================================ */
+        .date-readonly {
+            background: #f8f9fa !important;
+            color: #6c757d !important;
+            cursor: not-allowed;
+        }
+
         input[type="tel"] {
             letter-spacing: 0.5px;
         }
@@ -521,7 +521,15 @@
                     </div>
 
                     <div class="row compact-row">
-                        <div class="col-md-8 mb-3">
+                        <!-- Register Date - NEVER CHANGEABLE -->
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Register Date</label>
+                            <input type="date" name="register_date" class="form-control date-readonly" 
+                                   value="{{ old('register_date', $member->register_date ?? date('Y-m-d')) }}" readonly>
+                            <small class="text-muted" style="font-size:11px;">First registration date - Cannot be changed</small>
+                        </div>
+
+                        <div class="col-md-5 mb-3">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
                             <input type="text" name="name" class="form-control" value="{{ old('name', $member->name) }}" required>
                         </div>
@@ -571,6 +579,13 @@
                         </div>
 
                         <div class="col-md-3 mb-3">
+                            <label class="form-label">Member ID</label>
+                            <input type="text" class="form-control" value="{{ $member->member_id }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row compact-row">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Phone Number <span class="text-danger">*</span></label>
                             <input type="tel" name="phone" class="form-control" value="{{ old('phone', $member->phone) }}" 
                                    pattern="[0-9]{10}" maxlength="10" minlength="10" 
@@ -580,30 +595,19 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                    </div>
 
-                    <div class="row compact-row">
-                        <!-- ===== EMAIL - READONLY IF ACTIVE ===== -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" name="email" class="form-control" value="{{ old('email', $member->email) }}" 
                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }} required>
                         </div>
 
-                        <!-- ===== EMERGENCY CONTACT - ONLY 10 DIGITS ===== -->
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Emergency Contact</label>
                             <input type="tel" name="emergency_contact" class="form-control" value="{{ old('emergency_contact', $member->emergency_contact) }}" 
                                    pattern="[0-9]{10}" maxlength="10" minlength="10"
                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" placeholder="Enter 10 digit number">
                             <small class="text-muted" style="font-size:11px;">Enter 10 digit phone number only</small>
-                        </div>
-
-                        <!-- ===== MEMBER ID - READONLY IF ACTIVE ===== -->
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Member ID</label>
-                            <input type="text" class="form-control" value="{{ $member->member_id }}" 
-                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }} readonly>
                         </div>
                     </div>
 
@@ -658,7 +662,7 @@
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- MEMBERSHIP INFORMATION (LOCKED IF ACTIVE) -->
+                    <!-- MEMBERSHIP INFORMATION - Join Date HERE   -->
                     <!-- ========================================== -->
                     <div class="section-title mt-2">
                         <i class="fas fa-id-card"></i> Membership Information
@@ -678,6 +682,7 @@
                             </div>
                         @endif
 
+                        <!-- Join Date - ORIGINAL POSITION -->
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Join Date <span class="text-danger">*</span></label>
                             <input type="date" name="join_date" class="form-control" value="{{ old('join_date', $member->join_date) }}" 
@@ -764,15 +769,6 @@
                             <input type="text" name="final_price_display" id="finalPriceDisplay" class="form-control" value="{{ old('final_price', $member->final_price) }}" readonly>
                             <input type="hidden" name="final_price" id="finalPriceHidden" value="{{ old('final_price', $member->final_price) }}">
                         </div>
-
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label">Status <span class="text-danger">*</span></label>
-                            <select name="status" class="form-control" required
-                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'disabled style=background:#f8f9fa;color:#6c757d;' : '' }}>
-                                <option value="Active" {{ old('status', $member->status) == 'Active' ? 'selected' : '' }}>Active</option>
-                                <option value="Inactive" {{ old('status', $member->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
-                            </select>
-                        </div>
                     </div>
 
                     <!-- Description -->
@@ -811,6 +807,15 @@
                             </div>
                         @endif
 
+                        <!-- Payment Date - NEW -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Payment Date <span class="text-danger">*</span></label>
+                            <input type="date" name="payment_date" class="form-control" 
+                                   value="{{ old('payment_date', $member->payment_date ?? $member->join_date) }}"
+                                   {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }} required>
+                            <small class="text-muted" style="font-size:11px;">Date when payment was made</small>
+                        </div>
+
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Payment Type</label>
                             <select name="payment_type" id="paymentType" class="form-control" onchange="togglePaymentFields()"
@@ -827,7 +832,7 @@
                                    {{ ($member->status == 'Active' && !$member->isExpired()) ? 'readonly style=background:#f8f9fa;color:#6c757d;' : '' }}>
                         </div>
 
-                        <div class="col-md-4 mb-3 dynamic-field" id="screenshotDiv">
+                        <div class="col-md-12 mb-3 dynamic-field" id="screenshotDiv">
                             <label class="form-label">Upload Screenshot</label>
                             @if ($member->payment_screenshot)
                                 <div class="current-photo">
@@ -889,6 +894,24 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- ✅ STATUS - MOVED TO BOTTOM (BELOW ASSIGNMENT) -->
+                    <!-- ========================================== -->
+                    <div class="section-title mt-2">
+                        <i class="fas fa-toggle-on"></i> Status
+                    </div>
+
+                    <div class="row compact-row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status <span class="text-danger">*</span></label>
+                            <select name="status" class="form-control" required>
+                                <option value="Active" {{ old('status', $member->status) == 'Active' ? 'selected' : '' }}>Active</option>
+                                <option value="Inactive" {{ old('status', $member->status) == 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                            <small class="text-muted" style="font-size:11px;">Change member status (Active/Inactive)</small>
                         </div>
                     </div>
 
@@ -1172,12 +1195,10 @@
 
             togglePaymentFields();
 
-            // ===== ADD DOB EVENT LISTENER FOR AGE =====
             var dobInput = document.getElementById('dob');
             if (dobInput) {
                 dobInput.addEventListener('change', calculateAgeFromDOB);
                 dobInput.addEventListener('blur', calculateAgeFromDOB);
-                // Calculate age on page load if DOB has value
                 calculateAgeFromDOB();
             }
         });
