@@ -174,7 +174,7 @@ class MemberController extends Controller
     }
     
     // ==========================================
-    // ✅ FIXED: INDEX METHOD WITH TAB FILTERING
+    // ✅ INDEX METHOD WITH TAB FILTERING
     // ==========================================
     public function index(Request $request)
     {
@@ -197,8 +197,21 @@ class MemberController extends Controller
         // 'all' - no filter
         
         $members = $query->orderBy('id', 'desc')->paginate(15);
-        
-        return view('admin.members-list', compact('members'));
+
+        // Options required by the renewal modal in members-list.blade.php.
+        $memberships = Membership::where('status', 'Active')
+            ->orderBy('plan_name')
+            ->get();
+
+        $packages = Package::where('status', 'Active')
+            ->orderBy('package_name')
+            ->get();
+
+        return view('admin.members-list', compact(
+            'members',
+            'memberships',
+            'packages'
+        ));
     }
     
     public function edit($id)
@@ -473,5 +486,172 @@ class MemberController extends Controller
     {
         $members = Member::orderBy('id', 'desc')->paginate(15);
         return view('admin.hand-payment', compact('members'));
+    }
+
+    // ==========================================
+    // ✅ GET MEMBER DATA FOR RENEWAL MODAL
+    // ==========================================
+    public function getMemberData($id)
+    {
+        try {
+            $member = Member::with('trainer')->findOrFail($id);
+            
+            // Format the data to ensure all fields are present
+            $memberData = [
+                'id' => $member->id,
+                'member_id' => $member->member_id,
+                'name' => $member->name,
+                'email' => $member->email,
+                'phone' => $member->phone,
+                'join_date' => $member->join_date
+                    ? Carbon::parse($member->join_date)->toDateString()
+                    : null,
+                'expiry_date' => $member->expiry_date
+                    ? Carbon::parse($member->expiry_date)->toDateString()
+                    : null,
+                'payment_date' => $member->payment_date
+                    ? Carbon::parse($member->payment_date)->toDateString()
+                    : null,
+                'plan_type' => $member->plan_type,
+                'membership_plan' => $member->membership_plan,
+                'membership_duration' => $member->membership_duration,
+                'final_price' => $member->final_price,
+                'payment_type' => $member->payment_type,
+                'transaction_id' => $member->transaction_id,
+                'status' => $member->status,
+                'photo' => $member->photo,
+                'gender' => $member->gender,
+                'dob' => $member->dob,
+                'age' => $member->age,
+                'address' => $member->address,
+                'height' => $member->height,
+                'weight' => $member->weight,
+                'bmi' => $member->bmi,
+                'emergency_contact' => $member->emergency_contact,
+                'goal_type' => $member->goal_type,
+                'medical_issues' => $member->medical_issues,
+                'trainer_id' => $member->trainer_id,
+                'register_date' => $member->register_date,
+                'monthly_month' => $member->monthly_month,
+                'monthly_price' => $member->monthly_price,
+                'payment_screenshot' => $member->payment_screenshot,
+            ];
+            
+            return response()->json([
+                'success' => true,
+                'member' => $memberData
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching member data: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Member not found: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // ==========================================
+    // ✅ UPDATE MEMBER VIA AJAX FROM MODAL
+    // ==========================================
+    public function updateViaAjax(Request $request, $id)
+    {
+        try {
+            $member = Member::findOrFail($id);
+            
+            // ===== VALIDATION =====
+            $request->validate([
+                'join_date' => 'required|date',
+                'plan_type' => 'required|in:membership,package',
+                'membership_plan' => 'nullable|required_if:plan_type,membership',
+                'package_name' => 'nullable|required_if:plan_type,package',
+                'payment_date' => 'required|date',
+                'payment_type' => 'required|in:hand,online',
+                'renewal_amount' => 'required|numeric|min:0',
+                'status' => 'required|in:Active,Inactive',
+                'transaction_id' => 'nullable|string|max:100',
+                'payment_screenshot' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            ]);
+            
+            // ===== SET PLAN DETAILS =====
+            $membershipPlan = $request->membership_plan;
+            $membershipDuration = $request->membership_duration;
+            $finalPrice = $request->final_price;
+            $oldExpiryDate = $member->expiry_date;
+            $joinDate = $request->join_date ?? $member->join_date;
+            $expiryDate = $member->expiry_date;
+            
+            if ($request->plan_type == 'package' && $request->package_name) {
+                $package = Package::where('package_name', $request->package_name)->first();
+                if ($package) {
+                    $membershipPlan = $package->package_name;
+                    $membershipDuration = $package->duration . ' ' . $package->duration_type;
+                    $finalPrice = $package->price;
+                    $expiryDate = Carbon::parse($joinDate)->addMonths((int)$package->duration)->toDateString();
+                }
+            }
+            
+            if ($request->plan_type == 'membership' && $request->membership_plan) {
+                $membership = Membership::where('plan_name', $request->membership_plan)->first();
+                if ($membership) {
+                    $membershipPlan = $membership->plan_name;
+                    $membershipDuration = $membership->duration . ' ' . $membership->duration_type;
+                    $finalPrice = $membership->final_price;
+                    $expiryDate = Carbon::parse($joinDate)->addMonths((int)$membership->duration)->toDateString();
+                }
+            }
+            
+            // ===== HANDLE PAYMENT SCREENSHOT =====
+            $screenshotPath = $member->payment_screenshot;
+            if ($request->hasFile('payment_screenshot')) {
+                if ($member->payment_screenshot && Storage::disk('public')->exists($member->payment_screenshot)) {
+                    Storage::disk('public')->delete($member->payment_screenshot);
+                }
+                $screenshotPath = $request->file('payment_screenshot')->store('payment-screenshots', 'public');
+            }
+            
+            // ===== UPDATE MEMBER =====
+            $member->update([
+                'join_date' => $joinDate,
+                'expiry_date' => $expiryDate,
+                'plan_type' => $request->plan_type,
+                'membership_plan' => $membershipPlan,
+                'membership_duration' => $membershipDuration,
+                'final_price' => $finalPrice,
+                'payment_date' => $request->payment_date,
+                'payment_type' => $request->payment_type,
+                'transaction_id' => $request->transaction_id,
+                'payment_screenshot' => $screenshotPath,
+                'status' => $request->status,
+            ]);
+            
+            // ===== SAVE PAYMENT HISTORY =====
+            if ($oldExpiryDate != $expiryDate && $request->renewal_amount) {
+                PaymentHistory::create([
+                    'member_id' => $member->id,
+                    'plan_type' => $request->plan_type,
+                    'plan_name' => $membershipPlan,
+                    'duration' => $membershipDuration,
+                    'amount' => $request->renewal_amount,
+                    'payment_type' => $request->payment_type,
+                    'transaction_id' => $request->transaction_id,
+                    'payment_date' => $request->payment_date,
+                    'join_date' => $joinDate,
+                    'old_expiry_date' => $oldExpiryDate,
+                    'new_expiry_date' => $expiryDate,
+                ]);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Member renewed successfully!'
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error updating member via AJAX: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating member: ' . $e->getMessage()
+            ]);
+        }
     }
 }

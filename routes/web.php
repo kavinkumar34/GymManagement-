@@ -192,6 +192,10 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::put('/members/{id}', [MemberController::class, 'update'])->name('member.update');
     Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('member.destroy');
     Route::get('/members/{id}', [MemberController::class, 'show'])->name('member.show');
+
+    // ✅ NEW ROUTES FOR RENEWAL MODAL
+Route::get('/members/{id}/data', [MemberController::class, 'getMemberData'])->name('admin.member.data');
+Route::post('/members/{id}/update-ajax', [MemberController::class, 'updateViaAjax'])->name('admin.member.update.ajax');
     
     // Trainer Management
     Route::get('/trainers/create', [TrainerController::class, 'create'])->name('trainer.create');
@@ -1054,3 +1058,4 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::get('/trainer-salaries/report', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'report'])->name('trainer-salaries.report');
     Route::get('/trainer-salaries/export', [App\Http\Controllers\Admin\TrainerSalaryController::class, 'export'])->name('trainer-salaries.export');
 });
+

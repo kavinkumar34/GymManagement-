@@ -336,7 +336,6 @@
                 opacity: 0;
                 transform: translateY(-15px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -347,7 +346,6 @@
             from {
                 width: 100%;
             }
-
             to {
                 width: 0%;
             }
@@ -662,7 +660,6 @@
                 opacity: 0;
                 transform: translateY(-20px) scale(0.95);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0) scale(1);
@@ -673,7 +670,6 @@
             from {
                 opacity: 0;
             }
-
             to {
                 opacity: 1;
             }
@@ -775,6 +771,233 @@
             background: #c62828;
             transform: translateY(-1px);
             box-shadow: 0 3px 12px rgba(239, 83, 80, 0.3);
+        }
+
+        /* ============================================ */
+        /* RENEWAL MODAL - CENTER STYLES               */
+        /* ============================================ */
+        .renewal-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .renewal-modal-overlay.active {
+            display: flex;
+        }
+
+        .renewal-modal {
+            background: #ffffff;
+            border-radius: var(--radius-lg);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: slideUpModal 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideUpModal {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .renewal-modal .modal-header {
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #0d1b2a 0%, #1b3a5c 100%);
+            color: #ffffff;
+            border-bottom: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .renewal-modal .modal-header h4 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .renewal-modal .modal-header h4 i {
+            color: #4a9eff;
+        }
+
+        .renewal-modal .modal-header .modal-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0 4px;
+            line-height: 1;
+        }
+
+        .renewal-modal .modal-header .modal-close:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .renewal-modal .modal-body {
+            padding: 20px 24px 24px;
+        }
+
+        .renewal-modal .modal-body .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+            padding: 6px 14px;
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            border-left: 3px solid var(--primary);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .renewal-modal .modal-body .section-title i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .renewal-modal .modal-body .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .renewal-modal .modal-body .form-label .text-danger {
+            color: var(--danger) !important;
+        }
+
+        .renewal-modal .modal-body .form-control {
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            padding: 7px 12px;
+            font-size: 13px;
+            transition: all 0.3s;
+            background: #ffffff;
+            height: 38px;
+            color: var(--dark);
+            width: 100%;
+        }
+
+        .renewal-modal .modal-body .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.12);
+            outline: none;
+        }
+
+        .renewal-modal .modal-body .form-control[readonly] {
+            background: #f8f9fa;
+            cursor: not-allowed;
+            color: var(--gray);
+        }
+
+        .renewal-modal .modal-body textarea.form-control {
+            height: auto;
+            min-height: 50px;
+            resize: vertical;
+        }
+
+        .renewal-modal .modal-body select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+        /* Plan-specific fields are hidden until Plan Type is selected */
+        .renewal-modal .dynamic-field {
+            display: none !important;
+        }
+
+        .renewal-modal .dynamic-field.show {
+            display: block !important;
+        }
+
+        .renewal-modal .modal-body .compact-row {
+            margin-bottom: 0;
+        }
+
+        .renewal-modal .modal-body .compact-row .mb-3 {
+            margin-bottom: 10px !important;
+        }
+
+        .renewal-modal .modal-footer {
+            padding: 14px 24px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            position: sticky;
+            bottom: 0;
+            background: #ffffff;
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        }
+
+        .renewal-modal .modal-footer .btn-modal {
+            padding: 9px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .renewal-modal .modal-footer .btn-modal.cancel {
+            background: #f0f4f8;
+            color: var(--gray);
+        }
+
+        .renewal-modal .modal-footer .btn-modal.cancel:hover {
+            background: #e9ecef;
+        }
+
+        .renewal-modal .modal-footer .btn-modal.update {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .renewal-modal .modal-footer .btn-modal.update:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.35);
         }
 
         /* ============================================ */
@@ -1001,6 +1224,32 @@
             .members-tabs .tab-item:last-child .tab-link {
                 border-bottom: none;
             }
+
+            .renewal-modal {
+                max-width: 100%;
+                max-height: 95vh;
+                margin: 10px;
+                border-radius: var(--radius);
+            }
+
+            .renewal-modal .modal-header {
+                padding: 12px 16px;
+                border-radius: var(--radius) var(--radius) 0 0;
+            }
+
+            .renewal-modal .modal-body {
+                padding: 14px 16px;
+            }
+
+            .renewal-modal .modal-footer {
+                padding: 12px 16px 16px;
+                flex-direction: column;
+            }
+
+            .renewal-modal .modal-footer .btn-modal {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 576px) {
@@ -1070,6 +1319,16 @@
             .members-tabs .tab-item {
                 flex: 1 1 100%;
             }
+
+            .renewal-modal .modal-header h4 {
+                font-size: 14px;
+            }
+
+            .renewal-modal .modal-body .form-control {
+                font-size: 12px;
+                height: 34px;
+                padding: 5px 10px;
+            }
         }
     </style>
 
@@ -1115,55 +1374,52 @@
                 <!-- ========================================== -->
                 <!-- TABS - All | Active | Expired | Inactive  -->
                 <!-- ========================================== -->
-            <!-- ========================================== -->
-<!-- TABS - All | Active | Expired | Inactive  -->
-<!-- ========================================== -->
-@php
-    $currentTab = request('tab', 'all');
-    
-    // Count members for each tab
-    $allCount = $members->total();
-    $activeCount = \App\Models\Member::where('status', 'Active')
-        ->where(function($q) {
-            $q->whereNull('expiry_date')
-              ->orWhere('expiry_date', '>=', now());
-        })
-        ->count();
-    
-    $expiredCount = \App\Models\Member::where('expiry_date', '<', now())->count();
-    $inactiveCount = \App\Models\Member::where('status', 'Inactive')->count();
-@endphp
+                @php
+                    $currentTab = request('tab', 'all');
+                    
+                    // Count members for each tab
+                    $allCount = $members->total();
+                    $activeCount = \App\Models\Member::where('status', 'Active')
+                        ->where(function($q) {
+                            $q->whereNull('expiry_date')
+                              ->orWhere('expiry_date', '>=', now());
+                        })
+                        ->count();
+                    
+                    $expiredCount = \App\Models\Member::where('expiry_date', '<', now())->count();
+                    $inactiveCount = \App\Models\Member::where('status', 'Inactive')->count();
+                @endphp
 
-<div class="members-tabs">
-    <div class="tab-item">
-        <a href="{{ route('admin.member.index', ['tab' => 'all']) }}" 
-           class="tab-link {{ $currentTab == 'all' ? 'active' : '' }}">
-            <i class="fas fa-list"></i> All
-            <span class="tab-badge all">{{ $allCount }}</span>
-        </a>
-    </div>
-    <div class="tab-item">
-        <a href="{{ route('admin.member.index', ['tab' => 'active']) }}" 
-           class="tab-link {{ $currentTab == 'active' ? 'active' : '' }}">
-            <i class="fas fa-check-circle"></i> Active
-            <span class="tab-badge active">{{ $activeCount }}</span>
-        </a>
-    </div>
-    <div class="tab-item">
-        <a href="{{ route('admin.member.index', ['tab' => 'expired']) }}" 
-           class="tab-link {{ $currentTab == 'expired' ? 'active' : '' }}">
-            <i class="fas fa-exclamation-circle"></i> Expired
-            <span class="tab-badge expired">{{ $expiredCount }}</span>
-        </a>
-    </div>
-    <div class="tab-item">
-        <a href="{{ route('admin.member.index', ['tab' => 'inactive']) }}" 
-           class="tab-link {{ $currentTab == 'inactive' ? 'active' : '' }}">
-            <i class="fas fa-user-slash"></i> Inactive
-            <span class="tab-badge inactive">{{ $inactiveCount }}</span>
-        </a>
-    </div>
-</div>
+                <div class="members-tabs">
+                    <div class="tab-item">
+                        <a href="{{ route('admin.member.index', ['tab' => 'all']) }}" 
+                           class="tab-link {{ $currentTab == 'all' ? 'active' : '' }}">
+                            <i class="fas fa-list"></i> All
+                            <span class="tab-badge all">{{ $allCount }}</span>
+                        </a>
+                    </div>
+                    <div class="tab-item">
+                        <a href="{{ route('admin.member.index', ['tab' => 'active']) }}" 
+                           class="tab-link {{ $currentTab == 'active' ? 'active' : '' }}">
+                            <i class="fas fa-check-circle"></i> Active
+                            <span class="tab-badge active">{{ $activeCount }}</span>
+                        </a>
+                    </div>
+                    <div class="tab-item">
+                        <a href="{{ route('admin.member.index', ['tab' => 'expired']) }}" 
+                           class="tab-link {{ $currentTab == 'expired' ? 'active' : '' }}">
+                            <i class="fas fa-exclamation-circle"></i> Expired
+                            <span class="tab-badge expired">{{ $expiredCount }}</span>
+                        </a>
+                    </div>
+                    <div class="tab-item">
+                        <a href="{{ route('admin.member.index', ['tab' => 'inactive']) }}" 
+                           class="tab-link {{ $currentTab == 'inactive' ? 'active' : '' }}">
+                            <i class="fas fa-user-slash"></i> Inactive
+                            <span class="tab-badge inactive">{{ $inactiveCount }}</span>
+                        </a>
+                    </div>
+                </div>
 
                 <!-- Search & Filter -->
                 <div class="search-filter-section">
@@ -1313,12 +1569,17 @@
                                     <td>
                                         @if($member->expiry_date)
                                             @if(now()->gt($member->expiry_date))
-                                                <span class="status-badge expired">
+                                                <span class="status-badge expired"
+                                                      onclick="openRenewalModal({{ $member->id }})"
+                                                      style="cursor:pointer;"
+                                                      title="Click to update plan">
                                                     <span class="dot"></span> Expired
-                                                    <a href="{{ route('admin.member.edit', $member->id) }}?renew=true&amount={{ $member->final_price }}" 
-                                                       class="pay-btn" title="Renew Member">
+                                                    <button type="button"
+                                                            class="pay-btn"
+                                                            onclick="event.stopPropagation(); openRenewalModal({{ $member->id }})"
+                                                            title="Renew Member">
                                                         <i class="fas fa-credit-card"></i> Pay ₹{{ number_format($member->final_price ?? 0, 2) }}
-                                                    </a>
+                                                    </button>
                                                 </span>
                                             @else
                                                 @php
@@ -1414,6 +1675,202 @@
     </div>
 
     <!-- ========================================== -->
+    <!-- RENEWAL MODAL - CENTER                    -->
+    <!-- ========================================== -->
+    <div class="renewal-modal-overlay" id="renewalModal">
+        <div class="renewal-modal">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4><i class="fas fa-credit-card"></i> Renew Member Plan</h4>
+                <button class="modal-close" onclick="closeRenewalModal()">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <form id="renewalForm" action="" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" name="member_id" id="renewalMemberId">
+                    <input type="hidden" name="renewal_from_modal" value="1">
+
+                    <!-- ========================================== -->
+                    <!-- MEMBERSHIP INFORMATION                     -->
+                    <!-- ========================================== -->
+                    <div class="section-title">
+                        <i class="fas fa-id-card"></i> Membership Information
+                    </div>
+
+                    <div class="row compact-row">
+                        <!-- Join Date -->
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Join Date <span class="text-danger">*</span></label>
+                            <input type="date" name="join_date" id="modalJoinDate" class="form-control" required>
+                        </div>
+
+                        <!-- Expiry Date -->
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" name="expiry_date" id="modalExpiryDate" class="form-control" readonly>
+                            <small class="text-muted" style="font-size:11px;">Auto-calculated based on plan duration</small>
+                        </div>
+
+                        <!-- Plan Type -->
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Plan Type <span class="text-danger">*</span></label>
+                            <select name="plan_type" id="modalPlanType" class="form-control" required onchange="modalTogglePlanFields()">
+                                <option value="">-- Select Plan Type --</option>
+                                <option value="membership">Membership</option>
+                                <option value="package">Package</option>
+                            </select>
+                        </div>
+
+                        <!-- Membership Plan - DYNAMIC FIELD (Shows only when Plan Type is 'membership') -->
+                        <div class="col-md-3 mb-3 dynamic-field" id="modalMembershipPlanDiv">
+                            <label class="form-label">Membership Plan <span class="text-danger">*</span></label>
+                            <select name="membership_plan" id="modalMembershipPlan" class="form-control" onchange="modalGetMembershipDetails()">
+                                <option value="">-- Select Membership --</option>
+                                @foreach ($memberships ?? [] as $membership)
+                                    <option value="{{ $membership->plan_name }}">{{ $membership->plan_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Package - DYNAMIC FIELD (Shows only when Plan Type is 'package') -->
+                        <div class="col-md-3 mb-3 dynamic-field" id="modalPackageDiv">
+                            <label class="form-label">Package <span class="text-danger">*</span></label>
+                            <select name="package_name" id="modalPackageName" class="form-control" onchange="modalGetPackageDetails()">
+                                <option value="">-- Select Package --</option>
+                                @foreach ($packages ?? [] as $package)
+                                    <option value="{{ $package->package_name }}">{{ $package->package_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row compact-row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Duration</label>
+                            <input type="text" name="duration_display" id="modalDurationDisplay" class="form-control" readonly>
+                            <input type="hidden" name="membership_duration" id="modalMembershipDuration">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Price</label>
+                            <input type="text" name="price_display" id="modalPriceDisplay" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Final Price</label>
+                            <input type="text" name="final_price_display" id="modalFinalPriceDisplay" class="form-control" readonly>
+                            <input type="hidden" name="final_price" id="modalFinalPriceHidden">
+                        </div>
+                    </div>
+
+                    <div class="row compact-row" id="modalDescriptionDiv">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description_display" id="modalDescriptionDisplay" class="form-control" rows="2" readonly></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- PAYMENT INFORMATION                         -->
+                    <!-- ========================================== -->
+                    <div class="section-title mt-2">
+                        <i class="fas fa-credit-card"></i> Payment Information
+                    </div>
+
+                    <div class="row compact-row">
+                        <!-- Payment Date -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Payment Date <span class="text-danger">*</span></label>
+                            <input type="date" name="payment_date" id="modalPaymentDate" class="form-control" required>
+                            <small class="text-muted" style="font-size:11px;">Date when payment was made</small>
+                        </div>
+
+                        <!-- Payment Type -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Payment Type <span class="text-danger">*</span></label>
+                            <select name="payment_type" id="modalPaymentType" class="form-control" required onchange="modalTogglePaymentFields()">
+                                <option value="">-- Select Payment Type --</option>
+                                <option value="hand">Hand Payment</option>
+                                <option value="online">Online Payment</option>
+                            </select>
+                        </div>
+
+                        <!-- Transaction ID -->
+                        <div class="col-md-4 mb-3 dynamic-field" id="modalTransactionIdDiv">
+                            <label class="form-label">Transaction ID</label>
+                            <input type="text" name="transaction_id" id="modalTransactionId" class="form-control" placeholder="Enter transaction ID">
+                        </div>
+
+                        <div class="col-md-12 mb-3 dynamic-field" id="modalScreenshotDiv">
+                            <label class="form-label">Upload Screenshot</label>
+                            <div class="file-input-wrapper" style="position:relative; height:38px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                <div class="file-input-container" style="position:relative; flex:1; height:38px; min-width:150px;">
+                                    <div class="file-label" style="display:flex; align-items:center; gap:8px; padding:7px 14px; border:1px solid var(--border-color); border-radius:var(--radius); background:#ffffff; font-size:13px; color:var(--gray); height:38px; transition:all 0.3s; position:relative; z-index:1; cursor:pointer; white-space:nowrap;">
+                                        <i class="fas fa-image" style="color:var(--primary); font-size:14px;"></i>
+                                        <span>Choose screenshot</span>
+                                    </div>
+                                    <input type="file" name="payment_screenshot" accept="image/*" id="modalPaymentScreenshot" onchange="modalUpdateScreenshotFileName()" style="position:absolute; left:0; top:0; opacity:0; width:100%; height:100%; cursor:pointer; z-index:2;">
+                                </div>
+                                <span class="file-name" id="modalScreenshotFileName" style="font-size:13px; color:var(--dark); padding:0 8px; flex:1; min-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                    <span class="no-file" style="color:var(--gray); font-style:italic;">No file chosen</span>
+                                </span>
+                            </div>
+                            <small class="text-muted" style="font-size:11px;">Leave empty to keep current screenshot</small>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- RENEWAL PAYMENT AMOUNT                     -->
+                    <!-- ========================================== -->
+                    <div class="section-title mt-2">
+                        <i class="fas fa-hand-holding-usd" style="color: #10b981;"></i> Renewal Payment
+                    </div>
+
+                    <div class="row compact-row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-credit-card" style="color: #10b981;"></i> Renewal Payment Amount
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" step="0.01" name="renewal_amount" id="modalRenewalAmount" class="form-control" placeholder="Enter renewal payment amount" required>
+                            <small class="text-muted">This will be recorded in payment history for finance reports.</small>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="section-title mt-2">
+                        <i class="fas fa-toggle-on"></i> Status
+                    </div>
+
+                    <div class="row compact-row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status <span class="text-danger">*</span></label>
+                            <select name="status" class="form-control" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                            <small class="text-muted" style="font-size:11px;">Change member status (Active/Inactive)</small>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button class="btn-modal cancel" onclick="closeRenewalModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn-modal update" onclick="submitRenewalForm()">
+                    <i class="fas fa-save"></i> Update Plan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
     <!-- CUSTOM DELETE MODAL - TOP RIGHT           -->
     <!-- ========================================== -->
     <div class="delete-modal-overlay" id="deleteModal">
@@ -1467,7 +1924,6 @@
             deleteId = null;
         }
 
-        // Confirm Delete
         document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
             if (deleteId) {
                 let form = document.getElementById('delete-form');
@@ -1476,19 +1932,510 @@
             }
         });
 
-        // Close modal on overlay click
         document.getElementById('deleteModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeDeleteModal();
             }
         });
 
-        // Close modal on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeDeleteModal();
+                closeRenewalModal();
             }
         });
+
+        // ============================================
+        // RENEWAL MODAL FUNCTIONS
+        // ============================================
+        var currentMemberId = null;
+
+        function openRenewalModal(memberId) {
+            currentMemberId = memberId;
+            document.getElementById('renewalModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            document.getElementById('renewalForm').action = '/admin/members/' + memberId + '/update-ajax';
+            document.getElementById('renewalMemberId').value = memberId;
+
+            fetch('/admin/members/' + memberId + '/data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        populateRenewalModal(data.member);
+                    } else {
+                        alert('Failed to load member data. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to load member data. Please try again.');
+                });
+        }
+
+        function closeRenewalModal() {
+            document.getElementById('renewalModal').classList.remove('active');
+            document.body.style.overflow = '';
+            currentMemberId = null;
+            document.getElementById('renewalForm').reset();
+            document.getElementById('modalDurationDisplay').value = '';
+            document.getElementById('modalMembershipDuration').value = '';
+            document.getElementById('modalPriceDisplay').value = '';
+            document.getElementById('modalFinalPriceDisplay').value = '';
+            document.getElementById('modalFinalPriceHidden').value = '';
+            document.getElementById('modalDescriptionDisplay').value = '';
+            document.getElementById('modalScreenshotFileName').innerHTML = '<span class="no-file">No file chosen</span>';
+            document.getElementById('modalMembershipPlanDiv').classList.remove('show');
+            document.getElementById('modalPackageDiv').classList.remove('show');
+            document.getElementById('modalTransactionIdDiv').classList.remove('show');
+            document.getElementById('modalScreenshotDiv').classList.remove('show');
+            document.getElementById('modalDescriptionDiv').style.display = 'none';
+        }
+
+        document.getElementById('renewalModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeRenewalModal();
+            }
+        });
+
+        function populateRenewalModal(member) {
+            console.log('Existing member record loaded:', member);
+
+            document.getElementById('modalJoinDate').value =
+                member.join_date || '';
+
+            document.getElementById('modalExpiryDate').value =
+                member.expiry_date || '';
+
+            document.getElementById('modalPlanType').value =
+                member.plan_type || '';
+
+            document.getElementById('modalPaymentDate').value =
+                member.payment_date ||
+                member.join_date ||
+                '{{ date('Y-m-d') }}';
+
+            document.getElementById('modalPaymentType').value =
+                member.payment_type || '';
+
+            document.getElementById('modalTransactionId').value =
+                member.transaction_id || '';
+
+            var statusDropdown =
+                document.querySelector('#renewalForm select[name="status"]');
+
+            if (statusDropdown) {
+                statusDropdown.value = member.status || 'Active';
+            }
+
+            // Always show the values saved in the members table first.
+            document.getElementById('modalDurationDisplay').value =
+                member.membership_duration || '';
+
+            document.getElementById('modalMembershipDuration').value =
+                member.membership_duration || '';
+
+            if (
+                member.final_price !== null &&
+                member.final_price !== undefined &&
+                member.final_price !== ''
+            ) {
+                var savedPrice = parseFloat(member.final_price);
+
+                document.getElementById('modalPriceDisplay').value =
+                    isNaN(savedPrice)
+                        ? member.final_price
+                        : '₹ ' + savedPrice.toFixed(2);
+
+                document.getElementById('modalFinalPriceDisplay').value =
+                    isNaN(savedPrice)
+                        ? member.final_price
+                        : '₹ ' + savedPrice.toFixed(2);
+
+                document.getElementById('modalFinalPriceHidden').value =
+                    member.final_price;
+
+                document.getElementById('modalRenewalAmount').value =
+                    member.final_price;
+            }
+
+            // Hide both dynamic fields first.
+            document.getElementById('modalMembershipPlanDiv')
+                .classList.remove('show');
+
+            document.getElementById('modalPackageDiv')
+                .classList.remove('show');
+
+            document.getElementById('modalDescriptionDiv')
+                .style.display = 'none';
+
+            // MEMBERSHIP
+            if (member.plan_type === 'membership') {
+
+                document.getElementById('modalMembershipPlanDiv')
+                    .classList.add('show');
+
+                document.getElementById('modalDescriptionDiv')
+                    .style.display = 'flex';
+
+                var membershipSelect =
+                    document.getElementById('modalMembershipPlan');
+
+                var membershipValue =
+                    member.membership_plan || '';
+
+                if (membershipValue) {
+                    var membershipOption =
+                        Array.from(membershipSelect.options).find(function(option) {
+                            return String(option.value).trim() ===
+                                   String(membershipValue).trim();
+                        });
+
+                    // Existing plan may be inactive now. Add it temporarily
+                    // so the old member record is still visible.
+                    if (!membershipOption) {
+                        membershipOption =
+                            document.createElement('option');
+
+                        membershipOption.value = membershipValue;
+                        membershipOption.textContent =
+                            membershipValue + ' (Current)';
+
+                        membershipSelect.appendChild(membershipOption);
+                    }
+
+                    membershipSelect.value = membershipValue;
+
+                    // Load latest plan details without clearing the saved
+                    // member values if the old plan is inactive/deleted.
+                    modalGetMembershipDetails(true);
+                }
+
+            // PACKAGE
+            } else if (member.plan_type === 'package') {
+
+                document.getElementById('modalPackageDiv')
+                    .classList.add('show');
+
+                document.getElementById('modalDescriptionDiv')
+                    .style.display = 'flex';
+
+                var packageSelect =
+                    document.getElementById('modalPackageName');
+
+                // Package name is stored in members.membership_plan.
+                var packageValue =
+                    member.membership_plan || '';
+
+                if (packageValue) {
+                    var packageOption =
+                        Array.from(packageSelect.options).find(function(option) {
+                            return String(option.value).trim() ===
+                                   String(packageValue).trim();
+                        });
+
+                    // Existing package may be inactive now. Add it
+                    // temporarily so the old record is still visible.
+                    if (!packageOption) {
+                        packageOption =
+                            document.createElement('option');
+
+                        packageOption.value = packageValue;
+                        packageOption.textContent =
+                            packageValue + ' (Current)';
+
+                        packageSelect.appendChild(packageOption);
+                    }
+
+                    packageSelect.value = packageValue;
+
+                    // Load latest package details without clearing saved
+                    // member values if the old package is inactive/deleted.
+                    modalGetPackageDetails(true);
+                }
+            }
+
+            // PAYMENT TYPE
+            document.getElementById('modalTransactionIdDiv')
+                .classList.remove('show');
+
+            document.getElementById('modalScreenshotDiv')
+                .classList.remove('show');
+
+            if (member.payment_type === 'online') {
+                document.getElementById('modalTransactionIdDiv')
+                    .classList.add('show');
+
+                document.getElementById('modalScreenshotDiv')
+                    .classList.add('show');
+            }
+        }
+
+        function submitRenewalForm() {
+            var form = document.getElementById('renewalForm');
+            var formData = new FormData(form);
+
+            var joinDate = document.getElementById('modalJoinDate').value;
+            var planType = document.getElementById('modalPlanType').value;
+            var paymentDate = document.getElementById('modalPaymentDate').value;
+            var paymentType = document.getElementById('modalPaymentType').value;
+            var renewalAmount = document.getElementById('modalRenewalAmount').value;
+
+            if (!joinDate) {
+                alert('Please select Join Date.');
+                return;
+            }
+            if (!planType) {
+                alert('Please select Plan Type.');
+                return;
+            }
+            if (!paymentDate) {
+                alert('Please select Payment Date.');
+                return;
+            }
+            if (!paymentType) {
+                alert('Please select Payment Type.');
+                return;
+            }
+            if (!renewalAmount || parseFloat(renewalAmount) <= 0) {
+                alert('Please enter Renewal Payment Amount.');
+                return;
+            }
+
+            var submitBtn = document.querySelector('.renewal-modal .btn-modal.update');
+            var originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            submitBtn.disabled = true;
+
+            var memberId = document.getElementById('renewalMemberId').value;
+            if (!memberId) {
+                alert('Member ID not found.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+
+            var ajaxUrl = '/admin/members/' + memberId + '/update-ajax';
+
+            fetch(ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Member renewed successfully!');
+                    location.reload();
+                } else {
+                    alert('❌ Error: ' + (data.message || 'Failed to renew member.'));
+                }
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+
+        // ============================================
+        // MODAL - TOGGLE PLAN FIELDS (Like member-register)
+        // ============================================
+        function modalTogglePlanFields() {
+            let planType = document.getElementById('modalPlanType').value;
+
+            // Always hide both first.
+            document.getElementById('modalMembershipPlanDiv').classList.remove('show');
+            document.getElementById('modalPackageDiv').classList.remove('show');
+            document.getElementById('modalDescriptionDiv').style.display = 'none';
+
+            // Clear previous calculated plan details.
+            document.getElementById('modalDurationDisplay').value = '';
+            document.getElementById('modalMembershipDuration').value = '';
+            document.getElementById('modalPriceDisplay').value = '';
+            document.getElementById('modalFinalPriceDisplay').value = '';
+            document.getElementById('modalFinalPriceHidden').value = '';
+            document.getElementById('modalDescriptionDisplay').value = '';
+            document.getElementById('modalExpiryDate').value = '';
+            document.getElementById('modalRenewalAmount').value = '';
+
+            if (planType === 'membership') {
+
+                // Show ONLY Membership Plan.
+                document.getElementById('modalMembershipPlanDiv').classList.add('show');
+                document.getElementById('modalDescriptionDiv').style.display = 'flex';
+
+                // Package is not used for Membership.
+                document.getElementById('modalPackageName').value = '';
+
+                if (document.getElementById('modalMembershipPlan').value) {
+                    modalGetMembershipDetails();
+                }
+
+            } else if (planType === 'package') {
+
+                // Show ONLY Package.
+                document.getElementById('modalPackageDiv').classList.add('show');
+                document.getElementById('modalDescriptionDiv').style.display = 'flex';
+
+                // Membership Plan is not used for Package.
+                document.getElementById('modalMembershipPlan').value = '';
+
+                if (document.getElementById('modalPackageName').value) {
+                    modalGetPackageDetails();
+                }
+            }
+        }
+
+        // ============================================
+        // MODAL - GET MEMBERSHIP DETAILS
+        // ============================================
+        function modalGetMembershipDetails(preserveExisting = false) {
+            let planName = document.getElementById('modalMembershipPlan').value;
+
+            if (!planName) {
+                modalClearFields();
+                return;
+            }
+
+            document.getElementById('modalDurationDisplay').value = 'Loading...';
+
+            fetch('/get-membership-details/' + encodeURIComponent(planName))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let duration = data.data.duration + ' ' + data.data.duration_type;
+                        document.getElementById('modalDurationDisplay').value = duration;
+                        document.getElementById('modalMembershipDuration').value = duration;
+                        document.getElementById('modalPriceDisplay').value = '₹ ' + data.data.price;
+                        document.getElementById('modalFinalPriceDisplay').value = '₹ ' + data.data.final_price;
+                        document.getElementById('modalFinalPriceHidden').value = data.data.final_price;
+                        document.getElementById('modalDescriptionDisplay').value = data.data.description || '';
+                        document.getElementById('modalRenewalAmount').value = data.data.final_price;
+
+                        var joinDate = document.getElementById('modalJoinDate').value;
+                        if (joinDate) {
+                            var expiryDate = new Date(joinDate);
+                            expiryDate.setMonth(expiryDate.getMonth() + parseInt(data.data.duration));
+                            document.getElementById('modalExpiryDate').value = expiryDate.toISOString().split('T')[0];
+                        }
+                    } else {
+                        if (!preserveExisting) {
+                            modalClearFields();
+                            alert('Selected membership plan details not found.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading membership details:', error);
+                    if (!preserveExisting) {
+                        modalClearFields();
+                        alert('Error loading membership details. Please try again.');
+                    }
+                });
+        }
+
+        // ============================================
+        // MODAL - GET PACKAGE DETAILS
+        // ============================================
+        function modalGetPackageDetails(preserveExisting = false) {
+            let packageName = document.getElementById('modalPackageName').value;
+
+            if (!packageName) {
+                modalClearFields();
+                return;
+            }
+
+            document.getElementById('modalDurationDisplay').value = 'Loading...';
+
+            fetch('/get-package-details/' + encodeURIComponent(packageName))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let duration = data.data.duration + ' ' + data.data.duration_type;
+                        document.getElementById('modalDurationDisplay').value = duration;
+                        document.getElementById('modalMembershipDuration').value = duration;
+                        document.getElementById('modalPriceDisplay').value = '₹ ' + data.data.price;
+                        document.getElementById('modalFinalPriceDisplay').value = '₹ ' + data.data.price;
+                        document.getElementById('modalFinalPriceHidden').value = data.data.price;
+                        document.getElementById('modalDescriptionDisplay').value = data.data.description || '';
+                        document.getElementById('modalRenewalAmount').value = data.data.price;
+
+                        var joinDate = document.getElementById('modalJoinDate').value;
+                        if (joinDate) {
+                            var expiryDate = new Date(joinDate);
+                            expiryDate.setMonth(expiryDate.getMonth() + parseInt(data.data.duration));
+                            document.getElementById('modalExpiryDate').value = expiryDate.toISOString().split('T')[0];
+                        }
+                    } else {
+                        if (!preserveExisting) {
+                            modalClearFields();
+                            alert('Selected package details not found.');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading package details:', error);
+                    if (!preserveExisting) {
+                        modalClearFields();
+                        alert('Error loading package details. Please try again.');
+                    }
+                });
+        }
+
+        // ============================================
+        // MODAL - TOGGLE PAYMENT FIELDS
+        // ============================================
+        function modalTogglePaymentFields() {
+            let paymentType = document.getElementById('modalPaymentType').value;
+
+            document.getElementById('modalTransactionIdDiv').classList.remove('show');
+            document.getElementById('modalScreenshotDiv').classList.remove('show');
+
+            if (paymentType == 'online') {
+                document.getElementById('modalTransactionIdDiv').classList.add('show');
+                document.getElementById('modalScreenshotDiv').classList.add('show');
+            }
+        }
+
+        // ============================================
+        // MODAL - CLEAR FIELDS
+        // ============================================
+        function modalClearFields() {
+            document.getElementById('modalDurationDisplay').value = '';
+            document.getElementById('modalMembershipDuration').value = '';
+            document.getElementById('modalPriceDisplay').value = '';
+            document.getElementById('modalFinalPriceDisplay').value = '';
+            document.getElementById('modalFinalPriceHidden').value = '';
+            document.getElementById('modalDescriptionDisplay').value = '';
+            document.getElementById('modalExpiryDate').value = '';
+            document.getElementById('modalRenewalAmount').value = '';
+        }
+
+        // ============================================
+        // MODAL - SCREENSHOT FILE NAME UPDATE
+        // ============================================
+        function modalUpdateScreenshotFileName() {
+            var input = document.getElementById('modalPaymentScreenshot');
+            var display = document.getElementById('modalScreenshotFileName');
+
+            if (input.files && input.files.length > 0) {
+                var fileName = input.files[0].name;
+                if (fileName.length > 30) {
+                    fileName = fileName.substring(0, 27) + '...';
+                }
+                display.innerHTML = '<span class="selected-file" style="color:var(--primary); font-weight:500;"><i class="fas fa-check-circle" style="color:#4caf50;"></i> ' + fileName + '</span>';
+            } else {
+                display.innerHTML = '<span class="no-file" style="color:var(--gray); font-style:italic;">No file chosen</span>';
+            }
+        }
 
         // ============================================
         // SEARCH & FILTER TABLE
@@ -1575,6 +2522,28 @@
                     alert.style.display = 'none';
                 }, 3000);
             }
+
+            if (!document.querySelector('meta[name="csrf-token"]')) {
+                var meta = document.createElement('meta');
+                meta.name = 'csrf-token';
+                meta.content = '{{ csrf_token() }}';
+                document.head.appendChild(meta);
+            }
+
+            // Inline onchange handlers already handle plan changes.
+            // Join date change reloads the selected plan so the expiry
+            // date is recalculated automatically.
+            document.getElementById('modalJoinDate').addEventListener('change', function() {
+                var planType = document.getElementById('modalPlanType').value;
+
+                if (planType === 'membership' &&
+                    document.getElementById('modalMembershipPlan').value) {
+                    modalGetMembershipDetails();
+                } else if (planType === 'package' &&
+                           document.getElementById('modalPackageName').value) {
+                    modalGetPackageDetails();
+                }
+            });
         });
     </script>
 @endsection
