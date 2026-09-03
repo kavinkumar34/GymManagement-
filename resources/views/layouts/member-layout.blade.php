@@ -640,7 +640,7 @@
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                 </li>
-                <li class="{{ request()->routeIs('member.membership') ? 'active' : '' }}">
+            <!--    <li class="{{ request()->routeIs('member.membership') ? 'active' : '' }}">
                     <a href="{{ route('member.membership') }}">
                         <i class="fas fa-id-card"></i> Membership
                     </a>
@@ -649,7 +649,12 @@
                     <a href="{{ route('member.packages') }}">
                         <i class="fas fa-shopping-bag"></i> Packages
                     </a>
-                </li>
+                </li> -->
+                <li class="{{ request()->routeIs('member.plans') ? 'active' : '' }}">
+    <a href="{{ route('member.plans') }}">
+        <i class="fas fa-crown"></i> Plans
+    </a>
+</li>
                 <li class="{{ request()->routeIs('member.workout*') ? 'active' : '' }}">
                     <a href="{{ route('member.workout.index') }}">
                         <i class="fas fa-dumbbell"></i> Workout

@@ -777,12 +777,12 @@
                     <div class="stat-sub">{{ $packageCount }} Active Members</div>
                 </div>
 
-                <div class="stat-item">
+            <!--    <div class="stat-item">
                     <span class="stat-icon"><i class="fas fa-calendar-alt"></i></span>
                     <div class="stat-label">Monthly Plan Revenue</div>
                     <div class="stat-value orange">₹ {{ number_format($monthlyRevenue, 2) }}</div>
                     <div class="stat-sub">{{ $monthlyCount }} Active Members</div>
-                </div>
+                </div> -->
 
                 <div class="stat-item">
                     <span class="stat-icon"><i class="fas fa-rupee-sign"></i></span>

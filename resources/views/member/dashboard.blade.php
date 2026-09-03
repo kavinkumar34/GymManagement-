@@ -2,10 +2,14 @@
 
 @section('content')
 @php
-    // Fetch member data - Same as payments.blade.php
+    // Fetch member data
     $member = App\Models\Member::where('email', session('gym_user_email'))->first();
     $memberName = $member ? $member->name : session('gym_user_name', 'Guest');
     $trainer = $member ? $member->trainer : null;
+    
+    // Check if member is expired
+    $isExpired = $member && $member->expiry_date && now()->gt($member->expiry_date);
+    $isActive = $member && $member->status == 'Active' && !$isExpired;
     
     // Stats
     $attendanceCount = 0;
@@ -62,10 +66,9 @@
         }
     }
     
-    // Payment Data - Same as payments.blade.php
+    // Payment Data
     $payments = collect();
     if ($member) {
-        // Get payment/order details from MembershipOrder
         $payments = \App\Models\MembershipOrder::where('member_id', $member->member_id)
             ->orWhere('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
@@ -133,58 +136,68 @@
                 </div>
                 <div class="stat-info">
                     <span class="stat-label">Membership Status</span>
-                    <span class="stat-value {{ $member && $member->status == 'Active' ? 'active' : 'inactive' }}">
-                        {{ $member && $member->status == 'Active' ? 'Active' : 'Inactive' }}
-                    </span>
-                    <span class="stat-sub">Plan: {{ $member ? $member->membership_plan : 'N/A' }}</span>
+                    @if($isExpired || !$member)
+                        <span class="stat-value inactive">Inactive</span>
+                        <span class="stat-sub">No Active Plan</span>
+                    @elseif($isActive)
+                        <span class="stat-value active">Active</span>
+                        <span class="stat-sub">Plan: {{ $member ? $member->membership_plan : 'N/A' }}</span>
+                    @else
+                        <span class="stat-value inactive">Inactive</span>
+                        <span class="stat-sub">Plan: {{ $member ? $member->membership_plan : 'N/A' }}</span>
+                    @endif
                 </div>
             </div>
         </div>
 
-<!-- Card 2: Plan Expiry -->
-<div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
-    <div class="stat-card expiry">
-        <div class="stat-icon-wrapper" style="background: #fef3c7; color: #f59e0b;">
-            <i class="fas fa-clock"></i>
-        </div>
-        <div class="stat-info">
-            <span class="stat-label">Plan Expiry</span>
-            @if($member)
-                @if($member->expiry_date)
-                    @if(now()->gt($member->expiry_date))
-                        <span class="stat-value inactive">Expired</span>
-                        <span class="stat-sub">Expired on {{ date('d M Y', strtotime($member->expiry_date)) }}</span>
-                    @else
-                        @php
-                            // ✅ FIX: Check if join_date is in future
-                            if($member->join_date > now()) {
-                                $daysLeft = 0;
-                                $statusText = 'Not Started';
-                            } else {
-                                $daysLeft = floor(now()->diffInDays($member->expiry_date));
-                                $statusText = $daysLeft . ' days';
-                            }
-                        @endphp
-                        <span class="stat-value active">{{ $statusText }}</span>
-                        <span class="stat-sub">
-                            @if($member->join_date > now())
-                                Joins on {{ date('d M Y', strtotime($member->join_date)) }}
+        <!-- Card 2: Plan Expiry - WITH PAY NOW BUTTON -->
+        <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
+            <div class="stat-card expiry">
+                <div class="stat-icon-wrapper" style="background: #fef3c7; color: #f59e0b;">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Plan Expiry</span>
+                    @if($member)
+                        @if($member->expiry_date)
+                            @if(now()->gt($member->expiry_date))
+                                <span class="stat-value inactive">Expired</span>
+                                <span class="stat-sub">Expired on {{ date('d M Y', strtotime($member->expiry_date)) }}</span>
+                                <!-- ✅ PAY NOW BUTTON -->
+                                <a href="{{ route('member.plans') }}" class="pay-now-btn">
+                                    <i class="fas fa-credit-card me-1"></i> Pay Now
+                                </a>
                             @else
-                                Expires on {{ date('d M Y', strtotime($member->expiry_date)) }}
+                                @php
+                                    if($member->join_date > now()) {
+                                        $daysLeft = 0;
+                                        $statusText = 'Not Started';
+                                    } else {
+                                        $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                        $statusText = $daysLeft . ' days';
+                                    }
+                                @endphp
+                                <span class="stat-value active">{{ $statusText }}</span>
+                                <span class="stat-sub">
+                                    @if($member->join_date > now())
+                                        Joins on {{ date('d M Y', strtotime($member->join_date)) }}
+                                    @else
+                                        Expires on {{ date('d M Y', strtotime($member->expiry_date)) }}
+                                    @endif
+                                </span>
                             @endif
-                        </span>
+                        @else
+                            <span class="stat-value active">No Expiry</span>
+                            <span class="stat-sub">No expiry date set</span>
+                        @endif
+                    @else
+                        <span class="stat-value">N/A</span>
+                        <span class="stat-sub">No member data</span>
                     @endif
-                @else
-                    <span class="stat-value active">No Expiry</span>
-                    <span class="stat-sub">No expiry date set</span>
-                @endif
-            @else
-                <span class="stat-value">N/A</span>
-                <span class="stat-sub">No member data</span>
-            @endif
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+
         <!-- Card 3: Attendance -->
         <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 mb-4">
             <div class="stat-card attendance">
@@ -320,7 +333,7 @@
             </div>
         </div>
 
-      <!-- ========================================== -->
+   <!-- ========================================== -->
 <!-- RECENT PAYMENTS - Full Width               -->
 <!-- ========================================== -->
 <div class="col-12 mb-4">
@@ -338,7 +351,7 @@
                 <table class="payment-table-dashboard">
                     <thead>
                         <tr>
-                            <th>Payment Date</th>  <!-- CHANGED: Removed "Date", added "Payment Date" -->
+                            <th>Payment Date</th>
                             <th>Plan Type</th>
                             <th>Plan Name</th>
                             <th>Amount</th>
@@ -352,7 +365,6 @@
                                 <td>
                                     <span class="payment-date">
                                         <i class="fas fa-calendar-day me-1"></i>
-                                        <!-- ✅ FIX: Show PAYMENT DATE from member -->
                                         @if($member->payment_date)
                                             {{ date('d M Y', strtotime($member->payment_date)) }}
                                         @else
@@ -389,15 +401,10 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if($member->status == 'Active')
-                                        <span class="payment-status paid">
-                                            <i class="fas fa-check-circle me-1"></i> Paid
-                                        </span>
-                                    @else
-                                        <span class="payment-status failed">
-                                            <i class="fas fa-times-circle me-1"></i> Inactive
-                                        </span>
-                                    @endif
+                                    <!-- ✅ FIX: Always show "Paid" for completed payments -->
+                                    <span class="payment-status paid">
+                                        <i class="fas fa-check-circle me-1"></i> Paid
+                                    </span>
                                 </td>
                             </tr>
                             
@@ -407,7 +414,6 @@
                                     <td>
                                         <span class="payment-date">
                                             <i class="fas fa-calendar-day me-1"></i>
-                                            <!-- ✅ FIX: Show PAYMENT DATE from payment history -->
                                             {{ $payment->created_at->format('d M Y') }}
                                         </span>
                                     </td>
@@ -440,7 +446,7 @@
                                         </span>
                                     </td>
                                     <td>
-                                        @if($payment->payment_status == 'SUCCESS')
+                                        @if($payment->payment_status == 'SUCCESS' || $payment->payment_status == 'PAID')
                                             <span class="payment-status paid">
                                                 <i class="fas fa-check-circle me-1"></i> Paid
                                             </span>
@@ -671,6 +677,39 @@
 .stat-sub {
     font-size: 0.75rem;
     color: #94a3b8;
+    display: block;
+}
+
+/* ============================================ */
+/* PAY NOW BUTTON                               */
+/* ============================================ */
+.pay-now-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 18px;
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.pay-now-btn:hover {
+    background: #059669;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+    text-decoration: none;
+}
+
+.pay-now-btn i {
+    font-size: 0.8rem;
 }
 
 /* ============================================ */
@@ -1089,6 +1128,11 @@
     .payment-table-dashboard tbody td {
         padding: 6px 10px;
     }
+    
+    .pay-now-btn {
+        font-size: 0.7rem;
+        padding: 4px 14px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1147,6 +1191,13 @@
     .plan-badge {
         font-size: 0.6rem;
         padding: 2px 8px;
+    }
+    
+    .pay-now-btn {
+        font-size: 0.65rem;
+        padding: 4px 12px;
+        width: 100%;
+        justify-content: center;
     }
 }
 

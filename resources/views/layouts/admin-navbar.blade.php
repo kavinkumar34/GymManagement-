@@ -358,7 +358,7 @@
         </li>
         <li>
             <a class="dropdown-item-custom" href="{{ route('admin.member.index', ['tab' => 'expired']) }}">
-                <i class="fas fa-exclamation-circle" style="color: #ef5350;"></i> Pending Balance
+                <i class="fas fa-exclamation-circle" style="color: #ef5350;"></i> Pending Balance/Expired
                 @php
                     $expiredCount = \App\Models\Member::where('expiry_date', '<', now())->count();
                 @endphp

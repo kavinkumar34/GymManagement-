@@ -23,12 +23,8 @@ use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\BannerApiController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\AddressApiController;
-// ===== RETURN & EXCHANGE ROUTES =====
 use App\Http\Controllers\ReturnExchangeController;
 use App\Http\Controllers\Admin\AdminReturnExchangeController;
-
-
-// ============ NEW CONTROLLERS ============
 use App\Http\Controllers\Admin\AttributeController;
 use App\Http\Controllers\Admin\TopCategoryController;
 use App\Http\Controllers\Admin\BrandController;
@@ -37,29 +33,20 @@ use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\SizeChartController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\Admin\DeliverablePincodeController;
-
-// ============ OFFER CONTROLLERS ============
 use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\OfferController as PublicOfferController;
-
-// ============ REVIEW CONTROLLERS ============
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\ProductReviewController;
-
-// ============ COUPON CONTROLLER ============
 use App\Http\Controllers\Admin\CouponController;
-
-// ============ MODELS ============
 use App\Models\UserAddress;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\SubCategory;
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
-// ============ Gym Memebership Controller============
+// ============ Gym Membership Controllers ============
 use App\Http\Controllers\Admin\MembershipController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Member\MemberPackageController;
@@ -74,6 +61,11 @@ use App\Http\Controllers\Member\AttendanceController;
 use App\Http\Controllers\Member\ProgressController;
 use App\Http\Controllers\Member\AppointmentController as MemberAppointmentController;
 use App\Http\Controllers\Trainer\AppointmentController as TrainerAppointmentController;
+
+// ============ MEMBER CONTROLLERS ============
+use App\Http\Controllers\Member\MembershipController as MemberMembershipController;
+use App\Http\Controllers\Member\PackageController as MemberPackageCtrl;
+use App\Http\Controllers\Member\PlanController;
 
 // ============ SEARCH PRODUCTS API ============
 Route::get('/search-products', function (Illuminate\Http\Request $request) {
@@ -91,20 +83,15 @@ Route::get('/search-products', function (Illuminate\Http\Request $request) {
         ->limit(10)
         ->get(['id', 'name', 'final_price as price', 'mrp', 'category_id', 'sub_category_id']);
     
-    // Get category names and images
     $products->each(function ($product) {
         $product->category_name = \App\Models\Category::where('id', $product->category_id)->value('name') ?? '';
         $product->sub_category_name = \App\Models\SubCategory::where('id', $product->sub_category_id)->value('name') ?? '';
-        
         $image = \App\Models\ProductImage::where('product_id', $product->id)->first();
         $product->image_url = $image ? asset('storage/' . $image->image_path) : null;
     });
     
     return response()->json($products);
 })->name('search.products');
-
-
-
 
 // ============ HOME PAGE ============
 Route::get('/', function () {
@@ -161,7 +148,6 @@ Route::post('/contact', [ContactController::class, 'submit'])->name('contact.sub
 Route::post('/buy-now', [PaymentController::class, 'buyNow'])->name('buy.now');
 Route::post('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
 Route::post('/payment/failure', [PaymentController::class, 'paymentFailure'])->name('payment.failure');
-// ============ RAZORPAY PAYMENT ROUTES ============
 
 Route::post(
     '/razorpay/payment/verify',
@@ -172,10 +158,9 @@ Route::get(
     '/razorpay/payment/failure',
     [PaymentController::class, 'razorpayPaymentFailure']
 )->name('razorpay.payment.failure');
+
 Route::get('/order/success/{id}', [PaymentController::class, 'orderSuccess'])->name('order.success');
 Route::get('/my-orders', [PaymentController::class, 'myOrders'])->name('my.orders')->middleware('auth');
-
-// ============ COD ORDER ROUTE ============
 Route::post('/place-cod-order', [PaymentController::class, 'placeCodOrder'])->name('place.cod.order');
 
 // ============ TRACK ORDER & ABOUT ============
@@ -195,9 +180,8 @@ Route::get('/api/offers/category/{category_id}', [PublicOfferController::class, 
 // ============ ADMIN ROUTES ============
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
-        Route::get('/users/export', [UserController::class, 'export'])->name('users.export');  // ← NEW
-
-        Route::get('/products/{id}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
+    Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
+    Route::get('/products/{id}/details', [ProductController::class, 'getProductDetails'])->name('products.details');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // Member Management
@@ -280,8 +264,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/sizecharts/{id}/edit', [SizeChartController::class, 'edit'])->name('sizecharts.edit');
     Route::put('/sizecharts/{id}', [SizeChartController::class, 'update'])->name('sizecharts.update');
     Route::delete('/sizecharts/{id}', [SizeChartController::class, 'destroy'])->name('sizecharts.destroy');
-    // Size Charts - AJAX Details Route for View Modal
-Route::get('/size-charts/{id}/details', [SizeChartController::class, 'getDetails'])->name('sizecharts.details');
+    Route::get('/size-charts/{id}/details', [SizeChartController::class, 'getDetails'])->name('sizecharts.details');
     
     // Products
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
@@ -297,7 +280,8 @@ Route::get('/size-charts/{id}/details', [SizeChartController::class, 'getDetails
     Route::get('/get-categories/{topId}', [CategoryController::class, 'getByTopCategory'])->name('get.categories');
     Route::get('/get-subcategories/{categoryId}', [SubCategoryController::class, 'getByCategory'])->name('get.subcategories');
     Route::get('/get-producttypes/{subCategoryId}', [ProductTypeController::class, 'getBySubCategory'])->name('get.producttypes');
-Route::get('/get-producttypes-by-category/{categoryId}', [ProductTypeController::class, 'getByCategory'])->name('get.producttypes.by.category');    Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
+    Route::get('/get-producttypes-by-category/{categoryId}', [ProductTypeController::class, 'getByCategory'])->name('get.producttypes.by.category');
+    Route::get('/get-category-attributes/{categoryId}', [AttributeController::class, 'getCategoryAttributes'])->name('get.category.attributes');
     Route::get('/get-subcategory-attributes/{subCategoryId}', [AttributeController::class, 'getSubCategoryAttributes'])->name('get.subcategory.attributes');
     
     // GST ROUTE
@@ -345,43 +329,40 @@ Route::get('/get-producttypes-by-category/{categoryId}', [ProductTypeController:
     Route::post('/reviews/{id}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::get('/reviews/{id}/details', [ReviewController::class, 'getDetails'])->name('reviews.details');
-// Offers (Admin) - Combo Offers Manager
-Route::prefix('offers')->name('offers.')->group(function () {
-    Route::get('/', [OfferController::class, 'index'])->name('index');
-    Route::get('/create', [OfferController::class, 'create'])->name('create');
-    Route::post('/', [OfferController::class, 'store'])->name('store');
-    Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('edit');
-    Route::put('/{offer}', [OfferController::class, 'update'])->name('update');
-    Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('destroy');
-    Route::post('/{offer}/toggle', [OfferController::class, 'toggle'])->name('toggle');
-    Route::post('/{offer}/duplicate', [OfferController::class, 'duplicate'])->name('duplicate');
-    Route::get('/status/{status}', [OfferController::class, 'index'])->name('status');
-    Route::get('/get-products', [OfferController::class, 'getProducts'])->name('get-products');
-    Route::get('/get-offer-stats', [OfferController::class, 'getStats'])->name('get-stats');
-    Route::post('/bulk-delete', [OfferController::class, 'bulkDelete'])->name('bulk-delete');
-    Route::post('/bulk-status', [OfferController::class, 'bulkStatus'])->name('bulk-status');
-    Route::post('/apply-offer', [OfferController::class, 'applyOffer'])->name('apply');
-    Route::get('/validate/{code}', [OfferController::class, 'validateOffer'])->name('validate');
-});
 
-    // ============ ⭐ COUPON ROUTES (ADMIN) ⭐ ============
-    // Add this inside the admin routes group (around line where other coupon routes are)
-Route::get('coupons/{id}/view', [CouponController::class, 'view'])->name('admin.coupons.view');
+    // Offers (Admin)
+    Route::prefix('offers')->name('offers.')->group(function () {
+        Route::get('/', [OfferController::class, 'index'])->name('index');
+        Route::get('/create', [OfferController::class, 'create'])->name('create');
+        Route::post('/', [OfferController::class, 'store'])->name('store');
+        Route::get('/{offer}/edit', [OfferController::class, 'edit'])->name('edit');
+        Route::put('/{offer}', [OfferController::class, 'update'])->name('update');
+        Route::delete('/{offer}', [OfferController::class, 'destroy'])->name('destroy');
+        Route::post('/{offer}/toggle', [OfferController::class, 'toggle'])->name('toggle');
+        Route::post('/{offer}/duplicate', [OfferController::class, 'duplicate'])->name('duplicate');
+        Route::get('/status/{status}', [OfferController::class, 'index'])->name('status');
+        Route::get('/get-products', [OfferController::class, 'getProducts'])->name('get-products');
+        Route::get('/get-offer-stats', [OfferController::class, 'getStats'])->name('get-stats');
+        Route::post('/bulk-delete', [OfferController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::post('/bulk-status', [OfferController::class, 'bulkStatus'])->name('bulk-status');
+        Route::post('/apply-offer', [OfferController::class, 'applyOffer'])->name('apply');
+        Route::get('/validate/{code}', [OfferController::class, 'validateOffer'])->name('validate');
+    });
+
+    // ============ COUPON ROUTES (ADMIN) ============
+    Route::get('coupons/{id}/view', [CouponController::class, 'view'])->name('admin.coupons.view');
     Route::resource('coupons', CouponController::class);
     Route::get('coupons/toggle/{id}', [CouponController::class, 'toggleStatus'])->name('coupons.toggle');
     Route::get('coupons/check-code', [CouponController::class, 'checkCode'])->name('admin.coupons.check-code');
 });
 
-// ============ REVIEW SUBMIT ROUTE (PUBLIC - FOR USERS) ============
+// ============ REVIEW SUBMIT ROUTE ============
 Route::post('/submit-product-review', [ProductReviewController::class, 'store'])->name('submit.review')->middleware('auth');
 
+// ============ TRAINER ROUTES ============
 Route::prefix('trainer')->name('trainer.')->group(function () {
     Route::get('/dashboard', [TrainerDashboardController::class, 'index'])->name('dashboard');
-        Route::get('/members', [App\Http\Controllers\Trainer\TrainerMemberController::class, 'index'])->name('members');
-});
-
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/members', [App\Http\Controllers\Trainer\TrainerMemberController::class, 'index'])->name('members');
 });
 
 // ============ API ROUTES (Public) ============
@@ -393,13 +374,7 @@ Route::get('/api/products/category/{id}', [ProductApiController::class, 'getProd
 Route::get('/api/products/subcategory/{id}', [ProductApiController::class, 'getProductsBySubCategory']);
 Route::get('/api/products/stocks', [ProductApiController::class, 'getProductStocks']);
 Route::get('/api/banners', [BannerApiController::class, 'getBanners']);
-
-
-
-// ============ SINGLE PRODUCT STOCK API ============
 Route::get('/api/product-stock/{id}', [ProductApiController::class, 'getProductStock']);
-
-// ============ SUB CATEGORIES API ============
 Route::get('/api/subcategories/{categoryId}', function($categoryId) {
     $subCategories = SubCategory::where('category_id', $categoryId)
         ->where('is_active', 1)
@@ -408,33 +383,24 @@ Route::get('/api/subcategories/{categoryId}', function($categoryId) {
     return response()->json($subCategories);
 })->name('api.subcategories');
 
-// ============ CART SESSION ROUTE (Allow both guest and logged-in users) ============
+// ============ CART SESSION ROUTE ============
 Route::post('/api/set-checkout-cart', function (Request $request) {
     try {
-        // Store cart in session
         if ($request->has('cart')) {
             session(['checkout_cart' => $request->cart]);
         }
-        
-        // Store total amount if provided
         if ($request->has('total_amount')) {
             session(['checkout_total' => $request->total_amount]);
         }
-        
-        // Store shipping charge if provided
         if ($request->has('shipping_charge')) {
             session(['checkout_shipping' => $request->shipping_charge]);
         }
-        
-        // Store coupon data if provided
         if ($request->has('coupon_code')) {
             session(['checkout_coupon' => $request->coupon_code]);
         }
         if ($request->has('coupon_discount')) {
             session(['checkout_coupon_discount' => $request->coupon_discount]);
         }
-        
-        // Store guest data if provided (for guest users)
         if ($request->has('guest_name')) {
             session(['guest_name' => $request->guest_name]);
         }
@@ -444,7 +410,6 @@ Route::post('/api/set-checkout-cart', function (Request $request) {
         if ($request->has('guest_email')) {
             session(['guest_email' => $request->guest_email]);
         }
-        
         return response()->json([
             'success' => true,
             'message' => 'Checkout data saved successfully'
@@ -462,7 +427,6 @@ Route::post('/api/set-checkout-cart', function (Request $request) {
 Route::get('/api/check-pincode/{pincode}', function ($pincode) {
     $isDeliverable = \App\Models\DeliverablePincode::isDeliverable($pincode);
     $deliveryInfo = \App\Models\DeliverablePincode::getDeliveryInfo($pincode);
-    
     return response()->json([
         'success' => true,
         'deliverable' => $isDeliverable,
@@ -472,23 +436,19 @@ Route::get('/api/check-pincode/{pincode}', function ($pincode) {
         'message' => $isDeliverable ? 'Delivery available' : 'Delivery not available for this pincode'
     ]);
 })->name('check.pincode');
+
 // ============ CHECK GUEST CONTACT INFO API ============
 Route::get('/api/check-contact-info', function (Illuminate\Http\Request $request) {
-
     $email = trim($request->email ?? '');
     $phone = trim($request->phone ?? '');
-
     $emailExists = false;
     $phoneExists = false;
-
     if ($email !== '') {
         $emailExists = \App\Models\User::where('email', $email)->exists();
     }
-
     if ($phone !== '') {
         $phoneExists = \App\Models\User::where('phone', $phone)->exists();
     }
-
     return response()->json([
         'success' => true,
         'email_exists' => $emailExists,
@@ -513,59 +473,39 @@ Route::get('/api/user', function () {
     return response()->json(['success' => false, 'message' => 'Not logged in']);
 })->name('api.user');
 
-// ============ USER ADDRESSES API ============
-// ============ USER API ============
-
-Route::get('/api/user', [AddressApiController::class, 'getUser'])
-    ->name('api.user');
-
+Route::get('/api/user', [AddressApiController::class, 'getUser'])->name('api.user');
 
 // ============ USER ADDRESSES API ============
+Route::get('/api/user-addresses', [AddressApiController::class, 'getAddresses'])->name('api.user.addresses');
+Route::post('/api/user-addresses', [AddressApiController::class, 'storeAddress'])->name('api.user.addresses.store');
+Route::put('/api/user-addresses/{id}', [AddressApiController::class, 'updateAddress'])->name('api.user.addresses.update');
+Route::delete('/api/user-addresses/{id}', [AddressApiController::class, 'deleteAddress'])->name('api.user.addresses.delete');
 
-Route::get('/api/user-addresses', [AddressApiController::class, 'getAddresses'])
-    ->name('api.user.addresses');
-
-Route::post('/api/user-addresses', [AddressApiController::class, 'storeAddress'])
-    ->name('api.user.addresses.store');
-
-Route::put('/api/user-addresses/{id}', [AddressApiController::class, 'updateAddress'])
-    ->name('api.user.addresses.update');
-
-Route::delete('/api/user-addresses/{id}', [AddressApiController::class, 'deleteAddress'])
-    ->name('api.user.addresses.delete');
-
-
-    // ============ CHECK GUEST CONTACT INFORMATION ============
+// ============ CHECK GUEST CONTACT INFORMATION ============
 Route::get('/api/check-contact-info', function (Request $request) {
-
     $email = trim($request->email ?? '');
     $phone = trim($request->phone ?? '');
-
     $emailExists = false;
     $phoneExists = false;
-
     if ($email !== '') {
         $emailExists = \App\Models\User::where('email', $email)->exists();
     }
-
     if ($phone !== '') {
         $phoneExists = \App\Models\User::where('phone', $phone)->exists();
     }
-
     return response()->json([
         'success' => true,
         'email_exists' => $emailExists,
         'phone_exists' => $phoneExists
     ]);
 })->name('api.check.contact.info');
-    
+
 // ============ DELIVERABLE PINCODES API ============
 Route::get('/api/deliverable-pincodes', function () {
     try {
         $pincodes = \App\Models\DeliverablePincode::where('is_active', 1)
             ->select('id', 'state', 'shipping_charge', 'is_active')
             ->get();
-        
         return response()->json([
             'success' => true,
             'pincodes' => $pincodes
@@ -578,8 +518,7 @@ Route::get('/api/deliverable-pincodes', function () {
     }
 })->name('deliverable.pincodes');
 
-// ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ============
-// ============ ORDER DETAILS API (FOR MY ORDERS MODAL) ============
+// ============ ORDER DETAILS API ============
 Route::get('/api/order-details/{id}', [PaymentController::class, 'getOrderDetails'])
     ->middleware('auth')
     ->name('api.order.details');
@@ -587,14 +526,13 @@ Route::get('/api/order-details/{id}', [PaymentController::class, 'getOrderDetail
 // ============ CANCEL ORDER ROUTE ============
 Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');
 
-// ============ PRODUCT REVIEWS API (PUBLIC) ============
+// ============ PRODUCT REVIEWS API ============
 Route::get('/api/product-reviews/{productId}', function($productId) {
     $reviews = \App\Models\ProductReview::where('product_id', $productId)
         ->where('status', 'approved')
         ->with('user')
         ->orderBy('created_at', 'desc')
         ->get();
-    
     return response()->json([
         'success' => true,
         'reviews' => $reviews->map(function($review) {
@@ -612,28 +550,21 @@ Route::get('/api/product-reviews/{productId}', function($productId) {
     ]);
 })->name('api.product.reviews');
 
+// ============ TEST ROUTES ============
 Route::get('/test-mail', function () {
     try {
         $order = \App\Models\Order::with('items')->latest()->first();
         $user = \App\Models\User::where('email', 'praveenkavin241@gmail.com')->first();
-        
         if (!$order) {
             return 'No order found. Please place an order first.';
         }
-        
         if (!$user) {
             return 'User not found.';
         }
-        
         $items = $order->items;
-        
         \Illuminate\Support\Facades\Mail::to($user->email)
             ->send(new \App\Mail\OrderConfirmationMail($order, $user, $items, null));
-        
         return '✅ Email sent successfully to ' . $user->email . '! Check your inbox.';
-        
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return 'Validation Error: ' . $e->getMessage();
     } catch (\Exception $e) {
         return '❌ Error: ' . $e->getMessage();
     }
@@ -642,10 +573,8 @@ Route::get('/test-mail', function () {
 Route::get('/test-msg91', function() {
     $phone = '9025595190';
     $otp = rand(100000, 999999);
-    
     $otpService = new \App\Services\OTPService();
     $result = $otpService->sendOTP($phone, $otp);
-    
     return response()->json([
         'success' => $result['success'],
         'phone' => $phone,
@@ -659,10 +588,8 @@ Route::get('/test-msg91', function() {
 Route::get('/test-sms-final', function() {
     $phone = '9025595190';
     $otp = rand(100000, 999999);
-    
     $otpService = new \App\Services\OTPService();
     $result = $otpService->sendOTP($phone, $otp);
-    
     return response()->json([
         'success' => $result['success'],
         'phone' => $phone,
@@ -677,10 +604,8 @@ Route::get('/test-sms-final', function() {
 Route::get('/test-sms-now', function() {
     $phone = '9025595190';
     $otp = rand(100000, 999999);
-    
     $otpService = new \App\Services\OTPService();
     $result = $otpService->sendOTP($phone, $otp);
-    
     return response()->json([
         'success' => $result['success'],
         'phone' => $phone,
@@ -694,10 +619,8 @@ Route::get('/test-sms-now', function() {
 Route::get('/test-msg91-curl', function() {
     $phone = '9025595190';
     $otp = rand(100000, 999999);
-    
     $otpService = new \App\Services\OTPService();
     $result = $otpService->sendOTP($phone, $otp);
-    
     return response()->json([
         'success' => $result['success'],
         'phone' => $phone,
@@ -711,19 +634,15 @@ Route::get('/test-msg91-curl', function() {
 Route::get('/debug-sms', function() {
     $phone = '9025595190';
     $otp = rand(100000, 999999);
-    
     $phone = preg_replace('/[^0-9]/', '', $phone);
     $phone = ltrim($phone, '0');
     if (strlen($phone) === 10) {
         $phone = '91' . $phone;
     }
-    
     $message = "Dear customer, use this One Time Password {$otp} to log in to your ASCOXTECHNOSOFT profile registration. This OTP will be valid for the next 5 mins. - ASCOXTECHNOSOFT";
-    
     $apiKey = 'a7a8ce65-3d35-4d13-a715-c2c33ffca8a5';
     $senderId = 'ASCOXT';
     $templateId = '1707173148047034884';
-    
     $url = "https://api.msg91.com/api/sendhttp.php";
     $params = [
         'authkey' => $apiKey,
@@ -735,21 +654,17 @@ Route::get('/debug-sms', function() {
         'DLT_TE_ID' => $templateId,
         'encrypt' => 0
     ];
-    
     $fullUrl = $url . '?' . http_build_query($params);
-    
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $fullUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
     curl_close($ch);
-    
     return response()->json([
         'phone' => $phone,
         'otp' => $otp,
@@ -765,10 +680,8 @@ Route::get('/debug-sms', function() {
 Route::get('/test-sms-working', function() {
     $phone = '9025595190';
     $otp = rand(100000, 999999);
-    
     $otpService = new \App\Services\OTPService();
     $result = $otpService->sendOTP($phone, $otp);
-    
     return response()->json([
         'phone' => $phone,
         'otp' => $otp,
@@ -784,66 +697,51 @@ Route::post('/api/update-profile-image', function (Illuminate\Http\Request $requ
     if (!auth()->check()) {
         return response()->json(['success' => false, 'message' => 'Not authenticated']);
     }
-    
     if ($request->hasFile('profile_image')) {
         $user = auth()->user();
-        
-        // Validate file
         $request->validate([
             'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
         ]);
-        
-        // Delete old image if exists
         if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
             Storage::disk('public')->delete($user->profile_image);
         }
-        
         $image = $request->file('profile_image');
         $filename = time() . '_' . $user->id . '.' . $image->getClientOriginalExtension();
         $path = $image->storeAs('profile_images', $filename, 'public');
-        
         $user->profile_image = $path;
         $user->save();
-        
         return response()->json([
             'success' => true,
             'image_url' => asset('storage/' . $path)
         ]);
     }
-    
     return response()->json([
         'success' => false,
         'message' => 'No image uploaded'
     ]);
 })->name('update.profile.image')->middleware('auth');
 
-// ============ UPDATE PROFILE (NAME, PHONE, ADDRESS) ============
+// ============ UPDATE PROFILE ============
 Route::post('/api/update-profile', function (Illuminate\Http\Request $request) {
     if (!auth()->check()) {
         return response()->json(['success' => false, 'message' => 'Not authenticated']);
     }
-    
     $request->validate([
         'name' => 'required|string|max:255'
     ]);
-    
     $user = auth()->user();
     $user->name = $request->name;
     if ($request->phone) {
         $user->phone = $request->phone;
     }
     $user->save();
-    
-    // Update or create address
     if ($request->address || $request->city || $request->state || $request->pincode) {
         $address = \App\Models\UserAddress::where('user_id', $user->id)
             ->where('is_default', 1)
             ->first();
-        
         if (!$address) {
             $address = \App\Models\UserAddress::where('user_id', $user->id)->first();
         }
-        
         if ($address) {
             $address->address = $request->address ?? $address->address;
             $address->city = $request->city ?? $address->city;
@@ -867,7 +765,6 @@ Route::post('/api/update-profile', function (Illuminate\Http\Request $request) {
             ]);
         }
     }
-    
     return response()->json([
         'success' => true,
         'message' => 'Profile updated successfully'
@@ -893,7 +790,6 @@ Route::get('/api/available-coupons', function() {
             ->orderBy('id', 'desc')
             ->limit(5)
             ->get();
-        
         return response()->json([
             'success' => true,
             'coupons' => $coupons
@@ -909,7 +805,6 @@ Route::get('/api/available-coupons', function() {
 // ============ DEBUG COUPON ROUTE ============
 Route::get('/debug-coupon/{code}', function($code) {
     $coupon = \App\Models\Coupon::where('code', strtoupper($code))->first();
-    
     if ($coupon) {
         return response()->json([
             'found' => true,
@@ -917,19 +812,17 @@ Route::get('/debug-coupon/{code}', function($code) {
             'is_valid' => $coupon->isValid()
         ]);
     }
-    
     return response()->json([
         'found' => false,
         'message' => 'Coupon not found'
     ]);
 });
 
-// routes/web.php
+// ============ FORGOT PASSWORD ============
 Route::get('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showForgotForm'])->name('password.request');
 Route::post('forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLink'])->name('password.send');
 Route::get('reset-password/{token}/{email}', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('password.reset-form');
 Route::post('reset-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('password.reset');
-
 
 // ===== STATIC PAGES =====
 Route::get('/returns-exchange', function () {
@@ -948,60 +841,23 @@ Route::get('/terms-conditions', function () {
     return view('pages.terms-conditions');
 })->name('terms.conditions');
 
-
-// ============ MEMBER/TRAINER LOGIN WITH ROLE SELECTION FOR GYM MANAGEMENET ============
-
+// ============ MEMBER/TRAINER LOGIN ============
 Route::get('/member-trainer-login', [App\Http\Controllers\Auth\MemberTrainerLoginController::class, 'showLoginForm'])->name('member.trainer.login');
 Route::post('/member-trainer-login', [App\Http\Controllers\Auth\MemberTrainerLoginController::class, 'login'])->name('member.trainer.login.submit');
 
-Route::get('/admin/members-list', [MemberController::class, 'index'])
-    ->name('admin.member.index');
+// ============ ADMIN ROUTES (OUTSIDE AUTH GROUP) ============
+Route::get('/admin/members-list', [MemberController::class, 'index'])->name('admin.member.index');
+Route::get('/admin/trainers-list', [TrainerController::class, 'index'])->name('admin.trainer.index');
 
-Route::get('/admin/trainers-list', [TrainerController::class, 'index'])
-    ->name('admin.trainer.index');
+// ============ ADMIN MEMBERSHIP ROUTES ============
+Route::get('/admin/membership/create', [MembershipController::class, 'create'])->name('admin.membership.create');
+Route::post('/admin/membership/store', [MembershipController::class, 'store'])->name('admin.membership.store');
+Route::get('/admin/membership', [MembershipController::class, 'index'])->name('admin.membership.index');
+Route::get('/admin/membership/{id}/edit', [MembershipController::class, 'edit'])->name('admin.membership.edit');
+Route::put('/admin/membership/{id}', [MembershipController::class, 'update'])->name('admin.membership.update');
+Route::delete('/admin/membership/{id}', [MembershipController::class, 'destroy'])->name('admin.membership.destroy');
 
-
-    Route::get('/admin/membership/create', [MembershipController::class, 'create'])
-    ->name('admin.membership.create');
-
-Route::post('/admin/membership/store', [MembershipController::class, 'store'])
-    ->name('admin.membership.store');
-
-Route::get('/admin/membership', [MembershipController::class, 'index'])
-    ->name('admin.membership.index');
-    Route::get('/admin/membership/{id}/edit', [MembershipController::class, 'edit'])
-    ->name('admin.membership.edit');
-
-Route::put('/admin/membership/{id}', [MembershipController::class, 'update'])
-    ->name('admin.membership.update');
-
-Route::delete('/admin/membership/{id}', [MembershipController::class, 'destroy'])
-    ->name('admin.membership.destroy');
-
-    // Member - Membership
-// Member - Membership with auth middleware
-// ============ MEMBER ROUTES ============
-Route::prefix('member')->name('member.')->group(function () {
-    Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/membership', [App\Http\Controllers\Member\MemberController::class, 'membership'])->name('membership');
-    Route::post('/buy-membership', [App\Http\Controllers\Member\MemberController::class, 'buyMembership'])->name('buy.membership');
-    
-    // ✅ Payment Routes - CSRF Excluded
-Route::post('/membership-payment-success', [App\Http\Controllers\Member\MemberController::class, 'paymentSuccess'])
-    ->name('payment.success')
-    ->withoutMiddleware([
-        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class
-    ]);
-
-Route::post('/membership-payment-failure', [App\Http\Controllers\Member\MemberController::class, 'paymentFailure'])
-    ->name('payment.failure')
-    ->withoutMiddleware([
-        \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class
-    ]);
-    
-    Route::get('/payment/success-page/{id}', [App\Http\Controllers\Member\MemberController::class, 'paymentSuccessPage'])->name('payment.success.page');
-});
-// Admin - Package Routes
+// ============ ADMIN PACKAGE ROUTES ============
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
     Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
@@ -1011,201 +867,159 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/packages/{id}', [PackageController::class, 'destroy'])->name('package.destroy');
 });
 
-// Member - Packages
-// Member - Packages (NO auth middleware)
-Route::get('/member/packages', [MemberPackageController::class, 'index'])->name('member.packages');
-Route::post('/member/buy-package', [MemberPackageController::class, 'buy'])->name('member.buy.package');
+// ============ MEMBER ROUTES ============
+Route::prefix('member')->name('member.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [MemberDashboardController::class, 'index'])->name('dashboard');
+    
+    // Membership
+    Route::get('/membership', [MemberMembershipController::class, 'index'])->name('membership');
+    
+    // Packages
+    Route::get('/packages', [MemberPackageCtrl::class, 'index'])->name('packages');
+    
+    // Plans
+    Route::get('/plans', [PlanController::class, 'index'])->name('plans');
+    Route::post('/buy-plan', [PlanController::class, 'buyPlan'])->name('buy.plan');
+    Route::post('/payment-success', [PlanController::class, 'paymentSuccess'])->name('payment.success');
+    Route::post('/payment-failed', [PlanController::class, 'paymentFailed'])->name('payment.failed');
+    
+    // Attendance
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    
+    // Payments
+    Route::get('/payments', [App\Http\Controllers\Member\PaymentController::class, 'index'])->name('payments.index');
+    
+    // Progress
+    Route::get('/progress', [ProgressController::class, 'index'])->name('progress.index');
+    
+    // Appointments
+    Route::get('/appointments', [MemberAppointmentController::class, 'index'])->name('appointment.index');
+    Route::get('/appointments/create', [MemberAppointmentController::class, 'create'])->name('appointment.create');
+    Route::post('/appointments/store', [MemberAppointmentController::class, 'store'])->name('appointment.store');
+    
+    // Workout
+    Route::get('/workouts', [App\Http\Controllers\Member\WorkoutController::class, 'index'])->name('workout.index');
+    Route::get('/workouts/{id}', [App\Http\Controllers\Member\WorkoutController::class, 'show'])->name('workout.show');
+    
+    // Diet
+    Route::get('/diet', [MemberDietController::class, 'index'])->name('diet.index');
+    Route::get('/diet/{id}', [MemberDietController::class, 'show'])->name('diet.show');
+});
 
-Route::get('/admin/gym-dashboard', [DashboardController::class, 'index'])
-    ->name('admin.gym.dashboard');
+Route::get('/admin/gym-dashboard', [DashboardController::class, 'index'])->name('admin.gym.dashboard');
 
-// ADMIN - ASSIGN TRAINER ROUTES
+// ============ ADMIN ASSIGN TRAINER ROUTES ============
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Main Assign Trainer Pages
     Route::get('/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'index'])->name('assign.trainer.index');
     Route::get('/assign-trainer/list', [App\Http\Controllers\Admin\AssignTrainerController::class, 'assignedList'])->name('assign.trainer.list');
-    
-    // 👇 Bulk Assign Route
     Route::post('/assign-trainer/bulk', [App\Http\Controllers\Admin\AssignTrainerController::class, 'bulkAssign'])->name('assign.trainer.bulk');
-    
-    // Assign/Remove Trainer - Individual Member Actions
     Route::get('/member/{id}/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'assignForm'])->name('member.assign.trainer');
     Route::post('/member/{id}/assign-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'storeAssign'])->name('member.assign.trainer.store');
     Route::get('/member/{id}/remove-trainer', [App\Http\Controllers\Admin\AssignTrainerController::class, 'removeTrainer'])->name('member.remove.trainer');
 });
-Route::get('/members', [App\Http\Controllers\Trainer\TrainerMemberController::class, 'index'])
-    ->name('trainer.members');
 
-    // Admin - AJAX Routes for Membership/Package Details
+// ============ TRAINER MEMBERS ============
+Route::get('/members', [App\Http\Controllers\Trainer\TrainerMemberController::class, 'index'])->name('trainer.members');
+
+// ============ AJAX ROUTES ============
 Route::get('/get-membership-details/{planName}', [MemberController::class, 'getMembershipDetails'])->name('get.membership.details');
 Route::get('/get-package-details/{packageName}', [MemberController::class, 'getPackageDetails'])->name('get.package.details');
 
-//hand payment 
+// ============ HAND PAYMENT ============
 Route::get('/admin/hand-payment', [App\Http\Controllers\Admin\MemberController::class, 'handPayment'])->name('admin.hand.payment');
 
-// memeber online  payment
+// ============ MEMBER ONLINE PAYMENT ============
 Route::get('/admin/payment-orders', [App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('admin.payment.orders');
 
-// Trainer Workout Routes
+// ============ TRAINER WORKOUT ROUTES ============
 Route::prefix('trainer')->name('trainer.')->group(function () {
     Route::resource('workout', App\Http\Controllers\Trainer\WorkoutController::class);
 });
 
-// Member Workout Routes
+// ============ MEMBER WORKOUT ROUTES ============
 Route::prefix('member')->name('member.')->group(function () {
     Route::get('workouts', [App\Http\Controllers\Member\WorkoutController::class, 'index'])->name('workout.index');
     Route::get('workouts/{id}', [App\Http\Controllers\Member\WorkoutController::class, 'show'])->name('workout.show');
 });
 
-Route::prefix('trainer')
-    ->name('trainer.')
-    ->group(function () {
-
-        Route::resource('diet', DietController::class);
-
+// ============ TRAINER DIET ROUTES ============
+Route::prefix('trainer')->name('trainer.')->group(function () {
+    Route::resource('diet', DietController::class);
 });
 
-Route::prefix('member')
-    ->name('member.')
-    ->group(function () {
-
-        Route::get('/diet', [MemberDietController::class, 'index'])
-            ->name('diet.index');
-
-        Route::get('/diet/{id}', [MemberDietController::class, 'show'])
-            ->name('diet.show');
-
+// ============ MEMBER DIET ROUTES ============
+Route::prefix('member')->name('member.')->group(function () {
+    Route::get('/diet', [MemberDietController::class, 'index'])->name('diet.index');
+    Route::get('/diet/{id}', [MemberDietController::class, 'show'])->name('diet.show');
 });
 
-// ================= ADMIN ATTENDANCE =================
-
+// ============ ADMIN ATTENDANCE ============
 Route::prefix('admin')->name('admin.')->group(function () {
-
-    Route::get('/member-attendance', [MemberAttendanceController::class, 'index'])
-        ->name('member-attendance.index');
-
-Route::get('/trainer-attendance', [AdminTrainerAttendanceController::class, 'index'])
-    ->name('trainer-attendance.index');
-
+    Route::get('/member-attendance', [MemberAttendanceController::class, 'index'])->name('member-attendance.index');
+    Route::get('/trainer-attendance', [AdminTrainerAttendanceController::class, 'index'])->name('trainer-attendance.index');
 });
 
-
+// ============ TRAINER ATTENDANCE ============
 Route::prefix('trainer')->name('trainer.')->group(function () {
-
     Route::resource('trainer-attendance', TrainerTrainerAttendanceController::class);
-
     Route::resource('member-attendance', TrainerMemberAttendanceController::class);
-
 });
 
+// ============ MEMBER ATTENDANCE ============
 Route::prefix('member')->name('member.')->group(function () {
-
-    Route::get('/attendance', [AttendanceController::class, 'index'])
-        ->name('attendance.index');
-
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
 });
 
-
-// ================= Progress 23072026 =================
+// ============ PROGRESS ROUTES ============
 Route::prefix('trainer')->name('trainer.')->group(function () {
-
-    // Existing trainer routes...
-
-    Route::get('/progress', [App\Http\Controllers\Trainer\ProgressController::class, 'index'])
-        ->name('progress.index');
-
-    Route::get('/progress/create', [App\Http\Controllers\Trainer\ProgressController::class, 'create'])
-        ->name('progress.create');
-
-    Route::post('/progress/store', [App\Http\Controllers\Trainer\ProgressController::class, 'store'])
-        ->name('progress.store');
-
-    Route::get('/progress/{id}/edit', [App\Http\Controllers\Trainer\ProgressController::class, 'edit'])
-        ->name('progress.edit');
-
-    Route::post('/progress/{id}/update', [App\Http\Controllers\Trainer\ProgressController::class, 'update'])
-        ->name('progress.update');
-
-    Route::delete('/progress/{id}', [App\Http\Controllers\Trainer\ProgressController::class, 'destroy'])
-        ->name('progress.destroy');
-            Route::get('/progress/chart/{memberId}', [App\Http\Controllers\Trainer\ProgressController::class, 'chart'])
-        ->name('progress.chart');
-
+    Route::get('/progress', [App\Http\Controllers\Trainer\ProgressController::class, 'index'])->name('progress.index');
+    Route::get('/progress/create', [App\Http\Controllers\Trainer\ProgressController::class, 'create'])->name('progress.create');
+    Route::post('/progress/store', [App\Http\Controllers\Trainer\ProgressController::class, 'store'])->name('progress.store');
+    Route::get('/progress/{id}/edit', [App\Http\Controllers\Trainer\ProgressController::class, 'edit'])->name('progress.edit');
+    Route::post('/progress/{id}/update', [App\Http\Controllers\Trainer\ProgressController::class, 'update'])->name('progress.update');
+    Route::delete('/progress/{id}', [App\Http\Controllers\Trainer\ProgressController::class, 'destroy'])->name('progress.destroy');
+    Route::get('/progress/chart/{memberId}', [App\Http\Controllers\Trainer\ProgressController::class, 'chart'])->name('progress.chart');
 });
 
-Route::get('/progress', [App\Http\Controllers\Member\ProgressController::class, 'index'])
-    ->name('progress.index');
+Route::get('/progress', [App\Http\Controllers\Member\ProgressController::class, 'index'])->name('progress.index');
+Route::get('/member/progress', [App\Http\Controllers\Member\ProgressController::class, 'index'])->name('member.progress.index');
 
-    Route::get('/member/progress', [App\Http\Controllers\Member\ProgressController::class, 'index'])
-    ->name('member.progress.index');
-
-
-
-
+// ============ MEMBER APPOINTMENTS ============
 Route::prefix('member')->name('member.')->group(function () {
-
-    Route::get('/appointments', [MemberAppointmentController::class, 'index'])
-        ->name('appointment.index');
-
-    Route::get('/appointments/create', [MemberAppointmentController::class, 'create'])
-        ->name('appointment.create');
-
-    Route::post('/appointments/store', [MemberAppointmentController::class, 'store'])
-        ->name('appointment.store');
-
+    Route::get('/appointments', [MemberAppointmentController::class, 'index'])->name('appointment.index');
+    Route::get('/appointments/create', [MemberAppointmentController::class, 'create'])->name('appointment.create');
+    Route::post('/appointments/store', [MemberAppointmentController::class, 'store'])->name('appointment.store');
 });
 
+// ============ TRAINER APPOINTMENTS ============
 Route::prefix('trainer')->name('trainer.')->group(function () {
-
-    Route::get('/appointments', [TrainerAppointmentController::class, 'index'])
-        ->name('appointment.index');
-
-    Route::post('/appointments/{id}/approve', [TrainerAppointmentController::class, 'approve'])
-        ->name('appointment.approve');
-
-    Route::post('/appointments/{id}/reject', [TrainerAppointmentController::class, 'reject'])
-        ->name('appointment.reject');
-
+    Route::get('/appointments', [TrainerAppointmentController::class, 'index'])->name('appointment.index');
+    Route::post('/appointments/{id}/approve', [TrainerAppointmentController::class, 'approve'])->name('appointment.approve');
+    Route::post('/appointments/{id}/reject', [TrainerAppointmentController::class, 'reject'])->name('appointment.reject');
 });
 
+// ============ MEMBER PAYMENTS ============
 Route::prefix('member')->name('member.')->group(function () {
-
-    Route::get('/payments', [App\Http\Controllers\Member\PaymentController::class, 'index'])
-        ->name('payments.index');
-
+    Route::get('/payments', [App\Http\Controllers\Member\PaymentController::class, 'index'])->name('payments.index');
 });
 
-
-
-
-
-// Add this inside your admin routes group
+// ============ ADMIN REPORTS ============
 Route::prefix('admin')->name('admin.')->group(function() {
-    // ... other routes ...
-    
-    // Reports
     Route::get('/reports/orders', [App\Http\Controllers\Admin\AdminReportController::class, 'index'])->name('reports.orders');
     Route::get('/reports/export', [App\Http\Controllers\Admin\AdminReportController::class, 'export'])->name('reports.export');
+    Route::post('/payments/{orderId}/refund-status', [AdminPaymentController::class, 'updateRefundStatus'])->name('payments.refund-status');
 });
 
-// Admin refund status update
-Route::prefix('admin')->name('admin.')->group(function() {
-    // ... existing routes ...
-    Route::post('/payments/{orderId}/refund-status', [AdminPaymentController::class, 'updateRefundStatus'])
-        ->name('payments.refund-status');
-});
-
-// Cancel order route (user)
+// ============ CANCEL ORDER ============
 Route::post('/cancel-order', [PaymentController::class, 'cancelOrder'])->name('cancel.order')->middleware('auth');
 
-
-// ===== RETURN & EXCHANGE ROUTES (USER) =====
+// ===== RETURN & EXCHANGE ROUTES =====
 Route::middleware(['auth'])->group(function () {
     Route::get('/return-exchange/check/{orderId}', [ReturnExchangeController::class, 'checkEligibility'])->name('return.check');
     Route::post('/return-exchange/submit', [ReturnExchangeController::class, 'store'])->name('return.submit');
 });
 
-// ===== RETURN & EXCHANGE ROUTES (ADMIN) =====
 Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/returns', [AdminReturnExchangeController::class, 'index'])->name('returns.index');
     Route::get('/returns/{id}/details', [AdminReturnExchangeController::class, 'getDetails'])->name('returns.details');
@@ -1213,15 +1027,12 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('/returns/bulk-update', [AdminReturnExchangeController::class, 'bulkUpdate'])->name('returns.bulk-update');
 });
 
-
 // ============ FINANCE REPORTS ============
 Route::get('/admin/finance-reports', [App\Http\Controllers\Admin\FinanceReportController::class, 'index'])
     ->name('admin.finance.reports')
     ->middleware('auth:admin');
 
-
-
-    // ============ EXPENSES ROUTES ============
+// ============ EXPENSES ROUTES ============
 Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {
     Route::get('/expenses', [App\Http\Controllers\Admin\ExpenseController::class, 'index'])->name('expenses.index');
     Route::get('/expenses/create', [App\Http\Controllers\Admin\ExpenseController::class, 'create'])->name('expenses.create');
@@ -1231,9 +1042,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function
     Route::delete('/expenses/{id}', [App\Http\Controllers\Admin\ExpenseController::class, 'destroy'])->name('expenses.destroy');
     Route::get('/expenses/stats', [App\Http\Controllers\Admin\ExpenseController::class, 'stats'])->name('expenses.stats');
 });
-
-
-
 
 // ============ TRAINER SALARY ROUTES ============
 Route::prefix('admin')->name('admin.')->middleware('auth:admin')->group(function () {

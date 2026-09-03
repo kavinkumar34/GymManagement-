@@ -13,7 +13,6 @@ class MembershipController extends Controller
     public function index()
     {
         $memberships = Membership::latest()->paginate(10);
-
         return view('admin.membership-list', compact('memberships'));
     }
 
@@ -50,13 +49,9 @@ class MembershipController extends Controller
         $discount = $request->discount ?? 0;
 
         if ($request->discount_type == 'Flat') {
-
             $finalPrice = $price - $discount;
-
         } else {
-
             $finalPrice = $price - (($price * $discount) / 100);
-
         }
 
         if ($finalPrice < 0) {
@@ -84,7 +79,6 @@ class MembershipController extends Controller
     public function edit($id)
     {
         $membership = Membership::findOrFail($id);
-
         return view('admin.membership-edit', compact('membership'));
     }
 
@@ -108,11 +102,9 @@ class MembershipController extends Controller
         $imagePath = $membership->image;
 
         if ($request->hasFile('image')) {
-
             if ($membership->image) {
                 Storage::disk('public')->delete($membership->image);
             }
-
             $imagePath = $request->file('image')->store('membership-images', 'public');
         }
 
@@ -120,13 +112,9 @@ class MembershipController extends Controller
         $discount = $request->discount ?? 0;
 
         if ($request->discount_type == 'Flat') {
-
             $finalPrice = $price - $discount;
-
         } else {
-
             $finalPrice = $price - (($price * $discount) / 100);
-
         }
 
         if ($finalPrice < 0) {

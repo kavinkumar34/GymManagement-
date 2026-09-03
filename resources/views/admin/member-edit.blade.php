@@ -703,7 +703,7 @@
                                 <option value="">-- Select Plan Type --</option>
                                 <option value="membership" {{ old('plan_type', $member->plan_type) == 'membership' ? 'selected' : '' }}>Membership</option>
                                 <option value="package" {{ old('plan_type', $member->plan_type) == 'package' ? 'selected' : '' }}>Package</option>
-                                <option value="monthly" {{ old('plan_type', $member->plan_type) == 'monthly' ? 'selected' : '' }}>Monthly Plan</option>
+                              <!--  <option value="monthly" {{ old('plan_type', $member->plan_type) == 'monthly' ? 'selected' : '' }}>Monthly Plan</option> -->
                             </select>
                         </div>
 

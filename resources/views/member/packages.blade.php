@@ -1,3 +1,9 @@
+@php
+    $userId = session('gym_user_id');
+    $userName = session('gym_user_name');
+    $userEmail = session('gym_user_email');
+@endphp
+
 @extends('layouts.member-layout')
 
 @section('content')
@@ -5,7 +11,7 @@
     <div class="row">
         <div class="col-12">
             <div class="package-card-main">
-                <!-- Card Header - Matching Navbar Theme -->
+                <!-- Card Header -->
                 <div class="package-card-header">
                     <h4 class="mb-0">
                         <i class="fas fa-box me-2"></i> Our Packages
@@ -28,11 +34,48 @@
                         </div>
                     @endif
 
+                    <!-- Active Plan Warning -->
+                    @php
+                        $member = App\Models\Member::where('email', session('gym_user_email'))->first();
+                        $hasActivePlan = ($member && $member->status == 'Active' && !$member->isExpired());
+                    @endphp
+
+                    @if($hasActivePlan)
+                        <div class="alert alert-info" style="background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i class="fas fa-info-circle" style="font-size: 20px; color: #3b82f6;"></i>
+                                <div>
+                                    <strong style="color: #1d4ed8;">You have an active plan!</strong><br>
+                                    <span style="color: #1d4ed8; font-size: 0.85rem;">
+                                        Your current plan <strong>{{ $member->membership_plan }}</strong> is active until 
+                                        <strong>{{ \Carbon\Carbon::parse($member->expiry_date)->format('d M Y') }}</strong>.
+                                        @php
+                                            $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                        @endphp
+                                        <strong>{{ $daysLeft }} days left.</strong>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($member && $member->status == 'Inactive')
+                        <div class="alert alert-warning" style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 20px; color: #f59e0b;"></i>
+                                <div>
+                                    <strong style="color: #92400e;">Your plan has expired!</strong><br>
+                                    <span style="color: #92400e; font-size: 0.85rem;">
+                                        Please purchase a new plan to continue your membership.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="row g-4">
                         @forelse($packages as $package)
                             <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                                 <div class="package-card">
-                                    <!-- Image Section - Full Cover -->
+                                    <!-- Image Section -->
                                     <div class="package-image">
                                         @if($package->image)
                                             <img src="{{ asset('storage/'.$package->image) }}" 
@@ -44,7 +87,9 @@
                                                  style="object-fit: cover;">
                                         @endif
                                         
-                                   
+                                        <span class="badge-status {{ $package->status == 'Active' ? 'active' : 'inactive' }}">
+                                            {{ $package->status == 'Active' ? 'Available' : 'Not Available' }}
+                                        </span>
                                     </div>
 
                                     <!-- Content Section -->
@@ -68,7 +113,7 @@
                                             <p class="package-description">{{ Str::limit($package->description, 80) }}</p>
                                         @endif
 
-                                        <!-- Features - Show All -->
+                                        <!-- Features -->
                                         @php
                                             $features = $package->getFeaturesArrayAttribute();
                                         @endphp
@@ -98,15 +143,21 @@
                                             </div>
                                         @endif
 
-                                        <!-- Availability Badge Below Description -->
+                                        <!-- Buy Button -->
                                         @if($package->status == 'Active')
-                                            <div class="availability-badge">
-                                                <i class="fas fa-check-circle me-1"></i> Available
-                                            </div>
+                                            @if($hasActivePlan)
+                                                <button class="buy-btn buy-btn-disabled" disabled>
+                                                    <i class="fas fa-clock me-1"></i> Active Plan
+                                                </button>
+                                            @else
+                                                <button class="buy-btn" onclick="initiatePayment('package', {{ $package->id }}, {{ $package->price }}, '{{ addslashes($package->package_name) }}')">
+                                                    <i class="fas fa-shopping-cart me-1"></i> Buy Now
+                                                </button>
+                                            @endif
                                         @else
-                                            <div class="availability-badge inactive">
+                                            <button class="buy-btn buy-btn-disabled" disabled>
                                                 <i class="fas fa-times-circle me-1"></i> Not Available
-                                            </div>
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -134,6 +185,9 @@
         </div>
     </div>
 </div>
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
 /* ============================================ */
@@ -168,7 +222,7 @@
 }
 
 /* ============================================ */
-/* PACKAGE CARD - Professional Design           */
+/* PACKAGE CARD                                 */
 /* ============================================ */
 .package-card {
     background: #ffffff;
@@ -188,7 +242,7 @@
 }
 
 /* ============================================ */
-/* PACKAGE IMAGE - FULL COVER                   */
+/* PACKAGE IMAGE                                */
 /* ============================================ */
 .package-image {
     position: relative;
@@ -208,14 +262,13 @@
     transform: scale(1.08);
 }
 
-/* Status Badge */
 .badge-status {
     position: absolute;
     top: 12px;
     right: 12px;
     padding: 5px 14px;
     border-radius: 20px;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #ffffff;
     letter-spacing: 0.3px;
@@ -243,8 +296,7 @@
     color: #0d1b3e;
     font-weight: 700;
     font-size: 1.15rem;
-    margin-bottom: 4px;
-    letter-spacing: -0.3px;
+    margin-bottom: 6px;
 }
 
 .package-duration {
@@ -287,9 +339,6 @@
     font-weight: 400;
 }
 
-/* ============================================ */
-/* PACKAGE DESCRIPTION                          */
-/* ============================================ */
 .package-description {
     color: #64748b;
     font-size: 0.85rem;
@@ -298,7 +347,7 @@
 }
 
 /* ============================================ */
-/* PACKAGE FEATURES - All Features              */
+/* PACKAGE FEATURES                             */
 /* ============================================ */
 .package-features {
     margin-bottom: 12px;
@@ -328,7 +377,6 @@
     padding: 4px 0;
     color: #334155;
     font-size: 0.82rem;
-    transition: all 0.3s ease;
 }
 
 .features-list li i {
@@ -337,7 +385,6 @@
     width: 16px;
 }
 
-/* Hidden features */
 .features-list .hidden-feature {
     display: none;
     animation: fadeIn 0.3s ease;
@@ -347,7 +394,6 @@
     display: flex;
 }
 
-/* Show More Button */
 .btn-show-more {
     background: transparent;
     border: none;
@@ -364,7 +410,6 @@
 
 .btn-show-more:hover {
     color: #0d1b3e;
-    transform: scale(1.02);
 }
 
 .btn-show-more i {
@@ -372,38 +417,48 @@
 }
 
 /* ============================================ */
-/* AVAILABILITY BADGE - Below Description       */
+/* BUY BUTTON                                   */
 /* ============================================ */
-.availability-badge {
-    display: inline-flex;
+.buy-btn {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 16px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
     font-weight: 600;
-    background: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
+    color: #ffffff;
+    background: linear-gradient(135deg, #0d1b3e 0%, #1a2a6c 100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: auto;
 }
 
-.availability-badge i {
-    color: #10b981;
-    font-size: 0.85rem;
+.buy-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(13, 27, 62, 0.3);
 }
 
-.availability-badge.inactive {
-    background: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
+.buy-btn:active:not(:disabled) {
+    transform: translateY(0);
 }
 
-.availability-badge.inactive i {
-    color: #ef4444;
+.buy-btn-disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.buy-btn-disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 /* ============================================ */
-/* ALERTS - Custom Colors                       */
+/* ALERTS                                       */
 /* ============================================ */
 .alert-custom-success {
     background: #ecfdf5;
@@ -448,6 +503,20 @@
 }
 
 /* ============================================ */
+/* ANIMATIONS                                   */
+/* ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================ */
 /* PAGINATION                                   */
 /* ============================================ */
 .pagination-wrapper {
@@ -484,61 +553,15 @@
 }
 
 /* ============================================ */
-/* ANIMATIONS                                   */
-/* ============================================ */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.package-card {
-    animation: fadeInUp 0.5s ease forwards;
-}
-
-.package-card:nth-child(1) { animation-delay: 0.05s; }
-.package-card:nth-child(2) { animation-delay: 0.1s; }
-.package-card:nth-child(3) { animation-delay: 0.15s; }
-.package-card:nth-child(4) { animation-delay: 0.2s; }
-.package-card:nth-child(5) { animation-delay: 0.25s; }
-.package-card:nth-child(6) { animation-delay: 0.3s; }
-
-/* ============================================ */
 /* RESPONSIVE                                   */
 /* ============================================ */
-@media (max-width: 1200px) {
-    .package-image {
-        height: 180px;
-    }
-    
-    .new-price {
-        font-size: 1.3rem;
-    }
-}
-
 @media (max-width: 992px) {
     .package-image {
         height: 170px;
     }
     
     .new-price {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
 }
 
@@ -588,6 +611,11 @@
     .features-list li {
         font-size: 0.78rem;
     }
+    
+    .buy-btn {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -607,11 +635,6 @@
         font-size: 0.8rem;
     }
     
-    .availability-badge {
-        font-size: 0.7rem;
-        padding: 4px 12px;
-    }
-    
     .price-duration {
         font-size: 0.7rem;
     }
@@ -623,34 +646,142 @@
     .btn-show-more {
         font-size: 0.7rem;
     }
+    
+    .buy-btn {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
 }
 </style>
 
 <script>
 // ============================================ //
-// TOGGLE FEATURES - Show/Hide All Features    //
+// TOGGLE FEATURES - Show/Hide                  //
 // ============================================ //
 function toggleFeatures(packageId) {
     const hiddenFeatures = document.querySelectorAll(`#features-${packageId} .hidden-feature`);
     const toggleBtn = document.getElementById(`toggle-btn-${packageId}`);
     
-    // Check if features are currently hidden
     const isHidden = hiddenFeatures[0]?.classList.contains('show') === false;
     
     if (isHidden) {
-        // Show all features
         hiddenFeatures.forEach(feature => {
             feature.classList.add('show');
         });
         toggleBtn.innerHTML = '<i class="fas fa-minus-circle me-1"></i> Show less';
     } else {
-        // Hide extra features
         hiddenFeatures.forEach(feature => {
             feature.classList.remove('show');
         });
         const count = hiddenFeatures.length;
         toggleBtn.innerHTML = `<i class="fas fa-plus-circle me-1"></i> Show +${count} more`;
     }
+}
+
+// ============================================ //
+// INITIATE PAYMENT                             //
+// ============================================ //
+function initiatePayment(planType, planId, amount, planName) {
+    // Check if member has active plan
+    @php
+        $member = App\Models\Member::where('email', session('gym_user_email'))->first();
+        $hasActivePlan = ($member && $member->status == 'Active' && !$member->isExpired());
+    @endphp
+    
+    @if($hasActivePlan)
+        alert('You already have an active plan. Please wait until it expires to purchase a new plan.');
+        return;
+    @endif
+
+    // Show loading state
+    const btn = event.target.closest('.buy-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+    btn.disabled = true;
+
+    // Create order
+    fetch('{{ route('member.buy.plan') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            plan_type: planType,
+            plan_id: planId,
+            amount: amount
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.message || 'Failed to initiate payment. Please try again.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        // Open Razorpay Checkout
+        const options = {
+            key: data.key_id,
+            amount: data.amount * 100,
+            currency: 'INR',
+            name: 'Gym Management',
+            description: 'Purchase ' + data.plan_name + ' Plan',
+            order_id: data.order_id,
+            prefill: {
+                name: data.member_name,
+                email: data.member_email,
+                contact: data.member_phone
+            },
+            theme: {
+                color: '#0d1b3e'
+            },
+            handler: function(response) {
+                // Payment successful
+                fetch('{{ route('member.payment.success') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '{{ route('member.plans') }}';
+                    } else {
+                        alert('Payment successful but failed to update plan. Please contact support.');
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    alert('Something went wrong. Please contact support.');
+                    window.location.reload();
+                });
+            },
+            modal: {
+                ondismiss: function() {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }
+        };
+
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to initiate payment. Please try again.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
 }
 </script>
 @endsection

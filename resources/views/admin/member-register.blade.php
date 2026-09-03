@@ -598,7 +598,7 @@
                             <option value="">-- Select Plan Type --</option>
                             <option value="membership">Membership</option>
                             <option value="package">Package</option>
-                            <option value="monthly">Monthly Plan</option>
+                         <!--   <option value="monthly">Monthly Plan</option> -->
                         </select>
                     </div>
 

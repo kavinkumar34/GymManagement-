@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col-12">
             <div class="membership-card-main">
-                <!-- Card Header - Matching Navbar Theme -->
+                <!-- Card Header -->
                 <div class="membership-card-header">
                     <h4 class="mb-0">
                         <i class="fas fa-id-card me-2"></i> Membership Plans
@@ -34,11 +34,48 @@
                         </div>
                     @endif
 
+                    <!-- Active Plan Warning -->
+                    @php
+                        $member = App\Models\Member::where('email', session('gym_user_email'))->first();
+                        $hasActivePlan = ($member && $member->status == 'Active' && !$member->isExpired());
+                    @endphp
+
+                    @if($hasActivePlan)
+                        <div class="alert alert-info" style="background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i class="fas fa-info-circle" style="font-size: 20px; color: #3b82f6;"></i>
+                                <div>
+                                    <strong style="color: #1d4ed8;">You have an active plan!</strong><br>
+                                    <span style="color: #1d4ed8; font-size: 0.85rem;">
+                                        Your current plan <strong>{{ $member->membership_plan }}</strong> is active until 
+                                        <strong>{{ \Carbon\Carbon::parse($member->expiry_date)->format('d M Y') }}</strong>.
+                                        @php
+                                            $daysLeft = floor(now()->diffInDays($member->expiry_date));
+                                        @endphp
+                                        <strong>{{ $daysLeft }} days left.</strong>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($member && $member->status == 'Inactive')
+                        <div class="alert alert-warning" style="background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 10px; padding: 12px 18px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 20px; color: #f59e0b;"></i>
+                                <div>
+                                    <strong style="color: #92400e;">Your plan has expired!</strong><br>
+                                    <span style="color: #92400e; font-size: 0.85rem;">
+                                        Please purchase a new plan to continue your membership.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="row g-4">
                         @forelse($memberships as $membership)
                             <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                                 <div class="plan-card">
-                                    <!-- Image Section - Full Cover -->
+                                    <!-- Image Section -->
                                     <div class="plan-image">
                                         @if($membership->image)
                                             <img src="{{ asset('storage/'.$membership->image) }}" 
@@ -50,7 +87,9 @@
                                                  style="object-fit: cover;">
                                         @endif
                                         
-                                     
+                                        <span class="badge-status {{ $membership->status == 'Active' ? 'active' : 'inactive' }}">
+                                            {{ $membership->status == 'Active' ? 'Available' : 'Not Available' }}
+                                        </span>
                                     </div>
 
                                     <!-- Content Section -->
@@ -62,11 +101,10 @@
                                             {{ $membership->duration }} {{ ucfirst($membership->duration_type) }}
                                         </p>
 
-                                        <!-- Price Section with Discount Badge Inside -->
+                                        <!-- Price Section -->
                                         <div class="plan-price">
                                             @if($membership->discount > 0)
                                                 <span class="old-price">₹ {{ number_format($membership->price, 2) }}</span>
-                                                <!-- Discount Badge Inside Price -->
                                                 <span class="discount-badge-inline">
                                                     <i class="fas fa-tag me-1"></i>
                                                     {{ $membership->discount_type == 'Flat' ? '₹' : '' }}
@@ -84,15 +122,21 @@
                                             <p class="plan-description">{{ Str::limit($membership->description, 80) }}</p>
                                         @endif
 
-                                        <!-- Available Badge Below Description -->
+                                        <!-- Buy Button -->
                                         @if($membership->status == 'Active')
-                                            <div class="availability-badge">
-                                                <i class="fas fa-check-circle me-1"></i> Available
-                                            </div>
+                                            @if($hasActivePlan)
+                                                <button class="buy-btn buy-btn-disabled" disabled>
+                                                    <i class="fas fa-clock me-1"></i> Active Plan
+                                                </button>
+                                            @else
+                                                <button class="buy-btn" onclick="initiatePayment('membership', {{ $membership->id }}, {{ $membership->final_price }}, '{{ addslashes($membership->plan_name) }}')">
+                                                    <i class="fas fa-shopping-cart me-1"></i> Buy Now
+                                                </button>
+                                            @endif
                                         @else
-                                            <div class="availability-badge inactive">
+                                            <button class="buy-btn buy-btn-disabled" disabled>
                                                 <i class="fas fa-times-circle me-1"></i> Not Available
-                                            </div>
+                                            </button>
                                         @endif
                                     </div>
                                 </div>
@@ -120,6 +164,9 @@
         </div>
     </div>
 </div>
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
 /* ============================================ */
@@ -174,7 +221,7 @@
 }
 
 /* ============================================ */
-/* PLAN IMAGE - FULL COVER                      */
+/* PLAN IMAGE                                   */
 /* ============================================ */
 .plan-image {
     position: relative;
@@ -194,7 +241,6 @@
     transform: scale(1.08);
 }
 
-/* Status Badge - Only on Image */
 .badge-status {
     position: absolute;
     top: 12px;
@@ -243,7 +289,7 @@
 }
 
 /* ============================================ */
-/* PLAN PRICE WITH DISCOUNT BADGE INSIDE        */
+/* PLAN PRICE                                   */
 /* ============================================ */
 .plan-price {
     padding: 12px 14px;
@@ -260,7 +306,6 @@
     margin-right: 8px;
 }
 
-/* Discount Badge - Inside Price Section */
 .discount-badge-inline {
     display: inline-block;
     padding: 2px 12px;
@@ -302,38 +347,48 @@
 }
 
 /* ============================================ */
-/* AVAILABILITY BADGE - Below Description       */
+/* BUY BUTTON                                   */
 /* ============================================ */
-.availability-badge {
-    display: inline-flex;
+.buy-btn {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
     font-weight: 600;
-    background: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
+    color: #ffffff;
+    background: linear-gradient(135deg, #0d1b3e 0%, #1a2a6c 100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: auto;
 }
 
-.availability-badge i {
-    color: #10b981;
-    font-size: 0.85rem;
+.buy-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(13, 27, 62, 0.3);
 }
 
-.availability-badge.inactive {
-    background: #fef2f2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
+.buy-btn:active:not(:disabled) {
+    transform: translateY(0);
 }
 
-.availability-badge.inactive i {
-    color: #ef4444;
+.buy-btn-disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.buy-btn-disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 /* ============================================ */
-/* ALERTS - Custom Colors                       */
+/* ALERTS                                       */
 /* ============================================ */
 .alert-custom-success {
     background: #ecfdf5;
@@ -473,6 +528,11 @@
         padding: 4px 10px;
         font-size: 0.8rem;
     }
+    
+    .buy-btn {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -496,14 +556,123 @@
         font-size: 0.8rem;
     }
     
-    .availability-badge {
-        font-size: 0.7rem;
-        padding: 4px 12px;
-    }
-    
     .price-duration {
         font-size: 0.7rem;
     }
+    
+    .buy-btn {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
 }
 </style>
+
+<script>
+// ============================================ //
+// INITIATE PAYMENT                             //
+// ============================================ //
+function initiatePayment(planType, planId, amount, planName) {
+    // Check if member has active plan
+    @php
+        $member = App\Models\Member::where('email', session('gym_user_email'))->first();
+        $hasActivePlan = ($member && $member->status == 'Active' && !$member->isExpired());
+    @endphp
+    
+    @if($hasActivePlan)
+        alert('You already have an active plan. Please wait until it expires to purchase a new plan.');
+        return;
+    @endif
+
+    // Show loading state
+    const btn = event.target.closest('.buy-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Processing...';
+    btn.disabled = true;
+
+    // Create order
+    fetch('{{ route('member.buy.plan') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            plan_type: planType,
+            plan_id: planId,
+            amount: amount
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.message || 'Failed to initiate payment. Please try again.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        // Open Razorpay Checkout
+        const options = {
+            key: data.key_id,
+            amount: data.amount * 100,
+            currency: 'INR',
+            name: 'Gym Management',
+            description: 'Purchase ' + data.plan_name + ' Plan',
+            order_id: data.order_id,
+            prefill: {
+                name: data.member_name,
+                email: data.member_email,
+                contact: data.member_phone
+            },
+            theme: {
+                color: '#0d1b3e'
+            },
+            handler: function(response) {
+                // Payment successful
+                fetch('{{ route('member.payment.success') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '{{ route('member.plans') }}';
+                    } else {
+                        alert('Payment successful but failed to update plan. Please contact support.');
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    alert('Something went wrong. Please contact support.');
+                    window.location.reload();
+                });
+            },
+            modal: {
+                ondismiss: function() {
+                    // User closed the payment modal
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }
+        };
+
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to initiate payment. Please try again.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+</script>
 @endsection

@@ -386,19 +386,26 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label fw-bold"><i class="fas fa-phone"></i> Phone Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                <input type="tel" name="password" id="password"
-                                    class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="Enter your registered phone number" required>
-                            </div>
-                            @error('password')
-                                <span class="invalid-feedback">{{ $message }}</span>
-                            @enderror
-                            <small class="text-muted">Enter the phone number you registered with.</small>
-                        </div>
+                      <div class="mb-3">
+    <label for="password" class="form-label fw-bold"><i class="fas fa-phone"></i> Phone Number</label>
+    <div class="input-group">
+        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+        <input type="tel" name="password" id="password"
+            class="form-control @error('password') is-invalid @enderror"
+            placeholder="Enter 10-digit phone number" 
+            pattern="[0-9]{10}"
+            maxlength="10"
+            minlength="10"
+            inputmode="numeric"
+            onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
+            required>
+    </div>
+    @error('password')
+        <span class="invalid-feedback">{{ $message }}</span>
+    @enderror
+    <small class="text-muted">Enter your 10-digit registered phone number.</small>
+</div>
 
                         <div class="mb-4">
                             <label for="role" class="form-label fw-bold"><i class="fas fa-user-tag"></i> Login As</label>

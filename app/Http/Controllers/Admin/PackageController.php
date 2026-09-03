@@ -83,11 +83,9 @@ class PackageController extends Controller
         $image = $package->image;
 
         if ($request->hasFile('image')) {
-
             if ($package->image && Storage::disk('public')->exists($package->image)) {
                 Storage::disk('public')->delete($package->image);
             }
-
             $image = $request->file('image')->store('packages', 'public');
         }
 
